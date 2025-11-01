@@ -3309,7 +3309,7 @@ namespace P2PLibray.Inventory
                 Additem.Add("@ItemName", n.ItemName ?? "");
                 Additem.Add("@ItemCategoryId", n.ItemCategoryId.ToString());
                 Additem.Add("@ItemStatusId", n.ItemStatusId.ToString());
-                Additem.Add("@Date", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")); // formatted datetime
+                Additem.Add("@Date", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")); 
                 Additem.Add("@UOMId", n.UOMId.ToString());
                 Additem.Add("@Description", n.Description ?? "");
                 Additem.Add("@UnitRates", n.UnitRates.ToString());
@@ -3320,7 +3320,6 @@ namespace P2PLibray.Inventory
                 Additem.Add("@ExpiryDays", n.ExpiryDays.ToString());
                 Additem.Add("@IsQuality", n.ISQualityBit.ToString());
 
-                // Call stored procedure that returns dataset with Result
                 var ds = await obj.ExecuteStoredProcedureReturnDS("InventoryProcedure", Additem);
 
                 if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)

@@ -209,6 +209,9 @@
                 min-width: 120px;
             }
 
+        .hidden-force {
+            display: none !important;
+        }
 
     </style>
 </head>
@@ -303,12 +306,12 @@
                     <label for="BillingAddress" class="form-label">
                         Billing Address <span class="text-danger">*</span>
                     </label>
-                    <textarea class="form-control"
+                    <textarea class="form-control form-control-sm bg-light"
                               id="BillingAddress"
                               name="BillingAddress"
                               placeholder="Enter billing address"
                               minlength="10"
-                              required></textarea>
+                              required readonly></textarea>
                     <div class="invalid-feedback">
                         Billing address must be at least 10 characters long.
                     </div>
@@ -349,7 +352,7 @@
                             <th>Discount</th>
                             <th>GST</th>
                             <th>Amount</th>
-                            <th>Action</th>
+                            <th class="hideaction">Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -497,7 +500,28 @@
         // ====================================================
         $(document).ready(function () {
             const mode = getCookie("POMode");
+
+            const $restoreBtn = $("#btnRestoreItem");
+            if ($restoreBtn.length === 0) {
+                console.warn("Button not found!");
+                return;
+            }
+
             if (mode === "JIT") {
+                $("#btnRestoreItem").addClass("hidden-force");
+                ////$("#hideaction").addClass("hidden-force");
+                //table.column(10).visible(false);
+                //console.log("✅ Hidden btnRestoreItem for JIT mode");
+                //console.log("Columns count:", table.columns().count());
+
+            } else {
+                $restoreBtn.show();
+                console.log("ℹ️ Shown btnRestoreItem for normal mode");
+            }
+            if (mode === "JIT") {
+                
+                // $("#btnRestoreItem").hide(); // hide
+                $("#btnRestoreItem").css("display", "none !important");
                 // CallJITPOMethod();
                 console.log("Call JIT PO");
                 const itemCodes = JSON.parse(localStorage.getItem("SelectedJITItems") || "[]");
@@ -534,6 +558,7 @@
                         $("#CompanyName").val(header.CompanyName);
                         $("#CompanyAddress").val(header.CompanyAddress);
                         $("#VendorContactNumber").val(header.MobileNo);
+                        $("#BillingAddress").val(header.BillingAddress);
                         $("#VendorEmail").val(header.Email);
                         $("#VendorAccountNumber").val(header.AccountNumber);
                         $("#IFSCcode").val(header.IFSCCode);
@@ -609,7 +634,7 @@
                                 },
                                 { data: "GST",className: "text-center"},
                                 { data: "Amount",className: "text-center", render: data => '₹' + parseFloat(data).toFixed(2) },
-                                { data: null, orderable: false, searchable: false, render: () => '<a href="#" class="remove-link">Remove</a>' }
+                                { data: null, orderable: false, searchable: false, render: () => '<a href="#" class="remove-link">Remove</a>' },
                             ],
                             paging: true,
                             searching: false,
@@ -629,6 +654,10 @@
 
                             }
                         });
+                         if (mode === "JIT") {
+                             table.column(-1).visible(false).draw(false);
+                             console.log("✅ Hidden last column for JIT mode");
+                         }
                         // Recalculate totals
                         updateTableCalculations();
                         // Remove link handler
@@ -647,8 +676,10 @@
                         console.error(err);
                         alert("Failed to create JIT PO.");
                     }
-                });
+                 });
+               
             } else {
+                //$("#btnRestoreItem").toggle();
                 $.ajax({
                 url: '/Purchase/GetCreatePoDetailsOK',
                 type: 'GET',
@@ -686,9 +717,12 @@
                     $("#SwiftCode").val(header.SwiftCode);
                     $("#DeliveryAddress").val(header.DeliveryAddress);
                     $("#TotalAmount").val(header.TotalAmount);
+                    $("#BillingAddress").val(header.BillingAddress);
                     $("#transportationCharges").text('₹' +header.ShippingCharges);
                     $("#grandTotal").text('₹' +header.TotalAmount);
                     $("#subTotal").text('₹' + (header.SubAmount).toFixed(2));
+
+
 
                     // ------------------------------
                     // 👨‍💼 Accountant Dropdown
@@ -909,6 +943,15 @@
 
         function CretePO(e) {
             e.preventDefault();
+
+            // ✅ Get total rows in DataTable
+            let rowCount = table.rows({ search: 'applied' }).count();
+
+            // ✅ Check if rows are 0
+            if (rowCount === 0) {
+                toastr.error("No items available to create a Purchase Order!", "Error");
+                return; // Stop further execution
+            }
 
             // Remove old hidden fields
             $(".po-form input[name='ItemsJson']").remove();

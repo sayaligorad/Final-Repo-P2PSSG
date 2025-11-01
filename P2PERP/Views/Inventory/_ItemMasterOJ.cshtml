@@ -759,7 +759,7 @@
 
 
 
-                            {
+                           {
                                 extend: 'excelHtml5',
                                 text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
                                 title: 'Item Master List',
@@ -777,39 +777,41 @@
                                     rows: function (idx, data, node) {
                                         return $(node).find('.row-checkbox').prop('checked');
                                     },
-
                                     columns: ':visible:not(:first-child):not(:last-child):not(:nth-last-child(2))',
-
-                                    // 🩵 Fix #1: remove HTML  |  Fix #2: renumber serials
                                     format: {
                                         body: function (data, row, column, node) {
-                                            // --- remove any HTML tags safely ---
-                                            var text = $('<div>').html(data).text();
-
-                                            // --- detect and generate serial number column (if this is Sr.No column) ---
-                                            // Adjust column index to match your Sr.No column (0-based after exclusions)
-                                            if (column === 0) {
-                                                // We'll fill this later in customize()
-                                                return text || ''; // keep cell but overwrite later
-                                            }
-
-                                            return text;
+                                            return $('<div>').html(data).text(); // remove HTML
                                         }
                                     }
                                 },
 
                                 customize: function (xlsx) {
                                     const sheet = xlsx.xl.worksheets['sheet1.xml'];
+                                    const $sheet = $(sheet);
 
-                                    // center the Generated Date row
-                                    $('row c[r^="A2"]', sheet).attr('s', '51');
+                                    // ✅ Apply black borders to all cells
+                                    $('row c', $sheet).attr('s', '2'); // Style index 2 usually has border in default Excel XML
 
-                                    // 🩵 Fix #2 continued: renumber serials 1→N after export
+                                    // ✅ Center-align title and date rows
+                                    const stylesXml = xlsx.xl['styles.xml'];
+                                    const $styles = $(stylesXml);
+                                    const $cellXfs = $styles.find('cellXfs');
+
+                                    // Create new centered style
+                                    const xfXml =
+                                        '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1">' +
+                                        '<alignment horizontal="center" vertical="center"/></xf>';
+                                    $cellXfs.append(xfXml);
+                                    const centerStyleIndex = $cellXfs.children().length - 1;
+
+                                    // Center align Generated Date row (A2)
+                                    $('row c[r^="A2"]', $sheet).attr('s', centerStyleIndex);
+
+                                    // ✅ Renumber Sr.No. column
                                     let rowIndex = 0;
-                                    $('sheetData row', sheet).each(function () {
+                                    $('sheetData row', $sheet).each(function () {
                                         const r = parseInt($(this).attr('r'), 10);
-
-                                        // skip title + date + header rows (usually 1,2,3)
+                                        // skip first 3 rows (title, date, headers)
                                         if (r > 3) {
                                             const firstCell = $(this).find('c').first();
                                             if (firstCell.length) {
@@ -820,75 +822,21 @@
                                         }
                                     });
 
-                                    // 🔹 Clear and rebuild sheet data
-                                    $sheetData.empty();
-
-                                    // 🔹 Add Title row
-                                    var titleRow = '<row r="1"><c t="inlineStr" r="A1"><is><t>Inventory List</t></is></c></row>';
-                                    $sheetData.append(titleRow);
-
-                                    // 🔹 Add Date row  
-                                    var dateRow = '<row r="2"><c t="inlineStr" r="A2"><is><t>Generated Date: ' + formattedDate + '</t></is></c></row>';
-                                    $sheetData.append(dateRow);
-
-                                    // 🔹 Add existing rows with new numbers
-                                    var serial = 1;
-                                    existingRows.forEach(function (item, index) {
-                                        var $row = item.$row;
-                                        var newRowNum = index + 3; // Start from row 3
-
-                                        $row.attr('r', newRowNum);
-                                        $row.find('c').each(function () {
-                                            var $c = $(this);
-                                            var col = $c.attr('r').replace(/[0-9]/g, '');
-                                            $c.attr('r', col + newRowNum);
-
-                                            // Update serial number for data rows
-                                            if (newRowNum >= 4 && col === 'A') {
-                                                $c.attr('t', 'n');
-                                                var $v = $c.find('v');
-                                                if ($v.length) {
-                                                    $v.text(serial);
-                                                } else {
-                                                    $c.append('<v>' + serial + '</v>');
-                                                }
-                                            }
-                                        });
-
-                                        $sheetData.append($row);
-
-                                        // Increment serial for data rows only
-                                        if (newRowNum >= 4) {
-                                            serial++;
-                                        }
-                                    });
-
-                                    // 🔹 Merge cells for title and date
-                                    var $mergeCells = $sheet.find('mergeCells');
+                                    // ✅ Merge title + date cells across columns
+                                    const $mergeCells = $sheet.find('mergeCells');
                                     if ($mergeCells.length === 0) {
-                                        $sheetData.after('<mergeCells count="2"><mergeCell ref="A1:H1"/><mergeCell ref="A2:H2"/></mergeCells>');
+                                        $sheet.append('<mergeCells count="2"><mergeCell ref="A1:H1"/><mergeCell ref="A2:H2"/></mergeCells>');
                                     } else {
-                                        var count = parseInt($mergeCells.attr('count') || '0', 10);
+                                        const count = parseInt($mergeCells.attr('count') || '0', 10);
                                         $mergeCells.attr('count', count + 2);
                                         $mergeCells.append('<mergeCell ref="A1:H1"/><mergeCell ref="A2:H2"/>');
                                     }
 
-                                    // 🔹 Center-align title and date
-                                    var stylesXml = xlsx.xl['styles.xml'];
-                                    var $styles = $(stylesXml);
-                                    var $cellXfs = $styles.find('cellXfs');
-                                    var xfXml = '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1">' +
-                                        '<alignment horizontal="center" vertical="center"/>' +
-                                        '</xf>';
-                                    $cellXfs.append(xfXml);
-                                    var centerStyleIndex = $cellXfs.children().length - 1;
-
-                                    // Apply center style
+                                    // Apply center style to title (A1) and date (A2)
                                     $sheet.find('c[r="A1"]').attr('s', centerStyleIndex);
                                     $sheet.find('c[r="A2"]').attr('s', centerStyleIndex);
                                 }
                             },
-
 
 
 
@@ -1647,95 +1595,84 @@
 
 
      
+$('#itemForm').on('submit', function (e) {
+    e.preventDefault();
 
+    if (!validateItemForm()) return;
 
-        // saving item form
-        $('#itemForm').on('submit', function (e) {
-            e.preventDefault();
+    var item = $(this).serialize();
+    console.log("Serialized item:", item);
 
+    $.ajax({
+        url: '/Inventory/AddItemOJ',
+        type: 'POST',
+        data: item,
+        dataType: 'json',
+        success: function (data) {
+            console.log("✅ AJAX Success Response:", data);
 
-
-
-
-            if (!validateItemForm()) {
-                return; // stop here if invalid
+            if (!data || typeof data.status === 'undefined') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: '⚠️ Unexpected Response',
+                    text: 'Server did not return a valid status.',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                return;
             }
 
-           
-
-            var item = $(this).serialize();
-            console.log(item);
-
-            $.ajax({
-                url: '/Inventory/AddItemOJ',
-                type: 'POST',
-                data: item,
-                success: function (data) {
-                    // Hide any previous error
-                    $('#itemError').hide();
-                    $('#itemName').removeClass('is-invalid');
-
-                    if (data.status === 0) {
-                        // ❌ Item already exists
-                        $('#itemError').text('Item already exists!').show();
-                        $('#itemName').addClass('is-invalid').focus();
-                        Swal.fire({
-                            icon: 'error',
-                            text: 'Item already exists!',
-                            timer: 2000,
-                            showConfirmButton: false,
-                            timerProgressBar: true
-                        });
-                    }
-                    else if (data.status === 1) {
-                        // ✅ Success
-                        $('#itemForm')[0].reset();
-
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success ✅',
-                            text: 'Item added successfully!',
-                            timer: 1500,
-                            showConfirmButton: false,
-                            timerProgressBar: true
-                        });
-                        $('#table').DataTable().ajax.reload(null, false);
-
-
-                        // ✅ Close the form/modal after success
-                        setTimeout(function () {
-                            $('#itemModal').modal('hide'); // <-- change #itemModal to your modal ID
-                        }, 1500);
-                    }
-
-                    else {
-                        // ⚠️ Unexpected
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Oops ⚠️',
-                            text: 'Unexpected error occurred!',
-                            timer: 2000,
-                            showConfirmButton: false,
-                            timerProgressBar: true
-                        });
-                    }
-                },
-                error: function () {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error ❌',
-                        text: 'Something went wrong while saving item.',
-                        timer: 2000,
-                        showConfirmButton: false,
-                        timerProgressBar: true
-                    });
+            if (data.status === 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Duplicate ❌',
+                    text: data.message || 'Item already exists!',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                $('#itemName').addClass('is-invalid').focus();
+            }
+                else if (data.status === 1) {
+                // Hide modal first, then show success message
+                $('#itemModal').modal('hide');
+    
+                setTimeout(() => {
+                Swal.fire({
+                icon: 'success',
+                title: ' Item Added Success',
+                text: data.message || 'Item added successfully!',
+                timer: 2000,
+                showConfirmButton: false
+                }).then(() => {
+                $('#itemForm')[0].reset();
+                $('#table').DataTable().ajax.reload(null, false);
+                });
+                }, 300);
                 }
+            else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Oops ⚠️',
+                    text: 'Unexpected status value!',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("❌ AJAX Error:", error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error ❌',
+                text: 'Something went wrong while saving item.',
+                timer: 2000,
+                showConfirmButton: false
             });
+        }
+    });
+});
 
 
-
-
-        });
         // checking quality of item form
         $("#qualityCheck").on("change", function () {
             if ($(this).val() === "1") {  // Yes selected

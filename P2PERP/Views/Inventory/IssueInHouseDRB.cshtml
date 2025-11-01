@@ -65,15 +65,15 @@
                 <!-- First Row - Three Columns -->
                 <div class="row g-3 mb-4">
                     <div class="col-md-4">
-                        <label class="form-label fw-bold text-primary">Issue Code</label>
+                        <label class="form-label fw-bold text-dark">Issue Code</label>
                         <input type="text" id="IssueCode" class="form-control form-control-lg bg-light text-dark shadow-sm" readonly />
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label fw-bold text-primary">Issue Date</label>
+                        <label class="form-label fw-bold text-dark">Issue Date</label>
                         <input type="date" id="IssueDate" class="form-control form-control-lg bg-light text-dark shadow-sm" value="@DateTime.Now.ToString("yyyy-MM-dd")" readonly />
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label fw-bold text-primary">Department<span class="text-danger">*</span></label>
+                        <label class="form-label fw-bold text-dark">Department<span class="text-danger">*</span></label>
                         <select class="form-select form-select-lg dept-select shadow-sm" id="Department">
                             <option value="">Select Department</option>
                         </select>
@@ -85,7 +85,7 @@
                 <!-- Second Row - Three Columns -->
                 <div class="row g-3 mb-4">
                     <div class="col-md-4">
-                        <label class="form-label fw-bold text-primary">Employee Name<span class="text-danger">*</span></label>
+                        <label class="form-label fw-bold text-dark">Employee Name<span class="text-danger">*</span></label>
                         <select class="form-select form-select-lg emp-select shadow-sm" id="Employee">
                             <option value="">Select Employee</option>
                         </select>
@@ -93,7 +93,7 @@
                     </div>
 
                     <div class="col-md-4">
-                        <label class="form-label fw-bold text-primary">Item Name<span class="text-danger">*</span></label>
+                        <label class="form-label fw-bold text-dark">Item Name<span class="text-danger">*</span></label>
                         <select class="form-select form-select-lg item-select shadow-sm" id="ItemName">
                             <option selected value="">Select Item</option>
                         </select>
@@ -102,7 +102,7 @@
                     </div>
 
                     <div class="col-md-4">
-                        <label class="form-label fw-bold text-primary">Bin Name<span class="text-danger">*</span></label>
+                        <label class="form-label fw-bold text-dark">Bin Name<span class="text-danger">*</span></label>
                         <select class="form-select form-select-lg item-bin shadow-sm" id="BinName">
                             <option selected value="">Select Bin</option>
                         </select>
@@ -114,15 +114,15 @@
                 <!-- Third Row - Three Columns -->
                 <div class="row g-3 mb-4">
                     <div class="col-md-4">
-                        <label class="form-label fw-bold text-primary">Item Code</label>
+                        <label class="form-label fw-bold text-dark">Item Code</label>
                         <input type="text" id="ItemCode" class="form-control form-control-lg bg-light text-dark shadow-sm" readonly />
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label fw-bold text-primary">Category</label>
+                        <label class="form-label fw-bold text-dark">Category</label>
                         <input type="text" id="ItemCategory" class="form-control form-control-lg bg-light text-dark shadow-sm" readonly />
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label fw-bold text-primary">UOM</label>
+                        <label class="form-label fw-bold text-dark">UOM</label>
                         <input type="text" id="UOM" class="form-control form-control-lg bg-light text-dark shadow-sm" readonly />
                     </div>
                 </div>
@@ -130,7 +130,7 @@
                 <!-- Fourth Row - Two Columns + Button -->
                 <div class="row g-3 mb-4">
                     <div class="col-md-4">
-                        <label class="form-label fw-bold text-primary">Quantity</label>
+                        <label class="form-label fw-bold text-dark">Quantity</label>
                         <input type="number"
                                id="Quantity"
                                class="form-control form-control-lg  text-dark shadow-sm"
@@ -140,7 +140,7 @@
                     </div>
 
                     <div class="col-md-4">
-                        <label class="form-label fw-bold text-primary">Unit Price</label>
+                        <label class="form-label fw-bold text-dark">Unit Price</label>
                         <input type="number" id="PricePerUnit" class="form-control form-control-lg bg-light text-dark shadow-sm" readonly />
                     </div>
                     <div class="col-md-4 d-flex align-items-end">
@@ -714,7 +714,10 @@
                                     title: "Items Issued Successfully!",
                                     showConfirmButton: false,
                                     timer: 2000
-                                });
+                                }).then(() => {
+
+                                    location.reload();
+                                })
 
                                 // Reset form & table
                                 $("#issuedItemsTable tbody").empty();

@@ -2092,6 +2092,14 @@ namespace P2PLibray.Purchase
 
         public async Task<bool> SavePOJITItemsOK(Purchase model, string POcode)
         {
+            //Dictionary<string, string> parameters = new Dictionary<string, string>();
+            //parameters.Add("@Flag", "GetNewRQItemCodeOK");
+            //SqlDataReader rd = await obj.ExecuteStoredProcedureReturnDataReader("PurchaseProcedure", parameters);
+            //string rqItemCode = null;
+            //if(rd.Read())
+            //{
+            //    rqItemCode = rd["NewRQItemCode"].ToString();
+            //}
             foreach (var item in model.POItems)
             {
                 // Parse JSON string
