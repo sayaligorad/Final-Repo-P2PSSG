@@ -9,7 +9,7 @@
             <label class="form-label fw-bold text-dark">Category Name <span class="text-danger">*</span></label>
             @Html.TextBoxFor(m => m.ItemCategoryName, new
             {
-                @class = "form-control text-dark shadow-sm",
+                @class = "form-control form-control-sm shadow-sm ",
                 placeholder = "Enter category name",
                 id = "txtCategoryName",
             })
@@ -21,7 +21,7 @@
             <label class="form-label fw-bold text-dark">Description <span class="text-danger">*</span></label>
             @Html.TextAreaFor(m => m.Description, new
             {
-                @class = "form-control text-dark shadow-sm",
+                @class = "form-control form-control-sm  shadow-sm",
                 placeholder = "Enter description",
                 rows = "3",
                 id = "txtDescription"
@@ -31,9 +31,9 @@
 
         <!-- HSN Code -->
         <div class="mb-3">
-            <label class="form-label fw-bold text-dark">HSN Code <span class="text-danger">*</span></label>
-            <select id="cmbbxtaxrate" name="TaxRateId" class="form-select shadow-sm">
-                <option value="0">--Select HSN Code--</option>
+            <label class="form-label">HSN Code <span class="text-danger">*</span></label>
+            <select id="cmbbxtaxrate" name="TaxRateId" class="form-control form-control-sm shadow-sm ">
+                <option value="0">--select HSNCode--</option>
             </select>
             <span id="taxRateError" class="text-danger small fw-semibold"></span>
         </div>
@@ -42,14 +42,14 @@
             @if (Model.ItemCategoryId > 0)
             {
                 <!-- Edit Mode -->
-                <button type="submit" class="btn btn-success btn-lg" id="btnUpdateCategory">
+                <button type="submit" class="btn btn-success btn-lg btn-sm" id="btnUpdateCategory">
                     <i class="bi bi-pencil-square me-1"></i> Update
                 </button>
             }
             else
             {
                 <!-- Add Mode -->
-                <button type="submit" class="btn btn-success btn-lg" id="btnSaveCategory">
+                <button type="submit" class="btn btn-success btn-lg btn-sm" id="btnSaveCategory">
                     <i class="bi bi-check-circle me-1"></i> Save
                 </button>
             }
