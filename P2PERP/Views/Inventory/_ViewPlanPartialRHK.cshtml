@@ -132,6 +132,7 @@ function loadPlanDetails() {
 }
 
     function initDataTable() {
+
         // Destroy existing DataTable if already initialized
         if ($.fn.DataTable.isDataTable('#reqTable1')) {
             $('#reqTable1').DataTable().clear().destroy();
@@ -285,6 +286,7 @@ function loadPlanDetails() {
                     text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
                     className: 'btn btn-sm btn-outline-success',
                     title: "Plan Details",
+                    messageTop: 'Generated Date: ' + moment().format('DD/MM/YYYY'),
                     action: function (e, dt, button, config) {
                         if ($('#reqTable1 tbody input.row-select:checked').length === 0) {
                             showExportToast();
@@ -307,6 +309,15 @@ function loadPlanDetails() {
                                     : data;
                             }
                         }
+                    },
+                    customize: function (xlsx) {
+                        const sheet = xlsx.xl.worksheets['sheet1.xml'];
+
+                        // 🔹 Center the Title ("Plan Details")
+                        $('row:first c', sheet).attr('s', '51');
+
+                        // 🔹 Center the "Generated Date"
+                        $('row:eq(1) c', sheet).attr('s', '51');
                     }
                 },
                 // 🔹 CSV

@@ -1,12 +1,14 @@
 ﻿@{
     Layout = null;
     string prCode = ViewBag.PRCode ?? "";
+
 }
 
 <div id="prContent" class="mt-2">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <span class="badge bg-secondary text-dark fs-6 px-3 py-2 shadow-sm">PR Code: @prCode</span>
+        <span class="badge bg-light text-black fs-6 px-3 py-2 shadow-sm">PR Code: @prCode</span>
     </div>
+    
 
     <!-- PR Items Table -->
     <div class="card shadow-sm border-0 rounded-3 mb-4">
@@ -35,16 +37,23 @@
     <!-- Note and Buttons -->
     <div class="card shadow-sm border-0 rounded-3">
         <div class="card-body">
-            <div class="mb-3">
-                <label class="form-label fw-bold text-danger">Note from Manager:</label>
-                <textarea id="managerNote" class="form-control" rows="3" placeholder="Enter note here..."></textarea>
-            </div>
-            <div class="d-flex justify-content-end gap-2 mt-3">
-                <button id="rejectBtn" class="btn btn-danger px-4">✖ Reject</button>
-                <button id="approveBtn" class="btn btn-success px-4">✔ Approve</button>
-            </div>
+            <form id="rejectForm" novalidate>
+                <div class="mb-3">
+                    <label for="managerNote" class="form-label fw-bold text-danger">Note from Manager:</label>
+                    <textarea id="managerNote" class="form-control" rows="3" placeholder="Enter note here..." required></textarea>
+                    <div class="invalid-feedback">
+                        Please enter a note before rejecting.
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-3">
+                    <button type="button" id="rejectBtn" class="btn btn-danger btn-sm ">✖ Reject</button>
+                    <button type="button" id="approveBtn" class="btn btn-success btn-sm ">✔ Approve</button>
+                </div>
+            </form>
         </div>
     </div>
+
 </div>
 
 <style>
@@ -53,12 +62,25 @@
         text-align: center !important;
         vertical-align: middle;
     }
+    button.dt-button.processing,
+    div.dt-button.processing {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        background: none !important;
+    }
+
+        button.dt-button.processing:after {
+            content: none !important;
+        }
+    thead th {
+        white-space: nowrap !important;
+    }
 </style>
 
 <script>
-function initPRModal(prCode) {
-    // Load items
-    $.getJSON("/Purchase/ShowPendingPRItemsPRK", { prCode: prCode }, function (data) {
+    function initPRModal(prCode, ExpectedDate) {
+        // Load items
+        $.getJSON("/Purchase/ShowPendingPRItemsPRK", { prCode: prCode }, function (data) {
         let tbody = $("#prItemBody").empty();
 
         if (!data || data.length === 0) {
@@ -141,13 +163,22 @@ function initPRModal(prCode) {
 
     // Reject
     $("#rejectBtn").off("click").on("click", function () {
-        const note = $("#managerNote").val().trim();
+        const noteField = $("#managerNote");
+
+        // Clear any previous validation states
+        noteField.removeClass("is-invalid is-valid");
+
+        const note = noteField.val().trim();
+
         if (!note) {
-            if (typeof showToast === "function") {
-                showToast("⚠ Please enter a note before rejecting", "warning");
-            }
+            // Show Bootstrap invalid feedback (red border + message)
+            noteField.addClass("is-invalid");
             return;
+        } else {
+            // Mark as valid
+            noteField.addClass("is-valid");
         }
+
 
         Swal.fire({
             title: 'Confirm Rejection',

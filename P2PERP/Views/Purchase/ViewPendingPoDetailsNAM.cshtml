@@ -128,11 +128,12 @@
                 </div>
                 <div class="modal-footer justify-content-center">
                     <button type="button" id="confirmReject" class="btn btn-danger">Reject</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 </div>
+
             </div>
         </div>
     </div>
+
 
 
     <script>
@@ -160,7 +161,22 @@
                 $("#po_date").val(h.AddedDateVK || '');
                 $("#companyName").val(h.InvoiceToCompanyName || '');
                 $("#deliveryAddress").val(h.DeliveryAddress || '');
-                $("#termsCondition").text(h.TermConditionName || '');
+
+                if (h.TermConditionName) {
+                    // Split terms by comma and clean up spaces
+                    const termsArray = h.TermConditionName.split(',').map(t => t.trim()).filter(t => t);
+
+                    // Create an unordered list with serial numbers
+                    let ulHtml = '<ul class="mb-0 ps-3">';
+                    termsArray.forEach((term, i) => {
+                        ulHtml += `<li><strong>${i + 1}.</strong> ${term}</li>`;
+                    });
+                    ulHtml += '</ul>';
+
+                    $("#termsCondition").html(ulHtml);
+                } else {
+                    $("#termsCondition").html('<em>No terms and conditions available</em>');
+                }
                 $("#vendorName").val(h.VendorName || '');
                 $("#vendorCompany").val(h.VendorCompanyName || '');
                 $("#vendorContact").val(h.VendorContact || '');
@@ -168,28 +184,39 @@
             });
 
             // Load Items
-            $.getJSON('/Purchase/GetPOItemsNAM', { poCode }, function (rows) {
+            $.getJSON('/Purchase/GetPOItemsNAM', { poCode: poCode }, function (rows) {
+
                 const $tb = $("#poItemsTable tbody").empty();
                 if (!rows || rows.length === 0) {
-                    $tb.append('<tr><td colspan="9" class="text-center text-muted">No items</td></tr>');
+                    $tb.append('<tr><td colspan="10" class="text-center text-muted">No items found</td></tr>');
                     return;
                 }
+
                 let subtotal = 0;
-                rows.forEach((r, idx) => {
+                rows.forEach(function (r, idx) {
+                    const shipping = Number(r.ShippingCharges || 0);
+
+                    $("#ftShipping").text("₹" + shipping.toFixed(2));
+
+                    console.log(shipping)
+                    console.log("rowdata", r)
                     const c = calcLine(r.Quantity, r.CostPerUnit, r.Discount, r.GSTPct);
                     subtotal += c.lineTotal;
                     $tb.append(`
-                                    <tr>
-                                        <td>${idx + 1}</td>
-                                        <td>${r.ItemName || ''}</td>
-                                        <td>${r.Description || ''}</td>
-                                        <td>${r.Quantity}</td>
-                                        <td>${r.UOMName}</td>
-                                        <td>₹${r.CostPerUnit.toFixed(2)}</td>
-                                        <td>${r.Discount.toFixed(2)}%</td>
-                                        <td>${r.GSTPct.toFixed(2)}%</td>
-                                        <td class="text-end">₹${c.lineTotal.toFixed(2)}</td>
-                                    </tr>`);
+                            <tr>
+                                <td class="text-center">${idx + 1}</td>
+
+                                <td>${r.ItemName || ''}</td>
+                                <td title="${r.Description || ''}">${r.Description || ''}</td>
+                                <td class="text-end">${Number(r.Quantity || 0)}</td>
+                                <td>${r.UOMName || ''}</td>
+                                <td class="text-end">₹${Number(r.CostPerUnit || 0).toFixed(2)}</td>
+                                <td class="text-end">${Number(r.Discount || 0).toFixed(2)}%</td>
+                                <td class="text-end">${Number(r.GSTPct || 0).toFixed(2)}%</td>
+                                <td class="text-end">₹${c.lineTotal.toFixed(2)}</td>
+
+                            </tr>
+                        `);
                 });
 
                 $("#ftSubtotal").text(`₹${subtotal.toFixed(2)}`);
@@ -204,44 +231,111 @@
                     $("#btnApprove").prop("disabled", false);
                     $("#btnSendApproval").prop("disabled", true);
                 }
+                if ($.fn.DataTable.isDataTable('#poItemsTable')) {
+                    $('#poItemsTable').DataTable().clear().destroy();
+                }
 
-                // Initialize DataTable
-                $("#poItemsTable").DataTable({
-                    paging: false,
-                    searching: true,
+                $('#poItemsTable').DataTable({
+                    paging: true,
+                    pageLength: 10,
                     ordering: false,
-                    info: false,
+                    searching: false,
                     responsive: true,
-                    columnDefs: [{ className: "text-center", targets: "_all" }]
+                    lengthChange: false,
+                    info: true
                 });
             });
 
-            // Approve PO on this page
+            // Approve PO on this page 
             $("#btnApprove").click(function () {
-                const poCode = $("#poCode").val(); // get current PO code
-
                 Swal.fire({
-                    title: 'Are you sure?',
+                    title: 'Approve Purchase Order?',
                     text: `Do you want to approve PO ${poCode}?`,
-                    icon: 'warning',
+                    icon: 'question',
                     showCancelButton: true,
-                    confirmButtonText: 'Yes, approve it!',
-                    cancelButtonText: 'Cancel'
+                    confirmButtonText: 'Yes, Approve',
+                    cancelButtonText: 'Cancel',
+                    customClass: {
+                        confirmButton: 'btn btn-success', // ✅ Green for Yes
+                        cancelButton: 'btn btn-danger'    // ✅ Red for Cancel
+                    },
+                    buttonsStyling: false
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        $.get('/Purchase/ApprovePONAM', { poCode }, function (res) {
+
+                        // ✅ Show loading popup before sending request
+                        Swal.fire({
+                            title: 'Sending POS...',
+                            text: 'Please wait while email is sending to vendor..',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        // ✅ Your existing AJAX call
+                        $.post('/Purchase/ApprovePONAM', { poCode }, function (res) {
+
+                            // ✅ Close loader after response
+                            Swal.close();
+
                             if (res.success) {
+                                // First success alert
                                 Swal.fire({
                                     icon: 'success',
-                                    title: `PO ${poCode} approved successfully`,
+                                    title: `PO ${poCode} Approved Successfully`,
                                     showConfirmButton: false,
                                     timer: 2000
                                 }).then(() => {
-                                    // Redirect or refresh
+                                    // Second info alert for email
+                                    Swal.fire({
+                                        icon: 'info',
+                                        title: 'Email sent to vendor!',
+                                        showConfirmButton: false,
+                                        timer: 2000
+                                    }).then(() => {
+                                        window.location.href = '/Purchase/PurchaseOrdersVNK';
+                                    });
+                                });
+                            } else {
+                                Swal.fire('Error', res.message || 'Failed to approve PO', 'error');
+                            }
+                        });
+                    }
+                });
+            });
+
+
+
+
+            // ✅ Reject PO
+            $("#btnReject").click(function () {
+                Swal.fire({
+                    title: 'Reject Purchase Order?',
+                    text: `Do you want to reject PO ${poCode}?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, Reject',
+                    cancelButtonText: 'Cancel',
+                    customClass: {
+                        confirmButton: 'btn btn-danger',
+                        cancelButton: 'btn btn-secondary'
+                    },
+                    buttonsStyling: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.post('/Purchase/RejectPONAM', { poCode }, function (res) {
+                            if (res.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: `PO ${poCode} Rejected Successfully`,
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                }).then(() => {
                                     window.location.href = '/Purchase/PurchaseOrdersVNK';
                                 });
                             } else {
-                                Swal.fire('Error!', res.message || 'Failed to approve PO.', 'error');
+                                Swal.fire('Error', res.message || 'Failed to reject PO', 'error');
                             }
                         });
                     }
@@ -252,7 +346,7 @@
             // Reject PO
             $("#btnReject").click(function () {
                 $("#rejectReason").val('');
-                $("#rejectPoCode").text($("#poCode").val()); // Set PO code inside modal form
+                $("#rejectPoCode").text($("#poCode").val());
                 $("#rejectModal").modal('show');
             });
 

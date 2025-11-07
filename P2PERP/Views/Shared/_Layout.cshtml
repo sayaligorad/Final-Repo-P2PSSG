@@ -1,38 +1,38 @@
-﻿<!DOCTYPE html>
+﻿<!doctype html>
+
 @{
     Layout = null;
     string currentAction = ViewContext.RouteData.Values["action"].ToString();
     string currentController = ViewContext.RouteData.Values["controller"].ToString();
     string role = Session["RoleId"] != null ? Session["RoleId"].ToString() : "";
+    if (Session["StaffCode"] == null)
+    {
+        Response.Redirect("~/Account/Logout");
+    }
 }
-<html>
+<html class=" layout-navbar-fixed layout-menu-fixed layout-compact "
+      data-skin="default" data-bs-theme="light"
+      data-assets-path="~/Content/assets/">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
-    <meta name="robots" content="noindex, nofollow" />
-
-    <title>@ViewBag.Title</title>
-
-    <meta name="description" content="" />
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="~/Content/images/favicon/favicon.ico" />
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="~/Content/font-family-inter.css" />
-    <link rel="stylesheet" href="~/Content/iconify-icons.css" />
+    <link rel="stylesheet" href="~/Content/assets/vendor/fonts/iconify-icons.css" />
 
     <!-- Core CSS -->
-    <link rel="stylesheet" href="~/Content/node-waves.css" />
-    <link rel="stylesheet" href="~/Content/core.css" />
-    <link rel="stylesheet" href="~/Content/demo.css" />
-    <link rel="stylesheet" href="~/Content/Site.css" />
-    <link rel="stylesheet" href="~/Content/Layout.css" />
+    <link rel="stylesheet" href="~/Content/assets/vendor/libs/node-waves/node-waves.css" />
+    <link rel="stylesheet" href="~/Content/assets/vendor/libs/pickr/pickr-themes.css" />
+    <link rel="stylesheet" href="~/Content/assets/vendor/css/core.css" />
+    <link rel="stylesheet" href="~/Content/assets/css/demo.css" />
 
     <!-- Vendors CSS -->
-    <link rel="stylesheet" href="~/Content/perfect-scrollbar.css" />
-    <link rel="stylesheet" href="~/Content/apex-charts.css" />
+    <link rel="stylesheet" href="~/Content/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+
+    <!-- Custome CSS -->
+    <link rel="stylesheet" href="~/Content/Site.css" />
+
+    <!-- Vendors CSS -->
     <link rel="stylesheet" href="~/Content/dataTables.dataTables.min.css" />
     <link rel="stylesheet" href="~/Content/buttons.dataTables.min.css" />
     <link rel="stylesheet" href="~/Content/bootstrap-icons-1.11.3/package/font/bootstrap-icons.min.css">
@@ -40,21 +40,11 @@
     <link rel="stylesheet" href="~/Content/jquery-ui.css" />
     <link rel="stylesheet" type="text/css" href="~/Content/daterangepicker.css" />
     <link rel="stylesheet" href="~/Content/toastr.min.css" />
+    <link href="~/Content/dataTables.bootstrap5.min.css" rel="stylesheet" />
 
     <!-- jQuery -->
     <script src="~/Scripts/jquery-3.7.1.min.js"></script>
     <script src="~/Scripts/jquery-ui.min.js"></script>
-
-    <!-- Bootstrap & Popper -->
-    <script src="~/Scripts/popper.js"></script>
-    <script src="~/Scripts/bootstrap.bundle.min.js"></script>
-
-    <!-- Plugins & Helpers -->
-    <script src="~/Scripts/helpers.js"></script>
-    <script src="~/Scripts/config.js"></script>
-    <script src="~/Scripts/node-waves.js"></script>
-    <script src="~/Scripts/perfect-scrollbar.js"></script>
-    <script src="~/Scripts/menu.js"></script>
 
     <!-- DataTables & Export -->
     <script src="~/Scripts/dataTables.min.js"></script>
@@ -64,6 +54,13 @@
     <script src="~/Scripts/vfs_fonts.js"></script>
     <script src="~/Scripts/buttons.html5.min.js"></script>
     <script src="~/Scripts/buttons.print.min.js"></script>
+    <script src="~/Scripts/dataTables.bootstrap5.min.js"></script>
+
+    <!-- FixedHeader Extension -->
+    @*<script src="https://cdn.datatables.net/fixedheader/4.0.1/js/dataTables.fixedHeader.min.js"></script>*@
+    @*<link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/4.0.1/css/fixedHeader.dataTables.min.css" />*@
+    @*<script src="~/Scripts/dataTables.fixedHeader.min.js"></script>
+        <link href="~/Content/fixedHeader.dataTables.min.css" rel="stylesheet" />*@
 
     <!-- Validation -->
     <script src="~/Scripts/jquery.validate.min.js"></script>
@@ -73,7 +70,6 @@
     <script src="~/Scripts/highcharts.js"></script>
     <script src="~/Scripts/exporting.js"></script>
     <script src="~/Scripts/accessibility.js"></script>
-    <script src="~/Scripts/apexcharts.js"></script>
 
     <!-- Date & Time -->
     <script src="~/Scripts/moment.min.js"></script>
@@ -87,827 +83,113 @@
     <script src="~/Scripts/fullcalendar@6.1.19_index.global.min.js"></script>
     <script src="~/Scripts/bootstrap5@6.1.19_index.global.min.js"></script>
 
-    <!-- Main JS -->
-    <script src="~/Scripts/main.js"></script>
+    <!-- Page CSS -->
+    <!-- Helpers -->
+    <script src="~/Content/assets/vendor/js/helpers.js"></script>
+    <script src="~/Content/assets/js/config.js"></script>
 
-    <!-- Page-specific JS -->
-    <script src="~/Scripts/dashboards-analytics.js"></script>
+    <!-- Email Sending JS -->
+    <script src="~/Scripts/SendEmail.js"></script>
+
+
 
     <style>
-                /* Enhanced Gradient Background */
-                .bg-gradient-primary {
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%) !important;
-                    background-size: 200% 200% !important;
-                    animation: gradientShift 15s ease infinite;
-                }
 
-                @@keyframes gradientShift {
-                    0% {
-                        background-position: 0% 50%;
-                    }
 
-                    50% {
-                        background-position: 100% 50%;
-                    }
 
-                    100% {
-                        background-position: 0% 50%;
-                    }
-                }
-
-                /* Brand Logo Animation */
-                .brand-hover {
-                    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-                }
-
-                    .brand-hover:hover {
-                        transform: translateY(-2px);
-                    }
-
-                .logo-text {
-                    position: relative;
-                    overflow: hidden;
-                }
-
-                    .logo-text::after {
-                        content: '';
-                        position: absolute;
-                        bottom: 0;
-                        left: 0;
-                        width: 0;
-                        height: 2px;
-                        background: rgba(255, 255, 255, 0.8);
-                        transition: width 0.4s ease;
-                    }
-
-                .brand-hover:hover .logo-text::after {
-                    width: 100%;
-                }
-
-                .menu-divider {
-                    border-top: 1px solid rgba(255, 255, 255, 0.15);
-                    margin: 0 1.5rem;
-                    position: relative;
-                    overflow: hidden;
-                }
-
-                    .menu-divider::after {
-                        content: '';
-                        position: absolute;
-                        top: 0;
-                        left: -100%;
-                        width: 100%;
-                        height: 1px;
-                        background: rgba(255, 255, 255, 0.3);
-                        animation: shimmer 3s infinite;
-                    }
-
-                @@keyframes shimmer {
-                    0% {
-                        left: -100%;
-                    }
-
-                    100% {
-                        left: 100%;
-                    }
-                }
-
-                /* Menu Items Animation */
-                .menu-item-hover {
-                    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-                    color: rgba(255, 255, 255, 0.85) !important;
-                    margin: 4px 12px;
-                    position: relative;
-                    overflow: hidden;
-                }
-
-                    .menu-item-hover::before {
-                        content: '';
-                        position: absolute;
-                        top: 0;
-                        left: -100%;
-                        width: 100%;
-                        height: 100%;
-                        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-                        transition: left 0.5s;
-                    }
-
-                    .menu-item-hover:hover::before {
-                        left: 100%;
-                    }
-
-                    .menu-item-hover:hover, .menu-item.active > .menu-link {
-                        background: rgba(255, 255, 255, 0.15) !important;
-                        color: white !important;
-                        transform: translateX(8px);
-                        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-                    }
-
-                /* Submenu Animation */
-                .menu-sub {
-                    background: rgba(0, 0, 0, 0.2);
-                    border-radius: 10px;
-                    margin: 6px 16px;
-                    padding: 6px 0;
-                    overflow: hidden;
-                    max-height: 0;
-                    opacity: 0;
-                    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-                }
-
-                .menu-item.open .menu-sub {
-                    max-height: 500px;
-                    opacity: 1;
-                }
-
-                .slide-transition {
-                    transform-origin: top;
-                }
-
-                .submenu-item-hover {
-                    transition: all 0.3s ease;
-                    color: rgba(255, 255, 255, 0.75) !important;
-                    margin: 2px 8px;
-                    position: relative;
-                    overflow: hidden;
-                }
-
-                    .submenu-item-hover::before {
-                        content: '';
-                        position: absolute;
-                        left: 0;
-                        top: 0;
-                        height: 100%;
-                        width: 3px;
-                        background: rgba(255, 255, 255, 0.5);
-                        transform: scaleY(0);
-                        transition: transform 0.3s ease;
-                    }
-
-                    .submenu-item-hover:hover, .menu-item.active .submenu-item-hover {
-                        background: rgba(255, 255, 255, 0.1) !important;
-                        color: white !important;
-                        padding-left: 20px;
-                        transform: translateX(4px);
-                    }
-
-                        .submenu-item-hover:hover::before, .menu-item.active .submenu-item-hover::before {
-                            transform: scaleY(1);
-                        }
-
-                /* Arrow Animation */
-                .transition-arrow {
-                    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-                }
-
-                .menu-item.open .transition-arrow {
-                    transform: rotate(180deg);
-                }
-
-                /* Active State Enhancement */
-                .menu-item.active > .menu-link {
-                    background: rgba(255, 255, 255, 0.2) !important;
-                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-                }
-
-                /* Scrollbar Styling */
-                .menu-inner::-webkit-scrollbar {
-                    width: 4px;
-                }
-
-                .menu-inner::-webkit-scrollbar-track {
-                    background: rgba(255, 255, 255, 0.1);
-                    border-radius: 10px;
-                }
-
-                .menu-inner::-webkit-scrollbar-thumb {
-                    background: rgba(255, 255, 255, 0.3);
-                    border-radius: 10px;
-                }
-
-                    .menu-inner::-webkit-scrollbar-thumb:hover {
-                        background: rgba(255, 255, 255, 0.5);
-                    }
-
-                /* Logo Background Enhancement */
-                .logo-bg {
-                    background: rgba(255, 255, 255, 0.15);
-                    border-radius: 10px;
-                    padding: 6px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    transition: all 0.3s ease;
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-                }
-
-                .brand-hover:hover .logo-bg {
-                    background: rgba(255, 255, 255, 0.25);
-                    transform: scale(1.05);
-                }
-
-                /* Menu Icon Styling */
-                .menu-icon {
-                    width: 22px;
-                    text-align: center;
-                    transition: transform 0.3s ease;
-                }
-
-                .menu-item-hover:hover .menu-icon {
-                    transform: scale(1.1);
-                }
-
-                /* Ripple Effect */
-                .ripple-effect {
-                    position: absolute;
-                    border-radius: 50%;
-                    background: rgba(255, 255, 255, 0.6);
-                    transform: scale(0);
-                    animation: ripple 0.6s linear;
-                    pointer-events: none;
-                    width: 20px;
-                    height: 20px;
-                    margin-left: -10px;
-                    margin-top: -10px;
-                }
-
-                @@keyframes ripple {
-                    to {
-                        transform: scale(4);
-                        opacity: 0;
-                    }
-                }
-
-                /* Ensure menu items have relative positioning for ripple */
-                .menu-link {
-                    position: relative;
-                    overflow: hidden;
-                }
-
-                /* Global Loader Styles */
-                .global-loader {
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: rgba(0, 0, 0, 0.7);
-                    backdrop-filter: blur(5px);
-                    z-index: 9999;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                }
-
-                .loader-container {
-                    background: white;
-                    padding: 2rem;
-                    border-radius: 15px;
-                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-                    text-align: center;
-                    min-width: 200px;
-                    animation: slideUp 0.3s ease-out;
-                }
-
-
-
-                @@keyframes spinner-glow {
-                    from {
-                        box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
-                    }
-
-                    to {
-                        box-shadow: 0 0 20px rgba(102, 126, 234, 0.8);
-                    }
-                }
-
-                /* Enhanced Navbar Styles */
-                .enhanced-navbar {
-                    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
-                    backdrop-filter: blur(10px);
-                    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-                    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
-                    transition: all 0.3s ease;
-                    padding: 0.75rem 1rem;
-                }
-
-                .navbar-brand-section {
-                    min-width: 250px;
-                }
-
-                /* Menu Toggle Button */
-                .menu-toggle-btn {
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    width: 40px;
-                    height: 40px;
-                    border-radius: 12px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    transition: all 0.3s ease;
-                    color: white !important;
-                }
-
-                    .menu-toggle-btn:hover {
-                        transform: translateY(-2px);
-                        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-                    }
-
-                /* Breadcrumb */
-                .breadcrumb {
-                    background: transparent;
-                    margin-bottom: 0;
-                    padding: 0.5rem 0;
-                }
-
-                .breadcrumb-item a {
-                    color: #667eea;
-                    font-weight: 500;
-                    transition: color 0.3s ease;
-                }
-
-                    .breadcrumb-item a:hover {
-                        color: #764ba2;
-                    }
-
-                .breadcrumb-item.active {
-                    color: #6c757d;
-                    font-weight: 500;
-                }
-
-                /* Search Bar */
-                .nav-search-container {
-                    min-width: 300px;
-                }
-
-                .search-input {
-                    border-radius: 12px;
-                    border: 1px solid #e0e0e0;
-                    padding: 0.75rem 1rem;
-                    transition: all 0.3s ease;
-                    background: rgba(255, 255, 255, 0.8);
-                }
-
-                    .search-input:focus {
-                        border-color: #667eea;
-                        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-                        background: white;
-                    }
-
-                .input-group-text {
-                    border-radius: 12px 0 0 12px;
-                    border: 1px solid #e0e0e0;
-                    border-right: none;
-                    background: rgba(255, 255, 255, 0.8);
-                }
-
-                /* Quick Actions */
-                .quick-actions-btn {
-                    background: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
-                    color: #fff !important;
-                    border: none;
-                    transition: all 0.3s ease;
-                }
-
-                    .quick-actions-btn:hover {
-                        transform: scale(1.05);
-                        box-shadow: 0 4px 15px rgba(255, 165, 0, 0.3);
-                    }
-
-                .quick-actions-menu {
-                    min-width: 280px;
-                    border-radius: 16px;
-                    border: none;
-                    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-                }
-
-                    .quick-actions-menu .dropdown-header {
-                        font-weight: 700;
-                        color: #2c3e50;
-                        font-size: 1.1rem;
-                    }
-
-                    .quick-actions-menu .dropdown-item {
-                        border-radius: 8px;
-                        padding: 0.75rem 1rem;
-                        margin: 0.25rem 0;
-                        transition: all 0.3s ease;
-                    }
-
-                        .quick-actions-menu .dropdown-item:hover {
-                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                            color: white;
-                            transform: translateX(5px);
-                        }
-
-                /* Theme Toggle */
-                .theme-toggle-btn {
-                    background: rgba(255, 255, 255, 0.9);
-                    border: 1px solid #e0e0e0;
-                    transition: all 0.3s ease;
-                }
-
-                    .theme-toggle-btn:hover {
-                        background: white;
-                        border-color: #667eea;
-                        transform: rotate(15deg);
-                    }
-
-                /* Notification Enhancement */
-                .notification-btn {
-                    background: rgba(255, 255, 255, 0.9);
-                    border: 1px solid #e0e0e0;
-                    transition: all 0.3s ease;
-                }
-
-                    .notification-btn:hover {
-                        background: white;
-                        border-color: #667eea;
-                        transform: translateY(-2px);
-                    }
-
-                .notification-badge {
-                    animation: pulse 2s infinite;
-                }
-
-                @@keyframes pulse {
-                    0% {
-                        transform: scale(1);
-                    }
-
-                    50% {
-                        transform: scale(1.1);
-                    }
-
-                    100% {
-                        transform: scale(1);
-                    }
-                }
-
-                .notification-dropdown {
-                    min-width: 380px;
-                    border-radius: 16px;
-                    border: none;
-                    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-                }
-
-                    .notification-dropdown .dropdown-header {
-                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                        color: white;
-                        border-radius: 16px 16px 0 0;
-                        margin: -1px -1px 0 -1px;
-                    }
-
-                    .notification-dropdown .list-group-item {
-                        border: none;
-                        padding: 1rem;
-                        transition: all 0.3s ease;
-                    }
-
-                        .notification-dropdown .list-group-item:hover {
-                            background: #f8f9fa;
-                            transform: translateX(5px);
-                        }
-
-                /* User Dropdown Enhancement */
-                .user-avatar-btn .avatar {
-                    transition: all 0.3s ease;
-                }
-
-                .user-avatar-btn:hover .avatar {
-                    transform: scale(1.1);
-                    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-                }
-
-                .avatar-status {
-                    position: absolute;
-                    bottom: 2px;
-                    right: 2px;
-                    width: 12px;
-                    height: 12px;
-                    border: 2px solid white;
-                    border-radius: 50%;
-                }
-
-                .user-dropdown {
-                    min-width: 320px;
-                    border-radius: 16px;
-                    border: none;
-                    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-                }
-
-                    .user-dropdown .dropdown-header {
-                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                        color: white;
-                        border-radius: 16px 16px 0 0;
-                        margin: -1px -1px 0 -1px;
-                    }
-
-                    .user-dropdown .dropdown-item {
-                        border-radius: 8px;
-                        padding: 0.75rem 1rem;
-                        margin: 0.25rem 0;
-                        transition: all 0.3s ease;
-                    }
-
-                        .user-dropdown .dropdown-item:hover {
-                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                            color: white;
-                            transform: translateX(5px);
-                        }
-
-                /* Enhanced Content Area */
-                .content-wrapper {
-                    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-                    min-height: calc(100vh - 80px);
-                }
-
-                /* Card Enhancements */
-                .card {
-                    border: none;
-                    border-radius: 16px;
-                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-                    transition: all 0.3s ease;
-                    background: white;
-                }
-
-                    .card:hover {
-                        transform: translateY(-5px);
-                        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-                    }
-
-                .card-header {
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    color: white;
-                    border-radius: 16px 16px 0 0 !important;
-                    border: none;
-                    padding: 1.25rem 1.5rem;
-                }
-
-                /* Button Enhancements */
-                .btn {
-                    border-radius: 10px;
-                    font-weight: 600;
-                    transition: all 0.3s ease;
-                    border: none;
-                }
-
-                .btn-primary {
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-                }
-
-                    .btn-primary:hover {
-                        transform: translateY(-2px);
-                        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-                    }
-
-                /* Table Enhancements */
-                .table {
-                    border-radius: 12px;
-                    overflow: hidden;
-                    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
-                }
-
-                    .table thead th {
-                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                        color: white;
-                        border: none;
-                        padding: 1rem;
-                        font-weight: 600;
-                    }
-
-                    .table tbody tr {
-                        transition: all 0.3s ease;
-                    }
-
-                        .table tbody tr:hover {
-                            background: rgba(102, 126, 234, 0.05);
-                            transform: scale(1.01);
-                        }
-
-                /* Form Enhancements */
-                .form-control {
-                    border-radius: 10px;
-                    border: 1px solid #e0e0e0;
-                    padding: 0.75rem 1rem;
-                    transition: all 0.3s ease;
-                }
-
-                    .form-control:focus {
-                        border-color: #667eea;
-                        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-                    }
-
-                /* Responsive Design */
-                @@media (max-width: 1199.98px) {
-                    .navbar-brand-section {
-                        min-width: auto;
-                    }
-
-                    .nav-search-container {
-                        min-width: 250px;
-                    }
-
-                    .notification-dropdown {
-                        min-width: 320px;
-                    }
-                }
-
-                @@media (max-width: 767.98px) {
-                    .enhanced-navbar {
-                        padding: 0.5rem;
-                    }
-
-                    .nav-search-container {
-                        display: none !important;
-                    }
-
-                    .quick-actions-dropdown {
-                        display: none !important;
-                    }
-
-                    .notification-dropdown {
-                        min-width: 280px;
-                        position: fixed !important;
-                        top: 70px !important;
-                        right: 10px !important;
-                        left: 10px !important;
-                        width: auto !important;
-                    }
-
-                    .user-dropdown {
-                        min-width: 280px;
-                        position: fixed !important;
-                        top: 70px !important;
-                        right: 10px !important;
-                        left: 10px !important;
-                        width: auto !important;
-                    }
-                }
-
-                /* spinner rotate (MUST have this) */
-                /*@@keyframes spinner-rotate {
-          100% { transform: rotate(360deg); }
-        }*/
-
-             /* HTML: <div class="loader"></div> */
-/* HTML: <div class="loader"></div> */
-/* HTML: <div class="loader"></div> */
-/* HTML: <div class="loader"></div> */
-.loader {
-  width: 28px;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: #F10C49;
-  animation: l7 2s infinite;
-}
-@@keyframes l7 {
-  0%,
-  100%  {transform:translate(-30px,-30px);box-shadow:  0     0 #F4DD51, 0     0 #E3AAD6}
-  12.5% {transform:translate( 30px,-30px);box-shadow: -15px  0 #F4DD51,-30px  0 #E3AAD6}
-  25%   {transform:translate( 30px,-30px);box-shadow:  0     0 #F4DD51, 0     0 #E3AAD6}
-  37.5% {transform:translate( 30px, 30px);box-shadow:  0 -15px #F4DD51, 0 -30px #E3AAD6}
-  50%   {transform:translate( 30px, 30px);box-shadow:  0     0 #F4DD51, 0     0 #E3AAD6}
-  62.5% {transform:translate(-30px, 30px);box-shadow:  15px  0 #F4DD51, 30px  0 #E3AAD6}
-  75%   {transform:translate(-30px, 30px);box-shadow:  0     0 #F4DD51, 0     0 #E3AAD6}
-  87.5% {transform:translate(-30px,-30px);box-shadow:  0  15px #F4DD51, 0  30px #E3AAD6}
-}
-                /* Dark theme support */
-                [data-bs-theme="dark"] .enhanced-navbar {
-                    background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%) !important;
-                    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-                }
-
-                [data-bs-theme="dark"] .search-input,
-                [data-bs-theme="dark"] .input-group-text {
-                    background: rgba(45, 55, 72, 0.8);
-                    border-color: #4a5568;
-                    color: white;
-                }
-
-                [data-bs-theme="dark"] .theme-toggle-btn,
-                [data-bs-theme="dark"] .notification-btn {
-                    background: rgba(45, 55, 72, 0.8);
-                    border-color: #4a5568;
-                    color: white;
-                }
-
-                [data-bs-theme="dark"] .content-wrapper {
-                    background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
-                }
-
-                [data-bs-theme="dark"] .card {
-                    background: #2d3748;
-                    color: white;
-                }
-
-        /* Navbar Toggle Button */
-        #navbarMenuToggle {
-            background: rgba(255, 255, 255, 0.2) !important;
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            transition: all 0.3s ease;
-            margin-right: 1rem;
+        /* Enhanced Toast Styles */
+        .toast-success {
+            background-color: #28a745 !important;
+            color: white !important;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
         }
 
-            #navbarMenuToggle:hover {
-                background: rgba(255, 255, 255, 0.3) !important;
-                transform: scale(1.05);
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        .toast-error {
+            background-color: #dc3545 !important;
+            color: white !important;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+        }
+
+        .toast-info {
+            background-color: #17a2b8 !important;
+            color: white !important;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(23, 162, 184, 0.3);
+        }
+
+        .toast-warning {
+            background-color: #ffc107 !important;
+            color: #212529 !important;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+        }
+
+        /* Export buttons container */
+        .dt-buttons {
+            display: flex;
+            gap: 0.6rem;
+            margin-bottom: 0.8rem;
+        }
+
+        /* Base button style */
+        .dt-button {
+            border: none !important;
+            color: #fff !important;
+            font-weight: 500;
+            border-radius: 10px !important;
+            padding: 8px 14px !important;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+            /* Hover effects */
+            .dt-button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(123, 78, 255, 0.3);
             }
 
-/* Ensure proper sidebar positioning and transitions */
-.layout-menu {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    z-index: 1000;
-    transition: transform 0.3s ease-in-out;
-    transform: translateX(0);
-}
+        /* Specific button colors */
+        .buttons-print {
+            background: rgb(120, 129, 122, 0.30);
+        }
 
-.layout-menu-hidden {
-    transform: translateX(-100%) !important;
-}
+        .buttons-pdf {
+            background: rgb(120, 129, 122, 0.30);
+        }
 
-.layout-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 999;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-}
+        .buttons-excel {
+            background: rgb(120, 129, 122, 0.30);
+        }
 
-.layout-overlay.show {
-    opacity: 1;
-    visibility: visible;
-}
+        .buttons-copy {
+            background: rgb(120, 129, 122, 0.30);
+        }
 
-/* Adjust layout container for sidebar */
-.layout-container {
-    margin-left: 0;
-    transition: margin-left 0.3s ease;
-}
-
-/* Desktop - sidebar always visible */
-@@media (min-width: 1200px) {
-    .layout-menu {
-        position: relative !important;
-        transform: translateX(0) !important;
-        height: 100vh;
-    }
-
-    .layout-menu-hidden {
-        transform: translateX(-100%) !important;
-    }
-
-    .layout-overlay {
-        display: none !important;
-    }
-
-    .layout-container {
-        margin-left: 0;
-    }
-}
-
-/* Mobile - sidebar hidden by default */
-@@media (max-width: 1199.98px) {
-    .layout-menu {
-        transform: translateX(-100%);
-    }
-
-    .layout-overlay {
-        display: block;
-    }
-}
+        .buttons-csv {
+            background: rgb(120, 129, 122, 0.30);
+        }
     </style>
+
+
 </head>
 <body>
-    <!-- Layout wrapper -->
-    <div class="layout-wrapper layout-content-navbar">
-        <div class="layout-container scroll-container">
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5DDHKGP" height="0" width="0" style="display: none; visibility: hidden"></iframe></noscript>
 
-            <!-- Enhanced Animated Menu -->
-            <aside id="layout-menu" class="layout-menu menu-vertical menu " style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)!important;">
-                <!-- Brand Section with Animation -->
-                <div class="app-brand demo py-4 mb-3">
-                    <a href="index" class="app-brand-link d-flex align-items-center text-decoration-none brand-hover">
-                        <span class="app-brand-logo me-3">
-                            <span class="logo-bg">
-                                <svg width="34" height="28" viewBox="0 0 250 196" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Layout wrapper -->
+    <div class="layout-wrapper layout-content-navbar bg-gradient-light ">
+        <div class="layout-container">
+
+            <!-- Menu -->
+            <aside id="layout-menu" class="layout-menu menu-vertical menu shadow-right card ">
+                <div class="app-brand demo ">
+                    <a href="index.html" class="app-brand-link gap-xl-0 gap-2">
+                        <span class="app-brand-logo demo me-1">
+                            <span class="text-primary">
+                                <svg width="30" height="24" viewBox="0 0 250 196" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path fill-rule="evenodd" clip-rule="evenodd" d="M12.3002 1.25469L56.655 28.6432C59.0349 30.1128 60.4839 32.711 60.4839 35.5089V160.63C60.4839 163.468 58.9941 166.097 56.5603 167.553L12.2055 194.107C8.3836 196.395 3.43136 195.15 1.14435 191.327C0.395485 190.075 0 188.643 0 187.184V8.12039C0 3.66447 3.61061 0.0522461 8.06452 0.0522461C9.56056 0.0522461 11.0271 0.468577 12.3002 1.25469Z" fill="currentColor" />
                                     <path opacity="0.077704" fill-rule="evenodd" clip-rule="evenodd" d="M0 65.2656L60.4839 99.9629V133.979L0 65.2656Z" fill="black" />
                                     <path opacity="0.077704" fill-rule="evenodd" clip-rule="evenodd" d="M0 65.2656L60.4839 99.0795V119.859L0 65.2656Z" fill="black" />
@@ -921,33 +203,35 @@
                                 </svg>
                             </span>
                         </span>
-                        <span class="app-brand-text fw-bold fs-3 text-white logo-text">P2PERP</span>
+                        <span class="app-brand-text demo menu-text fw-semibold ms-2">Materio</span>
+                    </a>
+
+                    <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">
+                        <i class="menu-toggle-icon d-xl-inline-block align-middle"></i>
                     </a>
                 </div>
 
-                <div class="menu-divider my-3"></div>
+                <div class="menu-inner-shadow"></div>
 
-                <!-- Menu Items -->
-                <ul class="menu-inner py-2" style="overflow: auto; scrollbar-width: none;">
+                <ul class="menu-inner py-1">
                     @if (role == "5") // Purchase Requisition User
                     {
                         <li class="menu-item @(currentAction.Contains("CreatePRADDItemPSM") || currentAction.Contains("AllRequisitionSP") ? "active open" : "")">
-                            <a href="javascript:void(0);" class="menu-link menu-toggle d-flex align-items-center rounded-3 py-3 px-3 menu-item-hover">
+                            <a href="javascript:void(0);" class="menu-link menu-toggle">
                                 <i class="menu-icon tf-icons bi bi-layout-text-sidebar me-3 fs-5"></i>
-                                <div class="fw-semibold" data-i18n="Purchase Requisition">Purchase Requisition</div>
-                                <i class="menu-arrow bi bi-chevron-down ms-auto transition-arrow"></i>
+                                <div class="fw-semibold">Purchase Requisition</div>
                             </a>
                             <ul class="menu-sub slide-transition">
                                 <li class="menu-item @(currentAction == "CreatePRADDItemPSM" ? "active" : "")">
-                                    <a href="@Url.Action("CreatePRADDItemPSM", "Purchase")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
+                                    <a href="@Url.Action("CreatePRADDItemPSM", "Purchase")" class="menu-link">
                                         <i class="menu-icon tf-icons bi bi-box me-3"></i>
-                                        <div data-i18n="Stock Requirement">Stock Requirement</div>
+                                        <div>Stock Requirement</div>
                                     </a>
                                 </li>
                                 <li class="menu-item @(currentAction == "AllRequisitionSP" ? "active" : "")">
-                                    <a href="@Url.Action("AllRequisitionSP", "Purchase")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
+                                    <a href="@Url.Action("AllRequisitionSP", "Purchase")" class="menu-link">
                                         <i class="menu-icon tf-icons bi bi-collection me-3"></i>
-                                        <div data-i18n="All Requisition">All Requisition</div>
+                                        <div>All Requisition</div>
                                     </a>
                                 </li>
                             </ul>
@@ -957,9 +241,9 @@
                     @if (role == "6") // RFQ User
                     {
                         <li class="menu-item @(currentAction == "QuotationSJ" ? "active" : "")">
-                            <a href="@Url.Action("QuotationSJ", "Purchase")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
+                            <a href="@Url.Action("QuotationSJ", "Purchase")" class="menu-link">
                                 <i class="menu-icon tf-icons bi bi-list-ul me-3"></i>
-                                <div data-i18n="All RFQ">All RFQ</div>
+                                <div class="fw-semibold">All RFQ</div>
                             </a>
                         </li>
                     }
@@ -967,9 +251,9 @@
                     @if (role == "7") // Supplier Quotation User
                     {
                         <li class="menu-item @(currentAction.Contains("ShowAllRFQsVNK") ? "active" : "")">
-                            <a href="@Url.Action("ShowAllRFQsVNK", "Purchase")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
+                            <a href="@Url.Action("ShowAllRFQsVNK", "Purchase")" class="menu-link">
                                 <i class="menu-icon tf-icons bi bi-collection me-3"></i>
-                                <div data-i18n="All RQ">All RQ</div>
+                                <div class="fw-semibold">All RQ</div>
                             </a>
                         </li>
                     }
@@ -977,67 +261,65 @@
                     @if (role == "8") // Purchase Manager
                     {
                         <li class="menu-item @(currentAction.Contains("UserDashboardPRK") || currentAction.Contains("ShowPendingPRPRK") || currentAction.Contains("SupplierQuotationAMG") || currentAction.Contains("PurchaseOrdersVNK") || currentAction.Contains("VenderManagementOK")  ? "active open" : "")">
-                            <a href="javascript:void(0);" class="menu-link menu-toggle d-flex align-items-center rounded-3 py-3 px-3 menu-item-hover">
+                            <a href="javascript:void(0);" class="menu-link menu-toggle">
                                 <i class="menu-icon tf-icons bi bi-speedometer me-3 fs-5"></i>
-                                <div class="fw-semibold" data-i18n="Manager Dashboard">Manager Dashboard</div>
-                                <i class="menu-arrow bi bi-chevron-down ms-auto transition-arrow"></i>
+                                <div class="fw-semibold">Manager Dashboard</div>
                             </a>
                             <ul class="menu-sub slide-transition">
                                 <li class="menu-item @(ViewContext.RouteData.Values["action"].ToString() == "UserDashboardPRK" ? "active" : "")">
-                                    <a href="@Url.Action("UserDashboardPRK", "Purchase")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
-                                        <div data-i18n="Purchase Dashboard">Purchase Dashboard</div>
+                                    <a href="@Url.Action("UserDashboardPRK", "Purchase")" class="menu-link">
+                                        <div>Purchase Dashboard</div>
                                     </a>
                                 </li>
                                 <li class="menu-item @(currentAction.Contains("PurchaseRequisition") ? "active" : "")">
-                                    <a href="@Url.Action("ShowPendingPRPRK", "Purchase")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
+                                    <a href="@Url.Action("ShowPendingPRPRK", "Purchase")" class="menu-link">
                                         <i class="menu-icon tf-icons bi bi-bag me-3"></i>
-                                        <div data-i18n="Purchase Requisition">Purchase Requisition</div>
+                                        <div>Purchase Requisition</div>
                                     </a>
                                 </li>
                                 <li class="menu-item @(currentAction.Contains("SupplierQuotation") ? "active" : "")">
-                                    <a href="@Url.Action("SupplierQuotationAMG", "Purchase")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
+                                    <a href="@Url.Action("SupplierQuotationAMG", "Purchase")" class="menu-link">
                                         <i class="menu-icon tf-icons bi bi-briefcase me-3"></i>
-                                        <div data-i18n="Supplier Quotation">Supplier Quotation</div>
+                                        <div>Supplier Quotation</div>
                                     </a>
                                 </li>
                                 <li class="menu-item @(currentAction.Contains("PurchaseOrder") ? "active" : "")">
-                                    <a href="@Url.Action("PurchaseOrdersVNK", "Purchase")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
+                                    <a href="@Url.Action("PurchaseOrdersVNK", "Purchase")" class="menu-link">
                                         <i class="menu-icon tf-icons bi bi-cart-check me-3"></i>
-                                        <div data-i18n="Purchase Order">Purchase Order</div>
+                                        <div>Purchase Order</div>
                                     </a>
                                 </li>
                                 <li class="menu-item @(currentAction.Contains("Master") ? "active" : "")">
-                                    <a href="@Url.Action("VenderManagementOK", "Purchase")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
+                                    <a href="@Url.Action("VenderManagementOK", "Purchase")" class="menu-link">
                                         <i class="menu-icon tf-icons bi bi-people me-3"></i>
-                                        <div data-i18n="Vendor Management">Vendor Management</div>
+                                        <div>Vendor Management</div>
                                     </a>
                                 </li>
                             </ul>
                         </li>
 
                         <li class="menu-item @(currentAction.Contains("PurchaseRequestTableAT") || currentAction.Contains("RFQReportAT") || currentAction.Contains("PurchaseOrderReportAT") ? "active open" : "")">
-                            <a href="javascript:void(0);" class="menu-link menu-toggle d-flex align-items-center rounded-3 py-3 px-3 menu-item-hover">
+                            <a href="javascript:void(0);" class="menu-link menu-toggle">
                                 <i class="menu-icon tf-icons bi bi-bar-chart-line me-3 fs-5"></i>
-                                <div class="fw-semibold" data-i18n="Reports">Reports</div>
-                                <i class="menu-arrow bi bi-chevron-down ms-auto transition-arrow"></i>
+                                <div class="fw-semibold">Reports</div>
                             </a>
                             <ul class="menu-sub slide-transition">
                                 <li class="menu-item @(currentAction == "PurchaseRequestTableAT" ? "active" : "")">
-                                    <a href="@Url.Action("PurchaseRequestTableAT", "Purchase")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
+                                    <a href="@Url.Action("PurchaseRequestTableAT", "Purchase")" class="menu-link">
                                         <i class="menu-icon tf-icons bi bi-file-earmark-text me-3"></i>
-                                        <div data-i18n="PR Reports">PR Reports</div>
+                                        <div>PR Reports</div>
                                     </a>
                                 </li>
                                 <li class="menu-item @(currentAction == "RFQReportAT" ? "active" : "")">
-                                    <a href="@Url.Action("RFQReportAT", "Purchase")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
+                                    <a href="@Url.Action("RFQReportAT", "Purchase")" class="menu-link">
                                         <i class="menu-icon tf-icons bi bi-file-earmark-text me-3"></i>
-                                        <div data-i18n="RFQ Reports">RFQ Reports</div>
+                                        <div>RFQ Reports</div>
                                     </a>
                                 </li>
                                 <li class="menu-item @(currentAction == "PurchaseOrderReportAT" ? "active" : "")">
-                                    <a href="@Url.Action("PurchaseOrderReportAT", "Purchase")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
+                                    <a href="@Url.Action("PurchaseOrderReportAT", "Purchase")" class="menu-link">
                                         <i class="menu-icon tf-icons bi bi-file-earmark-text me-3"></i>
-                                        <div data-i18n="PO Reports">PO Reports</div>
+                                        <div>PO Reports</div>
                                     </a>
                                 </li>
                             </ul>
@@ -1046,23 +328,28 @@
 
                     @if (role == "9") // PO User
                     {
-                        <li class="menu-item @(currentAction.Contains("SelectedQuotationListShowOK") || currentAction.Contains("PurchaseOrederHistoryOK") ? "active open" : "")">
-                            <a href="javascript:void(0);" class="menu-link menu-toggle d-flex align-items-center rounded-3 py-3 px-3 menu-item-hover">
+                        <li class="menu-item @(currentAction.Contains("SelectedQuotationListShowOK") || currentAction.Contains("PurchaseOrederHistoryOK") || currentAction.Contains("JustInTimeItemListOK") ? "active open" : "")">
+                            <a href="javascript:void(0);" class="menu-link menu-toggle">
                                 <i class="menu-icon tf-icons bi bi-cart4 me-3 fs-5"></i>
-                                <div class="fw-semibold" data-i18n="PO User Dashboard">PO User Dashboard</div>
-                                <i class="menu-arrow bi bi-chevron-down ms-auto transition-arrow"></i>
+                                <div class="fw-semibold">PO User Dashboard</div>
                             </a>
                             <ul class="menu-sub slide-transition">
                                 <li class="menu-item @(currentAction == "SelectedQuotationListShowOK" ? "active" : "")">
-                                    <a href="@Url.Action("SelectedQuotationListShowOK", "Purchase")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
+                                    <a href="@Url.Action("SelectedQuotationListShowOK", "Purchase")" class="menu-link">
                                         <i class="menu-icon tf-icons bi bi-inbox me-3"></i>
-                                        <div data-i18n="Receive Quotation">Receive Quotation</div>
+                                        <div>Receive Quotation</div>
+                                    </a>
+                                </li>
+                                <li class="menu-item @(currentAction == "JustInTimeItemListOK" ? "active" : "")">
+                                    <a href="@Url.Action("JustInTimeItemListOK", "Purchase")" class="menu-link">
+                                        <i class="menu-icon tf-icons bi bi-clock-history me-3"></i>
+                                        <div>Just In Time</div>
                                     </a>
                                 </li>
                                 <li class="menu-item @(currentAction == "PurchaseOrederHistoryOK" ? "active" : "")">
-                                    <a href="@Url.Action("PurchaseOrederHistoryOK", "Purchase")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
+                                    <a href="@Url.Action("PurchaseOrederHistoryOK", "Purchase")" class="menu-link">
                                         <i class="menu-icon tf-icons bi bi-clock-history me-3"></i>
-                                        <div data-i18n="Purchase Order History">Purchase Order History</div>
+                                        <div>Purchase Order History</div>
                                     </a>
                                 </li>
                             </ul>
@@ -1074,54 +361,52 @@
                         if (role == "2")
                         {
                             <li class="menu-item @(currentAction == "Index" ? "active" : "")">
-                                <a href="@Url.Action("Index", "Inventory")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
+                                <a href="@Url.Action("Index", "Inventory")" class="menu-link">
                                     <i class="menu-icon tf-icons bi bi-speedometer2"></i>
-                                    <div data-i18n="Inventory Dashboard">Inventory Dashboard</div>
+                                    <div class="fw-semibold">Inventory Dashboard</div>
                                 </a>
                             </li>
 
                             <li class="menu-item @(currentAction.Contains("CategorySSG") || currentAction.Contains("WHIndex") ? "active open" : "")">
-                                <a href="javascript:void(0);" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover menu-toggle">
+                                <a href="javascript:void(0);" class="menu-link menu-toggle">
                                     <i class="menu-icon tf-icons bi bi-gear"></i>
-                                    <div data-i18n="Master Data">Master Data</div>
-                                    <i class="menu-arrow bi bi-chevron-down ms-auto transition-arrow"></i>
+                                    <div class="fw-semibold">Master Data</div>
                                 </a>
                                 <ul class="menu-sub">
                                     <li class="menu-item @(currentAction == "CategorySSG" ? "active" : "")">
-                                        <a href="@Url.Action("CategorySSG", "Inventory")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
+                                        <a href="@Url.Action("CategorySSG", "Inventory")" class="menu-link">
                                             <i class="menu-icon tf-icons bi bi-box-seam"></i>
-                                            <div data-i18n="Item Master">Item Master</div>
+                                            <div>Item Master</div>
                                         </a>
                                     </li>
                                     <li class="menu-item @(currentAction == "WHIndex" ? "active" : "")">
-                                        <a href="@Url.Action("WHIndex", "Inventory")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
+                                        <a href="@Url.Action("WHIndex", "Inventory")" class="menu-link">
                                             <i class="menu-icon tf-icons bi bi-grid-3x3-gap"></i>
-                                            <div data-i18n="Assign Bin">Assign Bin</div>
+                                            <div>Assign Bin</div>
                                         </a>
                                     </li>
                                 </ul>
                             </li>
                         }
 
-                        if (role == "2" || role == "3")
+                        if (role == "3")
                         {
                             <li class="menu-item @(currentAction.Contains("ReceiveMaterialDRB") || currentAction.Contains("IssueInHouseDRB") ? "active open" : "")">
-                                <a href="javascript:void(0);" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover menu-toggle">
+                                <a href="javascript:void(0);" class="menu-link menu-toggle">
                                     <i class="menu-icon tf-icons bi bi-arrow-left-right"></i>
-                                    <div data-i18n="Transaction">Transaction</div>
-                                    <i class="menu-arrow bi bi-chevron-down ms-auto transition-arrow"></i>
+                                    <div class="fw-semibold">Transaction</div>
                                 </a>
                                 <ul class="menu-sub">
                                     <li class="menu-item @(currentAction == "ReceiveMaterialDRB" ? "active" : "")">
-                                        <a href="@Url.Action("ReceiveMaterialDRB", "Inventory")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
+                                        <a href="@Url.Action("ReceiveMaterialDRB", "Inventory")" class="menu-link">
                                             <i class="menu-icon tf-icons bi bi-download"></i>
-                                            <div data-i18n="Receive Material">Receive Material</div>
+                                            <div>Receive Material</div>
                                         </a>
                                     </li>
                                     <li class="menu-item @(currentAction == "IssueInHouseDRB" ? "active" : "")">
-                                        <a href="@Url.Action("IssueInHouseDRB", "Inventory")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
+                                        <a href="@Url.Action("IssueInHouseDRB", "Inventory")" class="menu-link">
                                             <i class="menu-icon tf-icons bi bi-upload"></i>
-                                            <div data-i18n="Issue In House">Issue In House</div>
+                                            <div>Issue In House</div>
                                         </a>
                                     </li>
                                 </ul>
@@ -1131,61 +416,66 @@
                         if (role == "2" || role == "4")
                         {
                             <li class="menu-item @(currentAction == "StocksCheakLM" ? "active" : "")">
-                                <a href="@Url.Action("StocksCheakLM", "Inventory")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
+                                <a href="@Url.Action("StocksCheakLM", "Inventory")" class="menu-link">
                                     <i class="menu-icon tf-icons bi bi-clipboard-check"></i>
-                                    <div data-i18n="Stock Check">Stock Check</div>
+                                    <div class="fw-semibold">Stock Check</div>
                                 </a>
                             </li>
+                        }
 
+                        if (role == "2" || role == "4")
+                        {
                             <li class="menu-item @(currentAction.Contains("ShowStocklevelMHB") || currentAction.Contains("JITStockMHB") || currentAction.Contains("ISRStockMHB") || currentAction.Contains("NewplanMHB") || currentAction.Contains("StockMasterRHK") || currentAction.Contains("ReqMasterRHK") || currentAction.Contains("ManagerApprovalMHB") ? "active open" : "")">
-                                <a href="javascript:void(0);" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover menu-toggle">
+                                <a href="javascript:void(0);" class="menu-link menu-toggle">
                                     <i class="menu-icon tf-icons bi bi-bar-chart"></i>
-                                    <div data-i18n="Stock Planning">Stock Planning</div>
-                                    <i class="menu-arrow bi bi-chevron-down ms-auto transition-arrow"></i>
+                                    <div class="fw-semibold">Stock Planning</div>
                                 </a>
                                 <ul class="menu-sub">
-                                    <li class="menu-item @(currentAction == "ShowStocklevelMHB" ? "active" : "")">
-                                        <a href="@Url.Action("ShowStocklevelMHB", "Inventory")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
-                                            <i class="menu-icon tf-icons bi bi-graph-up"></i>
-                                            <div data-i18n="Analyze">Analyze</div>
-                                        </a>
-                                    </li>
-                                    <li class="menu-item @(currentAction == "JITStockMHB" ? "active" : "")">
-                                        <a href="@Url.Action("JITStockMHB", "Inventory")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
-                                            <i class="menu-icon tf-icons bi bi-clock-history"></i>
-                                            <div data-i18n="Just In Time">Just In Time</div>
-                                        </a>
-                                    </li>
-                                    <li class="menu-item @(currentAction == "ISRStockMHB" ? "active" : "")">
-                                        <a href="@Url.Action("ISRStockMHB", "Inventory")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
-                                            <i class="menu-icon tf-icons bi bi-clock-history"></i>
-                                            <div data-i18n="ISR Stock">ISR Stock</div>
-                                        </a>
-                                    </li>
-                                    <li class="menu-item @(currentAction == "NewplanMHB" ? "active" : "")">
-                                        <a href="@Url.Action("NewplanMHB", "Inventory")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
-                                            <i class="menu-icon tf-icons bi bi-cash-stack"></i>
-                                            <div data-i18n="MRP">MRP</div>
-                                        </a>
-                                    </li>
+                                    @if (role == "4")
+                                    {
+                                        <li class="menu-item @(currentAction == "ShowStocklevelMHB" ? "active" : "")">
+                                            <a href="@Url.Action("ShowStocklevelMHB", "Inventory")" class="menu-link">
+                                                <i class="menu-icon tf-icons bi bi-graph-up"></i>
+                                                <div>Analyze</div>
+                                            </a>
+                                        </li>
+                                        <li class="menu-item @(currentAction == "JITStockMHB" ? "active" : "")">
+                                            <a href="@Url.Action("JITStockMHB", "Inventory")" class="menu-link">
+                                                <i class="menu-icon tf-icons bi bi-clock-history"></i>
+                                                <div>Just In Time</div>
+                                            </a>
+                                        </li>
+                                        <li class="menu-item @(currentAction == "ISRStockMHB" ? "active" : "")">
+                                            <a href="@Url.Action("ISRStockMHB", "Inventory")" class="menu-link">
+                                                <i class="menu-icon tf-icons bi bi-clock-history"></i>
+                                                <div>ISR Stock</div>
+                                            </a>
+                                        </li>
+                                        <li class="menu-item @(currentAction == "NewplanMHB" ? "active" : "")">
+                                            <a href="@Url.Action("NewplanMHB", "Inventory")" class="menu-link">
+                                                <i class="menu-icon tf-icons bi bi-cash-stack"></i>
+                                                <div>MRP</div>
+                                            </a>
+                                        </li>
+                                    }
                                     @if (role == "2")
                                     {
                                         <li class="menu-item @(currentAction == "ManagerApprovalMHB" ? "active" : "")">
-                                            <a href="@Url.Action("ManagerApprovalMHB", "Inventory")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
+                                            <a href="@Url.Action("ManagerApprovalMHB", "Inventory")" class="menu-link">
                                                 <i class="menu-icon tf-icons bi bi-person-check"></i>
-                                                <div data-i18n="Manager Approval">Manager Approval</div>
+                                                <div>Manager Approval</div>
                                             </a>
                                         </li>
                                         <li class="menu-item @(currentAction == "ReqMasterRHK" ? "active" : "")">
-                                            <a href="@Url.Action("ReqMasterRHK", "Inventory")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
+                                            <a href="@Url.Action("ReqMasterRHK", "Inventory")" class="menu-link">
                                                 <i class="menu-icon tf-icons bi bi-list-check"></i>
-                                                <div data-i18n="Requirement List">Requirement List</div>
+                                                <div>Requirement List</div>
                                             </a>
                                         </li>
                                         <li class="menu-item @(currentAction == "StockMasterRHK" ? "active" : "")">
-                                            <a href="@Url.Action("StockMasterRHK", "Inventory")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
+                                            <a href="@Url.Action("StockMasterRHK", "Inventory")" class="menu-link">
                                                 <i class="menu-icon tf-icons bi bi-bar-chart-steps"></i>
-                                                <div data-i18n="StockPlan List">StockPlan List</div>
+                                                <div>StockPlan List</div>
                                             </a>
                                         </li>
                                     }
@@ -1196,28 +486,27 @@
                         if (role == "2")
                         {
                             <li class="menu-item @(currentAction.Contains("CurrentStockReportAMG") || currentAction.Contains("ReceivedMaterialReport") || currentAction.Contains("InhouseTransferReportVAMG") ? "active open" : "")">
-                                <a href="javascript:void(0);" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover menu-toggle">
+                                <a href="javascript:void(0);" class="menu-link menu-toggle">
                                     <i class="menu-icon tf-icons bi bi-bar-chart-line"></i>
-                                    <div data-i18n="Reports">Reports</div>
-                                    <i class="menu-arrow bi bi-chevron-down ms-auto transition-arrow"></i>
+                                    <div class="fw-semibold">Reports</div>
                                 </a>
                                 <ul class="menu-sub">
                                     <li class="menu-item @(currentAction == "CurrentStockReportAMG" ? "active" : "")">
-                                        <a href="@Url.Action("CurrentStockReportAMG", "Inventory")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
+                                        <a href="@Url.Action("CurrentStockReportAMG", "Inventory")" class="menu-link">
                                             <i class="menu-icon tf-icons bi bi-file-earmark-text"></i>
-                                            <div data-i18n="Current Stock Reports">Current Stock Reports</div>
+                                            <div>Current Stock Reports</div>
                                         </a>
                                     </li>
                                     <li class="menu-item @(currentAction == "ReceivedMaterialReport" ? "active" : "")">
-                                        <a href="@Url.Action("ReceivedMaterialReportAMG", "Inventory")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
+                                        <a href="@Url.Action("ReceivedMaterialReportAMG", "Inventory")" class="menu-link">
                                             <i class="menu-icon tf-icons bi bi-file-earmark-text"></i>
-                                            <div data-i18n="Received Material Reports">Received Material Reports</div>
+                                            <div>Received Material Reports</div>
                                         </a>
                                     </li>
                                     <li class="menu-item @(currentAction == "InhouseTransferReportVAMG" ? "active" : "")">
-                                        <a href="@Url.Action("InhouseTransferReportVAMG", "Inventory")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
+                                        <a href="@Url.Action("InhouseTransferReportVAMG", "Inventory")" class="menu-link">
                                             <i class="menu-icon tf-icons bi bi-file-earmark-text"></i>
-                                            <div data-i18n="Inhouse Transfer Reports">Inhouse Transfer Reports</div>
+                                            <div>Inhouse Transfer Reports</div>
                                         </a>
                                     </li>
                                 </ul>
@@ -1228,56 +517,54 @@
                     @if (role == "10" || role == "11" || role == "12") // GRN Roles
                     {
                         <li class="menu-item @(currentAction == "GRNDashboardRHK" ? "active" : "")">
-                            <a href="@Url.Action("GRNDashboardRHK", "GRN")" class="menu-link d-flex align-items-center rounded-3 py-3 px-3 menu-item-hover">
+                            <a href="@Url.Action("GRNDashboardRHK", "GRN")" class="menu-link">
                                 <i class="menu-icon tf-icons bi bi-speedometer2 me-3 fs-5"></i>
-                                <div class="fw-semibold" data-i18n="Dashboard">Dashboard</div>
+                                <div class="fw-semibold">Dashboard</div>
                             </a>
                         </li>
 
                         <li class="menu-item @(currentAction == "GRNSSG" || currentAction == "RejectedGoods" ? "active open" : "")" id="grn-transaction-menu">
-                            <a href="javascript:void(0);" class="menu-link menu-toggle d-flex align-items-center rounded-3 py-3 px-3 menu-item-hover">
+                            <a href="javascript:void(0);" class="menu-link menu-toggle">
                                 <i class="menu-icon tf-icons bi bi-arrow-left-right me-3 fs-5"></i>
-                                <div class="fw-semibold" data-i18n="Transaction">Transaction</div>
-                                <i class="menu-arrow bi bi-chevron-down ms-auto transition-arrow"></i>
+                                <div class="fw-semibold">Transaction</div>
                             </a>
                             <ul class="menu-sub slide-transition">
                                 <li class="menu-item @(currentAction == "GRNSSG" ? "active" : "")">
-                                    <a href="@Url.Action("GRNSSG", "GRN")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
+                                    <a href="@Url.Action("GRNSSG", "GRN")" class="menu-link">
                                         <i class="menu-icon tf-icons bi bi-download me-3"></i>
-                                        <div data-i18n="GRN Entry">GRN Entry</div>
+                                        <div>GRN Entry</div>
                                     </a>
                                 </li>
                                 <li class="menu-item @(currentAction == "RejectedGoods" ? "active" : "")">
-                                    <a href="@Url.Action("RejectedGoods", "GRN")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
+                                    <a href="@Url.Action("RejectedGoods", "GRN")" class="menu-link">
                                         <i class="menu-icon tf-icons bi bi-upload me-3"></i>
-                                        <div data-i18n="Return Good">Return Good</div>
+                                        <div>Return Good</div>
                                     </a>
                                 </li>
                             </ul>
                         </li>
                         <li class="menu-item @(currentAction.Contains("Report") ? "active open" : "")">
-                            <a href="javascript:void(0);" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover menu-toggle">
+                            <a href="javascript:void(0);" class="menu-link menu-toggle">
                                 <i class="menu-icon tf-icons bi bi-bar-chart-line"></i>
-                                <div data-i18n="Reports">Reports</div>
-                                <i class="menu-arrow bi bi-chevron-down ms-auto transition-arrow"></i>
+                                <div class="fw-semibold">Reports</div>
                             </a>
                             <ul class="menu-sub">
                                 <li class="menu-item @(currentAction == "ApprovedPOReportPSM" ? "active" : "")">
-                                    <a href="@Url.Action("ApprovedPOReportPSM", "GRN")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
+                                    <a href="@Url.Action("ApprovedPOReportPSM", "GRN")" class="menu-link">
                                         <i class="menu-icon tf-icons bi bi-file-earmark-text"></i>
-                                        <div data-i18n="Approved PO Reports">Approved PO Reports</div>
+                                        <div>Approved PO Reports</div>
                                     </a>
                                 </li>
                                 <li class="menu-item @(currentAction == "GRNSummaryReportPSM" ? "active" : "")">
-                                    <a href="@Url.Action("GRNSummaryReportPSM", "GRN")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
+                                    <a href="@Url.Action("GRNSummaryReportPSM", "GRN")" class="menu-link">
                                         <i class="menu-icon tf-icons bi bi-file-earmark-text"></i>
-                                        <div data-i18n="GRN Summary Reports">GRN Summary Reports</div>
+                                        <div>GRN Summary Reports</div>
                                     </a>
                                 </li>
                                 <li class="menu-item @(currentAction == "GoodsReturnSummaryReportPSM" ? "active" : "")">
-                                    <a href="@Url.Action("GoodsReturnSummaryReportPSM", "GRN")" class="menu-link d-flex align-items-center rounded-2 py-2 px-3 submenu-item-hover">
+                                    <a href="@Url.Action("GoodsReturnSummaryReportPSM", "GRN")" class="menu-link">
                                         <i class="menu-icon tf-icons bi bi-file-earmark-text"></i>
-                                        <div data-i18n="Goods Return Reports">Goods Return Reports</div>
+                                        <div>Goods Return Reports</div>
                                     </a>
                                 </li>
                             </ul>
@@ -1287,77 +574,108 @@
                     @if (role == "13" || role == "14" || role == "15") // Quality Check Roles
                     {
                         <li class="menu-item @(currentAction == "QCheckDashboardNAM" ? "active" : "")">
-                            <a href="@Url.Action("QCheckDashboardNAM", "Quality")" class="menu-link d-flex align-items-center rounded-3 py-3 px-3 menu-item-hover">
+                            <a href="@Url.Action("QCheckDashboardNAM", "Quality")" class="menu-link">
                                 <i class="menu-icon tf-icons bi bi-speedometer2 me-3 fs-5"></i>
                                 <div class="fw-semibold" data-i18n="Dashboard">Dashboard</div>
                             </a>
                         </li>
 
                         <li class="menu-item @(currentAction == "IndexRG" ? "active" : "")">
-                            <a href="@Url.Action("IndexRG", "Quality")" class="menu-link d-flex align-items-center rounded-3 py-3 px-3 menu-item-hover">
+                            <a href="@Url.Action("IndexRG", "Quality")" class="menu-link">
                                 <i class="menu-icon tf-icons bi bi-check2-square me-3 fs-5"></i>
                                 <div class="fw-semibold" data-i18n="Check Quality">Check Quality</div>
                             </a>
                         </li>
 
                         <li class="menu-item @(currentAction == "QalityCheackReports" ? "active" : "")">
-                            <a href="@Url.Action("QalityCheackReports", "Quality")" class="menu-link d-flex align-items-center rounded-3 py-3 px-3 menu-item-hover">
+                            <a href="@Url.Action("QalityCheackReports", "Quality")" class="menu-link">
                                 <i class="menu-icon tf-icons bi bi-file-earmark-text me-3 fs-5"></i>
                                 <div class="fw-semibold" data-i18n="Reports">Reports</div>
                             </a>
                         </li>
                     }
                 </ul>
+
             </aside>
-            <!-- / Enhanced Animated Menu -->
+
+            <div class="menu-mobile-toggler d-xl-none rounded-1">
+                <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large text-bg-secondary p-2 rounded-1">
+                    <i class="ri ri-menu-line icon-base"></i>
+                    <i class="ri ri-arrow-right-s-line icon-base"></i>
+                </a>
+            </div>
+            <!-- / Menu -->
             <!-- Layout container -->
             <div class="layout-page">
-                <!-- Enhanced Modern Navbar -->
-                <nav class="enhanced-navbar layout-navbar px-4 mb-4 navbar navbar-expand-xl align-items-center shadow-sm"
-                     id="layout-navbar"
-                     style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-           color: #fff !important">
-                    <!-- Menu Toggle & Brand (Left Side) -->
-                    <div class="navbar-brand-section d-flex align-items-center">
-                        <!-- Menu Toggle Button -->
-                        <button class="menu-toggle-btn waves-effect me-3" id="navbarMenuToggle">
-                            <i class="bi bi-list"></i>
-                        </button>
-                        <!-- Breadcrumb Navigation -->
-                        <nav aria-label="breadcrumb" class="d-none d-xl-block">
-                            <ol class="breadcrumb mb-0">
-                                <li class="breadcrumb-item">
-                                    <a href="@Url.Action("Index", currentController)" class="text-decoration-none text-white">
-                                        <i class="bi bi-house-door me-1"></i>Home
-                                    </a>
-                                </li>
-                                <li class="breadcrumb-item active" aria-current="page">
-                                    @ViewBag.Title
-                                </li>
-                            </ol>
-                        </nav>
-                    </div>
 
+                <!-- Navbar -->
+                <nav class="layout-navbar container-xxl navbar-detached navbar navbar-expand-xl align-items-center bg-navbar-theme" id="layout-navbar">
+                    <div class="layout-menu-toggle navbar-nav align-items-xl-center me-4 me-xl-0   d-xl-none ">
+                        <a class="nav-item nav-link px-0 me-xl-6" href="javascript:void(0)">
+                            <i class="icon-base ri ri-menu-line icon-md"></i>
+                        </a>
+                    </div>
                     <div class="navbar-nav-right d-flex align-items-center justify-content-end" id="navbar-collapse">
-                        <!-- Rest of your navbar content remains exactly the same -->
+                        <!-- Search -->
+                        <div class="navbar-nav align-items-center">
+                            <div class="nav-item navbar-search-wrapper mb-0">
+                                <a class="nav-item nav-link search-toggler px-0" href="javascript:void(0);">
+                                    <span class="d-inline-block text-body-secondary fw-normal" id="autocomplete"></span>
+                                </a>
+                            </div>
+                        </div>
+                        <!-- /Search -->
                         <ul class="navbar-nav flex-row align-items-center ms-md-auto">
+                            <!-- Style Switcher -->
+                            <li class="nav-item dropdown mt-2">
+                                <a class="nav-link dropdown-toggle hide-arrow btn btn-icon btn-text-secondary rounded-pill" id="nav-theme" href="javascript:void(0);" data-bs-toggle="dropdown">
+                                    <i class="icon-base ri ri-sun-line icon-22px theme-icon-active"></i>
+                                    <span class="d-none ms-2" id="nav-theme-text">Toggle theme</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-theme-text">
+                                    <li>
+                                        <button type="button" class="dropdown-item align-items-center active" data-bs-theme-value="light" aria-pressed="false">
+                                            <span> <i class="icon-base ri ri-sun-line icon-md me-3" data-icon="sun-line"></i>Light</span>
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button type="button" class="dropdown-item align-items-center" data-bs-theme-value="dark" aria-pressed="true">
+                                            <span> <i class="icon-base ri ri-moon-clear-line icon-md me-3" data-icon="moon-clear-line"></i>Dark</span>
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button type="button" class="dropdown-item align-items-center" data-bs-theme-value="system" aria-pressed="false">
+                                            <span> <i class="icon-base ri ri-computer-line icon-md me-3" data-icon="computer-line"></i>System</span>
+                                        </button>
+                                    </li>
+                                </ul>
+                            </li>
+                            <!-- / Style Switcher-->
+                            <!-- Email -->
+                            <li class="nav-item me-3 me-xl-2 ms-3 ms-xl-2 mt-2">
+                                <a class="text-black position-relative email-icon"
+                                   href="@Url.Action("SendMailHSB", currentController)">
+                                    <i class="ri-mail-line icon-md"></i>
+                                </a>
+                            </li>
+                            <!-- /Email -->
                             <!-- Calendar -->
-                            <li class="nav-item me-3 me-xl-2">
-                                <a class="text-black btn btn-icon btn-light rounded-pill waves-effect position-relative calendar-icon" href="@Url.Action("Calender", currentController)">
-                                    <i class="bi bi-calendar-event"></i>
+                            <li class="nav-item me-3 me-xl-2 ms-3 ms-xl-2">
+                                <a class="text-black position-relative calendar-icon" href="@Url.Action("Calender", currentController)">
+                                    <i class="ri-calendar-event-line icon-md"></i>
                                 </a>
                             </li>
                             <!--/ Calendar -->
                             <!-- Notification -->
-                            <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-3 me-xl-2">
-                                <a class="nav-link dropdown-toggle hide-arrow btn btn-icon btn-light rounded-pill waves-effect position-relative notification-btn"
+                            <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-3 mt-2 me-xl-2">
+                                <a class="nav-link dropdown-toggle hide-arrow waves-effect position-relative notification-btn"
                                    href="javascript:void(0);"
                                    data-bs-toggle="dropdown" aria-expanded="false">
                                     <span class="position-relative">
                                         <i class="icon-base ri ri-notification-2-line icon-md"></i>
                                         <span id="notificationBadge"
                                               class="badge bg-danger rounded-pill position-absolute notification-badge"
-                                              style="top: -5px; right: -5px; min-width: 18px; height: 18px; font-size: 10px; display: flex; align-items: center; justify-content: center;">
+                                              style="top: -7px; right: -5px; min-width: 18px; height: 18px; font-size: 10px; display: flex; align-items: center; justify-content: center;">
                                             0
                                         </span>
                                     </span>
@@ -1397,7 +715,7 @@
                                    href="javascript:void(0);"
                                    data-bs-toggle="dropdown">
                                     <div class="avatar avatar-online position-relative">
-                                        <img src="~/Content/images/avatars/1.png" alt="" id="layout-profile-photo" class="rounded-circle border border-3 border-white shadow-sm" />
+                                        <img src="~/Content/images/avatars/1.png" alt="" id="layout-profile-photo" class="rounded-circle shadow-sm" />
                                     </div>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end p-3 user-dropdown">
@@ -1405,7 +723,7 @@
                                         <div class="d-flex align-items-center">
                                             <div class="flex-shrink-0 me-3">
                                                 <div class="avatar avatar-online">
-                                                    <img src="~/Content/images/avatars/1.png" id="layout-another-photo" alt="" class="w-px-40 h-auto rounded-circle" />
+                                                    <img src="~/Content/images/avatars/1.png" id="layout-another-photo" alt="" class="w-px-40 rounded-circle" height="50" />
                                                 </div>
                                             </div>
                                             <div class="flex-grow-1">
@@ -1458,10 +776,34 @@
                         </ul>
                     </div>
                 </nav>
-                <!-- / Enhanced Modern Navbar -->
+                <!-- / Navbar -->
                 <!-- Content wrapper -->
-                <div class="content-wrapper scroll-container">
+                <div class="content-wrapper">
+
                     @RenderBody()
+                    <!-- Footer -->
+                    <footer class="content-footer footer bg-footer-theme">
+                        <div class="container-xxl">
+                            <div class="footer-container d-flex align-items-center justify-content-between py-4 flex-md-row flex-column">
+                                <div class="mb-2 mb-md-0">
+                                    &#169;
+                                    <script>
+                                        document.write(new Date().getFullYear());
+                                    </script>
+                                    made with ❤️ by <a href="https://rahitechit.com/" target="_blank" class="footer-link fw-medium">Rahitech</a>
+                                </div>
+                                <div class="d-none d-lg-inline-block">
+                                    <a href="https://themeselection.com/item/category/admin-templates/" target="_blank" class="footer-link me-4">Admin Templates</a>
+                                    <a href="https://themeselection.com/license/" class="footer-link me-4" target="_blank">License</a>
+                                    <a href="https://themeselection.com/item/category/bootstrap-templates/" target="_blank" class="footer-link me-4">Bootstrap Dashboard</a>
+                                    <a href="https://demos.themeselection.com/materio-bootstrap-html-admin-template/documentation/" target="_blank" class="footer-link me-4">Documentation</a>
+                                    <a href="https://themeselection.com/support/" target="_blank" class="footer-link d-none d-sm-inline-block">Support</a>
+                                </div>
+                            </div>
+                        </div>
+                    </footer>
+                    <!-- / Footer -->
+                    <div class="content-backdrop fade"></div>
                 </div>
                 <!-- Content wrapper -->
             </div>
@@ -1470,212 +812,22 @@
 
         <!-- Overlay -->
         <div class="layout-overlay layout-menu-toggle"></div>
+
+        <!-- Drag Target Area To SlideIn Menu On Small Screens -->
+        <div class="drag-target"></div>
+
     </div>
     <!-- / Layout wrapper -->
     <!-- Global Loader -->
     <div id="globalLoader" class="global-loader" style="display: none;">
-      
-            <div class="loader"></div>
 
-       
+        <div class="loader"></div>
+
     </div>
 
     <script>
-        // Enhanced Navbar Functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            // Theme Toggle
-            const themeToggle = document.getElementById('themeToggle');
-            const lightIcon = themeToggle.querySelector('.light-icon');
-            const darkIcon = themeToggle.querySelector('.dark-icon');
-
-            themeToggle.addEventListener('click', function() {
-                const html = document.documentElement;
-                const isDark = html.getAttribute('data-bs-theme') === 'dark';
-
-                if (isDark) {
-                    html.removeAttribute('data-bs-theme');
-                    lightIcon.classList.remove('d-none');
-                    darkIcon.classList.add('d-none');
-                    localStorage.setItem('theme', 'light');
-                } else {
-                    html.setAttribute('data-bs-theme', 'dark');
-                    lightIcon.classList.add('d-none');
-                    darkIcon.classList.remove('d-none');
-                    localStorage.setItem('theme', 'dark');
-                }
-            });
-
-            // Load saved theme
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                document.documentElement.setAttribute('data-bs-theme', 'dark');
-                lightIcon.classList.add('d-none');
-                darkIcon.classList.remove('d-none');
-            }
-
-            // Search functionality
-            const searchInput = document.getElementById('navbarSearch');
-            const searchClose = document.querySelector('.search-close');
-
-            if (searchInput) {
-                searchInput.addEventListener('input', function() {
-                    if (this.value.length > 0) {
-                        searchClose.classList.remove('d-none');
-                    } else {
-                        searchClose.classList.add('d-none');
-                    }
-                });
-
-                searchClose.addEventListener('click', function() {
-                    searchInput.value = '';
-                    searchClose.classList.add('d-none');
-                    searchInput.focus();
-                });
-            }
-
-            // Navbar scroll effect
-            let lastScrollTop = 0;
-            const navbar = document.getElementById('layout-navbar');
-
-            window.addEventListener('scroll', function() {
-                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-
-                if (scrollTop > lastScrollTop && scrollTop > 100) {
-                    // Scrolling down
-                    navbar.style.transform = 'translateY(-100%)';
-                } else {
-                    // Scrolling up
-                    navbar.style.transform = 'translateY(0)';
-                }
-
-                lastScrollTop = scrollTop;
-            });
-
-            // Enhanced notification badge animation
-            function animateNotificationBadge() {
-                const badge = document.getElementById('notificationBadge');
-                if (badge && badge.textContent !== '0') {
-                    badge.style.animation = 'none';
-                    setTimeout(() => {
-                        badge.style.animation = 'pulse 2s infinite';
-                    }, 10);
-                }
-            }
-
-            // Initialize animations
-            animateNotificationBadge();
-
-            // Re-animate when notifications update
-            const observer = new MutationObserver(animateNotificationBadge);
-            const badge = document.getElementById('notificationBadge');
-            if (badge) {
-                observer.observe(badge, { childList: true, characterData: true, subtree: true });
-            }
-        });
-
-        // Menu toggle functionality
-        document.addEventListener('DOMContentLoaded', function () {
-            var roleid = '@role';
-            var controllerName = '@currentController';
-
-            if (roleid === '13' || roleid === '14' || roleid === '15') {
-                if (controllerName !== 'Quality') {
-                    window.location.href = '/Account/Logout';
-                }
-            }
-
-            if (roleid === '10' || roleid === '11' || roleid === '12') {
-                if (controllerName !== 'GRN') {
-                    window.location.href = '/Account/Logout';
-                }
-            }
-
-            if (roleid === '2' || roleid === '3' || roleid === '4') {
-                if (controllerName !== 'Inventory') {
-                    window.location.href = '/Account/Logout';
-                }
-            }
-
-            if (roleid === '5' || roleid === '6' || roleid === '7' || roleid === '8' || roleid === '9') {
-                if (controllerName !== 'Purchase') {
-                    window.location.href = '/Account/Logout';
-                }
-            }
-
-            const menuToggle = document.querySelector('.layout-menu-toggle');
-            const menu = document.querySelector('.layout-menu');
-            const overlay = document.querySelector('.layout-overlay');
-
-            if (menuToggle && menu && overlay) {
-                menuToggle.addEventListener('click', function (e) {
-                    e.preventDefault();
-
-                    // Toggle menu visibility
-                    menu.classList.toggle('layout-menu-hidden');
-
-                    // Toggle overlay
-                    overlay.classList.toggle('show');
-
-                    // Store menu state in localStorage
-                    const isHidden = menu.classList.contains('layout-menu-hidden');
-                    localStorage.setItem('menuHidden', isHidden);
-                });
-
-                // Close menu when clicking overlay
-                overlay.addEventListener('click', function () {
-                    menu.classList.add('layout-menu-hidden');
-                    overlay.classList.remove('show');
-                    localStorage.setItem('menuHidden', true);
-                });
-
-                // Check saved state from localStorage
-                const menuHidden = localStorage.getItem('menuHidden') === 'true';
-                if (menuHidden) {
-                    menu.classList.add('layout-menu-hidden');
-                    overlay.classList.add('show');
-                }
-            }
-
-            // Handle window resize
-            function handleResize() {
-                const menu = document.querySelector('.layout-menu');
-                const overlay = document.querySelector('.layout-overlay');
-
-                if (window.innerWidth >= 1200) { // Desktop
-                    menu?.classList.remove('layout-menu-hidden');
-                    overlay?.classList.remove('show');
-                } else { // Mobile
-                    const menuHidden = localStorage.getItem('menuHidden') === 'true';
-                    if (menuHidden) {
-                        menu?.classList.add('layout-menu-hidden');
-                    }
-                }
-            }
-
-            window.addEventListener('resize', handleResize);
-            handleResize(); // Initial check
-        });
-
         $(document).ready(function () {
-            // Body and general colors
-            document.documentElement.style.setProperty('--body-bg', '#f5f5f9');
-            document.documentElement.style.setProperty('--navbar-bg', '#ffffff');
-            document.documentElement.style.setProperty('--card-bg', '#ffffff');
-            document.documentElement.style.setProperty('--card-text', '#6f6b7d');
-
-            // Sidebar/menu specific colors
-            document.documentElement.style.setProperty('--sidebar-bg', '#ffffff');
-            document.documentElement.style.setProperty('--sidebar-text', '#6f6b7d');
-            document.documentElement.style.setProperty('--menu-item-active-bg', 'rgba(105, 108, 255, 0.16)');
-            document.documentElement.style.setProperty('--menu-item-active-text', '#000000');
-            document.documentElement.style.setProperty('--menu-item-hover-bg', 'rgba(105, 108, 255, 0.08)');
-
-            // Remove dark mode classes from sidebar
-            const menu = document.querySelector('.layout-menu');
-            menu.classList.add('bg-menu-theme');
-
             // Load User Info with loader
-            showLoader('Loading user information...');
             $.ajax({
                 url: '@Url.Action("GetUserInfo", "Account")',
                 method: 'GET',
@@ -1689,14 +841,11 @@
                         $('#layout-profile-photo').attr('src', res.profilePhoto || defaultPhoto);
                         $('#layout-another-photo').attr('src', res.profilePhoto || defaultPhoto);
                     } else {
-                        window.location.href = '/Account/MainLogin';
+                        window.location.href = '/Account/Logout';
                     }
                 },
                 error: function () {
-                    window.location.href = '/Account/MainLogin';
-                },
-                complete: function() {
-                    hideLoader();
+                    window.location.href = '/Account/Logout';
                 }
             });
 
@@ -1705,6 +854,18 @@
 
             async function fetchNotifications() {
                 try {
+                    // Check session via AJAX or hidden value
+                    const sessionValid = await $.ajax({
+                        url: '/Account/CheckSession',
+                        type: 'GET'
+                    });
+
+                    if (!sessionValid.success) {
+                        // Session expired → redirect to logout
+                        window.location.href = '/Account/Logout';
+                        return;
+                    }
+
                     const notifications = await $.ajax({
                         url: '/Account/GetNotifications',
                         type: 'GET'
@@ -1744,36 +905,30 @@
 
             $(document).on('click', '.mark-read', async function () {
                 const id = $(this).data('id');
-                showLoader('Updating notification...');
                 await $.post('/Account/MarkAsRead', { id: id });
-                hideLoader();
                 fetchNotifications();
             });
 
             $('#btnMarkAllRead').click(async function () {
-                showLoader('Marking all as read...');
                 await $.post('/Account/MarkAllAsRead');
-                hideLoader();
                 fetchNotifications();
             });
 
             $('#btnViewAllNotifications').click(async function () {
-                showLoader('Loading all notifications...');
                 $('#dynamicNotificationsModal').remove(); // remove existing
 
                 const modalHtml = `
                     <div class="modal fade" id="dynamicNotificationsModal" tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog modal-lg modal-dialog-scrollable">
-                            <div class="modal-content">
-                                <div class="modal-header bg-primary">
-                                    <h5 class="modal-title fw-semibold text-white text-center w-100 pb-4">All Notifications</h5>
-                                    <button type="button" class="btn btn-close btn-close-white position-absolute top-0 end-0 m-3 fs-4" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                            <div class="modal-content shadow-lg rounded-3">
+                                <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-1"">
+                                    <h5 class="modal-title fw-bold text-white mb-0 fs-5">All Notifications</h5>
+                                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
                                     <ul id="allNotificationsList" class="list-group list-group-flush"></ul>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                     <button id="btnModalMarkAllRead" class="btn btn-primary">Mark all as read</button>
                                 </div>
                             </div>
@@ -1801,19 +956,45 @@
 
                 const modal = new bootstrap.Modal(document.getElementById('dynamicNotificationsModal'));
                 modal.show();
-                hideLoader();
 
                 // Modal Mark all as read
                 $('#btnModalMarkAllRead').click(async function () {
-                    showLoader('Marking all as read...');
                     await $.post('/Account/MarkAllAsRead');
                     fetchNotifications();
                     modal.hide();
-                    hideLoader();
                 });
             });
-        });
 
+            var roleid = '@role';
+            var controllerName = '@currentController';
+
+            if (roleid === '13' || roleid === '14' || roleid === '15') {
+                if (controllerName !== 'Quality') {
+                    window.location.href = '/Account/Logout';
+                }
+            }
+
+            if (roleid === '10' || roleid === '11' || roleid === '12') {
+                if (controllerName !== 'GRN') {
+                    window.location.href = '/Account/Logout';
+                }
+            }
+
+            if (roleid === '2' || roleid === '3' || roleid === '4') {
+                if (controllerName !== 'Inventory') {
+                    window.location.href = '/Account/Logout';
+                }
+            }
+
+            if (roleid === '5' || roleid === '6' || roleid === '7' || roleid === '8' || roleid === '9') {
+                if (controllerName !== 'Purchase') {
+                    window.location.href = '/Account/Logout';
+                }
+            }
+        });
+    </script>
+
+    <script>
         // Modal overlay effect fix
         document.addEventListener("DOMContentLoaded", function () {
             function moveModals() {
@@ -1830,337 +1011,17 @@
             const observer = new MutationObserver(moveModals);
             observer.observe(document.body, { childList: true, subtree: true });
         });
-
-        // Menu functionality
-        document.addEventListener('DOMContentLoaded', function () {
-            // Initialize menu states from server-side classes
-            document.querySelectorAll('.menu-item.open').forEach(menuItem => {
-                const arrow = menuItem.querySelector('.transition-arrow');
-                if (arrow) arrow.style.transform = 'rotate(180deg)';
-                const submenu = menuItem.querySelector('.menu-sub');
-                if (submenu) {
-                    submenu.style.maxHeight = '500px';
-                    submenu.style.opacity = '1';
-                }
-            });
-
-            // Add click handlers to all menu toggles
-            document.querySelectorAll('.menu-toggle').forEach(toggle => {
-                toggle.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    const menuItem = this.closest('.menu-item');
-                    const isOpen = menuItem.classList.contains('open');
-
-                    // Close all other open menus
-                    document.querySelectorAll('.menu-item.open').forEach(item => {
-                        if (item !== menuItem) {
-                            closeMenuItem(item);
-                        }
-                    });
-
-                    // Toggle current menu
-                    if (isOpen) {
-                        closeMenuItem(menuItem);
-                    } else {
-                        openMenuItem(menuItem);
-                    }
-                });
-            });
-
-            // Add click handlers to submenu items to prevent menu closing
-            document.querySelectorAll('.submenu-item-hover').forEach(item => {
-                item.addEventListener('click', function (e) {
-                    e.stopPropagation(); // Prevent click from bubbling to parent
-                    // Allow normal navigation - menu state will be maintained by server-side
-                });
-            });
-        });
-
-        function openMenuItem(menuItem) {
-            menuItem.classList.add('open');
-            const arrow = menuItem.querySelector('.transition-arrow');
-            if (arrow) arrow.style.transform = 'rotate(180deg)';
-            const submenu = menuItem.querySelector('.menu-sub');
-            if (submenu) {
-                submenu.style.maxHeight = '500px';
-                submenu.style.opacity = '1';
-            }
-        }
-
-        function closeMenuItem(menuItem) {
-            menuItem.classList.remove('open');
-            const arrow = menuItem.querySelector('.transition-arrow');
-            if (arrow) arrow.style.transform = 'rotate(0deg)';
-            const submenu = menuItem.querySelector('.menu-sub');
-            if (submenu) {
-                submenu.style.maxHeight = '0';
-                submenu.style.opacity = '0';
-            }
-        }
-
-        // Global Loader Management
-        class LoaderManager {
-            constructor() {
-                this.requestCount = 0;
-                this.loaderElement = document.getElementById('globalLoader');
-                this.minimumShowTime = 500; // Minimum show time in ms
-                this.maximumShowTime = 10000; // Default max visible time (10s)
-                this.startTime = null;
-                this.timeoutId = null; // Auto-hide timeout tracker
-                this.init();
-            }
-
-            init() {
-                this.overrideFetch();
-                this.overrideJQueryAjax();
-                this.overrideXMLHttpRequest();
-            }
-
-            show() {
-                if (this.requestCount === 0) {
-                    this.startTime = Date.now();
-                    this.loaderElement.style.display = 'flex';
-                    document.body.style.overflow = 'hidden';
-
-                    // Auto-hide loader after max time
-                    clearTimeout(this.timeoutId);
-                    this.timeoutId = setTimeout(() => {
-                        this.forceHide();
-                    }, this.maximumShowTime);
-                }
-                this.requestCount++;
-            }
-
-            hide() {
-                if (this.requestCount > 0) {
-                    this.requestCount--;
-                }
-
-                if (this.requestCount === 0) {
-                    const elapsed = Date.now() - this.startTime;
-                    const remaining = Math.max(0, this.minimumShowTime - elapsed);
-
-                    setTimeout(() => {
-                        this.loaderElement.style.display = 'none';
-                        document.body.style.overflow = '';
-                        clearTimeout(this.timeoutId);
-                    }, remaining);
-                }
-            }
-
-            // Force stop loader immediately
-            forceHide() {
-                this.requestCount = 0;
-                this.loaderElement.style.display = 'none';
-                document.body.style.overflow = '';
-                clearTimeout(this.timeoutId);
-                console.warn('⚠ Loader forcibly hidden after timeout.');
-            }
-
-            // Dynamically update max timeout duration
-            setMaxTimeout(durationMs) {
-                if (typeof durationMs === 'number' && durationMs > 0) {
-                    this.maximumShowTime = durationMs;
-                    console.info(`⏱ Loader max timeout set to ${durationMs} ms`);
-                } else {
-                    console.error(' Invalid timeout value. Must be a positive number.');
-                }
-            }
-
-            // --- Keep rest of your overrides and skip logic unchanged ---
-            overrideFetch() { /* same as before */ }
-            overrideJQueryAjax() { /* same as before */ }
-            overrideXMLHttpRequest() { /* same as before */ }
-            shouldSkipLoader(url) { /* same as before */ }
-        }
-
-        // Initialize loader manager when DOM is ready
-        document.addEventListener('DOMContentLoaded', function () {
-            LoaderManager.instance = new LoaderManager();
-        });
-
-        // Manual loader control
-        window.showLoader = function (text = 'Processing your request...') {
-            const loaderText = document.querySelector('.loader-text');
-            if (loaderText) loaderText.textContent = text;
-            LoaderManager.instance.show();
-        };
-
-        window.hideLoader = function () {
-            LoaderManager.instance.hide();
-        };
-
-        // New function to change loader timeout globally
-        window.setLoaderTimeout = function (durationMs) {
-            LoaderManager.instance.setMaxTimeout(durationMs);
-        };
-
-        // Optional manual force stop
-        window.stopLoaderNow = function () {
-            LoaderManager.instance.forceHide();
-        };
-
-       
-
-        // Handle link clicks that might trigger AJAX
-        document.addEventListener('click', function(e) {
-            const target = e.target;
-            if (target.tagName === 'A' && target.getAttribute('data-ajax') === 'true') {
-                e.preventDefault();
-                showLoader('Loading...');
-                // You can add your AJAX navigation logic here
-            }
-        });
-
-        // Handle submenu clicks
-        function handleSubmenuClick(event) {
-            event.stopPropagation();
-            // Allow normal navigation
-        };
-
-        setLoaderTimeout(1000); // sets max loader time to 5 seconds
-
-
-        // Navbar Menu Toggle Functionality
-        document.addEventListener('DOMContentLoaded', function () {
-            const navbarMenuToggle = document.getElementById('navbarMenuToggle');
-            const layoutMenu = document.getElementById('layout-menu');
-            const layoutOverlay = document.querySelector('.layout-overlay');
-
-            if (navbarMenuToggle && layoutMenu && layoutOverlay) {
-                navbarMenuToggle.addEventListener('click', function (e) {
-                    e.preventDefault();
-
-                    // Toggle menu visibility
-                    layoutMenu.classList.toggle('layout-menu-hidden');
-
-                    // Toggle overlay
-                    layoutOverlay.classList.toggle('show');
-
-                    // Store menu state in localStorage
-                    const isHidden = layoutMenu.classList.contains('layout-menu-hidden');
-                    localStorage.setItem('menuHidden', isHidden);
-
-                    // Add animation class for smooth transition
-                    layoutMenu.style.transition = 'all 0.3s ease-in-out';
-                });
-
-                // Close menu when clicking overlay
-                layoutOverlay.addEventListener('click', function () {
-                    layoutMenu.classList.add('layout-menu-hidden');
-                    layoutOverlay.classList.remove('show');
-                    localStorage.setItem('menuHidden', true);
-                });
-
-                // Check saved state from localStorage
-                const menuHidden = localStorage.getItem('menuHidden') === 'true';
-                if (menuHidden) {
-                    layoutMenu.classList.add('layout-menu-hidden');
-                } else {
-                    layoutMenu.classList.remove('layout-menu-hidden');
-                }
-
-                // Handle responsive behavior
-                function handleResponsiveMenu() {
-                    if (window.innerWidth < 1200) {
-                        // Mobile: menu hidden by default
-                        if (!localStorage.getItem('menuHidden')) {
-                            layoutMenu.classList.add('layout-menu-hidden');
-                            layoutOverlay.classList.add('show');
-                        }
-                    } else {
-                        // Desktop: show menu unless explicitly hidden
-                        const menuHidden = localStorage.getItem('menuHidden') === 'true';
-                        if (!menuHidden) {
-                            layoutMenu.classList.remove('layout-menu-hidden');
-                            layoutOverlay.classList.remove('show');
-                        }
-                    }
-                }
-
-                // Initial responsive check
-                handleResponsiveMenu();
-
-                // Handle window resize
-                window.addEventListener('resize', handleResponsiveMenu);
-            }
-        });
-
-        // Sidebar Toggle Functionality
-        document.addEventListener('DOMContentLoaded', function () {
-            const navbarMenuToggle = document.getElementById('navbarMenuToggle');
-            const layoutMenu = document.getElementById('layout-menu');
-            const layoutOverlay = document.querySelector('.layout-overlay');
-
-            function toggleMenu() {
-                const isHidden = layoutMenu.classList.contains('layout-menu-hidden');
-
-                if (isHidden) {
-                    // Show menu
-                    layoutMenu.classList.remove('layout-menu-hidden');
-                    layoutOverlay.classList.add('show');
-                } else {
-                    // Hide menu
-                    layoutMenu.classList.add('layout-menu-hidden');
-                    layoutOverlay.classList.remove('show');
-                }
-
-                // Save state
-                localStorage.setItem('menuHidden', !isHidden);
-            }
-
-            function closeMenu() {
-                layoutMenu.classList.add('layout-menu-hidden');
-                layoutOverlay.classList.remove('show');
-                localStorage.setItem('menuHidden', true);
-            }
-
-            // Initialize menu state
-            function initializeMenu() {
-                const menuHidden = localStorage.getItem('menuHidden') === 'true';
-                if (menuHidden) {
-                    layoutMenu.classList.add('layout-menu-hidden');
-                    layoutOverlay.classList.remove('show');
-                } else {
-                    layoutMenu.classList.remove('layout-menu-hidden');
-                    if (window.innerWidth < 1200) {
-                        layoutOverlay.classList.add('show');
-                    }
-                }
-            }
-
-            // Event listeners
-            if (navbarMenuToggle) {
-                navbarMenuToggle.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    toggleMenu();
-                });
-            }
-
-            if (layoutOverlay) {
-                layoutOverlay.addEventListener('click', function () {
-                    closeMenu();
-                });
-            }
-
-            // Initialize
-            initializeMenu();
-
-            // Handle responsive behavior
-            window.addEventListener('resize', function () {
-                if (window.innerWidth >= 1200) {
-                    layoutOverlay.classList.remove('show');
-                } else {
-                    const isHidden = layoutMenu.classList.contains('layout-menu-hidden');
-                    if (!isHidden) {
-                        layoutOverlay.classList.add('show');
-                    }
-                }
-            });
-        });
-
     </script>
+
+    <script src="~/Content/assets/vendor/libs/popper/popper.js"></script>
+    <script src="~/Content/assets/vendor/js/bootstrap.js"></script>
+    <script src="~/Content/assets/vendor/libs/node-waves/node-waves.js"></script>
+    <script src="~/Content/assets/vendor/libs/pickr/pickr.js"></script>
+    <script src="~/Content/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+    <script src="~/Content/assets/vendor/libs/hammer/hammer.js"></script>
+    @*<script src="~/Content/assets/vendor/libs/i18n/i18n.js"></script>*@
+    <script src="~/Content/assets/vendor/js/menu.js"></script>
+    <script src="~/Content/assets/js/main.js"></script>
 </body>
 </html>
+<!-- beautify ignore:end -->

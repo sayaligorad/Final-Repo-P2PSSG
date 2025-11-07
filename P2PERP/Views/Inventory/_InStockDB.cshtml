@@ -1,75 +1,54 @@
 ﻿@model P2PLibray.Inventory.GRNdetailsDRB
+@{
+    ViewBag.Title = "In-Stock Management";
+}
 
 
 <style>
-    .modal-header {
-        border-bottom: 2px solid rgba(255,255,255,0.2);
+    /*  Apply compact styling only to Instock Table */
+    .instockTable thead th,
+    .instockTable tbody td {
+        padding: 0.35rem 0.5rem !important;
+        font-size: 0.78rem !important;
+        vertical-align: middle !important;
+        text-align: center !important;
     }
 
-    .card {
-        border-radius: 0.5rem;
-    }
+        /*  Item Code & Item Name Left aligned like Transfer UI */
+        .instockTable tbody td:nth-child(2),
+        .instockTable tbody td:nth-child(3) {
+            text-align: left !important;
+        }
 
-    .card-header {
-        border-bottom: 1px solid rgba(0,0,0,0.05);
-    }
-
-    .table th {
+    /*  Table Header consistency */
+    .instockTable thead th {
         border-top: none;
-        font-weight: 600;
-        font-size: 0.875rem;
+        font-weight: 600 !important;
+        font-size: 0.78rem !important;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.4px;
     }
 
-    .table td {
-        vertical-align: middle;
-        padding: 0.75rem;
+    /*  Reduce padding inside large cell content (Storage Allocation block) */
+    .instockTable .p-3 {
+        padding: 0.4rem !important;
     }
 
-    .form-control, .form-select {
-        border-radius: 0.375rem;
-        transition: all 0.2s ease;
+    /*  Ensure dropdown labels look small & aligned */
+    .instockTable label.form-label-sm {
+        font-size: 0.72rem !important;
+        margin-bottom: 0.1rem;
     }
 
-        .form-control:focus, .form-select:focus {
-            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
-            border-color: #86b7fe;
-        }
-
-    .badge {
-        font-size: 0.75rem;
-        padding: 0.35em 0.65em;
+    /*  Fix width overflow behavior gracefully */
+    .instockTable td {
+        white-space: nowrap;
     }
 
-    .progress {
-        border-radius: 1rem;
+    td,th{
+        text-align: center !important;
     }
 
-    .btn {
-        border-radius: 0.375rem;
-        font-weight: 500;
-    }
-
-    /* Responsive adjustments */
-    @@media (max-width: 768px) {
-        .modal-body {
-            padding: 1rem;
-        }
-
-        .table-responsive {
-            font-size: 0.875rem;
-        }
-
-        .card-body .row.g-0 > .col-md-6 {
-            border-right: none !important;
-            border-bottom: 1px solid #dee2e6;
-        }
-
-            .card-body .row.g-0 > .col-md-6:last-child {
-                border-bottom: none;
-            }
-    }
 </style>
 
 <div class="modal fade" id="InStockModal" tabindex="-1" aria-labelledby="grnModalLabel" aria-hidden="true">
@@ -77,12 +56,14 @@
         <div class="modal-content shadow-lg rounded-3">
 
             <!-- Header -->
-            <div class="modal-header bg-primary text-white justify-content-center position-relative py-3">
-                <h5 class="modal-title fw-bold text-white text-center m-0 fs-4" id="grnModalLabel">
-                    <i class="bi bi-box-seam me-2"></i>In-Stocks Management
-                </h5>
-                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header bg-primary text-white d-flex justify-content-center align-items-center rounded-top p-1 ">
+                <h3 class="modal-title fw-bold text-white mb-0 fs-5" id="grnModalLabel">
+                    In-Stocks Management
+                </h3>
+                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+
 
             <!-- Body -->
             <div class="modal-body p-4">
@@ -90,39 +71,41 @@
 
                     <!-- GRN / Invoice Details - Enhanced Card Layout -->
                     <div class="card shadow-sm border-0 mb-4">
-                      
+
                         <div class="card-body p-0">
                             <div class="row g-0">
                                 <!-- Left Column -->
                                 <div class="col-md-6 p-3 border-end">
                                     <div class="row mb-3">
-                                        <label class="col-sm-4 col-form-label fw-bold text-muted small">GRN No</label>
+                                        <label class="col-sm-4 col-form-label col-form-label-sm fw-bold text-muted ">GRN No</label>
                                         <div class="col-sm-8">
-                                            <input type="text" class="form-control bg-light border-0 fw-semibold" name="GRNCode" value="@Model.GRNCode" readonly />
+                                            <input type="text" class="form-control form-control-sm bg-light border-0 fw-semibold" name="GRNCode" value="@Model.GRNCode" readonly />
                                         </div>
                                     </div>
                                     <div class="row mb-3">
-                                        <label class="col-sm-4 col-form-label fw-bold text-muted small">GRN Date</label>
+                                        <label class="col-sm-4 col-form-label col-form-label-sm fw-bold text-muted ">PO Reference</label>
                                         <div class="col-sm-8">
-                                            <input type="text" class="form-control bg-light border-0" value="@Model.GRNDate.ToString("dd/MM/yyyy")" readonly />
+                                            <input type="text" class="form-control form-control-sm bg-light border-0" name="POReference" value="@Model.POReference" readonly />
                                         </div>
                                     </div>
                                     <div class="row mb-3">
-                                        <label class="col-sm-4 col-form-label fw-bold text-muted small">PO Reference</label>
+                                        <label class="col-sm-4 col-form-label col-form-label-sm fw-bold text-muted">Vendor Code</label>
                                         <div class="col-sm-8">
-                                            <input type="text" class="form-control bg-light border-0" name="POReference" value="@Model.POReference" readonly />
+                                            <input type="text" class="form-control form-control-sm bg-light border-0" name="VendorCode" value="@Model.VendorCode" readonly />
                                         </div>
                                     </div>
+
                                     <div class="row mb-3">
-                                        <label class="col-sm-4 col-form-label fw-bold text-muted small">Invoice No</label>
+                                        <label class="col-sm-4 col-form-label col-form-label-sm fw-bold text-muted">Invoice No</label>
                                         <div class="col-sm-8">
-                                            <input type="text" class="form-control bg-light border-0" name="InvoiceCode" value="@Model.InvoiceCode" readonly />
+                                            <input type="text" class="form-control form-control-sm bg-light border-0" name="InvoiceCode" value="@Model.InvoiceCode" readonly />
                                         </div>
                                     </div>
-                                    <div class="row">
-                                        <label class="col-sm-4 col-form-label fw-bold text-muted small">Vendor Code</label>
+
+                                    <div class="row mb-3">
+                                        <label class="col-sm-4 col-form-label col-form-label-sm fw-bold text-muted small">Warehouse Code</label>
                                         <div class="col-sm-8">
-                                            <input type="text" class="form-control bg-light border-0" name="VendorCode" value="@Model.VendorCode" readonly />
+                                            <input type="text" class="form-control form-control-sm bg-light border-0" name="StorId" value="@Model.WareHouseCode" readonly />
                                         </div>
                                     </div>
                                 </div>
@@ -130,33 +113,33 @@
                                 <!-- Right Column -->
                                 <div class="col-md-6 p-3">
                                     <div class="row mb-3">
-                                        <label class="col-sm-4 col-form-label fw-bold text-muted small">PO Contact Info</label>
+                                        <label class="col-sm-4 col-form-label col-form-label-sm fw-bold text-muted ">GRN Date</label>
                                         <div class="col-sm-8">
-                                            <input type="text" class="form-control bg-light border-0" name="POContactInfo" value="@Model.ContactNo" readonly />
+                                            <input type="text" class="form-control form-control-sm bg-light border-0" value="@Model.GRNDate.ToString("dd/MM/yyyy")" readonly />
                                         </div>
                                     </div>
                                     <div class="row mb-3">
-                                        <label class="col-sm-4 col-form-label fw-bold text-muted small">Invoice Date</label>
+                                        <label class="col-sm-4 col-form-label form-control-sm fw-bold text-muted ">PO Contact Info</label>
                                         <div class="col-sm-8">
-                                            <input type="text" class="form-control bg-light border-0" name="InvoiceDate" value="@Model.InvoiceDate" readonly />
+                                            <input type="text" class="form-control form-control-sm bg-light border-0" name="POContactInfo" value="@Model.ContactNo" readonly />
                                         </div>
                                     </div>
                                     <div class="row mb-3">
-                                        <label class="col-sm-4 col-form-label fw-bold text-muted small">Vendor Name</label>
+                                        <label class="col-sm-4 col-form-label col-form-label-sm fw-bold text-muted ">Vendor Name</label>
                                         <div class="col-sm-8">
-                                            <input type="text" class="form-control bg-light border-0" name="VendorName" value="@Model.VendorName" readonly />
+                                            <input type="text" class="form-control form-control-sm bg-light border-0" name="VendorName" value="@Model.VendorName" readonly />
                                         </div>
                                     </div>
                                     <div class="row mb-3">
-                                        <label class="col-sm-4 col-form-label fw-bold text-muted small">Store ID</label>
+                                        <label class="col-sm-4 col-form-label col-form-label-sm fw-bold text-muted ">Invoice Date</label>
                                         <div class="col-sm-8">
-                                            <input type="text" class="form-control bg-light border-0" name="StorId" value="@Model.WareHouseCode" readonly />
+                                            <input type="text" class="form-control form-control-sm bg-light border-0" name="InvoiceDate" value="@Model.InvoiceDate" readonly />
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <label class="col-sm-4 col-form-label fw-bold text-muted small">Warehouse Name</label>
+                                        <label class="col-sm-4 col-form-label col-form-label-sm fw-bold text-muted ">Warehouse Name</label>
                                         <div class="col-sm-8">
-                                            <input type="text" class="form-control bg-light border-0" name="WareHouseName" value="@Model.WarehouseName" readonly />
+                                            <input type="text" class="form-control form-control-sm bg-light border-0" name="WareHouseName" value="@Model.WarehouseName" readonly />
                                         </div>
                                     </div>
                                 </div>
@@ -166,13 +149,13 @@
 
                     <!-- Item Allocation Table - Enhanced -->
                     <div class="card shadow-sm border-0">
-                       
+
                         <div class="card-body p-0">
                             <div class="table-responsive">
-                                <table class="table table-hover align-middle mb-0 instockTable">
-                                    <thead class="table-primary">
+                                <table class="table table-striped table-hover align-middle mb-0 instockTable">
+                                    <thead class="table-dark">
                                         <tr>
-                                            <th class="text-center">#</th>
+                                            <th class="text-center">SR.No</th>
                                             <th>Item Code</th>
                                             <th>Item Name</th>
                                             <th>Type</th>
@@ -202,10 +185,10 @@
                                                 <td class="text-center">
                                                     <span class="badge bg-light text-dark border">@item.UOMName</span>
                                                 </td>
-                                                <td class="text-center fw-semibold">@item.Quantity</td>
+                                                <td class="text-center fw-semibold Quantity">@item.Quantity</td>
                                                 <td class="text-center">
                                                     <div class="d-flex flex-column align-items-center">
-                                                        <span class="fw-semibold @(isComplete ? "text-success" : "text-primary")">@item.QuantityStored</span>
+                                                        <span class="fw-semibold QuantityStored @(isComplete ? "text-success" : "text-primary")">@item.QuantityStored</span>
                                                         @if (!isComplete)
                                                         {
                                                             <div class="progress mt-1" style="height: 5px; width: 60px;">
@@ -225,26 +208,26 @@
                                                         <!-- Storage Location Selectors -->
                                                         <div class="row g-2 mb-3">
                                                             <div class="col-sm-6 col-lg-3">
-                                                                <label class="form-label small fw-semibold text-muted">Area</label>
-                                                                <select class="form-select form-select-sm area-ddl" @(isComplete ? "disabled" : "")>
+                                                                <label class="form-label-sm fw-semibold text-muted">Area</label>
+                                                                <select class="form-select form-select-sm area-ddl bg-white text-dark" @(isComplete ? "disabled" : "")>
                                                                     <option value="">Select Area</option>
                                                                 </select>
                                                             </div>
                                                             <div class="col-sm-6 col-lg-3">
-                                                                <label class="form-label small fw-semibold text-muted">Rack</label>
-                                                                <select class="form-select form-select-sm rack-ddl" @(isComplete ? "disabled" : "")>
+                                                                <label class="form-label-sm fw-semibold text-muted">Rack</label>
+                                                                <select class="form-select form-select-sm rack-ddl bg-white text-dark" @(isComplete ? "disabled" : "")>
                                                                     <option value="">Select Rack</option>
                                                                 </select>
                                                             </div>
                                                             <div class="col-sm-6 col-lg-3">
-                                                                <label class="form-label small fw-semibold text-muted">Row</label>
-                                                                <select class="form-select form-select-sm row-ddl" @(isComplete ? "disabled" : "")>
+                                                                <label class="form-label-sm fw-semibold text-muted">Row</label>
+                                                                <select class="form-select form-select-sm row-ddl bg-white text-dark" @(isComplete ? "disabled" : "")>
                                                                     <option value="">Select Row</option>
                                                                 </select>
                                                             </div>
                                                             <div class="col-sm-6 col-lg-3">
-                                                                <label class="form-label small fw-semibold text-muted">Bin</label>
-                                                                <select class="form-select form-select-sm bin-ddl" @(isComplete ? "disabled" : "")>
+                                                                <label class="form-label-sm fw-semibold text-muted">Bin</label>
+                                                                <select class="form-select form-select-sm bin-ddl bg-white text-dark" @(isComplete ? "disabled" : "")>
                                                                     <option value="">Select Bin</option>
                                                                 </select>
                                                             </div>
@@ -264,8 +247,8 @@
                                                                 </span>
                                                             </div>
                                                             <div class="d-flex align-items-center gap-2">
-                                                                <label class="form-label small fw-semibold text-muted mb-0">Assign Qty:</label>
-                                                                <input type="number" class="form-control form-control-sm assign-qty" style="width: 100px;" min="0" value="0" @(isComplete ? "disabled" : "") />
+                                                                <label class="form-label-sm fw-semibold text-muted mb-0">Assign Qty:</label>
+                                                                <input type="number" class="form-control form-control-sm bg-white text-dark assign-qty" style="width: 150px;" min="0" font-size="14px" ; placeholder="Enter quantity" @(isComplete ? "disabled" : "") />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -280,11 +263,9 @@
 
                     <!-- Footer Buttons -->
                     <div class="d-flex justify-content-end gap-3 mt-4 pt-3 border-top">
-                        <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
-                            <i class="bi bi-x-circle me-2"></i>Close
-                        </button>
-                        <button type="button" class="btn btn-success px-4 btnAssign">
-                            <i class="bi bi-check-circle me-2"></i>Assign Storage
+
+                        <button type="button" class="btn btn-success btn-sm px-4 btnAssign">
+                            <i class="bi bi-check-circle me-2"></i>Assign Quantity
                         </button>
                     </div>
 
@@ -301,237 +282,282 @@
 
 
 <script>
-    $(document).ready(function () {
+$(document).ready(function () {
 
-
-
-        //  Initialize DataTable for instock
+    // Ensure DataTable initialized only once
+    if (!$.fn.DataTable.isDataTable('.instockTable')) {
         $('.instockTable').DataTable({
-            destroy: true,     // ensures no duplicate initialization
+            destroy: true,
             responsive: true,
             searching: false,
             ordering: false,
             paging: false,
             info: false,
-            columnDefs: [
-                { targets: "_all", className: "text-center align-middle" }
-            ]
-        });
-
-
-
-        // 🔹 Directly load Areas using Model.WareHouseCode
-        let warehouseCode = '@Model.WareHouseCode';
-        if (warehouseCode) {
-            $(".area-ddl").each(function () {
-                var $area = $(this);
-                $area.empty().append($('<option/>').val("").text("-- Select Area --"));
-
-                $.ajax({
-                    url: '@Url.Action("GetSectionDRB", "Inventory")',
-                    type: 'GET',
-                    data: { code: warehouseCode },
-                    success: function (data) {
-                        console.log("Sections:", data);
-                        $.each(data, function (i, section) {
-                            $area.append($('<option/>').val(section.SectionCode).text(section.SectionName));
-                        });
-                    }
-                });
-            });
-        }
-
-        // 🔹 Area → Rack
-        $(document).on("change", ".area-ddl", function () {
-            var sectionCode = $(this).val();
-            var $row = $(this).closest("tr");
-            var $rack = $row.find(".rack-ddl");
-            var $rowddl = $row.find(".row-ddl");
-            var $bin = $row.find(".bin-ddl");
-
-            $rack.empty().append($('<option/>').val("").text("-- Select Rack --"));
-            $rowddl.empty().append($('<option/>').val("").text("-- Select Row --"));
-            $bin.empty().append($('<option/>').val("").text("-- Select Bin --"));
-
-            if (sectionCode) {
-                $.ajax({
-                    url: '@Url.Action("GetRackDRB", "Inventory")',
-                    type: 'GET',
-                    data: { Sectioncode: sectionCode },
-                    success: function (data) {
-                        console.log("Racks:", data);
-                        $.each(data, function (i, rack) {
-                            $rack.append($('<option/>').val(rack.RackCode).text(rack.RackName));
-                        });
-                    }
-                });
-            }
-        });
-
-        // 🔹 Rack → Row
-        $(document).on("change", ".rack-ddl", function () {
-            var rackCode = $(this).val();
-            var $row = $(this).closest("tr");
-            var $rowddl = $row.find(".row-ddl");
-            var $bin = $row.find(".bin-ddl");
-
-            $rowddl.empty().append($('<option/>').val("").text("-- Select Row --"));
-            $bin.empty().append($('<option/>').val("").text("-- Select Bin --"));
-
-            if (rackCode) {
-                $.ajax({
-                    url: '@Url.Action("GetRowDRB", "Inventory")',
-                    type: 'GET',
-                    data: { Rackcode: rackCode },
-                    success: function (data) {
-                        console.log("Rows:", data);
-                        $.each(data, function (i, rw) {
-                            $rowddl.append($('<option/>').val(rw.RowCode).text(rw.RowName));
-                        });
-                    }
-                });
-            }
-        });
-
-        // 🔹 Row → Bin
-        $(document).on("change", ".row-ddl", function () {
-    var rowCode = $(this).val();
-    var $row = $(this).closest("tr");
-    var grnItemCode = $row.find(".grnitemcode").val(); // ✅ Fixed selector
-    var $bin = $row.find(".bin-ddl");
-
-    $bin.empty().append($('<option/>').val("").text("-- Select Bin --"));
-
-    if (rowCode) {
-        $.ajax({
-            url: '@Url.Action("GetBinDRB", "Inventory")',
-            type: 'GET',
-            dataType: 'json', // ✅ ensure response parsed correctly
-            data: {
-                RowCode: rowCode,       // ✅ match exact param name
-                GRNItemCode: grnItemCode
-            },
-            success: function (data) {
-                console.log("Bins:", data);
-                $.each(data, function (i, bin) {
-                    $bin.append(
-                        $('<option/>')
-                            .val(bin.BinCode)
-                            .text(bin.BinName)
-                            .attr("data-max", bin.MaxQuantity)
-                            .attr("data-current", bin.CurrentItems)
-                    );
-                });
-            },
-            error: function (xhr, status, error) {
-                console.error("Error loading bins:", error);
-            }
+            columnDefs: [{ targets: "_all", className: "text-center align-middle" }]
         });
     }
-});
 
 
-        // Bin → Show capacity
-        $(document).on("change", ".bin-ddl", function () {
-            var $bin = $(this);
-            var $row = $bin.closest("tr");
-
-            var selected = $bin.find(":selected");
-            var max = selected.data("max") || 0;
-            var current = selected.data("current") || 0;
-
-            $row.find(".current-items").text(current);
-            $row.find(".max-capacity").text(max);
-            $row.find(".assign-qty").val(0);
-            $row.find(".remaining").text(max - current);
-        });
-
-        // When AssignQty changes → update Remaining
-        $(document).on("input", ".assign-qty", function () {
-            var $input = $(this);
-            var $row = $input.closest("tr");
-
-            var assignQty = parseInt($input.val()) || 0;
-            var current = parseInt($row.find(".current-items").text()) || 0;
-            var max = parseInt($row.find(".max-capacity").text()) || 0;
-
-            var remaining = max - (current + assignQty);
-
-            // Prevent over-assign
-            if (remaining < 0) {
-                toastr.warning("Bin Capacity Exceeded...!");
-                $input.val(0);
-                remaining = max - current;
-            }
-
-            $row.find(".remaining").text(remaining);
-        });
-
-        // 🔹 Save Assignments
-       $(".btnAssign").click(function () {
-    let assignments = [];
-
-    $(".instockTable tbody tr").each(function () {
-        let grnItemCode = $(this).find(".grnitemcode").val(); // Correct identifier
-        let binCode = $(this).find(".bin-ddl").val();
-        let assignQty = parseInt($(this).find(".assign-qty").val()) || 0;
-
-        if (binCode && assignQty > 0) {
-            assignments.push({
-                GRNItemCode: grnItemCode,
-                BinCode: binCode,
-                QuantityStored: assignQty,
-                CreatedDate: new Date().toISOString()
-            });
-        }
-    });
-
-    if (assignments.length === 0) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'No Items',
-            text: 'No items assigned to bins!',
-            confirmButtonText: 'OK'
-        });
-        return;
-    }
+    const warehouseCode = '@Model.WareHouseCode';
+    if (!warehouseCode) return;
 
     $.ajax({
-        url: '@Url.Action("SaveItemBinAssignmentDRB", "Inventory")',
-        type: 'POST',
-        contentType: "application/json",
-        data: JSON.stringify(assignments),
-        success: function (res) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Assignment Saved',
-                text: 'Bin assignment saved successfully!',
-                timer: 2000,
-                showConfirmButton: false
-            }).then(() => {
-                location.reload();
-            });
-        },
-        error: function () {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Something went wrong while saving bin assignments!'
+        url: '@Url.Action("GetSectionDRB", "Inventory")',
+        type: 'GET',
+        data: { code: warehouseCode },
+        success: function (data) {
+            console.log("Sections reloaded:", data);
+            $(".area-ddl").each(function () {
+                const $area = $(this);
+                $area.empty().append($('<option/>').val("").text("-- Select Area --"));
+                $.each(data, function (i, section) {
+                    $area.append($('<option/>').val(section.SectionCode).text(section.SectionName));
+                });
             });
         }
     });
-});
 
 
-        // 🔹 Disable row if fully stored
+
+    // Clear dependent dropdowns before repopulating
+    function resetDropdowns($row) {
+        $row.find(".rack-ddl, .row-ddl, .bin-ddl").each(function () {
+            $(this).empty().append($('<option/>').val("").text(""));
+        });
+    }
+
+    // Area → Rack
+    $(document).off("change", ".area-ddl").on("change", ".area-ddl", function () {
+        const sectionCode = $(this).val();
+        const $row = $(this).closest("tr");
+        const $rack = $row.find(".rack-ddl");
+        resetDropdowns($row);
+
+        if (sectionCode) {
+            $.ajax({
+                url: '@Url.Action("GetRackDRB", "Inventory")',
+                type: 'GET',
+                data: { Sectioncode: sectionCode },
+                success: function (data) {
+                    console.log("Racks:", data);
+                    $rack.append($('<option/>').val("").text("-- Select Rack --"));
+                    $.each(data, function (i, rack) {
+                        if ($rack.find(`option[value='${rack.RackCode}']`).length === 0) { // No duplicates
+                            $rack.append($('<option/>').val(rack.RackCode).text(rack.RackName));
+                        }
+                    });
+                }
+            });
+        }
+    });
+
+    // Rack → Row
+    $(document).off("change", ".rack-ddl").on("change", ".rack-ddl", function () {
+        const rackCode = $(this).val();
+        const $row = $(this).closest("tr");
+        const $rowddl = $row.find(".row-ddl");
+        const $bin = $row.find(".bin-ddl");
+        $rowddl.empty().append($('<option/>').val("").text("-- Select Row --"));
+        $bin.empty().append($('<option/>').val("").text("-- Select Bin --"));
+
+        if (rackCode) {
+            $.ajax({
+                url: '@Url.Action("GetRowDRB", "Inventory")',
+                type: 'GET',
+                data: { Rackcode: rackCode },
+                success: function (data) {
+                    console.log("Rows:", data);
+                    $.each(data, function (i, rw) {
+                        if ($rowddl.find(`option[value='${rw.RowCode}']`).length === 0) { // Prevent duplicates
+                            $rowddl.append($('<option/>').val(rw.RowCode).text(rw.RowName));
+                        }
+                    });
+                }
+            });
+        }
+    });
+
+    // Row → Bin
+    $(document).off("change", ".row-ddl").on("change", ".row-ddl", function () {
+        const rowCode = $(this).val();
+        const $row = $(this).closest("tr");
+        const grnItemCode = $row.find(".grnitemcode").val();
+        const $bin = $row.find(".bin-ddl");
+        $bin.empty().append($('<option/>').val("").text("-- Select Bin --"));
+
+        if (rowCode) {
+            $.ajax({
+                url: '@Url.Action("GetBinDRB", "Inventory")',
+                type: 'GET',
+                dataType: 'json',
+                data: { RowCode: rowCode, GRNItemCode: grnItemCode },
+                success: function (data) {
+                    console.log("Bins:", data);
+                    $.each(data, function (i, bin) {
+                        if ($bin.find(`option[value='${bin.BinCode}']`).length === 0) { // Prevent duplicates
+                            $bin.append(
+                                $('<option/>')
+                                    .val(bin.BinCode)
+                                    .text(bin.BinName)
+                                    .attr("data-max", bin.MaxQuantity)
+                                    .attr("data-current", bin.CurrentItems)
+                            );
+                        }
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading bins:", error);
+                }
+            });
+        }
+    });
+
+    // Bin capacity update
+    $(document).off("change", ".bin-ddl").on("change", ".bin-ddl", function () {
+        const $bin = $(this);
+        const $row = $bin.closest("tr");
+        const selected = $bin.find(":selected");
+        const max = selected.data("max") || 0;
+        const current = selected.data("current") || 0;
+
+        $row.find(".current-items").text(current);
+        $row.find(".Quantity").text();
+        $row.find(".max-capacity").text(max);
+        $row.find(".assign-qty").val(0);
+        $row.find(".remaining").text(max - current);
+    });
+
+    // Assign quantity update
+    $(document).off("input", ".assign-qty").on("input", ".assign-qty", function () {
+        const $input = $(this);
+        const $row = $input.closest("tr");
+        const assignQty = parseInt($input.val()) || 0;
+        const current = parseInt($row.find(".current-items").text()) || 0;
+        const max = parseInt($row.find(".max-capacity").text()) || 0;
+        const totalItemQty = parseInt($row.find(".Quantity").text()) || 0;
+        const QuantityStored = parseInt($row.find(".QuantityStored").text()) || 0;
+        const Total = totalItemQty - QuantityStored;
+        let remaining = max - (current + assignQty);
+
+        // --- Error message placeholder ---
+        let $errorMsg = $row.find(".assign-qty-error");
+        if ($errorMsg.length === 0) {
+            $errorMsg = $('<div class="text-danger small mt-1 assign-qty-error"></div>');
+            $input.after($errorMsg);
+        }
+
+        // --- 1️⃣ Negative value check ---
+        if (assignQty <= 0) {
+            $errorMsg.text("Quantity must be greater than zero.");
+            $input.addClass("is-invalid");
+            $row.find(".remaining").text(max - current);
+            return;
+        }
+
+        // --- 2️⃣ Exceeding item quantity check ---
+        if (assignQty > totalItemQty - QuantityStored) {
+            $errorMsg.text("Assigned quantity cannot exceed total item quantity (" + Total + ").");
+            toastr.error("Assigned quantity exceeds available quantity!");
+            $input.addClass("is-invalid");
+            $input.val(totalItemQty); // reset to max allowed
+            $row.find(".remaining").text(max - current);
+            return;
+        }
+
+        // --- 3️⃣ Bin capacity exceeded check ---
+        if (remaining < 0) {
+            $errorMsg.text("Bin capacity exceeded!");
+            toastr.warning("Bin capacity exceeded!");
+            $input.addClass("is-invalid");
+            $input.val(0);
+            $row.find(".remaining").text(max - current);
+            return;
+        }
+
+        // --- 4️⃣ Valid input ---
+        $errorMsg.text("");
+        $input.removeClass("is-invalid");
+        $row.find(".remaining").text(remaining);
+    });
+
+
+
+    // Save Assignments
+    $(".btnAssign").off("click").on("click", function () {
+        const assignments = [];
+
         $(".instockTable tbody tr").each(function () {
-            var qty = parseInt($(this).find("td:eq(5)").text()) || 0;
-            var stored = parseInt($(this).find("td:eq(6)").text()) || 0;
+            const grnItemCode = $(this).find(".grnitemcode").val();
+            const binCode = $(this).find(".bin-ddl").val();
+            const assignQty = parseInt($(this).find(".assign-qty").val()) || 0;
 
-            if (qty === stored) {
-                $(this).addClass("table-secondary");
-                $(this).find("select, input").prop("disabled", true);
+            if (binCode && assignQty > 0) {
+                assignments.push({
+                    GRNItemCode: grnItemCode,
+                    BinCode: binCode,
+                    QuantityStored: assignQty,
+                    CreatedDate: new Date().toISOString()
+                });
+            }
+        });
+
+        if (assignments.length === 0) {
+            Swal.fire({ icon: 'warning', title: 'No Items', text: 'No items assigned to bins!', confirmButtonText: 'OK' });
+            return;
+        }
+
+        $.ajax({
+            url: '@Url.Action("SaveItemBinAssignmentDRB", "Inventory")',
+            type: 'POST',
+            contentType: "application/json",
+            data: JSON.stringify(assignments),
+            success: function () {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Assignment Saved',
+                    text: 'Bin assignment saved successfully!',
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => location.reload());
+            },
+            error: function () {
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Something went wrong while saving bin assignments!' });
             }
         });
     });
+
+
+    // Disable row if fully stored
+    $(".instockTable tbody tr").each(function () {
+        var qty = parseInt($(this).find("td:eq(5)").text()) || 0;
+        var stored = parseInt($(this).find("td:eq(6)").text()) || 0;
+
+        if (qty === stored) {
+            $(this).addClass("table-secondary");
+            $(this).find("select, input").prop("disabled", true);
+        }
+    });
+
+
+    if (ItemId) {
+        $.ajax({
+            type: "GET",
+            url: "/Inventory/GetBinNameItemDRB",
+            data: { itemcode: ItemId },
+            dataType: "json",
+            success: function (response) {
+                if (response && response.length > 0) {
+                    $.each(response, function (i, emp) {
+
+                       
+                    });
+                } else {
+                    $BinSelect.append('<option value="">No Bin found</option>');
+                }
+            }
+        });
+    }
+
+
+});
 </script>

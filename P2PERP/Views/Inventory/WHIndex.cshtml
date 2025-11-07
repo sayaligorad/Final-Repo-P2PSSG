@@ -1,27 +1,31 @@
 ﻿
+@{
+    ViewBag.Title = "Assign Bin";
+}
 
-<ul class="nav nav-pills container nav-justified " id="warehousesTabs" role="tablist">
-    <li class="nav-item card shadow" role="presentation">
+
+<ul class="nav nav-pills" id="warehousesTabs" role="tablist">
+    <li class="nav-item " role="presentation">
         <button class="nav-link active" id="warehouse-tab" data-bs-toggle="tab" data-bs-target="#warehouse" type="button" role="tab">
             Warehouse
         </button>
     </li>
-    <li class="nav-item card shadow" role="presentation">
+    <li class="nav-item " role="presentation">
         <button class="nav-link" id="section-tab" data-bs-toggle="tab" data-bs-target="#section" type="button" role="tab">
             Section
         </button>
     </li>
-    <li class="nav-item card shadow" role="presentation">
+    <li class="nav-item" role="presentation">
         <button class="nav-link" id="rack-tab" data-bs-toggle="tab" data-bs-target="#rack" type="button" role="tab">
             Rack
         </button>
     </li>
-    <li class="nav-item card shadow" role="presentation">
+    <li class="nav-item " role="presentation">
         <button class="nav-link" id="row-tab" data-bs-toggle="tab" data-bs-target="#row" type="button" role="tab">
             Row
         </button>
     </li>
-    <li class="nav-item card shadow" role="presentation">
+    <li class="nav-item" role="presentation">
         <button class="nav-link" id="bin-tab" data-bs-toggle="tab" data-bs-target="#bin" type="button" role="tab">
             Bin
         </button>
@@ -66,9 +70,40 @@
     </div>
 </div>
 <style>
-    .content-wrapper
-    {
-        justify-content: start !important;
-           
+    .content-wrapper {
+        justify-content: flex-start !important;
     }
 </style>
+
+<script>
+    if (typeof window.setLoaderTimeout === "function") {
+        window.setLoaderTimeout(5000);
+    }
+
+    $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+        var target = $(e.target).data("bs-target"); // e.g., "#rack"
+
+        if (target === "#rack") {
+            // Initialize Rack table here if not initialized
+            if (!window.rackInitialized) {
+                initRackTab(); // your function to init DataTable + modals
+                window.rackInitialized = true;
+            }
+        }
+
+        if (target === "#row") {
+            if (!window.rowInitialized) {
+                initRowTab(); // create similar function for Row
+                window.rowInitialized = true;
+            }
+        }
+
+        if (target === "#bin") {
+            if (!window.binInitialized) {
+                initBinTab(); // create similar function for Bin
+                window.binInitialized = true;
+            }
+        }
+    });
+
+</script>

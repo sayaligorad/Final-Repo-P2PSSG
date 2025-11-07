@@ -47,11 +47,11 @@ body {
 .tab-header {
     display: flex;
     gap: 20px;
-    justify-content: center;
+/*    justify-content: center;*/
     margin-bottom: 30px;
 }
 
-.tab-btn {
+/*.tab-btn {
     position: relative;
     padding: 12px 30px;
     border-radius: 12px;
@@ -63,9 +63,9 @@ body {
     z-index: 1;
     overflow: hidden;
     transition: all 0.3s ease;
-}
+}*/
 
-    .tab-btn::before {
+/*    .tab-btn::before {
         content: "";
         position: absolute;
         top: -3px;
@@ -76,9 +76,9 @@ body {
         background: conic-gradient(from 0deg, #3b82f6, #9333ea, #f59e0b, #ef4444, #3b82f6);
         z-index: -1;
         animation: spin 4s linear infinite;
-    }
+    }*/
 
-    .tab-btn::after {
+/*    .tab-btn::after {
         content: "";
         position: absolute;
         top: 2px;
@@ -93,7 +93,7 @@ body {
     .tab-btn.active {
         background: var(--tab-active-bg);
         color: blue !important;
-    }
+    }*/
 
 @keyframes spin {
     from {
@@ -129,7 +129,7 @@ body {
 }
 
 /* Buttons */
-.btn-save {
+/*.btn-save {
     background-color: var(--btn-save-bg);
     color: white;
 }
@@ -137,7 +137,7 @@ body {
 .btn-cancel {
     background-color: var(--btn-cancel-bg);
     color: white;
-}
+}*/
 
 .form-section {
     margin-bottom: 1.5rem;

@@ -41,42 +41,37 @@
         <!-- Single Card wrapping everything -->
         <div class="card shadow-sm rounded bg-white p-4">
 
-            <!-- Header with Print -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <button class="btn btn-outline-primary btn-sm" id="btnPrint" title="Print">
-                    <i class="bi bi-printer-fill text-dark fs-5"></i>
-                </button>
-            </div>
+          
 
             <!-- Header Details -->
             <div class="row g-3 mb-4">
                 <div class="col-md-2">
                     <label class="form-label">RFQ No</label>
-                    <input id="RFQCode" class="form-control" readonly />
+                    <input  id="RFQCode" class="form-control small text-muted border rounded p-2 bg-light mb-2 mt-2" readonly />
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Register Quotation Code</label>
-                    <input id="RegisterQuotationCode" class="form-control" readonly />
+                    <input id="RegisterQuotationCode" class="form-control  small text-muted border rounded p-2 bg-light mb-2 mt-2" readonly />
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">VQ Date</label>
-                    <input id="SystemDate" class="form-control" readonly />
+                    <input id="SystemDate" class="form-control  small text-muted border rounded p-2 bg-light mb-2 mt-2" readonly />
                 </div>
                 <div class="col-md-2">
                     <label class="form-label">Vendor Name</label>
-                    <input id="VendorName" class="form-control" readonly />
+                    <input id="VendorName" class="form-control  small text-muted border rounded p-2 bg-light mb-2 mt-2" readonly />
                 </div>
                 <div class="col-md-2">
                     <label class="form-label">Vendor Code</label>
-                    <input id="VendorCode" class="form-control" readonly />
+                    <input id="VendorCode" class="form-control  small text-muted border rounded p-2 bg-light mb-2 mt-2" readonly />
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Vendor Company</label>
-                    <input id="CompanyName" class="form-control" readonly />
+                    <input id="CompanyName" class="form-control  small text-muted border rounded p-2 bg-light mb-2 mt-2" readonly />
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Vendor Expected Delivery Date</label>
-                    <input id="VendorDeliveryDate" class="form-control" readonly />
+                    <input id="VendorDeliveryDate" class="form-control  small text-muted border rounded p-2 bg-light mb-2 mt-2" readonly />
                 </div>
             </div>
 
@@ -153,43 +148,83 @@
                     $("#ftShipping").text("₹ " + Number(h.ShippingCharges || 0).toFixed(2));
                 });
 
-            //Get RQItems By Code
+           
+            // Get RQItems By Code
             $.getJSON('/Purchase/GetRQItemsByCodeVNK', { rqCode: rqCode })
                 .done(function (rows) {
+
+                    // ✅ Destroy existing DataTable before changing table content
+                    if ($.fn.DataTable.isDataTable('#grid')) {
+                        $('#grid').DataTable().clear().destroy();
+                    }
+
                     const $tb = $("#grid tbody").empty();
                     let subTotal = 0;
+
                     (rows || []).forEach(function (r, idx) {
                         const c = calcLine(r.Quantity, r.CostPerUnit, r.Discount, r.GST);
                         subTotal += c.lineTot;
                         $tb.append(`
-                                <tr>
-                                    <td class="text-center">${idx + 1}</td>
-                                    <td class="text-center">${r.ItemCode}</td>
-                                    <td>${r.ItemName || ""}</td>
-                                    <td class="text-center" title="${r.Description || ''}" data-bs-toggle="tooltip">${r.Description || ""}</td>
-                                    <td class="text-end">${Number(r.Quantity || 0)}</td>
-                                    <td class="text-center">${r.UOMName || ""}</td>
-                                    <td class="text-end">₹ ${Number(r.CostPerUnit || 0).toFixed(2)}</td>
-                                    <td class="text-end">${Number(r.Discount || 0).toFixed(2)}%</td>
-                                    <td class="text-end">${Number(r.GST || 0).toFixed(2)}%</td>
-                                    <td class="text-end">₹ ${c.lineTot.toFixed(2)}</td>
-                                </tr>
-                            `);
+                <tr>
+                    <td class="text-center">${idx + 1}</td>
+                    <td class="text-center">${r.ItemCode}</td>
+                    <td>${r.ItemName || ""}</td>
+                    <td class="text-center" title="${r.Description || ''}" data-bs-toggle="tooltip">${r.Description || ""}</td>
+                    <td class="text-end">${Number(r.Quantity || 0)}</td>
+                    <td class="text-center">${r.UOMName || ""}</td>
+                    <td class="text-end">₹ ${Number(r.CostPerUnit || 0).toFixed(2)}</td>
+                    <td class="text-end">${Number(r.Discount || 0).toFixed(2)}%</td>
+                    <td class="text-end">${Number(r.GST || 0).toFixed(2)}%</td>
+                    <td class="text-end">₹ ${c.lineTot.toFixed(2)}</td>
+                </tr>
+            `);
                     });
+
+                    // ✅ Update totals
                     $("#ftSubTotal").text("₹ " + subTotal.toFixed(2));
                     const shipping = Number($("#ftShipping").text().replace("₹", "").trim() || 0);
                     $("#ftGrand").text("₹ " + (subTotal + shipping).toFixed(2));
 
+                    // ✅ Reinitialize DataTable AFTER adding rows
+                    $('#grid').DataTable({
+
+
+                        paging: true,
+                        searching: true,
+                        info: true,
+                        ordering: false,
+                        lengthChange: false,
+                        pageLength: 10,
+                        language: {
+                            info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                            infoEmpty: "No entries available",
+                            lengthMenu: "Show _MENU_ entries",
+                            paginate: { previous: "<", next: ">" }
+                        },
+
+                        dom: '<"d-flex justify-content-between align-items-center mb-2"<"d-flex"l><"d-flex justify-content-end"f>>t<"d-flex justify-content-between align-items-center mt-2"ip>',
+                        initComplete: function () {
+                            $('#grid_filter input').addClass("form-control ms-2").attr("placeholder", "Search...").css("height", "40px");
+                        }
+
+                    });
+
+                    // Re-enable tooltips
                     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
                     tooltipTriggerList.map(function (tooltipTriggerEl) {
                         return new bootstrap.Tooltip(tooltipTriggerEl);
                     });
                 });
 
+
             $("#btnPrint").on("click", function () {
                 window.print();
             });
-        })();
+            })();
+
+
+
+
 
         //Modal Hide show
         $(document).on('hidden.bs.modal', '.modal', function () {

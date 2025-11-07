@@ -1,4 +1,17 @@
 ﻿<style>
+    /* .circular-glass-btn {
+        width: 40px;
+        height: 38px;
+        border-radius: 5px;
+        backdrop-filter: blur(4px);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        padding: 0;
+        border: none;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.30);
+    }*/
     #currentStockTable thead th {
         text-align: center;
         vertical-align: middle;
@@ -9,14 +22,29 @@
         vertical-align: middle;
     }
 
-    div.dt-buttons {
-        margin-top: 10px;
-        margin-bottom: 10px;
+    /* Buffer on export icon proccess remove */
+    button.dt-button.processing,
+    div.dt-button.processing {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        background: none !important;
+    }
+
+        button.dt-button.processing:after {
+            content: none !important;
+        }
+
+    #currentStockTable thead th {
+        padding: 0.3rem 0.4rem !important;
+    }
+
+    #ViewBin thead th {
+        padding: 0.10rem 0.11rem !important;
     }
 </style>
 
 <div class="container mt-4 card shadow-sm">
-    <h3 class="text-primary text-center fw-bolder mt-3">Current Stock</h3>
+    <h3 class="text-primary text-center fw-bolder mt-3">Current Stock Check</h3>
     <table id="currentStockTable" class="table table-bordered table-striped wrap">
         <thead class="table-dark text-center">
             <tr>
@@ -37,20 +65,44 @@
 
 <!-- Modal -->
 <div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <!-- Added modal-dialog-centered -->
         <div class="modal-content">
-            <div class="modal-header bg-primary justify-content-center position-relative">
-                <h4 class="modal-title text-white text-center" id="viewModalLabel">View Item</h4>
+            <div class="modal-header bg-primary justify-content-center position-relative" style="padding-top: 0.7rem; padding-bottom: 0.7rem;">
+                <h4 class="modal-title text-white text-center fs-5 p-1" id="viewModalLabel">View Item</h4>
                 <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+
             <div class="modal-body">
-                <p><strong>Item Code:</strong> <span id="modalItemCode"></span></p>
-                <p><strong>Item Name:</strong> <span id="modalItemName"></span></p>
-                <p><strong>Current Quantity:</strong> <span id="modalQuantity"></span></p>
-                <p><strong>Reorder Quantity:</strong> <span id="modalReorderQty"></span></p>
+                <div class="row mb-2">
+                    <!-- Left Column -->
+                    <div class="col-md-6">
+                        <div class="mb-2">
+                            <label class="form-label fw-bold">Item Code:</label>
+                            <input type="text" id="modalItemCode" class="form-control bg-light text-muted" readonly>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label fw-bold">Item Name:</label>
+                            <input type="text" id="modalItemName" class="form-control bg-light text-muted" readonly>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="col-md-6">
+                        <div class="mb-2">
+                            <label class="form-label fw-bold">Current Quantity:</label>
+                            <input type="text" id="modalQuantity" class="form-control bg-light text-muted" readonly>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label fw-bold">Reorder Quantity:</label>
+                            <input type="text" id="modalReorderQty" class="form-control bg-light text-muted" readonly>
+                        </div>
+                    </div>
+                </div>
+
                 <hr />
                 <h5>Bin Details</h5>
-                <table class="table table-sm table-bordered">
+                <table class="table table-sm table-bordered" id="ViewBin">
                     <thead class="table-dark text-center">
                         <tr>
                             <th>Sr.No.</th>
@@ -60,11 +112,11 @@
                     </thead>
                     <tbody id="modalBinTable"></tbody>
                 </table>
-
             </div>
         </div>
     </div>
 </div>
+
 
 <script>
 $(document).ready(function () {
@@ -128,7 +180,7 @@ $(document).ready(function () {
                     data-id="${row.ItemCode}"
                     title="View Current Stock"
                     data-bs-toggle="tooltip">
-                <i class="bi bi-eye"></i>
+                <i class="bi bi-eye-fill"></i>
             </button>`;
                 }
 
@@ -140,45 +192,94 @@ $(document).ready(function () {
             {
                 extend: 'print',
                 text: '<i class="bi bi-printer-fill text-dark fs-5"></i>',
-                title: `Current Stock - ${moment().format("YYYY-MM-DD")}`,
+                title: '',
                 exportOptions: {
                     columns: function (idx, data, node) {
                         var header = $(node).closest('table').find('th').eq(idx).text().trim();
-                        if (header === "Status") return false;  // Status column hidden
-                        if (header === "BinList") return true;  // Hidden BinList column included
-                        if (idx === 0) return false;            // Skip checkbox column
-                        return true;                            // All other columns
+                        if (header === "Status") return false;
+                        if (header === "BinList") return true;
+                        if (idx === 0) return false; // skip checkbox/serial
+                        return true;
                     },
                     rows: function (idx, data, node) {
-                        return selectedIds.has(data.ItemCode + "_" + idx); // Only selected rows
+                        return selectedIds.has(data.ItemCode + "_" + idx);
                     },
-                    format: { body: serialFormatter() } // Serial number reset
+                    format: {
+                        body: serialFormatter() // fixed serial numbering logic
+                    }
                 },
                 action: function (e, dt, button, config) {
                     if (selectedIds.size === 0) {
                         toastr.warning("Please select at least one item before printing.");
                         return;
                     }
+                    // reset counter & trigger print
                     $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config);
                 },
                 customize: function (win) {
-                    $(win.document.body).find('table')
-                        .css('border', '1px solid black')
-                        .css('border-collapse', 'collapse')
-                        .find('th, td')
-                        .css('border', '1px solid black')
-                        .css('padding', '5px');
+                    //  Body reference
+                    var $body = $(win.document.body);
 
-                    $(win.document.body).find('th')
-                        .css('background-color', 'black')
-                        .css('color', 'white');
+                    //  Add custom styles
+                    $body.append(`
+<style>
+    thead th {
+        background-color: black !important;
+        color: white !important;
+        text-align: center !important;
+        vertical-align: middle !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        font-weight: bold !important;
+        padding: 8px !important;
+    }
+    table {
+        border-collapse: collapse !important;
+        width: 100% !important;
+        margin: 0 auto !important;
+    }
+    td, th {
+        border: 1px solid #000 !important;
+        padding: 6px !important;
+        text-align: center !important;
+        vertical-align: middle !important;
+    }
+    tbody td {
+        text-align: center !important;
+        vertical-align: middle !important;
+    }
+    h3, p {
+        text-align: center !important;
+    }
+</style>
+        `);
+
+                    //  Add title and metadata
+                    $body.prepend(`
+            <h3>Current Stock Report</h3>
+            <p>Generated Date: ${moment().format("DD/MM/YYYY")}</p>
+        `);
+
+                    //  Apply font & layout styling
+                    $body.css({
+                        'font-size': '12pt',
+                        'font-family': 'Arial, sans-serif'
+                    });
+
+                    //  Fix serial numbers (recalculate for selected rows)
+                    const $table = $body.find('table');
+                    $table.find('tbody tr').each(function (index) {
+                        $(this).find('td:first').text(index + 1);
+                    });
                 }
             },
+
+
             // --- PDF ---
             {
                 extend: 'pdfHtml5',
                 text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
-                title: `Current Stock - ${moment().format("YYYY-MM-DD")}`,
+                title: `Current Stock`,
                 exportOptions: {
                     columns: function (idx, data, node) {
                         var header = $(node).closest('table').find('th').eq(idx).text().trim();
@@ -219,7 +320,7 @@ $(document).ready(function () {
                         cell.alignment = 'center';
                     });
 
-                    // ✅ Center align table on PDF
+                    //  Center align table on PDF
                     doc.content[1].table.widths = Array(
                         doc.content[1].table.body[0].length
                     ).fill('*');
@@ -227,10 +328,10 @@ $(document).ready(function () {
                     doc.content[1].alignment = 'center';
                     doc.content[1].margin = [0, 10, 0, 0];
 
-                    // ✅ Add Generated Date under title (DATE ONLY)
+                    //  Add Generated Date under title (DATE ONLY)
                     var generatedDate = moment().format("YYYY-MM-DD");
                     doc.content.splice(1, 0, {
-                        text: `Generated Date: ${generatedDate}`,
+                        text: `Generated Date: ${moment().format("DD/MM/YYYY")}`,
                         alignment: 'center',
                         margin: [0, 0, 0, 10],
                         fontSize: 10,
@@ -239,37 +340,59 @@ $(document).ready(function () {
                 }
             },
 
-            // --- EXCEL ---
+            // --- Excel ---
             {
                 extend: 'excelHtml5',
                 text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
-                title: `Current Stock - ${moment().format("YYYY-MM-DD")}`,
+                title: 'Current Stock Report',
+                messageTop: `Generated Date: ${moment().format("DD/MM/YYYY")}`,
                 exportOptions: {
-                    columns: function (idx, data, node) {
-                        var header = $(node).closest('table').find('th').eq(idx).text().trim();
-                        if (header === "Status") return false;
-                        if (header === "BinList") return true;
-                        if (idx === 0) return false;
-                        return true;
-                    },
+                    columns: [1, 2, 3, 4, 5, 6], // Export only actual data columns
                     rows: function (idx, data, node) {
-                        return selectedIds.has(data.ItemCode + "_" + idx);
-                    },
-                    format: { body: serialFormatter() }
+                        let uniqueId = data.ItemCode + "_" + idx;
+                        return selectedIds.has(uniqueId);
+                    }
+                },
+                customize: function (xlsx) {
+                    let sheet = xlsx.xl.worksheets['sheet1.xml'];
+
+                    // Title row style (already centered)
+                    let titleStyle = $('row[r="1"] c', sheet).attr('s');
+
+                    // Bold Title and keep it centered
+                    $('row[r="1"] c', sheet).attr('s', titleStyle);
+
+                    // Bold Generated Date and keep it centered
+                    $('row[r="2"] c', sheet).attr('s', titleStyle);
+
+                    // Insert "Sr. No" column at start and make bold
+                    let serial = 1;
+                    $('row', sheet).each(function () {
+                        let rowIndex = parseInt($(this).attr('r'));
+
+                        if (rowIndex === 3) {
+                            // Header row: add Sr. No at start and make bold
+                            $(this).find('c:first').before(`<c t="inlineStr" s="2"><is><t>Sr. No</t></is></c>`);
+                        } else if (rowIndex > 3) {
+                            // Data rows: insert serial numbers
+                            $(this).find('c:first').before(`<c t="inlineStr" s="2"><is><t>${serial}</t></is></c>`);
+                            serial++;
+                        }
+                    });
                 },
                 action: function (e, dt, button, config) {
                     if (selectedIds.size === 0) {
-                        toastr.warning("Please select at least one item before exporting.");
-                        return;
+                        toastr.warning('Please select at least one row to export!');
+                    } else {
+                        $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
                     }
-                    $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
                 }
             },
             // --- CSV ---
             {
                 extend: 'csvHtml5',
                 text: '<i class="bi bi-filetype-csv text-success fs-5"></i>',
-                title: `Current Stock - ${moment().format("YYYY-MM-DD")}`,
+                title: `Current Stock - ${moment().format("DD/MM/YYYY")}`,
                 exportOptions: {
                     columns: function (idx, data, node) {
                         var header = $(node).closest('table').find('th').eq(idx).text().trim();
@@ -314,12 +437,13 @@ $(document).ready(function () {
     $('#currentStockTable tbody').on('click', '.transfer-btn', function () {
         var rowData = currentStockTable.row($(this).closest('tr')).data();
 
-        $('#modalItemCode').text(rowData.ItemCode);
-        $('#modalItemName').text(rowData.ItemName);
-        $('#modalQuantity').text(rowData.CurrentQty);
-        $('#modalReorderQty').text(rowData.ReorderQuantity);
+        // Fill input fields instead of span/label
+        $('#modalItemCode').val(rowData.ItemCode);
+        $('#modalItemName').val(rowData.ItemName);
+        $('#modalQuantity').val(rowData.CurrentQty);
+        $('#modalReorderQty').val(rowData.ReorderQuantity);
 
-        // Fill Bin table with Sr.No.
+        // Fill Bin table with Sr.No. (unchanged)
         let binList = rowData.BinName ? rowData.BinName.split(",") : [];
         let binRows = "";
         let srNo = 1;
@@ -328,16 +452,17 @@ $(document).ready(function () {
             let parts = bin.trim().match(/(.*)\((\d+)\)/);
             if (parts) {
                 binRows += `<tr class="text-center">
-                              <td>${srNo++}</td>
-                              <td>${parts[1].trim()}</td>
-                              <td>${parts[2]}</td>
-                            </tr>`;
+                          <td>${srNo++}</td>
+                          <td>${parts[1].trim()}</td>
+                          <td>${parts[2]}</td>
+                        </tr>`;
             }
         });
 
         $('#modalBinTable').html(binRows);
         $('#viewModal').modal('show');
     });
+
 
     // Initialize Bootstrap tooltips
     $('body').tooltip({

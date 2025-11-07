@@ -120,6 +120,17 @@
             background-color: rgba(255, 255, 255, 0.2) !important;
         }
 
+        button.dt-button.processing,
+        div.dt-button.processing {
+            pointer-events: auto !important;
+            opacity: 1 !important;
+            background: none !important;
+        }
+
+            button.dt-button.processing:after {
+                content: none !important;
+            }
+
 
     </style>
 
@@ -233,7 +244,8 @@
             <div class="card chart-card shadow-sm">
                 <div class="card-header chart-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Quality Check Status Distribution</h5>
-                  
+                    <span class="badge bg-light text-dark">Date Range: <span id="selectedRangeBadge">This Year</span></span>
+
                 </div>
                 <div class="card-body chart-body">
                     <div id="statusChart" style="height: 400px;"></div>
@@ -243,7 +255,7 @@
             <div class="card chart-card shadow-sm">
                 <div class="card-header chart-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>GRN Trends Over Time</h5>
-                    <span class="badge bg-light text-dark">Date Range: <span id="selectedRangeBadge">This Year</span></span>
+                    
                 </div>
                 <div class="card-body chart-body">
                     <div id="trendChart" style="height: 400px;"></div>
@@ -336,10 +348,10 @@
 
                 <div class="modal-header bg-primary text-white position-relative">
                     <div class="w-100 text-center">
-                        <h5 class="modal-title text-white fw-bold mb-0" id="itemsModalLabel">Details</h5>
+                        <h5 class="modal-title text-white fw-bold mb-2" id="itemsModalLabel">Details</h5>
                     </div>
 
-                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3 mb-2" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
                 <div class="modal-body" id="modalContent">
@@ -398,15 +410,14 @@
                 autoUpdateInput: false,
                 locale: {
                     cancelLabel: 'Clear',
-                    format: 'DD-MM-YYYY'
+                    format: 'DD/MM/YYYY'
                 },
                 ranges: {
                     'Today': [moment(), moment()],
-                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
                     'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                    'This Month': [moment().startOf('month'), moment().endOf('month')],
-                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                    'Last 1 Month': [moment().subtract(1, 'months').startOf('day'), moment()],
+                    'Last 3 Months': [moment().subtract(3, 'months').startOf('day'), moment()],
+                    'Last 1 Year': [moment().subtract(12, 'months').startOf('day'), moment()]
                 }
             });
 
@@ -414,7 +425,7 @@
             $('#reportrange').on('apply.daterangepicker', function (ev, picker) {
                 tableStartDate = picker.startDate;
                 tableEndDate = picker.endDate;
-                $(this).val(tableStartDate.format('DD-MM-YYYY') + ' - ' + tableEndDate.format('DD-MM-YYYY'));
+                $(this).val(tableStartDate.format('DD/MM/YYYY') + ' - ' + tableEndDate.format('DD/MM/YYYY'));
 
                 // Filter the table based on date range
                 filterTableByDate();
@@ -434,7 +445,7 @@
                 // Custom filtering function for date range
                 $.fn.dataTable.ext.search.push(
                     function (settings, data, dataIndex) {
-                        var date = moment(data[7], 'DD-MM-YYYY'); // Assuming date is in 4th column (index 3)
+                        var date = moment(data[7], 'DD/MM/YYYY'); // Assuming date is in 4th column (index 3)
 
                         if ((tableStartDate === null && tableEndDate === null) ||
                             (tableStartDate === null && date <= tableEndDate) ||
@@ -488,16 +499,14 @@
                 endDate: end,
                 locale: {
                     cancelLabel: 'Clear',
-                    format: 'DD-MM-YYYY'
+                    format: 'DD/MM/YYYY'
                 },
                 ranges: {
                     'Today': [moment(), moment()],
-                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
                     'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                    'This Month': [moment().startOf('month'), moment().endOf('month')],
-                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
-                    'This Year': [moment().startOf('year'), moment().endOf('year')]
+                    'Last 1 Month': [moment().subtract(1, 'months').startOf('day'), moment()],
+                    'Last 3 Months': [moment().subtract(3, 'months').startOf('day'), moment()],
+                    'Last 1 Year': [moment().subtract(12, 'months').startOf('day'), moment()]
 
                 },
                 alwaysShowCalendars: true,
@@ -938,12 +947,13 @@
                             }
                         }
                     },
-                    // 🔹 Excel
+                    //Excel
                     {
                         extend: 'excelHtml5',
                         text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
                         className: 'btn btn-sm btn-outline-success',
                         title: "Recent GRN",
+                        messageTop: 'Generated Date: ' + moment().format('DD/MM/YYYY'),
                         action: function (e, dt, button, config) {
                             if ($('#reqTable tbody input.row-select:checked').length === 0) {
                                 showExportToast();
@@ -966,6 +976,15 @@
                                         : data;
                                 }
                             }
+                        },
+                        customize: function (xlsx) {
+                            const sheet = xlsx.xl.worksheets['sheet1.xml'];
+
+                            // 🔹 Center the Title (Row 1)
+                            $('row:first c', sheet).attr('s', '51');
+
+                            // 🔹 Center the "Generated Date" messageTop (Row 2)
+                            $('row:eq(1) c', sheet).attr('s', '51');
                         }
                     },
                     // 🔹 CSV
@@ -1191,12 +1210,12 @@
                                     }
                                 }
                             },
-                            // 🔹 Excel
                             {
                                 extend: 'excelHtml5',
                                 text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
                                 className: 'btn btn-sm btn-outline-success',
                                 title: `${title}`,
+                                messageTop: 'Generated Date: ' + moment().format('DD/MM/YYYY'),
                                 action: function (e, dt, button, config) {
                                     if ($('#ListTable tbody input.row-select:checked').length === 0) {
                                         showExportToast();
@@ -1219,6 +1238,15 @@
                                                 : data;
                                         }
                                     }
+                                },
+                                customize: function (xlsx) {
+                                    const sheet = xlsx.xl.worksheets['sheet1.xml'];
+
+                                    // Center the title
+                                    $('row:first c', sheet).attr('s', '51');
+
+                                    // Center the "Generated Date" messageTop
+                                    $('row:eq(1) c', sheet).attr('s', '51');
                                 }
                             },
                             // 🔹 CSV

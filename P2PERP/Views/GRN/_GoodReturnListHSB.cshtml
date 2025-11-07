@@ -1,12 +1,18 @@
-﻿<h4 class="text-center text-primary fw-bold">Goods Return List</h4>
+﻿@*<h4 class="text-center text-primary fw-bold">Goods Return List</h4>*@
 
 <!-- Date Filters -->
-<div class="mb-3 d-flex gap-2">
+<div class="mb-3 d-flex gap-2 mt-5">
     <div class="input-group" style="max-width: 280px;">
         <span class="input-group-text bg-primary text-white">
             <i class="bi bi-calendar-date"></i> <!-- Bootstrap icon -->
         </span>
         <input type="text" id="returnGoodsRange" class="form-control" placeholder="Select date range" readonly />
+    </div>
+
+
+    <div style="margin-left:190px;">
+        <h4 class="text-center text-primary fw-bold">Goods Return List</h4>
+
     </div>
     <!-- Reset Filter Button -->
     @*<button id="resetFilter" class="btn btn-primary">
@@ -46,9 +52,9 @@
         <div class="modal-content">
 
             <!-- Header -->
-            <div class="modal-header bg-gradient bg-primary text-white d-flex justify-content-center align-items-center">
-                <h5 id="modalHeading" class="modal-title fw-bold text-uppercase text-white mb-2  heading"></h5>
-                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
+            <div class="modal-header bg-gradient bg-primary text-white d-flex justify-content-center align-items-center fs-5 py-1">
+                <h5 id="modalHeading" class="modal-title fw-bold text-uppercase text-white "></h5>
+                <button type="button" class="btn-close  rounded-end-3 fs-5 position-absolute btn-close-white top-0 end-0 m-1" data-bs-dismiss="modal"></button>
             </div>
 
             <!-- Body -->
@@ -63,6 +69,124 @@
 
 <script>
     $(document).ready(function () {
+
+
+        // Reusable PDF/Print customization function
+        function customizeDoc(doc) {
+            // Title Styling
+            doc.styles.title = {
+                color: '#000000',
+                fontSize: 16,
+                bold: true,
+                alignment: 'center'
+            };
+
+            // Generated on date
+            doc.content.splice(1, 0, {
+                text: 'Generated on: ' + new Date().toISOString().split('T')[0],
+                fontSize: 10,
+                italics: true,
+                alignment: 'center',
+                margin: [0, 0, 0, 12]
+            });
+
+            // Table Header Styling
+            doc.styles.tableHeader = {
+                fillColor: '#000000',
+                color: 'white',
+                bold: true,
+                fontSize: 11,
+                alignment: 'center'
+            };
+
+            // Table Border + Padding
+            var objLayout = {};
+            objLayout['hLineWidth'] = function () { return .5; };
+            objLayout['vLineWidth'] = function () { return .5; };
+            objLayout['hLineColor'] = function () { return '#aaa'; };
+            objLayout['vLineColor'] = function () { return '#aaa'; };
+            objLayout['paddingLeft'] = function () { return 6; };
+            objLayout['paddingRight'] = function () { return 6; };
+
+            // Get the table
+            var tableNode = doc.content[doc.content.length - 1];
+            tableNode.layout = objLayout;
+
+            // Set fixed widths for all columns
+            var colCount = tableNode.table.body[0].length;
+            tableNode.table.widths = Array(colCount).fill('*');
+
+            // Wrap in margin to simulate center alignment
+            tableNode.alignment = 'center';
+            tableNode.margin = [0, 0, 0, 0];
+        }
+
+        // Clear processing state for all DataTable buttons
+        window.__dt_clearAllProcessing = function () {
+            try {
+                // Try to clear via DataTables API
+                var tables = $.fn.dataTable.tables();
+                for (var i = 0; i < tables.length; i++) {
+                    try {
+                        var api = $(tables[i]).DataTable();
+                        if (!api || !api.buttons) continue;
+                        var btnCount = (api.buttons().nodes && api.buttons().nodes().length) || 0;
+                        for (var j = 0; j < btnCount; j++) {
+                            try { api.button(j).processing(false); } catch (e) { }
+                        }
+                    } catch (e) { }
+                }
+            } catch (e) { }
+
+            // Fallback DOM cleanup
+            try {
+                $('.dt-button').removeClass('dt-button-processing');
+                $('.dt-button').prop('disabled', false);
+            } catch (e) { }
+        };
+
+        // Listen for print-done message from print window
+        window.addEventListener('message', function (ev) {
+            if (ev && ev.data === 'dt_print_done') {
+                window.__dt_clearAllProcessing();
+            }
+        });
+
+        // Store original button actions if not already stored
+        if (!$.fn.dataTable.ext.buttons.pdfHtml5.__originalAction) {
+            $.fn.dataTable.ext.buttons.pdfHtml5.__originalAction =
+                $.fn.dataTable.ext.buttons.pdfHtml5.action;
+        }
+        if (!$.fn.dataTable.ext.buttons.print.__originalAction) {
+            $.fn.dataTable.ext.buttons.print.__originalAction =
+                $.fn.dataTable.ext.buttons.print.action;
+        }
+        if (!$.fn.dataTable.ext.buttons.excelHtml5.__originalAction) {
+            $.fn.dataTable.ext.buttons.excelHtml5.__originalAction =
+                $.fn.dataTable.ext.buttons.excelHtml5.action;
+        }
+        if (!$.fn.dataTable.ext.buttons.csvHtml5.__originalAction) {
+            $.fn.dataTable.ext.buttons.csvHtml5.__originalAction =
+                $.fn.dataTable.ext.buttons.csvHtml5.action;
+        }
+
+        // Toast notification function
+        // ✅ Configure toastr once
+        toastr.options = {
+            closeButton: true,
+            progressBar: true,
+            newestOnTop: true,
+            positionClass: "toast-top-right",
+            preventDuplicates: true,
+            timeOut: 3000,
+            extendedTimeOut: 1000,
+            showDuration: 300,
+            hideDuration: 300,
+            showMethod: "slideDown",
+            hideMethod: "fadeOut"
+        };
+
+
 
         // Date Range Setup
         let startDate = null;
@@ -91,11 +215,10 @@
             locale: { cancelLabel: 'Clear' },// keep input empty at first
             ranges: {
                 'Today': [moment(), moment()],
-                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
                 'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                'This Month': [moment().startOf('month'), moment().endOf('month')],
-                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                'Last 1 Month': [moment().subtract(1, 'months').startOf('day'), moment()],
+                'Last 3 Months': [moment().subtract(3, 'months').startOf('day'), moment()],
+                'Last 1 Year': [moment().subtract(12, 'months').startOf('day'), moment()]
             }
         }, cb);
 
@@ -103,7 +226,7 @@
         $.fn.dataTable.ext.search.push(function (settings, data) {
             if (settings.nTable.id !== 'ReturnGoods') return true;
             const addedDate = moment(data[3], ["DD/MM/YYYY", "DD/MM/YYYY HH:mm:ss"]); // index 3 = "GR Date"
-            if (!startDate || !endDate) return true; // ✅ no filter on first load
+            if (!startDate || !endDate) return true; // no filter on first load
             if (!addedDate.isValid()) return true;
             return addedDate.isSameOrAfter(startDate, 'day') && addedDate.isSameOrBefore(endDate, 'day');
         });
@@ -152,7 +275,7 @@
                         let statusText = data || 'Unknown';
                         let statusLower = statusText.trim().toLowerCase();
 
-                        let bgColor = '#6c757d'; // default gray
+                        let bgColor = '#198754'; // default gray
 
 
                         if (statusLower == 'assign') bgColor = '#0d6efd';       // blue (primary)
@@ -192,214 +315,321 @@
                     }
                 }
             ],
-            
+
             columnDefs: [
                 { targets: "_all", className: "text-center" } // center all columns
             ],
             ordering: false,
             buttons: [
-
+                // Print button
                 {
                     extend: 'print',
                     text: '<i class="bi bi-printer-fill text-dark fs-5"></i>',
+                    title: 'Return Goods Report',
                     exportOptions: {
-                        rows: selectedRows,
                         columns: [1, 2, 3, 4, 5, 6, 7],
-                        modifier: { search: 'applied', order: 'applied' },
+                        rows: selectedRows,
                         format: {
-                            body: (function () {
-                                let counter = 0;
-                                return function (data, row, column, node) {
-                                    if (column === 1) {
-                                        counter++;
-                                        return counter;
-                                    }
-                                    return data;
-                                };
-                            })()
+                            body: function (data, rowIdx, colIdx, node) {
+                                if (colIdx === 1) return getExportSrNo(rowIdx, table);
+                                return data;
+                            }
                         }
-                    },
-                    title: '',
-                    action: function (e, dt, button, config) {
-                        let selected = dt.$('.row-select:checked', { page: 'all' }).length;
-                        if (!selected) {
-                            showExportToast();
-                            return;
-                        }
-                        exportRowIndex = 0;
-                        $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config);
                     },
                     customize: function (win) {
-                        $(win.document.body).css({
-                            'font-size': '12px',
-                            'font-family': 'Arial, sans-serif'
-                        });
-                        $(win.document.body).prepend(
-                            `<h3 style="text-align:center;">Return Goods Report</h3>
-   <p style="text-align:center;">Generated on: ${moment().format("YYYY-MM-DD")}</p>`
-                        );
-                        $(win.document.body).find('table')
-                            .addClass('compact')
-                            .css({
-                                'font-size': '12px',
-                                'border': '1px solid black',
-                                'width': 'auto',
-                                'margin-left': 'auto',
-                                'margin-right': 'auto',
-                                'border-collapse': 'collapse'
-                            });
-                        $(win.document.body).find('thead').css({
-                            'background-color': '#343a40',
-                            'color': 'white'
-                        });
-                        $(win.document.body).find('table td, table th').css({
-                            'text-align': 'center',
-                            'padding': '4px'
-                        });
-                        $(win.document.body).find('tbody tr td:first-child, thead tr th:first-child').css("padding-left", "15px");
-                    }
-                },
-                {
-                    extend: 'pdf',
-                    text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
-                    exportOptions: {
-                        rows: selectedRows,
-                        columns: [1, 2, 3, 4, 5, 6, 7],
-                        modifier: { search: 'applied', order: 'applied' },
-                        format: {
-                            body: (function () {
-                                let counter = 0;
-                                return function (data, row, column, node) {
-                                    if (column === 1) {
-                                        counter++;
-                                        return counter;
-                                    }
-                                    return data;
-                                };
-                            })()
-                        }
+                        var $body = $(win.document.body);
+
+                        // Add header
+                        $body.prepend(`
+            <h1 style="text-align:center;">Return Goods Report</h1>
+            <div style="text-align:center;font-style:italic;font-size:10pt;margin-bottom:12px;">
+                Generated Date: ${moment().format("DD/MM/YYYY")}
+            </div>
+        `);
+
+                        // Style table
+                        $body.find('table')
+                            .addClass('table table-bordered table-striped')
+                            .css({ width: '100%', 'border-collapse': 'collapse' });
+
+                        $body.append(`
+            <style>
+                thead th {
+                    background-color: black !important;
+                    color: white !important;
+                    text-align: center !important;
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                }
+                td, th {
+                    border: 1px solid #000 !important;
+                    padding: 6px !important;
+                    text-align:center !important;
+                }
+            </style>
+        `);
+
+                        $body.css('font-size', '12pt');
                     },
-                    title: 'Return Goods Report',
                     action: function (e, dt, button, config) {
-                        let selected = dt.$('.row-select:checked', { page: 'all' }).length;
-                        if (!selected) {
+                        var selected = dt.rows().nodes().to$().find('input.row-select:checked').length;
+                        var btnApi = dt.button(button);
+
+                        if (selected === 0) {
                             showExportToast();
+                            try { btnApi.processing(false); } catch (err) { }
                             return;
                         }
-                        exportRowIndex = 0;
-                        $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, button, config);
+
+                        // Show spinner
+                        try { btnApi.processing(true); } catch (err) { }
+
+                        // Call original print action
+                        try {
+                            $.fn.dataTable.ext.buttons.print.__originalAction.call(this, e, dt, button, config);
+                        } catch (err) {
+                            // Ensure spinner not left running
+                            setTimeout(function () { try { btnApi.processing(false); } catch (e) { } }, 300);
+                            throw err;
+                        }
+
+                        // Final fallback: if print window never reports, clear after 2s
+                        setTimeout(function () { try { btnApi.processing(false); } catch (err) { } }, 2000);
+                    }
+                },
+
+                // PDF Export
+                {
+                    extend: 'pdfHtml5',
+                    text: '<i class="bi bi-file-earmark-pdf-fill text-danger fs-5"></i>',
+                    titleAttr: 'PDF',
+                    title: 'Return Goods Report',
+                    orientation: 'landscape',
+                    pageSize: 'A4',
+                    exportOptions: {
+                        columns: [1, 2, 3, 4, 5, 6, 7],
+                        rows: selectedRows,
+                        format: {
+                            body: function (data, rowIdx, colIdx, node) {
+                                if (colIdx === 1) return getExportSrNo(rowIdx, table);
+                                return data;
+                            }
+                        }
                     },
                     customize: function (doc) {
                         doc.pageMargins = [40, 60, 40, 40];
-                        doc.styles.title = {
-                            fontSize: 16,
-                            bold: true,
-                            alignment: 'center',
-                            margin: [0, 0, 0, 20]
-                        };
+                        doc.styles.title = { fontSize: 16, bold: true, alignment: 'center', margin: [0, 0, 0, 12] };
                         doc.content.splice(1, 0, {
-                            text: `Generated on: ${moment().format("YYYY-MM-DD")}`,
+                            text: `Generated Date: ${moment().format("DD/MM/YYYY")}`,
                             alignment: 'center',
-                            margin: [0, 0, 0, 10],
-                            fontSize: 10,
-                            italics: true
+                            italics: true,
+                            fontSize: 10
                         });
-                        var tableNode = doc.content.find(node => node.table);
+
+                        let tableNode = doc.content.find(n => n.table);
                         if (tableNode) {
-                            tableNode.table.widths = Array(tableNode.table.body[0].length).fill('auto');
+                            tableNode.table.widths = ['10%', '15%', '15%', '15%', '15%', '15%', '15%'];
                             tableNode.layout = {
-                                fillColor: function (rowIndex) { return rowIndex === 0 ? '#343a40' : null; },
-                                hLineColor: function () { return '#ccc'; },
-                                vLineColor: function () { return '#ccc'; },
-                                hLineWidth: function () { return 0.5; },
-                                vLineWidth: function () { return 0.5; },
-                                paddingLeft: function () { return 5; },
-                                paddingRight: function () { return 5; }
+                                hLineWidth: () => 0.5,
+                                vLineWidth: () => 0.8,
+                                hLineColor: () => '#ccc',
+                                vLineColor: () => '#ccc',
+                                fillColor: rowIdx => rowIdx === 0 ? '#343a40' : null
                             };
+
+                            // Header styling
                             tableNode.table.body[0].forEach(cell => {
                                 cell.color = 'white';
                                 cell.alignment = 'center';
                                 cell.bold = true;
                                 cell.fontSize = 11;
                             });
+
+                            // Body styling
                             tableNode.table.body.slice(1).forEach((row, idx) => {
-                                row.forEach(cell => {
-                                    cell.fontSize = 10;
-                                    cell.margin = [5, 3, 5, 3];
-                                    cell.alignment = 'center';
-                                });
-                                if (idx % 2 === 0) {
-                                    row.forEach(cell => { cell.fillColor = '#f9f9f9'; });
-                                }
+                                row.forEach(cell => { cell.alignment = 'center'; cell.fontSize = 10; cell.margin = [5, 3, 5, 3]; });
+                                if (idx % 2 === 0) row.forEach(cell => { cell.fillColor = '#f9f9f9'; });
                             });
                         }
+                    },
+                    action: function (e, dt, button, config) {
+                        var selected = dt.$('.row-select:checked', { page: 'all' }).length;
+                        var btnApi = dt.button(button);
+                        if (selected === 0) { showExportToast(); btnApi.processing(false); return; }
+                        btnApi.processing(true);
+
+                        if (window.pdfMake && pdfMake.createPdf && !pdfMake._patchedForDT) {
+                            (function () {
+                                var origCreate = pdfMake.createPdf;
+                                pdfMake.createPdf = function (docDefinition) {
+                                    var pdfDoc = origCreate.call(pdfMake, docDefinition);
+                                    var origDownload = pdfDoc.download;
+                                    pdfDoc.download = function (filename, cb) {
+                                        origDownload.call(pdfDoc, filename, function () {
+                                            try { btnApi.processing(false); } catch (err) { }
+                                            if (typeof cb === 'function') cb();
+                                        });
+                                    };
+                                    return pdfDoc;
+                                };
+                                pdfMake._patchedForDT = true;
+                            })();
+                        }
+
+                        $.fn.dataTable.ext.buttons.pdfHtml5.__originalAction.call(this, e, dt, button, config);
+                        setTimeout(function () { try { btnApi.processing(false); } catch (err) { } }, 1500);
                     }
                 },
 
+                // Excel Export
                 {
-                    extend: 'excel',
-                    text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
+                    extend: 'excelHtml5',
+                    text: '<i class="bi bi-file-earmark-excel-fill text-success fs-5"></i>',
+                    sheetName: 'Good Return List',
+                    filename:'GoodReturnList',
+                    title: null,
                     exportOptions: {
-                        rows: selectedRows,
                         columns: [1, 2, 3, 4, 5, 6, 7],
-                        modifier: { search: 'applied', order: 'applied' },
+                        rows: selectedRows,
                         format: {
-                            body: (function () {
-                                let counter = 0;
-                                return function (data, row, column, node) {
-                                    if (column === 1) {
-                                        counter++;
-                                        return "   " + counter;
-                                    }
-                                    return data;
-                                };
-                            })()
+                            body: function (data, rowIdx, colIdx, node) {
+                                if (colIdx === 1) return getExportSrNo(rowIdx, table);
+                                return data;
+                            }
                         }
                     },
-                    title: `Return Goods Report - ${moment().format("YYYY-MM-DD")}`,
                     action: function (e, dt, button, config) {
-                        let selected = dt.$('.row-select:checked', { page: 'all' }).length;
-                        if (!selected) {
-                            showExportToast();
-                            return;
+                        var selected = dt.$('.row-select:checked', { page: 'all' }).length;
+                        var btnApi = dt.button(button);
+                        if (selected === 0) { showExportToast(); try { btnApi.processing(false); } catch (err) { } return; }
+                        try { btnApi.processing(true); } catch (err) { }
+                        $.fn.dataTable.ext.buttons.excelHtml5.__originalAction.call(this, e, dt, button, config);
+                        setTimeout(function () { try { btnApi.processing(false); } catch (err) { } }, 300);
+                    },
+                    customize: function (xlsx) {
+                        var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                        var stylesXml = xlsx.xl['styles.xml'];
+
+
+
+
+                        // ===== Create a centered text style =====
+                        var cellXfs = $('cellXfs xf', stylesXml);
+                        var centerStyleIndex = cellXfs.length;
+                        cellXfs.last().after(
+                            '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1">' +
+                            '<alignment horizontal="center" vertical="center"/></xf>'
+                        );
+
+                        // ===== Detect number of exported columns dynamically =====
+                        var numCols = $('cols col', sheet).length;
+                        if (numCols === 0) numCols = 7; // fallback if DataTables doesn't generate <cols>
+
+                        // Calculate last column letter (A, B, C, ...)
+                        function getExcelColumn(colNum) {
+                            var dividend = colNum, columnName = "", modulo;
+                            while (dividend > 0) {
+                                modulo = (dividend - 1) % 26;
+                                columnName = String.fromCharCode(65 + modulo) + columnName;
+                                dividend = Math.floor((dividend - modulo) / 26);
+                            }
+                            return columnName;
                         }
-                        exportRowIndex = 0;
-                        $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
-                    }
+                        var lastColLetter = getExcelColumn(numCols);
+
+                        // ===== Ensure <mergeCells> exists =====
+                        if ($('mergeCells', sheet).length === 0) {
+                            $('worksheet', sheet).prepend('<mergeCells count="0"></mergeCells>');
+                        }
+
+                        var mergeCells = $('mergeCells', sheet);
+                        var count = parseInt(mergeCells.attr('count') || 0);
+
+                        // ===== Add merged cells for Title and Date =====
+                        mergeCells.append(`<mergeCell ref="A1:${lastColLetter}1"/>`);
+                        mergeCells.append(`<mergeCell ref="A2:${lastColLetter}2"/>`);
+                        mergeCells.attr('count', count + 2);
+
+                        // ===== Create Title & Date rows =====
+                        var title = "Good Return List";
+                        var dateText = "Generated Date: " + moment().format("DD/MM/YYYY");
+
+                        var titleRow = `
+        <row r="1">
+            <c r="A1" t="inlineStr" s="${centerStyleIndex}">
+                <is><t>${title}</t></is>
+            </c>
+        </row>
+        <row r="2">
+            <c r="A2" t="inlineStr" s="${centerStyleIndex}">
+                <is><t>${dateText}</t></is>
+            </c>
+        </row>
+    `;
+
+                        // ===== Shift existing rows down by 2 =====
+                        $('row', sheet).each(function () {
+                            var r = parseInt($(this).attr('r'));
+                            $(this).attr('r', r + 2);
+                            $(this).find('c').each(function () {
+                                var ref = $(this).attr('r');
+                                var col = ref.replace(/[0-9]/g, '');
+                                $(this).attr('r', col + (r + 2));
+                            });
+                        });
+
+                        // ===== Insert new rows at top =====
+                        var sheetData = $('sheetData', sheet);
+                        sheetData.prepend(titleRow);
+                    },
+
                 },
+
+                // CSV Export
                 {
-                    extend: 'csv',
+                    extend: 'csvHtml5',
                     text: '<i class="bi bi-filetype-csv text-success fs-5"></i>',
+                    titleAttr: 'CSV',
+                    title: 'Return_Goods_Report',
                     exportOptions: {
-                        rows: selectedRows,
                         columns: [1, 2, 3, 4, 5, 6, 7],
-                        modifier: { search: 'applied', order: 'applied' },
+                        rows: selectedRows,
                         format: {
-                            body: (function () {
-                                let counter = 0;
-                                return function (data, row, column, node) {
-                                    if (column === 1) {
-                                        counter++;
-                                        return "   " + counter;
-                                    }
-                                    return data;
-                                };
-                            })()
+                            body: function (data, rowIdx, colIdx, node) {
+                                if (colIdx === 1) return getExportSrNo(rowIdx, table);
+                                return data;
+                            }
                         }
                     },
-                    title: `Return_Goods_Report_${moment().format("YYYY-MM-DD")}`,
                     action: function (e, dt, button, config) {
-                        // validation: any selected rows?
-                        let selected = dt.$('.row-select:checked', { page: 'all' }).length;
-                        if (!selected) {
+                        var selected = dt.rows().nodes().to$().find('input.row-select:checked').length;
+                        var btnApi = dt.button(button);
+
+                        if (selected === 0) {
                             showExportToast();
+                            try { btnApi.processing(false); } catch (err) { }
                             return;
                         }
-                        exportRowIndex = 0; // reset counter
-                        $.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, button, config);
+
+                        try { btnApi.processing(false); } catch (err) { }
+
+                        $.fn.dataTable.ext.buttons.csvHtml5.__originalAction.call(this, e, dt, button, config);
+
+                        // Stop spinner almost immediately (no real callback exists)
+                        setTimeout(function () {
+                            try { btnApi.processing(false); } catch (err) { }
+                        }, 300);
                     }
-                },
-            ]
+                }
+            ],
+            drawCallback: function (settings) {
+                // Recalculate Sr.No
+                var api = this.api();
+                api.column(1, { page: 'current' }).nodes().each((cell, i) => cell.innerHTML = i + 1 + settings._iDisplayStart);
+                // Initialize tooltips
+                $('[data-bs-toggle="tooltip"]').tooltip({ customClass: 'tooltip-dark' });
+            }
+
         });
 
         // Configure toastr once
@@ -483,7 +713,7 @@
         return $(node).find('.row-select').prop('checked');
     }
 
-   
+
 
     // toaster show
     function showToast(message, type = 'danger') {
@@ -498,6 +728,17 @@
         $('#toastContainer').append($toast);
         new bootstrap.Toast($toast[0], { delay: 3000 }).show();
         $toast.on('hidden.bs.toast', function () { $(this).remove(); });
+    }
+
+    // Helper function to recalc SrNo for export across all pages
+    function getExportSrNo(rowIdx, tbl) {
+        // Get all rows nodes
+        let allRows = tbl.rows({ order: 'applied', search: 'applied' }).nodes().toArray();
+        // Filter only the checked rows
+        let checkedRows = allRows.filter(row => $(row).find('input.row-select').prop('checked'));
+        // Find the position of this row in the checkedRows array
+        let sr = checkedRows.findIndex(row => tbl.row(row).index() === rowIdx) + 1;
+        return sr; // consecutive Sr.No
     }
 </script>
 

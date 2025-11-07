@@ -85,7 +85,8 @@ namespace P2PLibray.Quality
         public string VenderName { get; set; }
         public string AddDate { get; set; }
         public string QualityCheckDate { get; set; }
-        public string Reason { get; set; }
+        public string QCFailedDate { get; set; }
+		public string Reason { get; set; }
     }
 
     // Detailed failed item info
@@ -97,7 +98,7 @@ namespace P2PLibray.Quality
         public string ItemName { get; set; }
         public string Reason { get; set; }
         public string AddedDate { get; set; }
-    }
+	}
 
     // GRN basic info for display
     public class GRNShowItemPR
@@ -107,9 +108,16 @@ namespace P2PLibray.Quality
         public string StatusName { get; set; }
         public string AddedDate { get; set; }
 
+		// Model class for Pending Items
+		public class PendingItemPR
+		{
+			public string GRNCode { get; set; }
+			public string ItemCode { get; set; }
+			public string ItemName { get; set; }
+			public string AddedDate { get; set; }
+		}
+		#endregion Prashant
 
-        #endregion Prashant
 
-       
-    }
+	}
 }

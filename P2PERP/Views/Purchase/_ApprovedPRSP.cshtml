@@ -1,5 +1,78 @@
 ﻿@model P2PLibray.Purchase.Purchase
 
+
+<style>
+    #ViewItems3 thead th {
+        padding: 0.3rem 0.4rem !important;
+    }
+    .form-control, .form-select {
+        border-radius: 0.5rem;
+        border: 1px solid #ced4da;
+        transition: all 0.3s ease;
+    }
+
+        .form-control:focus, .form-select:focus {
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+            border-color: #86b7fe;
+        }
+
+    .btn {
+        border-radius: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .card {
+        border: none;
+    }
+
+    .table th {
+        border-top: none;
+        font-weight: 600;
+    }
+
+    .table-responsive {
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+
+    /*  Compact Table Row Size */
+    .table td, .table th {
+        padding: 0.35rem 0.5rem !important;
+        font-size: 0.78rem;
+        vertical-align: middle;
+    }
+
+    .btn-delete {
+        padding: 2px 6px !important;
+        font-size: 0.70rem !important;
+    }
+
+        .btn-delete i {
+            font-size: 0.75rem !important;
+        }
+
+
+    @@media (max-width: 768px) {
+        .form-control, .form-select, .btn, .table td, .table th {
+            font-size: 0.85rem;
+        }
+    }
+    button.dt-button.processing,
+    div.dt-button.processing {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        background: none !important;
+    }
+
+        button.dt-button.processing:after {
+            content: none !important;
+        }
+</style>
 <!-- ===================== Main Container ===================== -->
 <div class="container mt-4">
     <div class="table-responsive">
@@ -12,7 +85,7 @@
                 <span class="input-group-text bg-primary text-white">
                     <i class="bi bi-calendar-date"></i> <!-- Calendar Icon -->
                 </span>
-                <input type="text" id="Rejectedrange3" placeholder="Select date Range" class="form-control" readonly />
+                <input type="text" id="Rejectedrange3" placeholder="Select date Range" class="form-control form-control-sm text-center shadow-sm text-dark" readonly />
             </div>
         </div>
 
@@ -21,7 +94,7 @@
             <thead class="table-dark">
                 <tr>
                     <th><input type="checkbox" id="selectAll3" /></th><!-- Select All -->
-                    <th>SR NO</th>
+                    <th>SR.NO</th>
                     <th>PR CODE</th>
                     <th>ADDED DATE</th>
                     <th>APPROVE/REJECTED BY</th>
@@ -40,10 +113,9 @@
         <div class="modal-content">
 
             <!-- Modal Header -->
-            <div class="modal-header bg-primary text-white d-flex justify-content-center position-relative p-0">
-                <h4 class="modal-title m-0 fw-bold text-white flex-grow-1 text-center py-3">Purchase Requisition Details</h4>
-                <button type="button" class="btn-close btn-close-white position-absolute end-0 top-0 m-0 p-3 h-100"
-                        data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="card-header bg-primary text-white d-flex justify-content-center align-items-center rounded-top p-1">
+                <h3 class="modal-title fw-bold text-white mb-0 fs-5">Purchase Requisition Details</h3>
+                <button type="button" class="btn btn-close btn-close-white position-absolute top-0 end-0 m-3 fs-4" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
             <!-- Modal Body -->
@@ -58,31 +130,33 @@
                         <div class="card-body p-3">
 
                             <!-- Requisition Info Section -->
-                            <div class="container mb-4 fw-bold fs-5">
-
-                                <div class="row text-center mb-3">
-                                    <div class="col">
-                                        <label class="form-label fw-bold fs-5 me-2 mb-0">PR CODE :</label>
-                                        <div id="PRCODE3" class="fw-semibold text-primary"></div>
-                                    </div>
-                                    <div class="col">
-                                        <label class="form-label fw-bold fs-5 me-2 mb-0">Required Date :</label>
-                                        <div id="RequiredDate3" class="fw-semibold text-success"></div>
-                                    </div>
-                                </div>
-
+                            <div class="container mb-3 fw-bold fs-5">
                                 <div class="row text-center">
-                                    <div class="col">
-                                        <label class="form-label fw-bold fs-5 me-2 mb-0">Created By :</label>
-                                        <div id="FullName3" class="fw-semibold text-dark"></div>
-                                    </div>
-                                    <div class="col">
-                                        <label class="form-label fw-bold fs-5 me-2 mb-0">Status :</label>
-                                        <div id="Status3" class="fw-semibold"></div>
-                                    </div>
-                                </div>
 
+                                    <div class="col">
+                                        <label class="form-label form-label-sm fw-bold text-dark">PR CODE :</label>
+                                        <input id="PRCODE3" class="form-control form-control-sm text-center text-dark bg-light fw-semibold" type="text" readonly />
+                                    </div>
+
+                                    <div class="col">
+                                        <label class="form-label form-label-sm fw-bold text-dark">Required Date :</label>
+                                        <input id="RequiredDate3" class="form-control form-control-sm text-center text-dark bg-light fw-semibold" type="text" readonly />
+                                    </div>
+
+                                    <div class="col">
+                                        <label class="form-label form-label-sm fw-bold text-dark">Created By :</label>
+                                        <input id="FullName3" class="form-control form-control-sm text-center bg-light text-dark fw-semibold text-dark" type="text" readonly />
+                                    </div>
+
+                                    <div class="col">
+                                        <label class="form-label form-label-sm fw-bold text-dark">Status :</label>
+                                        <input id="Status3" class="form-control form-control-sm text-center text-dark bg-light fw-semibold" type="text" readonly />
+                                    </div>
+
+                                </div>
                             </div>
+
+
 
 
                             <!-- Divider -->
@@ -95,7 +169,7 @@
                                     <table id="ViewItems3" class="table table-bordered table-hover align-middle text-center mb-0">
                                         <thead class="table-dark text-black">
                                             <tr>
-                                                <th class="border-top-0">SR NO</th>
+                                                <th class="border-top-0">SR.NO</th>
                                                 <th class="border-top-0">ITEM CODE</th>
                                                 <th class="border-top-0">ITEM NAME</th>
                                                 <th class="border-top-0">DESCRIPTION</th>
@@ -116,75 +190,6 @@
         </div>
     </div>
 </div>
-
-<!-- ===================== Update Modal ===================== -->
-<div class="modal fade" id="updateapproeModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white d-flex justify-content-center position-relative p-0">
-                <h4 class="modal-title m-0 text-white fw-bold flex-grow-1 text-center py-3">Update Purchase Requisition</h4>
-                <button type="button" class="btn-close btn-close-white position-absolute end-0 top-0 m-0 p-3 h-100"
-                        data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <!-- Requisition Info -->
-                <div class="card shadow-sm mb-4">
-                    <div class="text-black text-center fw-bold">
-                        <h4>Requisition Info</h4>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover align-middle text-center mb-0">
-                            <thead class="table-dark">
-                                <tr class="bg-black text-white text-center fw-bold">
-                                    <th class="border-top-0">PR CODE</th>
-                                    <th class="border-top-0">Required Date</th>
-                                    <th class="border-top-0">Created By</th>
-                                </tr>
-                            </thead>
-                            <tbody id="PRInfoBodyUpdate">
-                                <tr>
-                                    <td id="PRCODEUpdate3"></td>
-                                    <td id="RequiredDateUpdate3"></td>
-                                    <td id="FullNameUpdate3"></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Item Details (Editable) -->
-                <div class="card shadow-sm mb-4">
-                    <div class="text-black text-center fw-bold">
-                        <h4>Item Details</h4>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover align-middle text-center mb-0">
-                            <thead class="table-dark text-white">
-                                <tr>
-                                    <th class="border-top-0">SR NO</th>
-                                    <th class="border-top-0">ITEM CODE</th>
-                                    <th class="border-top-0">ITEM NAME</th>
-                                    <th class="border-top-0">DESCRIPTION</th>
-                                    <th class="border-top-0">QTY</th>
-                                    <th class="border-top-0">UNIT RATE</th>
-                                    <th class="border-top-0">AMOUNT</th>
-                                    <th class="border-top-0">ACTION</th>
-
-                                </tr>
-                            </thead>
-                            <tbody id="ItemTableBodyUpdate3">
-                                <!-- Dynamic rows will be appended here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-
 
 <!-- ===================== Script Section ===================== -->
 <script>
@@ -233,7 +238,7 @@
                 },
                 { // Serial Number
                     data: null,
-                    title: "SR NO",
+                    title: "SR.NO",
                     className: 'no-export',
                     orderable: false,
                     render: function (data, type, row, meta) {
@@ -244,6 +249,7 @@
                 {  //  Format Added Date
                     data: "AddedDate",
                     title: "Added Date",
+
                     render: function (data) {
                         if (!data) return "-";
                         var match = /\/Date\((\d+)\)\//.exec(data);
@@ -302,14 +308,14 @@
                         if (row.Status === "Pending") {
                             // Show both Update and View buttons
                             return `
-<button class="btn btn-sm btn-warning update-btn3"
+<button class="btn btn-sm btn-warning update-btn3 square-pill d-inline-flex align-items-center px-2 py-1 shadow-Update" data-bs-toggle="tooltip""
         data-id="${row.PRCode}"
         data-bs-toggle="modal"
         data-bs-target="#updateapproeModal"
         title="Update PR">
     <i class="bi bi-pencil"></i>
 </button>
-<button class="btn btn-sm btn-primary view-btn3"
+<button class="btn btn-sm btn-primary view-btn3 square-pill d-inline-flex align-items-center px-2 py-1 shadow-View"
         data-id="${row.PRCode}"
         data-bs-toggle="modal"
         data-bs-target="#ApprovedModal"
@@ -319,7 +325,7 @@
                         } else if (row.Status === "Approved" || row.Status === "Rejected") {
                             // Show only View button
                             return `
-<button class="btn btn-sm btn-primary view-btn3"
+<button class="btn btn-sm btn-primary view-btn3 square-pill d-inline-flex align-items-center px-2 py-1 shadow-View"
         data-id="${row.PRCode}"
         data-bs-toggle="modal"
         data-bs-target="#ApprovedModal"
@@ -332,6 +338,9 @@
                     }
                 }
             ],
+            columnDefs: [
+                { className: "text-center", targets: "_all" }
+            ],
             ordering: false,
             dom: '<"d-flex justify-content-between align-items-center mb-2"Bf>rt<"d-flex justify-content-between align-items-center mt-2"ip>',
             buttons: [
@@ -340,17 +349,17 @@
                     text: '<i class="bi bi-printer-fill text-dark fs-5"></i>',
                     title: 'PR Report',
                     exportOptions: {
+                        // Print only selected rows
                         rows: function (idx, data, node) {
                             return selectedRowsApproved.includes(data.PRCode);
                         },
-                        columns: function (idx, data, node) {
-                            return !$(node).hasClass('no-export') && idx !== $('#TableApproved thead th').length - 1;
-                        }
+                        // Exclude 'no-export' and last column
+                        columns: ':visible:not(.no-export):not(:last-child)'
                     },
                     action: function (e, dt, button, config) {
                         if (!selectedRowsApproved || selectedRowsApproved.length === 0) {
-                            toastr.warning(" Please select at least one PR before exporting!");
-                            return; ViewItems2
+                            toastr.warning("Please select at least one PR before printing!");
+                            return; // Stop print
                         }
                         $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config);
                     },
@@ -358,16 +367,52 @@
                         $(win.document.body).css('font-size', '12pt');
                         let table = $(win.document.body).find('table');
 
-                        $(win.document.body).find('h1').css('text-align', 'center');
-
-                        let headerRow = table.find('thead tr');
-                        headerRow.prepend('<th style="text-align:center">SR NO</th>');
-
-                        table.find('tbody tr').each(function (i) {
-                            $(this).prepend('<td style="text-align:center">' + (i + 1) + '</td>');
+                        // 🟦 Clean up any hidden/empty columns before adding SR.NO
+                        table.find('thead tr').each(function () {
+                            $(this).find('th').filter(function () {
+                                return $(this).text().trim() === '' || $(this).is(':hidden');
+                            }).remove();
+                        });
+                        table.find('tbody tr').each(function () {
+                            $(this).find('td').filter(function () {
+                                return $(this).text().trim() === '' || $(this).is(':hidden');
+                            }).remove();
                         });
 
-                        table.addClass('display').css('font-size', 'inherit');
+                        // 🟦 Center the title
+                        $(win.document.body).find('h1')
+                            .css('text-align', 'center')
+                            .css('font-size', '18pt')
+                            .css('margin-bottom', '5px');
+
+                        // 🟦 Add Generated Date below title
+                        $(win.document.body).find('h1').after(
+                            '<div style="text-align:center; margin-bottom:10px; font-size:11pt; font-weight:bold;">' +
+                            'Generated Date: ' + moment().format("DD/MM/YYYY") +
+                            '</div>'
+                        );
+
+                        // 🟦 Add SR.NO column at first position
+                        let headerRow = table.find('thead tr');
+                        headerRow.prepend('<th style="text-align:center;">SR.NO</th>');
+
+                        // 🟦 Add SR.NO data in body rows
+                        table.find('tbody tr').each(function (i) {
+                            $(this).prepend('<td style="text-align:center;">' + (i + 1) + '</td>');
+                        });
+
+                        // 🟦 Table styling
+                        table.addClass('display')
+                            .css('width', '100%')
+                            .css('border-collapse', 'collapse')
+                            .css('font-size', 'inherit');
+
+                        // 🟦 Add borders for better print look
+                        table.find('th, td').css({
+                            'border': '1px solid #000',
+                            'padding': '4px',
+                            'text-align': 'center'
+                        });
                     }
                 },
 
@@ -378,82 +423,77 @@
                     text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
                     title: 'PR Report',
                     exportOptions: {
-                        // Exclude columns with class 'no-export' AND last column
-                        columns: function (idx, data, node) {
-                            return !$(node).hasClass('no-export') && idx !== $('#TableApproved thead th').length - 1;
-                        },
+                        // Include all visible columns except last one or 'no-export' class
+                        columns: ':visible:not(.no-export):not(:last-child)',
                         rows: function (idx, data, node) {
                             return selectedRowsApproved.includes(data.PRCode); // Only selected rows
                         }
                     },
                     action: function (e, dt, button, config) {
                         if (!selectedRowsApproved || selectedRowsApproved.length === 0) {
-                            toastr.warning(" Please select at least one PR before exporting!")
-                            return; // Stop PDF export
+                            toastr.warning("Please select at least one PR before exporting!");
+                            return;
                         }
                         $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, button, config);
                     },
                     customize: function (doc) {
                         // Title style
-                        doc.styles.title = {
-                            fontSize: 16,
-                            bold: true,
-                            alignment: 'center',
-                            margin: [0, 0, 0, 12]
-                        };
+                        doc.styles.title = { fontSize: 16, bold: true, alignment: 'center', margin: [0, 0, 0, 12] };
+
+                        // Add generated date
                         doc.content.splice(1, 0, {
-                            text: 'Generated on: ' + moment().format("YYYY-MM-DD"),
+                            text: 'Generated Date: ' + moment().format("DD/MM/YYYY"),
                             alignment: 'center',
                             margin: [0, 0, 0, 12],
-                            fontSize: 11,
-                            italics: true
+                            fontSize: 11
                         });
 
-                        // Find the table node
+                        // Find table
                         var tableNode = doc.content.find(n => n.table);
                         if (tableNode) {
-                            // Add SR NO column at start
-                            tableNode.table.body[0].unshift({
-                                text: 'SR NO',
-                                color: 'white',
-                                fillColor: '#343a40',
-                                alignment: 'center',
-                                bold: true,
-                                fontSize: 11
-                            });
+                            // Fix: Clean any hidden/empty cells before adding Sr No
+                            tableNode.table.body = tableNode.table.body.map(row => row.filter(cell => cell.text !== ''));
 
-                            // Make all header cells white
-                            tableNode.table.body[0].forEach(cell => {
-                                cell.color = 'white';
-                                cell.fillColor = '#343a40';
-                                cell.bold = true;
-                                cell.alignment = 'center';
-                                cell.fontSize = 11;
-                            });
+                            // Add SR.NO to all rows including header
+                            tableNode.table.body.forEach((row, index) => {
+                                if (index === 0) {
+                                    // Header row
+                                    row.unshift({
+                                        text: 'SR.NO',
+                                        color: 'white',
+                                        fillColor: '#343a40',
+                                        alignment: 'center',
+                                        bold: true,
+                                        fontSize: 11
+                                    });
+                                } else {
+                                    // Data rows
+                                    row.unshift({
+                                        text: index.toString(),
+                                        alignment: 'center',
+                                        fontSize: 10
+                                    });
+                                }
 
-                            // Add SR NO values and style body rows
-                            let srNo = 1;
-                            tableNode.table.body.slice(1).forEach(row => {
-                                row.unshift({
-                                    text: srNo.toString(),
-                                    alignment: 'center',
-                                    fontSize: 10
-                                });
-                                srNo++;
-
+                                // Styling each cell
                                 row.forEach(cell => {
-                                    cell.fontSize = 10;
                                     cell.alignment = 'center';
                                     cell.margin = [4, 3, 4, 3];
+                                    if (index === 0) {
+                                        cell.color = 'white';
+                                        cell.fillColor = '#343a40';
+                                        cell.bold = true;
+                                    }
                                 });
                             });
 
-                            // Adjust column widths including SR NO
-                            tableNode.table.widths = ['8%', '12%', '15%', '15%', '15%', '10%', '15%', '10%'];
+                            // Dynamic widths for all columns
+                            const columnCount = tableNode.table.body[0].length;
+                            tableNode.table.widths = Array(columnCount).fill('*');
 
                             // Table borders
                             tableNode.layout = {
-                                fillColor: function (rowIndex) { return rowIndex === 0 ? '#343a40' : null; },
+                                fillColor: rowIndex => rowIndex === 0 ? '#343a40' : null,
                                 hLineColor: () => '#ccc',
                                 vLineColor: () => '#ccc',
                                 hLineWidth: () => 0.5,
@@ -464,57 +504,189 @@
                         // Page margins
                         doc.pageMargins = [40, 60, 40, 40];
                     }
-                },
+                }
+,  
+
                 {
                     extend: 'excelHtml5',
                     text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
-                    title: 'PR Report',
+                    title: '', // We'll insert title manually
                     exportOptions: {
-                        // Export only selected rows
                         rows: function (idx, data, node) {
                             return selectedRowsApproved.includes(data.PRCode);
                         },
-                        // Exclude columns with class 'no-export' AND last column
                         columns: function (idx, data, node) {
                             return !$(node).hasClass('no-export') && idx !== $('#TableApproved thead th').length - 1;
                         }
                     },
                     action: function (e, dt, button, config) {
                         if (!selectedRowsApproved || selectedRowsApproved.length === 0) {
-                            toastr.warning("Please select at least one PR before exporting!")
+                            toastr.warning("Please select at least one PR before exporting!");
                             return; // Stop Excel export
                         }
                         $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
                     },
                     customize: function (xlsx) {
                         var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                        var sheetData = $('sheetData', sheet);
 
-                        // Optional: You can style the header row
-                        $('row c[r^="A1"]', sheet).attr('s', '2'); // Example: style first cell
+                        // Count table columns
+                        var headerCount = $('#TableApproved thead th').length;
+                        if (headerCount <= 0) headerCount = 1;
+
+                        // Convert column number → Excel column letter (A, B, C, ...)
+                        function numToColumn(n) {
+                            var s = '';
+                            while (n > 0) {
+                                var m = (n - 1) % 26;
+                                s = String.fromCharCode(65 + m) + s;
+                                n = Math.floor((n - 1) / 26);
+                            }
+                            return s;
+                        }
+                        var lastCol = numToColumn(headerCount);
+
+                        // Shift all existing rows down by 2 (title + date)
+                        $('row', sheetData).each(function () {
+                            var $row = $(this);
+                            var oldR = parseInt($row.attr('r'), 10);
+                            var newR = oldR + 2;
+                            $row.attr('r', newR);
+                            $row.find('c').each(function () {
+                                var $c = $(this);
+                                var ref = $c.attr('r');
+                                if (ref) {
+                                    var col = ref.replace(/[0-9]/g, '');
+                                    $c.attr('r', col + newR);
+                                }
+                            });
+                        });
+
+                        // Generate date (DD-MM-YYYY)
+                        var now = new Date();
+                        var formattedDate =
+                            ("0" + now.getDate()).slice(-2) + "/" +
+                            ("0" + (now.getMonth() + 1)).slice(-2) + "/" +
+                            now.getFullYear();
+
+                        var title = 'PR Report';
+                        var dateText = 'Generated Date: ' + formattedDate;
+
+                        // Add Title and Date rows
+                        var titleRow = `
+<row r="1">
+    <c t="inlineStr" s="51" r="A1"><is><t>${title}</t></is></c>
+</row>`;
+                        var dateRow = `
+<row r="2">
+    <c t="inlineStr" s="51" r="A2"><is><t>${dateText}</t></is></c>
+</row>`;
+
+                        sheetData.prepend(dateRow);
+                        sheetData.prepend(titleRow);
+
+                        // Merge cells across all table columns
+                        var mergeRef1 = 'A1:' + lastCol + '1';
+                        var mergeRef2 = 'A2:' + lastCol + '2';
+                        var mergeCells = $('mergeCells', sheet);
+
+                        if (mergeCells.length === 0) {
+                            var mergeXml = `<mergeCells count="2">
+            <mergeCell ref="${mergeRef1}"/>
+            <mergeCell ref="${mergeRef2}"/>
+        </mergeCells>`;
+                            $(sheet).find('worksheet').append(mergeXml);
+                        } else {
+                            var count = parseInt(mergeCells.attr('count') || '0', 10);
+                            mergeCells.attr('count', count + 2);
+                            mergeCells.append(`<mergeCell ref="${mergeRef1}"/>`);
+                            mergeCells.append(`<mergeCell ref="${mergeRef2}"/>`);
+                        }
+
+                        // Apply center + bold style to title and date
+                        $('row[r="1"] c', sheet).attr('s', '51');
+                        $('row[r="2"] c', sheet).attr('s', '51');
+
+                        // --- ADD Sr. No. HEADING ---
+                        $('row', sheetData).each(function () {
+                            var $row = $(this);
+                            var rowNum = parseInt($row.attr('r'), 10);
+                            if (rowNum === 3) { // header row
+                                // Directly add "Sr. No." at column A
+                                var srHeading = `<c t="inlineStr" s="51" r="A3"><is><t>Sr. No</t></is></c>`;
+                                // Prepend without shifting existing header cells
+                                $row.prepend(srHeading);
+                            }
+                        });
+
+                        // --- ADD Sr. No. TO DATA ROWS ---
+                        $('row', sheetData).each(function () {
+                            var $row = $(this);
+                            var rowNum = parseInt($row.attr('r'), 10);
+                            if (rowNum > 3) { // skip title, date, header
+                                // Directly add Sr. No. cell in column A
+                                var srNo = rowNum - 3;
+                                var srCell = `<c t="inlineStr" r="A${rowNum}"><is><t>${srNo}</t></is></c>`;
+                                $row.prepend(srCell);
+                            }
+                        });
                     }
+
                 },
                 {
                     extend: 'csvHtml5',
                     text: '<i class="bi bi-filetype-csv text-success fs-5"></i>',
                     title: 'PR Report',
                     exportOptions: {
-                        // Export only selected rows
                         rows: function (idx, data, node) {
                             return selectedRowsApproved.includes(data.PRCode);
                         },
-                        // Exclude columns with class 'no-export' and last column
-                        columns: function (idx, data, node) {
-                            return !$(node).hasClass('no-export') && idx !== $('#TableApproved thead th').length - 1;
+                        columns: ':not(.no-export):not(:last-child)' // Exclude action/hidden columns
+                    },
+                    customize: function (csv) {
+                        var lines = csv.split('\n');
+
+                        if (lines.length > 1) {
+                            // Clean and remove first empty column if present
+                            lines = lines.map(line => {
+                                // Split properly even if values contain quotes
+                                var cols = line.split(',');
+
+                                // If the first column is blank or quotes only, remove it
+                                if (cols.length > 1 && (cols[0].trim() === '' || cols[0].trim() === '""')) {
+                                    cols.shift();
+                                }
+
+                                // Remove any remaining fully empty columns
+                                cols = cols.filter(col => col.trim() !== '' && col.trim() !== '""');
+
+                                return cols.join(',');
+                            });
+
+                            // Add "Sr No" header manually
+                            lines[0] = 'Sr No,' + lines[0];
+
+                            // Add serial number for each data row
+                            for (var i = 1; i < lines.length; i++) {
+                                if (lines[i].trim() !== '') {
+                                    lines[i] = i + ',' + lines[i];
+                                }
+                            }
                         }
+
+                        return lines.join('\n');
                     },
                     action: function (e, dt, button, config) {
                         if (!selectedRowsApproved || selectedRowsApproved.length === 0) {
-                            toastr.warning("Please select at least one PR before exporting!")
-                            return; // Stop CSV export
+                            toastr.warning("Please select at least one PR before exporting!");
+                            return;
                         }
                         $.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, button, config);
                     }
                 }
+
+
+
 
             ]
         });
@@ -537,11 +709,10 @@
             },
             ranges: {
                 'Today': [moment(), moment()],
-                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
                 'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                'This Month': [moment().startOf('month'), moment().endOf('month')],
-                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                'Last 1 Month': [moment().subtract(1, 'months').startOf('day'), moment()],
+                'Last 3 Months': [moment().subtract(3, 'months').startOf('day'), moment()],
+                'Last 1 Year': [moment().subtract(12, 'months').startOf('day'), moment()]
             }
         });
 
@@ -584,8 +755,9 @@
 
 
         // Row Selection
-        $('#TableApproved').on('change', '.row-select3', function () {
+        $(document).on('change', '.row-select3', function () {
             let id = $(this).data('id');
+
             if (this.checked) {
                 if (!selectedRowsApproved.includes(id)) {
                     selectedRowsApproved.push(id);
@@ -593,10 +765,14 @@
             } else {
                 selectedRowsApproved = selectedRowsApproved.filter(x => x !== id);
             }
+
+            // ✅ Update "Select All" checkbox automatically
+            var allChecked = $('.row-select3').length === $('.row-select3:checked').length;
+            $('#selectAll3').prop('checked', allChecked);
         });
 
-        // Select All Checkbox
-        $('#selectAll3').on('click', function () {
+        // ✅ Select All Checkbox
+        $(document).on('click', '#selectAll3', function () {
             var checked = this.checked;
             $('.row-select3').each(function () {
                 $(this).prop('checked', checked).trigger('change');
@@ -617,25 +793,12 @@
                 if (response.success) {
                     var formattedDate = moment(response.data.RequiredDate).format("DD/MM/YYYY");
 
-                    $("#PRCODE3").text(response.data.PRCode);
-                    $("#RequiredDate3").text(formattedDate);
-                    $("#FullName3").text(response.data.FullName);
-                    $("#Status3").text(response.data.Status);
+                    $("#PRCODE3").val(response.data.PRCode);
+                    $("#RequiredDate3").val(formattedDate);
+                    $("#FullName3").val(response.data.FullName);
+                    $("#Status3").val(response.data.Status);
 
-                    let statusText = response.data.Status;
-                    let statusDiv = $("#Status3");
-                    statusDiv.removeClass("text-success text-danger text-warning text-dark"); // old classes remove
-                    statusDiv.text(statusText);
-
-                    if (statusText === "Approved") {
-                        statusDiv.addClass("text-success");
-                    }
-                    else if (statusText === "Rejected") {
-                        statusDiv.addClass("text-danger");
-                    }
-                    else if (statusText === "Pending") {
-                        statusDiv.addClass("text-warning");
-                    }
+                   
                 }
             },
             error: function (xhr, status, error) {
@@ -653,7 +816,7 @@
             responsive: true,
             paging: true,
             searching: true,
-            ordering: true,
+            ordering: false,
             info: true,
             lengthChange: true,
             pageLength: 10,
@@ -680,7 +843,20 @@
                 },
                 { data: "ItemCode", title: "ITEM CODE" },
                 { data: "ItemName", title: "ITEM NAME" },
-                { data: "Description", title: "DESCRIPTION" },
+                {
+                    data: "Description", title: "DESCRIPTION",
+                    createdCell: function (td, cellData) {
+                        if (cellData) {
+                            // truncate text if too long
+                            let shortText = cellData.length > 25 ? cellData.substring(0, 25) + "..." : cellData;
+                            $(td)
+                                .text(shortText)
+                                .attr("title", cellData)
+                                .attr("data-bs-toggle", "tooltip")
+                                .attr("data-bs-placement", "top");
+                        }
+                    }
+},
                 { data: "RequiredQuantity", title: "QTY" },
                 {
                     data: "UnitRate",
@@ -705,6 +881,9 @@
                     }
                 }
             ],
+            columnDefs: [
+                { className: "text-center", targets: "_all" }
+            ],
 
             ordering: false,
             dom: '<"d-flex justify-content-between align-items-center mb-2"Bf>rt<"d-flex justify-content-between align-items-center mt-2"ip>',
@@ -723,9 +902,9 @@
 
                         // Custom Header HTML
                         let headerHtml = `
-        <h2 class="text-center mb-2">Purchase Requisition Details</h2>
+        <h3 class="text-center mb-2">Purchase Requisition Details</h3>
         <div style="text-align:center; margin-bottom:10px; font-size:11pt; font-style:italic;">
-            Generated on: ${moment().format("YYYY-MM-DD")}
+            Generated Date: ${moment().format("YYYY-MM-DD")}
         </div>
         <table class="table table-borderless mb-3">
             <tr>
@@ -762,147 +941,6 @@
             ],
             language: {
                 lengthMenu: ""
-            }
-        });
-    });
-
-
-    // ===================== Update Modal Loader =====================
-    $(document).on("click", ".update-btn3", function () {
-        var prCode = $(this).data("id");
-        loadUpdateModal3(prCode);
-    });
-    // Reinitialize tooltips after DataTable draw
-    $(document).on('mouseenter', '[title]', function () {
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'))
-        tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
-        })
-    });
-
-    // Load Update Modal Function
-    function loadUpdateModal3(prCode) {
-        // Load PR Info
-        $.ajax({
-            url: '/Purchase/DetailsPartialSP',
-            type: 'POST',
-            data: { id: prCode },
-            success: function (response) {
-                if (response.success) {
-                    var formattedDate = moment(response.data.RequiredDate3).format("DD/MM/YYYY");
-
-                    $("#PRCODE3").text(response.data.PRCode);
-                    $("#RequiredDate3").text(formattedDate);
-                    $("#FullName3").text(response.data.FullName);
-                    $("#Status3").text(response.data.Status);
-
-                    let statusText = response.data.Status;
-                    let statusDiv = $("#Status3");
-                    statusDiv.removeClass("text-success text-danger text-warning text-dark"); // old classes remove
-                    statusDiv.text(statusText);
-
-                    if (statusText === "Approved") {
-                        statusDiv.addClass("text-success");
-                    }
-                    else if (statusText === "Rejected") {
-                        statusDiv.addClass("text-danger");
-                    }
-                    else if (statusText === "Pending") {
-                        statusDiv.addClass("text-warning");
-                    }
-
-                    console.log(response.data);
-                }
-            },
-            error: function (xhr, status, error) {
-                console.error("AJAX Error:", status, error, xhr.responseText);
-            }
-        });
-
-        // Load Item Details (Editable)
-        $.ajax({
-            url: '/Purchase/ItemPartialSP',
-            type: 'POST',
-            data: { id: prCode },
-            success: function (response) {
-                if (response.success) {
-                    $("#ItemTableBodyUpdate3").empty(); // Clear old rows
-
-                    $.each(response.data, function (i, item) {
-                        var row = `
-                        <tr data-id="${item.PRItemId}">
-                            <td>${i + 1}</td>
-                            <td>${item.ItemCode}</td>
-                            <td>${item.ItemName}</td>
-                            <td>${item.Description}</td>
-                            <td>
-                                <input type="number" class="form-control qty-input"
-                                    value="${item.RequiredQuantity}" min="1" />
-                            </td>
-                            <td>₹ ${parseFloat(item.UnitRate).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                            <td>₹ ${parseFloat(item.Amount).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                            <td>
-                                <button class="btn btn-sm btn-success save-item-btn3">Save</button>
-                            </td>
-                        </tr>`;
-                        $("#ItemTableBodyUpdate3").append(row);
-                    });
-                    // Initialize DataTable or re-initialize safely
-                    $("#ItemTableUpdate3").DataTable({
-                        ordering: false,
-                        paging: true,
-                        searching: true,
-                        info: true,
-                        destroy: true  // Important to allow re-initialization
-                    });
-                }
-            },
-            error: function (xhr, status, error) {
-                console.error("Error loading item details:", error);
-            }
-        });
-    }
-
-    // ===================== Save Item Quantity =====================
-    $(document).on("click", ".save-item-btn3", function () {
-        var row = $(this).closest("tr");
-        var prItemId = row.data("id");
-        var requiredQuantity = row.find(".qty-input").val();
-
-        $.ajax({
-            url: '/Purchase/UpdateItemQuantitySP',
-            type: 'POST',
-            data: { PRItemId: prItemId, requiredQuantity: requiredQuantity },
-            success: function (response) {
-                if (response.success) {
-                    // SweetAlert2 success popup
-                    Swal.fire({
-                        title: 'Success!',
-                        text: 'Item updated successfully!',
-                        icon: 'success',
-                        confirmButtonText: 'OK'
-                    }).then(() => {
-                        // Close the Update Modal after SweetAlert
-                        $('#updateapproeModal').modal('hide');
-                    });
-                } else {
-                    // SweetAlert2 error popup if backend returns failure
-                    Swal.fire({
-                        title: 'Error!',
-                        text: response.message || 'Failed to update item.',
-                        icon: 'error',
-                        confirmButtonText: 'OK'
-                    });
-                }
-            },
-            error: function () {
-                // SweetAlert2 error popup for AJAX errors
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'Something went wrong while updating the item.',
-                    icon: 'error',
-                    confirmButtonText: 'OK'
-                });
             }
         });
     });

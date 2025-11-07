@@ -39,7 +39,7 @@ function handleAjaxForm(form) {
 
                 case "changePassword":
                     showToast("Password Changed Successfully", "success");
-                    setTimeout(() => window.location.href = "/Account/MainLogin", 3000);
+                    setTimeout(() => window.location.href = "/Account/Logout", 3000);
                     break;
             }
         },
@@ -80,6 +80,6 @@ function redirectByDepartment(department) {
         case 8: window.location.href = `/AdmSalesAndDistributionin/Index`; break;
         case 9: window.location.href = `/HumanResources/Index`; break;
         case 10: window.location.href = `/Maintenance/Index`; break;
-        default: window.location.href = `/Dashboard/Index`; break;
+        default: window.location.href = `/Account/Logout`; break;
     }
 }

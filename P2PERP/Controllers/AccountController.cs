@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -26,6 +27,7 @@ namespace P2PERP.Controllers
         /// Displays the login page and clears any existing session.
         /// </summary>
         /// <returns>The login view.</returns>
+        [Route("Account/Login")]
         [HttpGet]
         public ActionResult MainLogin()
         {
@@ -59,6 +61,7 @@ namespace P2PERP.Controllers
         /// A JSON result indicating success or failure. 
         /// On success, includes the department ID.
         /// </returns>
+        [Route("Account/Login")]
         [HttpPost]
         public async Task<ActionResult> MainLogin(Account acc)
         {
@@ -73,6 +76,9 @@ namespace P2PERP.Controllers
             Session["StaffCode"] = acc1.StaffCode;
             Session["DepartmentId"] = acc1.DepartmentId;
             Session["RoleId"] = acc1.RoleId;
+
+            await bal.AfterLogin();
+
             return Json(new { success = true, departmentId = acc1.DepartmentId });
         }
 
@@ -87,12 +93,15 @@ namespace P2PERP.Controllers
         }
 
         /// <summary>
-        /// Verifies whether the provided email exists and sends a reset code.
+        /// Handles a user's request to reset their password.
+        /// Verifies if the provided email exists in the system, 
+        /// and if valid, stores relevant session information for the password reset process.
         /// </summary>
-        /// <param name="acc">The account object containing the email address.</param>
+        /// <param name="acc">An <see cref="Account"/> object containing the user's email address.</param>
         /// <returns>
-        /// A JSON result indicating success or failure. 
-        /// On success, a verification code is sent to the user’s email.
+        /// Returns a JSON result:
+        /// - If the email is valid: { success = true } and stores the staff code and email in session for further steps.
+        /// - If the email is invalid: { success = false, message = "Invalid Email" }.
         /// </returns>
         [HttpPost]
         public async Task<ActionResult> ForgotPassword(Account acc)
@@ -106,26 +115,24 @@ namespace P2PERP.Controllers
 
             Session["StaffCodeForForgotPassword"] = str;
             Session["ForgetPasswordEmail"] = acc.EmailAddress;
+            Session["VerificationCode"] = acc.Code;
 
-            string code = CreateCode();
+            return Json(new { success = true });
+        }
 
-            var email = new Email
-            {
-                ToEmails = new List<string> { acc.EmailAddress },
-                Subject = "Forgot Password Verification Code",
-                Body = $"The Code For Your <b> {acc.EmailAddress} </b> is <p style='text-align: center;font-size: xx-large;'><b> {code} </b></p>",
-                IsBodyHtml = true
-            };
-
-            int send = SendEmail(email);
-            if (send == 1)
-            {
-                return Json(new { success = true });
-            }
-            else
-            {
-                return Json(new { success = false });
-            }
+        /// <summary>
+        /// Checks whether the current user session contains a valid StaffCode.
+        /// </summary>
+        /// <returns>
+        /// Returns a JSON object with:
+        /// - success = true, if Session["StaffCode"] exists.
+        /// - success = false, if Session["StaffCode"] is null.
+        /// </returns>
+        [HttpGet]
+        public JsonResult CheckSession()
+        {
+            bool isValid = Session["StaffCode"] != null;
+            return Json(new { success = isValid }, JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>
@@ -224,70 +231,67 @@ namespace P2PERP.Controllers
         }
 
         /// <summary>
-        /// Creates a random 4-digit verification code and stores it in session.
+        /// Sends an email with optional CC, BCC, and attachments to the specified recipients.
         /// </summary>
-        /// <returns>The generated 4-digit code as a string.</returns>
-        public string CreateCode()
+        /// <param name="email">The Email object containing recipients, subject, body, and attachments.</param>
+        /// <returns>
+        /// A JSON result indicating the outcome:
+        /// - success = true, message = "Email sent successfully." if the email was sent successfully.
+        /// - success = false, message = error details if sending failed.
+        /// </returns>
+        [Route("Account/SendEmail")]
+        [HttpPost]
+        [ValidateInput(false)]
+        public JsonResult SendEmail()
         {
-            Random random = new Random();
-            int number = random.Next(0, 10000);
-            string fourDigitString = number.ToString("D4");
-            Session["VerificationCode"] = fourDigitString;
-            return fourDigitString;
-        }
-
-        /// <summary>
-        /// Sends a forgot password verification code to the given email address.
-        /// </summary>
-        /// <param name="mail">The recipient email address.</param>
-        /// <returns>1 if the email was sent successfully; otherwise 0.</returns>
-        public int SendEmail(Email email)
-        {
-            int sent = 0;
             try
             {
-                string senderEmail = WebConfigurationManager.AppSettings["MainEmail"];
-                string appPassword = WebConfigurationManager.AppSettings["AppPassword"];
+                var request = HttpContext.Request;
 
-                using (SmtpClient smtpClient = new SmtpClient("smtp.gmail.com", 587))
+                // Read and deserialize email JSON manually
+                var emailJson = request.Form["email"];
+                var email = JsonConvert.DeserializeObject<Email>(emailJson);
+
+                using (var smtpClient = new SmtpClient("smtp.gmail.com", 587))
                 {
-                    smtpClient.Credentials = new NetworkCredential(senderEmail, appPassword);
+                    smtpClient.Credentials = new NetworkCredential(
+                        WebConfigurationManager.AppSettings["MainEmail"],
+                        WebConfigurationManager.AppSettings["AppPassword"]
+                    );
                     smtpClient.EnableSsl = true;
 
-                    using (MailMessage mailMessage = new MailMessage())
+                    using (var mail = new MailMessage())
                     {
-                        mailMessage.From = new MailAddress(senderEmail);
-                        mailMessage.Subject = email.Subject;
-                        mailMessage.Body = email.Body;
-                        mailMessage.IsBodyHtml = email.IsBodyHtml;
+                        mail.From = new MailAddress(WebConfigurationManager.AppSettings["MainEmail"]);
+                        mail.Subject = email.Subject;
+                        mail.Body = email.Body;
+                        mail.IsBodyHtml = email.IsBodyHtml;
 
-                        // Add To
-                        if (email.ToEmails != null)
-                            email.ToEmails.ForEach(e => mailMessage.To.Add(e));
+                        email.ToEmails?.ForEach(x => mail.To.Add(x));
+                        email.CcEmails?.ForEach(x => mail.CC.Add(x));
+                        email.BccEmails?.ForEach(x => mail.Bcc.Add(x));
 
-                        // Add CC
-                        if (email.CcEmails != null)
-                            email.CcEmails.ForEach(e => mailMessage.CC.Add(e));
+                        // Attach uploaded files directly (no saving)
+                        for (int i = 0; i < request.Files.Count; i++)
+                        {
+                            var file = request.Files[i];
+                            if (file != null && file.ContentLength > 0)
+                            {
+                                var attachment = new Attachment(file.InputStream, file.FileName);
+                                mail.Attachments.Add(attachment);
+                            }
+                        }
 
-                        // Add BCC
-                        if (email.BccEmails != null)
-                            email.BccEmails.ForEach(e => mailMessage.Bcc.Add(e));
-
-                        // Add Attachments
-                        if (email.AttachmentPaths != null)
-                            email.AttachmentPaths.ForEach(path => mailMessage.Attachments.Add(new Attachment(path)));
-
-                        smtpClient.Send(mailMessage);
-                        sent = 1;
+                        smtpClient.Send(mail);
                     }
                 }
+
+                return Json(new { success = true, message = "Email sent successfully." });
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Email send failed: {ex.Message}");
+                return Json(new { success = false, message = ex.Message });
             }
-
-            return sent;
         }
 
         /// <summary>
@@ -469,7 +473,7 @@ namespace P2PERP.Controllers
                     return Json(city, JsonRequestBehavior.AllowGet);
                 }
 
-                return Json(body, JsonRequestBehavior.AllowGet);
+                return Json(cities, JsonRequestBehavior.AllowGet);
             }
         }
 
@@ -505,279 +509,79 @@ namespace P2PERP.Controllers
 
             // Fetch user permissions
             var permissions = await bal.GetReadPermissions(staffCode);
+            var permissionNames = permissions.Select(p => p.PermissionName).ToList();
 
-            // Loop through each permission and load events accordingly
+            bool hasPR = permissionNames.Contains("PurchaseRequisition");
+            bool hasPO = permissionNames.Contains("PurchaseOrder");
+            bool hasSP = permissionNames.Contains("StockPlanning");
+
+            // --- Combined logic ---
+            if (hasSP)
+            {
+                // Always load these if user has StockPlanning
+                var isrEvents = await bal.GetItemStockRefillEventsAsync();
+                var mrpEvents = await bal.GetMaterialReqPlanningEventsAsync();
+                var jitEvents = await bal.GetJustInTimeEventsAsync();
+
+                // Filter based on PR/PO presence
+                if (hasPR && hasPO)
+                {
+                    // All three → keep all
+                    events.AddRange(isrEvents);
+                    events.AddRange(mrpEvents);
+                    events.AddRange(jitEvents);
+                }
+                else if (hasPR && !hasPO)
+                {
+                    // PR + SP → Refile + Planning
+                    events.AddRange(isrEvents);
+                    events.AddRange(mrpEvents);
+                }
+                else if (hasPO && !hasPR)
+                {
+                    // PO + SP → JIT only
+                    events.AddRange(jitEvents);
+                }
+                else
+                {
+                    // Only SP (no PR, no PO) → All three
+                    events.AddRange(isrEvents);
+                    events.AddRange(mrpEvents);
+                    events.AddRange(jitEvents);
+                }
+            }
+
+            // --- Main permission-based events ---
             foreach (var perm in permissions)
             {
                 switch (perm.PermissionName)
                 {
                     case "PurchaseRequisition":
-                        // Load Purchase Requisition events
-                        var PRList = await bal.PRListPCM();
-                        foreach (var pr in PRList)
-                        {
-                            var PRDetails = await bal.PRDetails(pr.IdCode);
-                            events.Add(new
-                            {
-                                id = pr.IdCode,
-                                title = $"Purchase Requisition Is Added By {pr.AddedBy}",
-                                start = pr.AddedDate.ToString("yyyy/MM/ddTHH:mm:ss"),
-                                //className = pr.Status == "Approved" ? "bg-success" : (pr.Status == "Pending" ? "bg-warning" : "bg-danger"),
-                                color = "#007bff",
-
-                                extendedProps = new
-                                {
-                                    module = "PurchaseRequisition",
-                                    PRCode = PRDetails.PRCode,
-                                    RequiredDate = PRDetails.RequiredDate?.ToString("dd-MM-yyyy").Replace("-", "/"),
-                                    StatusName = PRDetails.StatusName,
-                                    Description = PRDetails.Description,
-                                    AddedBy = PRDetails.AddedBy,
-                                    AddedDate = PRDetails.AddedDate?.ToString("dd-MM-yyyy").Replace("-", "/"),
-                                    ApprovedBy = PRDetails.ApprovedBy,
-                                    ApprovedDate = PRDetails.ApprovedDate?.ToString("dd-MM-yyyy").Replace("-", "/"),
-                                    PriorityName = PRDetails.PriorityName,
-
-                                    Items = PRDetails.Items
-                                }
-                            });
-                        }
+                        events.AddRange(await bal.GetPurchaseRequisitionEventsAsync());
                         break;
+
                     case "RequestForQuotation":
-                        // Load RFQ events
-                        var RFQList = await bal.RFQListPCM();
-                        foreach (var pr in RFQList)
-                        {
-                            var RFQDetails = await bal.RFQDetails(pr.IdCode);
-                            events.Add(new
-                            {
-                                id = pr.IdCode,
-                                title = $"Request For Quotation Is Added By {pr.AddedBy}",
-                                start = pr.AddedDate.ToString("yyyy-MM-dd"),
-                                end = ((pr.EndDate.Date.AddDays(1) - pr.AddedDate.Date).TotalDays > 7 ? pr.AddedDate.Date.AddDays(7) : pr.EndDate.Date.AddDays(-2)).ToString("yyyy-MM-dd"),
-                                //className = pr.Status == "Requested" ? "bg-success" : "bg-warning",
-                                color = "#17a2b8",
-
-                                extendedProps = new
-                                {
-                                    module = "RequestForQuotation",
-                                    RFQCode = RFQDetails.RFQCode,
-                                    PRCode = RFQDetails.PRCode,
-                                    ExpectedDate = RFQDetails.ExpectedDate?.ToString("dd-MM-yyyy").Replace("-", "/"),
-                                    Description = RFQDetails.Description,
-                                    AddedBy = RFQDetails.AddedBy,
-                                    AddedDate = RFQDetails.AddedDate?.ToString("dd-MM-yyyy").Replace("-", "/"),
-                                    AccountantName = RFQDetails.AccountantName,
-                                    AccountantEmail = RFQDetails.AccountantEmail,
-                                    DeliveryAddress = RFQDetails.DeliveryAddress,
-
-                                    Items = RFQDetails.Items
-                                }
-                            });
-                        }
+                        events.AddRange(await bal.GetRFQEventsAsync());
                         break;
+
                     case "RegisterQuotation":
-                        // Load Register Quotation events (grouped by date)
-                        var RQList = await bal.RQListPCM();
-                        foreach (var pr in RQList)
-                        {
-                            var RQDetails = await bal.RQDetails(pr.AddedDate.ToString("yyyy-MM-dd"));
-
-                            var items = RQDetails.Select(i => new {
-                                i.RegisterQuotationCode,
-                                i.RFQCode,
-                                i.VendorName,
-                                i.StatusName,
-                                i.AddedBy,
-                                DeliveryDate = i.DeliveryDate.HasValue ? i.DeliveryDate.Value.ToString("dd-MM-yyyy").Replace("-", "/") : "",
-                                AddedDate = i.AddedDate.HasValue ? i.AddedDate.Value.ToString("dd-MM-yyyy").Replace("-", "/") : "",
-                                i.ApprovedBy,
-                                ApprovedDate = i.ApprovedDate.HasValue ? i.ApprovedDate.Value.ToString("dd-MM-yyyy").Replace("-", "/") : "",
-                                i.ShippingCharges
-                            });
-
-                            events.Add(new
-                            {
-                                id = $"RQ-{pr.AddedDate:yyyyMMdd}",
-                                title = $"{pr.Count} Quotations are Registerd By {pr.AddedBy}",
-                                start = pr.AddedDate.ToString("yyyy-MM-ddTHH:mm:ss"),
-                                //color = "#f8f9fa",
-                                //textColor = "#212529",
-                                //borderColor = "#212529",
-                                color = "#6f42c1",
-
-                                extendedProps = new
-                                {
-                                    module = "RegisterQuotation",
-
-                                    Items = items
-                                }
-                            });
-                        }
+                        events.AddRange(await bal.GetRegisterQuotationEventsAsync());
                         break;
+
                     case "PurchaseOrder":
-                        // Load Purchase Order events
-                        var POList = await bal.POListPCM();
-                        foreach (var po in POList)
-                        {
-                            var PODetails = await bal.GetPODetails(po.IdCode);
-
-                            events.Add(new
-                            {
-                                id = po.IdCode,
-                                title = $"Purchase Order Is Added By {po.AddedBy}",
-                                start = po.AddedDate.ToString("yyyy-MM-ddTHH:mm:ss"),
-                                //className = po.Status == "Approved" ? "bg-success" :
-                                //            (po.Status == "Pending" ? "bg-warning" : "bg-danger"),
-                                color = "#fd7e14",
-
-                                extendedProps = new
-                                {
-                                    module = "PurchaseOrder",
-
-                                    POCode = PODetails.POCode,
-                                    StatusName = PODetails.StatusName,
-                                    AddedDate = PODetails.AddedDate?.ToString("dd-MM-yyyy").Replace("-", "/"),
-                                    ApprovedDate = PODetails.ApprovedDate?.ToString("dd-MM-yyyy").Replace("-", "/"),
-                                    TotalAmount = PODetails.TotalAmount,
-                                    BillingAddress = PODetails.BillingAddress,
-                                    VendorName = PODetails.VendorName,
-                                    AddedBy = PODetails.AddedBy,
-                                    ApprovedBy = PODetails.ApprovedBy,
-                                    AccountantName = PODetails.AccountantName,
-                                    ShippingCharges = PODetails.ShippingCharges,
-
-                                    Items = PODetails.Items,
-
-                                    TermConditions = PODetails.TermConditions ?? new List<string>()
-                                }
-                            });
-                        }
+                        events.AddRange(await bal.GetPurchaseOrderEventsAsync());
                         break;
+
                     case "GRNInfo":
-                        // Load GRN (Goods Receipt Note) events
-                        var GRNList = await bal.GRNListPCM();
-                        foreach (var grn in GRNList)
-                        {
-                            var GRNDetails = await bal.GRNDetails(grn.IdCode);
-
-                            var items = GRNDetails.Items.Select(g => new
-                            {
-                                g.GRNCode,
-                                g.GRNItemCode,
-                                g.ItemCode,
-                                g.ItemName,
-                                g.Quantity,
-                                g.CostPerUnit,
-                                g.Discount,
-                                g.TaxRate,
-                                g.FinalAmount
-                            }).ToList();
-
-                            events.Add(new
-                            {
-                                id = grn.IdCode,
-                                title = $"GRN Is Added By {grn.AddedBy}",
-                                start = grn.AddedDate.ToString("yyyy-MM-ddTHH:mm:ss"),
-                                //className = grn.Status == "Completed" ? "bg-success" : "bg-warning",
-                                color = "#28a745",
-
-                                extendedProps = new
-                                {
-                                    module = "GRNInfo",
-
-                                    POCode = GRNDetails.POCode,
-                                    GRNCode = GRNDetails.GRNCode,
-                                    PODate = GRNDetails.PODate?.ToString("dd/MM/yyyy").Replace("-","/"),
-                                    GRNDate = GRNDetails.GRNDate?.ToString("dd-MM-yyyy").Replace("-", "/"),
-                                    InvoiceDate = GRNDetails.InvoiceDate?.ToString("dd-MM-yyyy").Replace("-", "/"),
-                                    VendorName = GRNDetails.VendorName,
-                                    InvoiceCode = GRNDetails.InvoiceCode,
-                                    CompanyAddress = GRNDetails.CompanyAddress,
-                                    BillingAddress = GRNDetails.BillingAddress,
-                                    StatusName = GRNDetails.StatusName,
-                                    TotalAmount = GRNDetails.TotalAmount,
-                                    ShippingCharges = Convert.ToDecimal(GRNDetails.ShippingCharges),
-
-                                    Items = items,
-                                }
-                            });
-                        }
+                        events.AddRange(await bal.GetGRNEventsAsync());
                         break;
+
                     case "GoodsReturnInfo":
-                        // Load Goods Return events
-                        var goodsReturnList = await bal.GRListPCM();
-                        foreach (var gr in goodsReturnList)
-                        {
-                            var GRDetails = await bal.GRDetails(gr.IdCode);
-                            events.Add(new
-                            {
-                                id = gr.IdCode,
-                                title = $"Goods Return Entry Is Added By {gr.AddedBy}",
-                                start = gr.AddedDate.ToString("yyyy-MM-ddTHH:mm:ss"),
-                                //className = gr.Status == "Assign" ? "bg-warning" : "bg-success",
-                                color = "ffc107",
-
-                                extendedProps = new
-                                {
-                                    module = "GoodsReturnInfo",
-
-                                    GoodsReturnCode = GRDetails.GoodsReturnCode,
-                                    GRNCode = GRDetails.GRNCode,
-                                    TransporterName = GRDetails.TransporterName,
-                                    TransportContactNo = GRDetails.TransportContactNo,
-                                    VehicleNo = GRDetails.VehicleNo,
-                                    VehicleType = GRDetails.VehicleType,
-                                    Reason = GRDetails.Reason,
-                                    AddedBy = GRDetails.AddedBy,
-                                    AddedDate = GRDetails.AddedDate?.ToString("dd-MM-yyyy").Replace("-", "/"),
-                                    Status = GRDetails.StatusName,
-
-                                    Items = GRDetails.Items,
-                                }
-                            });
-                        }
+                        events.AddRange(await bal.GetGoodsReturnEventsAsync());
                         break;
+
                     case "QualityCheckInfo":
-                        // Load Quality Check events
-                        var QCList = await bal.QCListPCM();
-                        foreach (var qc in QCList)
-                        {
-                            var QCDetails = await bal.QCDetails(qc.AddedDate.ToString("yyyy-MM-dd"), qc.Status);
-
-                            var items = QCDetails.Select(i => new {
-                                i.QualityCheckCode,
-                                i.StatusName,
-                                i.GRNItemsCode,
-                                i.ItemCode,
-                                i.ItemName,
-                                i.Quantity,
-                                i.InspectionFrequency,
-                                i.SampleQualityChecked,
-                                i.SampleTestFailed,
-                                i.QCAddedBy,
-                                QCAddedDate = i.QCAddedDate.HasValue ? i.QCAddedDate.Value.ToString("dd-MM-yyyy").Replace("-", "/") : "",
-                                i.QCFailedAddedBy,
-                                QCFailedDate = i.QCFailedDate.HasValue ? i.QCFailedDate.Value.ToString("dd-MM-yyyy").Replace("-", "/") : "",
-                                i.Reason
-                            });
-
-                            events.Add(new
-                            {
-                                id = $"QC-{qc.AddedDate:yyyyMMdd}",
-                                title = $"{qc.Count} Items Has {(qc.Status == "Confirmed" ? "Passed" : "Failed")} Quality Check",
-                                start = qc.AddedDate.ToString("yyyy-MM-ddTHH:mm:ss"),
-                                //className = qc.Status == "Non-Confirmed" ? "bg-danger" : "bg-success",
-                                color = "#dc3545",
-
-                                extendedProps = new
-                                {
-                                    module = "QualityCheckInfo",
-
-                                    Items = items,
-                                }
-                            });
-                        }
+                        events.AddRange(await bal.GetQualityCheckEventsAsync());
                         break;
                 }
             }
@@ -843,5 +647,54 @@ namespace P2PERP.Controllers
             await bal.MarkAllAsRead(staffCode);
             return Json(new { success = true });
         }
+
+
+        [HttpGet]
+        public ActionResult SendMailHSB()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult SendMailHSB(HttpPostedFileBase attachment, string toEmail, string subject, string messageBody)
+        {
+            try
+            {
+                string fromEmail = System.Configuration.ConfigurationManager.AppSettings["SenderEmail"];
+                string password = System.Configuration.ConfigurationManager.AppSettings["SenderPassword"];
+
+                MailMessage mail = new MailMessage();
+                mail.From = new MailAddress(fromEmail);
+                mail.To.Add(toEmail);
+                mail.Subject = subject;
+                mail.Body = messageBody;
+                mail.IsBodyHtml = true;
+
+                // Add attachment if provided
+                if (attachment != null && attachment.ContentLength > 0)
+                {
+                    string fileName = Path.GetFileName(attachment.FileName);
+                    mail.Attachments.Add(new Attachment(attachment.InputStream, fileName));
+                }
+
+                SmtpClient smtp = new SmtpClient("smtp.gmail.com")
+                {
+                    Port = 587,
+                    Credentials = new NetworkCredential(fromEmail, password),
+                    EnableSsl = true
+                };
+
+                smtp.Send(mail);
+                ViewBag.Status = "Email sent successfully!";
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Status = "Error: " + ex.Message;
+            }
+
+            return View();
+        }
+
+
     }
 }

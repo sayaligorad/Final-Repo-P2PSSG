@@ -1,4 +1,8 @@
-﻿@model IEnumerable<P2PLibray.Purchase.Purchase>
+﻿@{
+    ViewBag.Title = "PR Reports";
+}
+
+@model IEnumerable<P2PLibray.Purchase.Purchase>
 
 <div class="main-content" id="pageContent">
     <div class="container mt-5">
@@ -15,12 +19,29 @@
         </div>
 
         @*✅ Pie Chart Section with total count on left*@
+        <!--<div class="row mb-4">-->
+        @*Chart on Right*@
+        <!--<div class="col-md-12">
+            <div class="card p-3 shadow h-100">
+                <h4 class="text-primary fw-bold text-center mb-3">PR Converted vs Not Converted</h4>
+                <div id="statusPieChart" style="height:350px;"></div>
+            </div>
+        </div>
+    </div>-->
         <div class="row mb-4">
-            @*Chart on Right*@
-            <div class="col-md-12">
+            <!-- Chart 1: PR Converted vs Not Converted -->
+            <div class="col-md-6">
                 <div class="card p-3 shadow h-100">
                     <h4 class="text-primary fw-bold text-center mb-3">PR Converted vs Not Converted</h4>
                     <div id="statusPieChart" style="height:350px;"></div>
+                </div>
+            </div>
+
+            <!-- Chart 2: Approved vs Rejected -->
+            <div class="col-md-6">
+                <div class="card p-3 shadow h-100">
+                    <h4 class="text-primary fw-bold text-center mb-3">PR Approved vs Rejected</h4>
+                    <div id="approvalChart" style="height:350px;"></div>
                 </div>
             </div>
         </div>
@@ -28,7 +49,7 @@
 
         <!-- ✅ Table Section -->
         <div class="card p-3 shadow">
-            <h3 class="mb-3">Purchase Requisition List</h3>
+            <h3 class="mb-3 text-center text-primary">Purchase Requisition List</h3>
             <div class="table-responsive">
                 <table id="purchaseTable" class="table table-striped table-bordered nowrap w-100">
                     <thead class="table-dark">
@@ -63,9 +84,9 @@
                                 <td>@item.StatusName</td>
                                 <td>
                                     <button id="btnview" type="button"
-                                            class="btn btn-sm btn-primary view-items"
+                                            class="btn btn-sm btn-primary view-items rounded-2"
                                             data-prcode="@item.PRCode">
-                                        <i class="bi bi-eye"></i>
+                                        <i class="bi bi-eye fs-6"></i>
                                     </button>
 
                                 </td>
@@ -82,15 +103,25 @@
 
 @*Modal View*@
 
-<div class="modal fade" data-bs-backdrop="true" id="prItemsModal" tabindex="-1" aria-hidden="true">
+@*<div class="modal fade" data-bs-backdrop="true" id="prItemsModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white position-relative">
-                <h5 class="modal-title text-white w-100 text-center">Purchase Requisition Items</h5>
-                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
+                <h5 class="modal-title text-white w-100 text-center mb-2 fw-bold fs-5 p-1" >Purchase Requisition Items</h5>
+                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3 mb-2" data-bs-dismiss="modal"></button>
+            </div>*@
+<div class="modal fade" id="prItemsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content shadow-lg rounded-3">
+            <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-1">
+                <!-- Modal title -->
+                <h5 class="modal-title fw-bold text-white mb-0 fs-5">Purchase Requisition Items</h5>
+                <!-- Close button -->
+                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
             <div class="modal-body">
+                
                 <table id="prItemsTable" class="table table-striped table-bordered w-100">
                     <thead class="table-dark">
                         <tr>
@@ -98,7 +129,7 @@
                             <th class="text-center">PRCode</th>
                             <th class="text-center">Item Name</th>
                             <th class="text-center">Cost Per Unit</th>
-                            <th class="text-center">RequiredQuantity</th>
+                            <th class="text-center">Required Quantity</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -136,6 +167,59 @@
 
 
 <script>
+
+
+    // Clear processing state for all DataTable buttons
+    window.__dt_clearAllProcessing = function () {
+        try {
+            // Try to clear via DataTables API
+            var tables = $.fn.dataTable.tables();
+            for (var i = 0; i < tables.length; i++) {
+                try {
+                    var api = $(tables[i]).DataTable();
+                    if (!api || !api.buttons) continue;
+                    var btnCount = (api.buttons().nodes && api.buttons().nodes().length) || 0;
+                    for (var j = 0; j < btnCount; j++) {
+                        try { api.button(j).processing(false); } catch (e) { }
+                    }
+                } catch (e) { }
+            }
+        } catch (e) { }
+
+        // Fallback DOM cleanup
+        try {
+            $('.dt-button').removeClass('dt-button-processing');
+            $('.dt-button').prop('disabled', false);
+        } catch (e) { }
+    };
+
+    // Listen for print-done message from print window
+    window.addEventListener('message', function (ev) {
+        if (ev && ev.data === 'dt_print_done') {
+            window.__dt_clearAllProcessing();
+        }
+    });
+
+    // Store original button actions if not already stored
+    if (!$.fn.dataTable.ext.buttons.pdfHtml5.__originalAction) {
+        $.fn.dataTable.ext.buttons.pdfHtml5.__originalAction =
+            $.fn.dataTable.ext.buttons.pdfHtml5.action;
+    }
+    if (!$.fn.dataTable.ext.buttons.print.__originalAction) {
+        $.fn.dataTable.ext.buttons.print.__originalAction =
+            $.fn.dataTable.ext.buttons.print.action;
+    }
+    if (!$.fn.dataTable.ext.buttons.excelHtml5.__originalAction) {
+        $.fn.dataTable.ext.buttons.excelHtml5.__originalAction =
+            $.fn.dataTable.ext.buttons.excelHtml5.action;
+    }
+    if (!$.fn.dataTable.ext.buttons.csvHtml5.__originalAction) {
+        $.fn.dataTable.ext.buttons.csvHtml5.__originalAction =
+            $.fn.dataTable.ext.buttons.csvHtml5.action;
+    }
+
+
+
     var table;
     var statusChart;
     var startDate = null;
@@ -146,7 +230,7 @@
         table = $('#purchaseTable').DataTable({
             scrollX: false,
             scrollCollapse: true,
-            ordering:false,
+            ordering: false,
             autoWidth: false,
             dom:
                 "<'row mb-2'<'col-6'B><'col-6 text-end'f>>" +
@@ -177,7 +261,7 @@
                     extend: 'print',
                     title: '', // remove default title
                     text: '<i class="bi bi-printer-fill text-dark"></i>',
-                    className: 'btn bg-muted btn-outline-dark border-2 fw-bold',
+
                     exportOptions: {
                         columns: [1, 2, 3, 4, 6, 7, 8, 9], // include Sr.No, exclude checkbox & action
                         rows: function (idx, data, node) {
@@ -185,137 +269,212 @@
                         },
                         format: {
                             body: function (data, rowIdx, colIdx, node) {
-                                // remove any HTML tags
+                                // remove HTML tags
                                 if (typeof data === 'string') return data.replace(/<\/?[^>]+(>|$)/g, "").trim();
                                 return data;
                             }
                         }
                     },
+
                     action: function (e, dt, button, config) {
-                        if ($('.rowCheckbox:checked').length === 0) {
+                        var selected = dt.rows().nodes().to$().find('input.row-select:checked').length;
+                        var btnApi = dt.button(button);
+
+                        // 🔹 Check both .row-select and .rowCheckbox for flexibility
+                        var selectedCount = selected || $('.rowCheckbox:checked').length;
+
+                        // --- No selection: show toast and stop ---
+                        if (selectedCount === 0) {
                             showExportToast();
+                            try { btnApi.processing(false); } catch (err) { }
                             return;
                         }
-                        $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config);
+
+                        // --- Show spinner ---
+                        try { btnApi.processing(true); } catch (err) { }
+
+                        // --- Execute original Print action safely ---
+                        try {
+                            $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config);
+                        } catch (err) {
+                            setTimeout(function () {
+                                try { btnApi.processing(false); } catch (e) { }
+                            }, 300);
+                            throw err;
+                        }
+
+                        // --- Final safeguard to stop spinner if print window doesn't respond ---
+                        setTimeout(function () {
+                            try { btnApi.processing(false); } catch (err) { }
+                        }, 2000);
                     },
+
                     customize: function (win) {
                         var exportDate = new Date().toLocaleDateString('en-GB');
 
-                        // Remove unwanted blank text (from DataTables default print)
+                        // Remove default DataTables title
                         $(win.document.body).find('h1').remove();
 
-                        // Add custom heading and export date
-                        $(win.document.body).prepend(
-                            `<h2 style="text-align:center; margin-bottom:0.2em;">Purchase Requisition List</h2>
-<p style="text-align:center; font-size:10pt; margin-top:0;">Export Date: ${exportDate}</p>`
-                        );
+                        // Add custom title and export date
+                        $(win.document.body).prepend(`
+            <h2 style="text-align:center; margin-bottom:0.2em;">Purchase Requisition List</h2>
+            <p style="text-align:center; font-size:10pt; margin-top:0;">Generated Date: ${exportDate}</p>
+        `);
 
-                        $(win.document.body).find('table')
+                        var $table = $(win.document.body).find('table');
+                        $table
                             .addClass('display')
-                            .css('font-size', '10pt')
-                            .css('border-collapse', 'collapse')
-                            .css('width', '100%');
+                            .css({
+                                'font-size': '10pt',
+                                'border-collapse': 'collapse',
+                                'width': '100%'
+                            });
 
-                        // center all table headers & cells
-                        $(win.document.body).find('th, td')
-                            .css('text-align', 'center')
-                            .css('vertical-align', 'middle');
+                        // 🖤 Black header with white text (fixed request)
+                        $table.find('thead th').css({
+                            'background-color': 'black',
+                            'color': 'white',
+                            'font-weight': 'bold',
+                            'text-align': 'center',
+                            'vertical-align': 'middle',
+                            'padding': '8px',
+                            'border': '1px solid #000'
+                        });
 
-                        // Recompute Sr.No in the exported table (first column)
-                        $(win.document.body).find('table tbody tr').each(function (i, row) {
+                        // Style table body cells
+                        $table.find('tbody td').css({
+                            'text-align': 'center',
+                            'vertical-align': 'middle',
+                            'padding': '6px',
+                            'border': '1px solid #000'
+                        });
+
+                        // Recompute Sr.No in print (first column)
+                        $table.find('tbody tr').each(function (i, row) {
                             $(row).find('td').eq(0).text(i + 1);
                         });
                     }
                 },
 
-                // ----- PDF: exclude checkbox column, keep PR Code intact, add Export Date & header style -----
-                {
 
+                // ----- PDF: exclude checkbox column, keep PR Code intact, add Export Date & header style -----
+
+                {
                     extend: 'pdfHtml5',
                     title: 'Purchase Requisition List',
                     text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
-                    className: 'btn bg-muted btn-outline-dark border-2 fw-bold',
+
                     exportOptions: {
-                        columns: function (idx, data, node) { return idx !== 0; },
-                        rows: function (idx, data, node) { return selectedPRCodes.length === 0 || selectedPRCodes.includes(data[2]); },
+                        // Exclude the actual first and last columns dynamically
+                        columns: function (idx, data, node) {
+                            var dt = table; // uses your existing DataTable instance
+                            var colIndexes = dt.columns().indexes().toArray(); // actual column indexes
+                            var firstIdx = colIndexes[0];
+                            var lastIdx = colIndexes[colIndexes.length - 1];
+                            return idx !== firstIdx && idx !== lastIdx;
+                        },
+
+                        // Export only selected PRs if any
+                        rows: function (idx, data, node) {
+                            return selectedPRCodes.length === 0 || selectedPRCodes.includes(data[2]);
+                        },
+
+                        // Recalculate serial number based on exported first column
                         format: {
                             body: function (data, rowIdx, colIdx, node) {
-                                if (colIdx === 0) return rowIdx + 1;
+                                var dt = table;
+                                var colIndexes = dt.columns().indexes().toArray();
+                                var firstIdx = colIndexes[0];
+                                if (colIdx === firstIdx) return rowIdx + 1; // Serial no.
                                 if (typeof data === 'string') return data.replace(/<\/?[^>]+(>|$)/g, "").trim();
                                 return data;
                             }
                         }
                     },
 
+                    // ✅ Prevent export if no row selected
                     action: function (e, dt, button, config) {
-                        if ($('.rowCheckbox:checked').length === 0) {
-                            showExportToast(); // 🔔 will now work
+                        var selected = dt.rows().nodes().to$().find('input.row-select:checked').length;
+                        var btnApi = dt.button(button);
+
+                        // Check both row-select and rowCheckbox for flexibility
+                        var selectedCount = selected || $('.rowCheckbox:checked').length;
+
+                        if (selectedCount === 0) {
+                            showExportToast();
+                            try { btnApi.processing(false); } catch (err) { }
                             return;
                         }
-                        $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, button, config);
+
+                        // Show spinner
+                        try { btnApi.processing(true); } catch (err) { }
+
+                        // ✅ Call original PDF export action
+                        try {
+                            $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, button, config);
+                        } catch (err) {
+                            // Ensure spinner not left running
+                            setTimeout(function () {
+                                try { btnApi.processing(false); } catch (e) { }
+                            }, 300);
+                            throw err;
+                        }
+
+                        // Final fallback: if export takes long or fails silently, clear spinner
+                        setTimeout(function () {
+                            try { btnApi.processing(false); } catch (err) { }
+                        }, 2000);
                     },
+
 
                     customize: function (doc) {
                         try {
-                            // center title
+                            // --- Center title ---
                             if (doc.content && doc.content.length > 0 && doc.content[0].text) {
                                 doc.content[0].alignment = 'center';
                                 doc.content[0].fontSize = 14;
                             }
 
-                            // insert Export Date right below title
-                            var exportDate = new Date().toLocaleDateString('en-GB'); // dd/mm/yyyy
+                            // --- Add Export Date below title ---
+                            const exportDate = new Date().toLocaleDateString('en-GB'); // dd/mm/yyyy
                             doc.content.splice(1, 0, {
-                                text: 'Export Date: ' + exportDate,
+                                text: 'Generated Date: ' + exportDate,
                                 alignment: 'center',
                                 margin: [0, 0, 0, 8],
                                 fontSize: 10
                             });
 
-                            // find the first content node that contains a table
-                            var tableNodeIndex = -1;
-                            for (var i = 0; i < doc.content.length; i++) {
-                                if (doc.content[i] && doc.content[i].table) {
-                                    tableNodeIndex = i;
-                                    break;
-                                }
-                            }
+                            // --- Locate table node ---
+                            let tableNodeIndex = doc.content.findIndex(n => n.table);
                             if (tableNodeIndex === -1) return;
+                            const tableNode = doc.content[tableNodeIndex];
 
-                            var tableNode = doc.content[tableNodeIndex];
-
-                            // ensure style objects exist
+                            // --- Table header/body style ---
                             doc.styles = doc.styles || {};
-                            doc.styles.tableHeader = doc.styles.tableHeader || {};
-                            doc.styles.tableBodyEven = doc.styles.tableBodyEven || {};
-                            doc.styles.tableBodyOdd = doc.styles.tableBodyOdd || {};
+                            doc.styles.tableHeader = {
+                                alignment: 'center',
+                                fillColor: '#212529',
+                                color: '#ffffff',
+                                bold: true
+                            };
+                            doc.styles.tableBodyEven = { alignment: 'center' };
+                            doc.styles.tableBodyOdd = { alignment: 'center' };
 
-                            // header style: dark background + white text + centered
-                            doc.styles.tableHeader.alignment = 'center';
-                            doc.styles.tableHeader.fillColor = '#212529';
-                            doc.styles.tableHeader.color = '#ffffff';
-                            doc.styles.tableHeader.bold = true;
-
-                            // center body cells
-                            doc.styles.tableBodyEven.alignment = 'center';
-                            doc.styles.tableBodyOdd.alignment = 'center';
-
-                            // borders & padding
+                            // --- Borders and padding ---
                             tableNode.layout = {
-                                hLineWidth: function (i, node) { return 0.5; },
-                                vLineWidth: function (i, node) { return 0.5; },
-                                hLineColor: function (i, node) { return '#dddddd'; },
-                                vLineColor: function (i, node) { return '#dddddd'; },
-                                paddingLeft: function (i, node) { return 6; },
-                                paddingRight: function (i, node) { return 6; },
-                                paddingTop: function (i, node) { return 4; },
-                                paddingBottom: function (i, node) { return 4; }
+                                hLineWidth: () => 0.5,
+                                vLineWidth: () => 0.5,
+                                hLineColor: () => '#dddddd',
+                                vLineColor: () => '#dddddd',
+                                paddingLeft: () => 6,
+                                paddingRight: () => 6,
+                                paddingTop: () => 4,
+                                paddingBottom: () => 4
                             };
 
-                            // recompute Sr.No in the exported table body (exported column 0)
-                            var body = tableNode.table && tableNode.table.body ? tableNode.table.body : null;
-                            if (!body || !body.length) return;
-                            for (var r = 1; r < body.length; r++) {
+                            // --- Recompute Sr.No in exported table body ---
+                            const body = tableNode.table.body;
+                            for (let r = 1; r < body.length; r++) {
                                 body[r][0] = { text: String(r), alignment: 'center' };
                             }
                         } catch (err) {
@@ -324,57 +483,279 @@
                     }
                 },
 
-                // ----- EXCEL: same column exclusion and Sr.No handling -----
+                //EXCEL
                 {
                     extend: 'excelHtml5',
-                    title: 'Purchase_Requisition_List',
                     text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
-                    className: 'btn bg-muted btn-outline-dark border-2 fw-bold',
+                    titleAttr: 'Export Excel',
+                    title: '',
+                    filename: 'Purchase_Requisition_List',
+
+                    action: function (e, dt, button, config) {
+                        var selected = dt.rows().nodes().to$().find('input.row-select:checked, input.rowCheckbox:checked').length;
+                        var btnApi = dt.button(button);
+
+                        if (selected === 0) {
+                            showExportToast();
+                            try { btnApi.processing(false); } catch (err) { }
+                            return;
+                        }
+
+                        try { btnApi.processing(true); } catch (err) { }
+
+                        // Call original excelHtml5 action
+                        $.fn.dataTable.ext.buttons.excelHtml5.__originalAction.call(this, e, dt, button, config);
+
+                        // Fallback clear spinner after short delay
+                        setTimeout(function () {
+                            try { btnApi.processing(false); } catch (err) { }
+                        }, 300);
+                    },
+
                     exportOptions: {
-                        //columns: function (idx, data, node) { return idx !== 0; },
-                        columns: [1, 2, 3, 4, 6, 7, 8, 9],
-                        rows: function (idx, data, node) { return selectedPRCodes.length === 0 || selectedPRCodes.includes(data[2]); },
+                        columns: [2, 3, 4, 6, 7, 8, 9],
+                        rows: function (idx, data, node) {
+                            return selectedPRCodes.length === 0 || selectedPRCodes.includes(data[2]);
+                        },
                         format: {
                             body: function (data, rowIdx, colIdx, node) {
-                                if (colIdx === 0) return rowIdx + 1;
-                                if (typeof data === 'string') return data.replace(/<\/?[^>]+(>|$)/g, "").trim();
-                                return data;
+                                if (colIdx === 0) return getExportSrNo(rowIdx, table);
+                                return typeof data === 'string'
+                                    ? data.replace(/<[^>]*>/g, '').trim()
+                                    : data;
                             }
                         }
                     },
-                    action: function (e, dt, button, config) {
-                        if ($('.rowCheckbox:checked').length === 0) {
-                            showExportToast();
-                            return;
+
+                    customize: function (xlsx) {
+                        // ✅ Rename worksheet
+                        var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                        $('sheet', xlsx.xl['workbook.xml']).attr('name', 'Purchase_Requisition');
+
+                        // ✅ Date in dd/mm/yyyy format
+                        var now = new Date();
+                        var day = String(now.getDate()).padStart(2, '0');
+                        var month = String(now.getMonth() + 1).padStart(2, '0');
+                        var year = now.getFullYear();
+                        var formattedDate = day + '/' + month + '/' + year;
+
+                        var sheetData = $('sheetData', sheet);
+
+                        // Shift all data rows down by 2 (for title + date)
+                        sheetData.find('row').each(function () {
+                            var r = parseInt($(this).attr('r'));
+                            $(this).attr('r', r + 2);
+                            $(this).find('c').each(function () {
+                                var cellRef = $(this).attr('r');
+                                var col = cellRef.replace(/[0-9]/g, '');
+                                $(this).attr('r', col + (r + 2));
+                            });
+                        });
+
+                        // ✅ Insert Title row (merged across all columns)
+                        var titleRow =
+                            '<row r="1">' +
+                            '<c t="inlineStr" r="A1">' +
+                            '<is><t>Purchase Requisition List</t></is>' +
+                            '</c>' +
+                            '</row>';
+
+                        // ✅ Insert Export Date row (merged across all columns)
+                        var dateRow =
+                            '<row r="2">' +
+                            '<c t="inlineStr" r="A2">' +
+                            '<is><t>Generated Date: ' + formattedDate + '</t></is>' +
+                            '</c>' +
+                            '</row>';
+
+                        // Add rows to the top
+                        sheetData.prepend(dateRow);
+                        sheetData.prepend(titleRow);
+
+                        // ✅ Add merge cells for centering title and date across all columns
+                        var mergeCells = $('mergeCells', sheet);
+                        if (mergeCells.length === 0) {
+                            $('worksheet', sheet).append('<mergeCells count="2"/>');
+                            mergeCells = $('mergeCells', sheet);
+                        } else {
+                            var currentCount = parseInt(mergeCells.attr('count') || 0);
+                            mergeCells.attr('count', currentCount + 2);
                         }
-                        $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
-                    },
+
+                        // Calculate total columns (8 columns from export + Sr.No = 9 columns)
+                        var totalCols = 9;
+                        var endCol = String.fromCharCode(64 + totalCols); // A=65, I=73 for 9 columns
+
+                        // Add title merge (A1:I1)
+                        mergeCells.append('<mergeCell ref="A1:' + endCol + '1"/>');
+                        // Add date merge (A2:I2)
+                        mergeCells.append('<mergeCell ref="A2:' + endCol + '2"/>');
+
+                        // ✅ Add Sr.No header and serial numbers to data rows
+                        var dataRows = $(sheet).find('row').slice(2); // Skip title and date rows
+
+                        // Add Sr.No header to the first data row (which is now row 3)
+                        var headerRow = $(dataRows[0]);
+                        var headerCells = headerRow.find('c');
+
+                        // Create Sr.No header cell
+                        var srNoHeader = '<c t="inlineStr" r="A3"><is><t>Sr.No</t></is></c>';
+
+                        // Shift existing headers to the right
+                        headerCells.each(function () {
+                            var cellRef = $(this).attr('r');
+                            var col = cellRef.replace(/\d+/g, '');
+                            var newCol = String.fromCharCode(65 + (col.charCodeAt(0) - 64)); // B, C, D, etc.
+                            $(this).attr('r', newCol + '3');
+                        });
+
+                        // Add Sr.No header at the beginning
+                        headerRow.prepend(srNoHeader);
+
+                        // Add serial numbers to data rows (starting from row 4)
+                        dataRows.slice(1).each(function (index) {
+                            var row = $(this);
+                            var rowNum = parseInt(row.attr('r'));
+                            var cells = row.find('c');
+
+                            // Create serial number cell
+                            var srNoCell = '<c t="inlineStr" r="A' + rowNum + '"><is><t>' + (index + 1) + '</t></is></c>';
+
+                            // Shift existing cells to the right
+                            cells.each(function () {
+                                var cellRef = $(this).attr('r');
+                                var col = cellRef.replace(/\d+/g, '');
+                                var newCol = String.fromCharCode(65 + (col.charCodeAt(0) - 64)); // B, C, D, etc.
+                                $(this).attr('r', newCol + rowNum);
+                            });
+
+                            // Add serial number at the beginning
+                            row.prepend(srNoCell);
+                        });
+
+                        // ✅ Add styles for centering + font
+                        var styles = xlsx.xl['styles.xml'];
+                        var cellXfs = $('cellXfs', styles);
+                        var fonts = $('fonts', styles);
+
+                        // Count existing fonts
+                        var fontCount = $('font', fonts).length;
+
+                        // Add new font for title (bold, size 14)
+                        fonts.append(
+                            '<font>' +
+                            '<sz val="14"/>' +  // Font size 14
+                            '<b/>' +             // Bold
+                            '<color rgb="000000"/>' +  // Black
+                            '</font>'
+                        );
+
+                        // Add new font for date (size 11)
+                        fonts.append(
+                            '<font>' +
+                            '<sz val="11"/>' +   // Font size 11
+                            '<color rgb="000000"/>' +  // Black
+                            '</font>'
+                        );
+
+                        // Count existing cellXfs
+                        var styleCount = $('xf', cellXfs).length;
+
+                        // Add new style for title (use new bold/large font, center alignment)
+                        cellXfs.append(
+                            '<xf numFmtId="0" fontId="' + fontCount + '" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1">' +
+                            '<alignment horizontal="center" vertical="center" wrapText="1"/>' +
+                            '</xf>'
+                        );
+
+                        // Add new style for date (use new font, center alignment)
+                        cellXfs.append(
+                            '<xf numFmtId="0" fontId="' + (fontCount + 1) + '" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1">' +
+                            '<alignment horizontal="center" vertical="center" wrapText="1"/>' +
+                            '</xf>'
+                        );
+
+                        // Apply new style indexes to the cells
+                        $('c[r=A1]', sheet).attr('s', styleCount);       // Title style
+                        $('c[r=A2]', sheet).attr('s', styleCount + 1);   // Date style
+                    }
                 },
 
-                // ----- CSV: same -----
+
+                //// ----- CSV: same -----
+
                 {
                     extend: 'csvHtml5',
                     title: 'Purchase_Requisition_List',
                     text: '<i class="bi bi-filetype-csv text-success fs-5"></i>',
-                    className: 'btn bg-muted btn-outline-dark border-2 fw-bold',
+
                     exportOptions: {
-                        columns: function (idx, data, node) { return idx !== 0; },
-                        rows: function (idx, data, node) { return selectedPRCodes.length === 0 || selectedPRCodes.includes(data[2]); },
+                        columns: [2, 3, 4, 5, 6, 7, 8, 9], // All columns except checkbox and action
+                        rows: function (idx, data, node) {
+                            return selectedPRCodes.length === 0 || selectedPRCodes.includes(data[2]);
+                        },
                         format: {
                             body: function (data, rowIdx, colIdx, node) {
-                                if (colIdx === 0) return rowIdx + 1;
-                                if (typeof data === 'string') return data.replace(/<\/?[^>]+(>|$)/g, "").trim();
+                                if (typeof data === 'string') {
+                                    return data.replace(/<\/?[^>]+(>|$)/g, "").trim();
+                                }
                                 return data;
                             }
                         }
                     },
+
+                    customize: function (csv) {
+                        var lines = csv.split('\n');
+                        if (!lines || lines.length === 0) return csv;
+
+                        var newLines = [];
+
+                        // Process header row - add "Sr.No" as first column
+                        if (lines[0]) {
+                            var headers = ['"Sr.No"'];
+                            var originalHeaders = lines[0].split(',');
+                            headers = headers.concat(originalHeaders);
+                            newLines.push(headers.join(','));
+                        }
+
+                        // Process data rows - add serial numbers
+                        for (var i = 1; i < lines.length; i++) {
+                            if (lines[i].trim()) {
+                                var row = ['"' + i + '"']; // Serial number starting from 1
+                                var originalCells = lines[i].split(',');
+                                row = row.concat(originalCells);
+                                newLines.push(row.join(','));
+                            }
+                        }
+
+                        return newLines.join('\n');
+                    },
+
                     action: function (e, dt, button, config) {
-                        if ($('.rowCheckbox:checked').length === 0) {
+                        var selected = dt.rows().nodes().to$().find('input.row-select:checked').length;
+                        var btnApi = dt.button(button);
+                        var selectedCount = selected || $('.rowCheckbox:checked').length;
+
+                        if (selectedCount === 0) {
                             showExportToast();
+                            try { btnApi.processing(false); } catch (err) { }
                             return;
                         }
-                        $.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, button, config);
-                    },
+
+                        try { btnApi.processing(true); } catch (err) { }
+
+                        try {
+                            $.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, button, config);
+                        } catch (err) {
+                            console.error('CSV export error:', err);
+                            setTimeout(function () { try { btnApi.processing(false); } catch (e) { } }, 300);
+                            throw err;
+                        }
+
+                        setTimeout(function () {
+                            try { btnApi.processing(false); } catch (err) { }
+                        }, 300);
+                    }
                 },
 
                 'colvis'
@@ -392,7 +773,7 @@
         table.columns.adjust().draw();
 
         // custom date filter (PR Created Date column index 3)
-        
+
         $.fn.dataTable.ext.search.push(function (settings, data) {
             var reqDateStr = data[3]; // PR Created column
             if (!reqDateStr) return true;
@@ -435,7 +816,7 @@
             alwaysShowCalendars: false, // calendars show only on Custom Range
             locale: {
                 cancelLabel: 'Clear',
-                format: 'DD-MM-YYYY',
+                format: 'DD/MM/YYYY',
                 applyLabel: 'Apply',
                 customRangeLabel: 'Custom Range'
             },
@@ -450,7 +831,7 @@
             // Fires after a range is selected (predefined or custom)
             startDate = start.toDate();
             endDate = end.toDate();
-            $('#dateRange').val(start.format('DD-MM-YYYY') + ' - ' + end.format('DD-MM-YYYY'));
+            $('#dateRange').val(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
             table.draw();
         });
 
@@ -471,13 +852,42 @@
             var dataArray = [];
             for (var key in data) dataArray.push({ name: key, y: data[key] });
 
+            //statusChart = Highcharts.chart('statusPieChart', {
+            //    chart: { type: 'pie' },
+            //    title: { text: 'Converted vs Not Converted to RFQ' },
+            //    subtitle: {
+            //        text: '<span style="font-size:32px; font-weight:bold;">Total PR: ' + totalPR + '</span>',
+            //        align: 'left', verticalAlign: 'top', x: 10, y: 20, useHTML: true
+            //    },
+            //    plotOptions: {
+            //        pie: {
+            //            allowPointSelect: true,
+            //            cursor: 'pointer',
+            //            dataLabels: {
+            //                enabled: true,
+            //                format: '<b>{point.name}</b>: {point.y}'
+            //            },
+            //            // ✅ add click event for filtering table
+            //            point: {
+            //                events: {
+            //                    click: function () {
+            //                        // this.name will be "Converted" or "Not Converted"
+            //                        var filterValue = this.name === 'Converted' ? 'Yes' : 'No';
+            //                        // search the ConvertedToRFQ column (index 5) for Yes/No
+            //                        table.column(5).search(filterValue).draw();
+            //                    }
+            //                }
+            //            }
+            //        }
+            //    },
+            //    series: [{
+            //        name: 'Count',
+            //        colorByPoint: true,
+            //        data: dataArray
+            //    }]
             statusChart = Highcharts.chart('statusPieChart', {
                 chart: { type: 'pie' },
-                title: { text: 'Converted vs Not Converted to RFQ' },
-                subtitle: {
-                    text: '<span style="font-size:32px; font-weight:bold;">Total PR: ' + totalPR + '</span>',
-                    align: 'left', verticalAlign: 'top', x: 10, y: 20, useHTML: true
-                },
+                title: { text: 'PR to RFQ' },
                 plotOptions: {
                     pie: {
                         allowPointSelect: true,
@@ -486,13 +896,10 @@
                             enabled: true,
                             format: '<b>{point.name}</b>: {point.y}'
                         },
-                        // ✅ add click event for filtering table
                         point: {
                             events: {
                                 click: function () {
-                                    // this.name will be "Converted" or "Not Converted"
                                     var filterValue = this.name === 'Converted' ? 'Yes' : 'No';
-                                    // search the ConvertedToRFQ column (index 5) for Yes/No
                                     table.column(5).search(filterValue).draw();
                                 }
                             }
@@ -503,8 +910,70 @@
                     name: 'Count',
                     colorByPoint: true,
                     data: dataArray
-                }]
+                }],
+                credits: { enabled: false },
+            // Draw total PR count slightly below the chart
             });
+
+            //For the second chart of approved and rrejected status
+
+            function buildApprovalChart() {
+                var counts = { 'Approved': 0, 'Rejected': 0 };
+
+                // Count approved/rejected from current filtered table rows
+                table.rows({ filter: 'applied' }).every(function () {
+                    var status = $(this.node()).find('td').eq(9).text().trim(); // Status column index 9
+                    if (status.includes("Approved")) counts['Approved']++;
+                    else if (status.includes("Rejected")) counts['Rejected']++;
+                });
+
+                Highcharts.chart('approvalChart', {
+                    chart: { type: 'bar' }, // horizontal bar chart
+                    title: { text: '' },
+                    xAxis: {
+                        categories: ['Approved', 'Rejected'], // categories on y-axis (bar chart flips axes)
+                        title: { text: null }
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: { text: 'Count', align: 'high' },
+                        labels: { overflow: 'justify' }
+                    },
+                    plotOptions: {
+                        series: {
+                            dataLabels: {
+                                enabled: true,
+                                format: '{point.y}'
+                            },
+                            animation: false
+                        }
+                    },
+                    series: [{
+                        name: 'PR Count',
+                        data: [
+                            { y: counts['Approved'], color: '#28a745' },
+                            { y: counts['Rejected'], color: '#dc3545' }
+                        ]
+                    }],
+                    credits: { enabled: false }
+                });
+            }
+
+            // Call initially and on table draw
+            buildApprovalChart();
+            table.on('draw', function () {
+                updateChart();        // existing PR Converted chart
+                buildApprovalChart(); // new Approval vs Rejected bar chart
+            });
+
+
+
+
+
+
+
+
+
         }
 
         // 🟢 Double-click anywhere on the chart container to clear the filter
@@ -579,7 +1048,7 @@
                             );
                         });
                     }
- else {
+                    else {
                         $('#prItemsTable tbody').append(
                             `<tr><td colspan="4" class="text-center text-muted">No items found.</td></tr>`
                         );
@@ -594,6 +1063,17 @@
             });
         });
 
+
+        // Helper function to recalc SrNo for export across all pages
+        function getExportSrNo(rowIdx, tbl) {
+            // Get all rows nodes
+            let allRows = tbl.rows({ order: 'applied', search: 'applied' }).nodes().toArray();
+            // Filter only the checked rows
+            let checkedRows = allRows.filter(row => $(row).find('input.row-select').prop('checked'));
+            // Find the position of this row in the checkedRows array
+            let sr = checkedRows.findIndex(row => tbl.row(row).index() === rowIdx) + 1;
+            return sr; // consecutive Sr.No
+        }
 
 
     });

@@ -10,6 +10,17 @@
 
     <style>
 
+        button.dt-button.processing,
+        div.dt-button.processing {
+            pointer-events: auto !important;
+            opacity: 1 !important;
+            background: none !important;
+        }
+
+            button.dt-button.processing:after {
+                content: none !important;
+            }
+
         #quotationTable thead th {
             text-align: center !important;
             vertical-align: middle;
@@ -62,8 +73,12 @@
             text-align: center !important;
         }
 
+
         #quotationDetailModal .modal-dialog {
-            margin-top: 1px !important;
+            margin: 0 auto;
+            position: relative;
+            top: 50%;
+            transform: translateY(-50%);
         }
 
 
@@ -122,7 +137,7 @@
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header bg-primary  justify-content-center">
-                    <h5 class="modal-title fw-bold text-white mb-0">Supplier Quotation Details</h5>
+                    <h5 class="modal-title fw-bold text-white mb-4">Supplier Quotation Details</h5>
                     <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body" id="quotationDetailContent"></div>
@@ -164,6 +179,8 @@
 
             let quotationTable = $('#quotationTable').DataTable({
                 dom: '<"dt-toolbar"<"dt-left"B><"dt-search"f>>rt<"bottom d-flex justify-content-between align-items-center"ip>',
+                ordering: false,
+                destroy: true,
                 buttons: [
 
 
@@ -252,7 +269,7 @@
                             doc.content[0].alignment = 'center';
                             doc.content[0].fontSize = 14;
                             var exportDate = new Date().toLocaleDateString('en-GB');
-                            doc.content.splice(1, 0, { text: 'Export Date: ' + exportDate, alignment: 'center', margin: [0, 0, 0, 8], fontSize: 10 });
+                            doc.content.splice(1, 0, { text: 'Generated Date: ' + exportDate, alignment: 'center', margin: [0, 0, 0, 8], fontSize: 10 });
                             var tableNode = doc.content.find(c => c.table);
                             if (!tableNode) return;
                             doc.styles = doc.styles || {};
@@ -274,7 +291,7 @@
                     {
                         extend: 'excelHtml5',
                         title: '',
-                        filename: 'Quotations List',
+                        filename: 'Quotations_List',
                         text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
                         titleAttr: 'Export Excel',
                         action: function (e, dt, button, config) {
@@ -291,93 +308,157 @@
                             format: {
                                 body: function (data, rowIdx, colIdx) {
                                     if (colIdx === 1) return ++window.__excelSrCounter;
-                                    if (typeof data === 'string') return data.replace(/<\/?[^>]+(>|$)/g, "").trim();
-                                    return data;
+                                    return typeof data === 'string' ? data.replace(/<\/?[^>]+(>|$)/g, "").trim() : data;
                                 }
                             }
                         },
                         customize: function (xlsx) {
                             var sheet = xlsx.xl.worksheets['sheet1.xml'];
-                            const today = new Date();
-                            const dateStr = today.toLocaleDateString('en-GB');
+                            var $sheet = $(sheet);
 
-                            $(sheet).find('row').each(function () {
+                            // Count number of columns in sheet
+                            var colCount = $('row:first c', sheet).length;
+                            if (colCount === 0) colCount = 6; // fallback
+                            var lastCol = String.fromCharCode(64 + colCount);
+
+                            // Move existing data down by 2 rows
+                            $sheet.find('sheetData row').each(function () {
                                 var r = parseInt($(this).attr('r'));
                                 $(this).attr('r', r + 2);
                                 $(this).find('c').each(function () {
                                     var cellRef = $(this).attr('r');
-                                    var col = cellRef.replace(/\d+/g, '');
-                                    var row = parseInt(cellRef.replace(/\D/g, '')) + 2;
+                                    var col = cellRef.replace(/[0-9]/g, '');
+                                    var row = parseInt(cellRef.replace(/[A-Z]/g, '')) + 2;
                                     $(this).attr('r', col + row);
                                 });
                             });
 
-                            var titleRow = `<row r="1">
-                        <c t="inlineStr" r="A1">
-                            <is><t>Quotations List</t></is>
-                        </c>
-                    </row>`;
+                            // Title and date text
+                            var title = 'Quotations List';
+                            var generatedDate = 'Generated Date: ' + moment().format('DD/MM/YYYY');
 
-                            var dateRow = `<row r="2">
-                        <c t="inlineStr" r="A2">
-                            <is><t>Export Date: ${dateStr}</t></is>
-                        </c>
-                    </row>`;
+                            // Add new title and date rows
+                            var titleRow = `
+<row r="1">
+    <c t="inlineStr" r="A1" s="55">
+        <is><t>${title}</t></is>
+    </c>
+</row>`;
+                            var dateRow = `
+<row r="2">
+    <c t="inlineStr" r="A2" s="56">
+        <is><t>${generatedDate}</t></is>
+    </c>
+</row>`;
 
-                            sheet.childNodes[0].childNodes[1].innerHTML = titleRow + dateRow + sheet.childNodes[0].childNodes[1].innerHTML;
+                            $sheet.find('sheetData').prepend(titleRow + dateRow);
+
+                            // Merge cells for title and date (centered horizontally)
+                            var mergeCells = $sheet.find('mergeCells');
+                            if (mergeCells.length === 0) {
+                                mergeCells = $('<mergeCells count="0"></mergeCells>');
+                                $sheet.append(mergeCells);
+                            }
+
+                            mergeCells.append(`<mergeCell ref="A1:${lastCol}1"/>`);
+                            mergeCells.append(`<mergeCell ref="A2:${lastCol}2"/>`);
+                            mergeCells.attr('count', mergeCells.find('mergeCell').length);
+
+                            // Add centered alignment styles
+                            var styles = xlsx.xl['styles.xml'];
+                            var $styles = $(styles);
+                            var cellXfs = $styles.find('cellXfs');
+                            var count = parseInt(cellXfs.attr('count'));
+                            var newStyleIndex1 = count;
+                            var newStyleIndex2 = count + 1;
+
+                            // Add two centered alignment styles
+                            cellXfs.append(`date
+<xf numFmtId="0" fontId="0" fillId="0" borderId="0" applyAlignment="1">
+    <alignment horizontal="center" vertical="center"/>
+</xf>`);
+                            cellXfs.append(`
+<xf numFmtId="0" fontId="0" fillId="0" borderId="0" applyAlignment="1">
+    <alignment horizontal="center" vertical="center"/>
+</xf>`);
+                            cellXfs.attr('count', count + 2);
+
+                            // Apply the new styles to A1 and A2
+                            $sheet.find('c[r="A1"]').attr('s', newStyleIndex1);
+                            $sheet.find('c[r="A2"]').attr('s', newStyleIndex2);
                         }
                     },
 
-                    // CSV
+                  
+                    // ✅ CSV Export for Quotation Table
                     {
                         extend: 'csvHtml5',
                         title: '',
                         text: '<i class="bi bi-filetype-csv text-success fs-5"></i>',
-                        titleAttr: 'Export CSV',
+                        titleAttr: 'Export to CSV',
+                        attr: {
+                            'data-bs-toggle': 'tooltip',
+                            'data-bs-placement': 'bottom',
+                            'title': 'Export to CSV'
+                        },
                         action: function (e, dt, button, config) {
+                            // ✅ Require at least one selected row
                             if ($('#quotationTable .row-select:checked').length === 0) {
-                                showToast("Please select at least one Quotation to export CSV", "warning");
+                                showToast("Please select at least one Quotation to export!", "warning");
                                 return;
                             }
+
+                            // ✅ Reset serial number before export
                             window.__srnoCounter = 0;
+
+                            // ✅ Trigger default CSV export
                             $.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, button, config);
                             dt.processing(false);
                         },
                         exportOptions: {
+                            // ✅ Export only checked rows
                             rows: function (idx, data, node) {
                                 return $(node).find('.row-select').prop('checked');
                             },
+                            // ✅ Exclude checkbox and action columns
                             columns: function (idx) {
                                 return idx !== 0 && idx !== 6;
                             },
                             format: {
-                                body: function (data, rowIdx, colIdx) {
-                                    if (colIdx === 1) {
-                                        if (!window.__srnoCounter) window.__srnoCounter = 0;
-                                        return ++window.__srnoCounter;
-                                    }
+                                body: (function () {
+                                    return function (data, rowIdx, colIdx) {
+                                        // Clean HTML tags
+                                        data = typeof data === 'string' ? data.replace(/<[^>]*>/g, '').trim() : data;
 
-                                    // Vendor Delivery Date formatting
-                                    if (colIdx === 5) {
-                                        if (moment(data, moment.ISO_8601, true).isValid()) {
-                                            return moment(data).format("YYYY-MM-DD");
+                                        // ✅ Serial Number column
+                                        if (colIdx === 1) {
+                                            if (!window.__srnoCounter) window.__srnoCounter = 0;
+                                            return ++window.__srnoCounter;
                                         }
-                                        return data;
-                                    }
 
-                                    if (typeof data === 'string') return data.replace(/<[^>]*>/g, "").trim();
-                                    return data;
-                                }
+                                        // ✅ Vendor Delivery Date (assumed column index 5)
+                                        if (colIdx === 5) {
+                                            const m = moment(data, ["DD/MM/YYYY", "YYYY-MM-DD", "DD-MM-YYYY"], true);
+                                            if (m.isValid()) {
+                                                return m.format("DD/MM/YYYY"); // unified format
+                                            }
+                                            return data;
+                                        }
+
+                                        // ✅ Default return
+                                        return data;
+                                    };
+                                })()
                             }
                         },
+                        // ✅ Filename with date stamp
                         filename: function () {
-                            return 'Quotations_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+                            return 'Quotations_' + new Date().toISOString().slice(0, 10).replace(/-/g, "");
                         },
                         customize: function (csv) {
-                            const today = new Date();
-                            const dateStr = today.toLocaleDateString('en-GB');
-                            const header = `"Quotations"\n"Export Date: ${dateStr}"\n`;
-                            return header + csv;
+                            // Optional: add padding/spaces to improve visual alignment
+                            const spaces = '          ';
+                            return spaces + '\n' + csv;
                         }
                     }
 

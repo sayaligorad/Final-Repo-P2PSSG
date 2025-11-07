@@ -1,14 +1,18 @@
 ﻿@{
     Layout = "";
 }
-
+<style>
+    #categoryTable thead th {
+        padding: 0.3rem 0.4rem !important;
+    }
+</style>
 <!-- Category List Card -->
 <div class="table-responsive card shadow p-3 bg-white rounded">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="text-primary fw-bolder text-center flex-grow-1 m-0">Category List</h4>
         <div class="d-flex gap-2">
             <button class="btn btn-success btn-sm" id="btnAddCategory">
-                <i class="bi bi-plus-circle"></i> Add Category
+                <i class="bi bi-plus-circle me-2"></i> Add Category
             </button>
             <div id="exportContainer" class="d-flex gap-2"></div>
         </div>
@@ -30,12 +34,14 @@
 </div>
 
 <!-- Create/Edit Category Modal -->
-<div class="modal fade" id="categoryModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header bg-primary py-2 px-3" style="min-height:50px;">
-                <h5 class="modal-title m-0 flex-grow-1 text-white text-center fs-5" id="categoryModalTitle">Create / Edit Category</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+<div class="modal fade" id="categoryModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content shadow-lg rounded-3">
+            <div class="card-header bg-primary text-white d-flex justify-content-center align-items-center rounded-top p-1 position-relative">
+                <h3 id="categoryModalTitle" class="modal-title fw-bold text-white mb-0 fs-5 w-100 text-center">
+                    Create / Edit Category
+                </h3>
+                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" id="categoryModalBody">
                 <p class="text-center py-3">Loading...</p>
@@ -43,6 +49,19 @@
         </div>
     </div>
 </div>
+
+<style>
+    button.dt-button.processing,
+    div.dt-button.processing {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        background: none !important;
+    }
+
+        button.dt-button.processing:after {
+            content: none !important;
+        }
+</style>
 
 <script>
 toastr.options = {
@@ -54,8 +73,9 @@ toastr.options = {
     timeOut: "3000"
 };
 
-function showExportWarning(msg="Please select at least one row before exporting.") { toastr.warning(msg,"Warning"); }
-function showExportSuccess(msg="Export completed.") { toastr.success(msg,"Success"); }
+function showExportWarning(msg="Please select at least one row before exporting.") { toastr.warning(msg); }
+    function showExportSuccess(msg = "Export completed.") { toastr.success(msg, "Success"); }
+
 
 $(document).ready(function () {
     let selectedCategories = new Set();
@@ -98,11 +118,8 @@ $(document).ready(function () {
                 render: function (data,type,row) {
                     return `
                         <div class="d-flex gap-1 justify-content-center">
-                            <button class="btn btn-secondary btn-sm btnEditCategory" data-id="${row.ItemCategoryId}" data-bs-toggle="tooltip" title="Edit Category">
-                                <i class="bi bi-pencil-square"></i>
-                            </button>
-                            <button class="btn btn-danger btn-sm btnDeleteCategory" data-id="${row.ItemCategoryId}" data-name="${row.ItemCategoryName}" data-bs-toggle="tooltip" title="Delete Category">
-                                <i class="bi bi-trash"></i>
+                            <button class="btn btn-secondary square-pill d-inline-flex align-items-center px-2 py-1 btn-sm btnEditCategory" data-id="${row.ItemCategoryId}" data-bs-toggle="tooltip" title="Edit Category">
+                                <i class="bi bi-pencil-square "></i>
                             </button>
                         </div>`;
                 }
@@ -113,7 +130,7 @@ $(document).ready(function () {
             // PRINT
             {
                 extend: 'print',
-                text: '<i class="bi bi-printer-fill fs-5"></i>',
+                text: '<i class="bi bi-printer-fill text-dark fs-5"></i>',
                 title: '',
                 exportOptions: {
                     columns: [2, 3, 4],
@@ -129,7 +146,7 @@ $(document).ready(function () {
                         moment().format("DD/MM/YYYY") + '</h5>'
                     );
 
-                    body.find('table thead tr').prepend('<th>S.No.</th>');
+                    body.find('table thead tr').prepend('<th>Sr.No.</th>');
                     let counter = 0;
                     body.find('table tbody tr').each(function () {
                         $(this).prepend('<td>' + (++counter) + '</td>');
@@ -150,7 +167,6 @@ $(document).ready(function () {
                 action: function (e, dt, btn, config) {
                     if (selectedCategories.size === 0) { showExportWarning(); return; }
                     $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, btn, config);
-                    showExportSuccess("Print started.");
                 }
             },
 
@@ -158,6 +174,7 @@ $(document).ready(function () {
             {
                 extend: 'pdfHtml5',
                 text: '<i class="bi bi-file-earmark-pdf fs-5 text-danger"></i>',
+                filename: `Category_List_${moment().format("DD-MM-YYYY")}`,
                 title: '',
                 exportOptions: {
                     columns: [2, 3, 4],
@@ -173,7 +190,7 @@ $(document).ready(function () {
 
                     let body = doc.content[doc.content.length - 1].table.body;
 
-                    body[0].unshift({ text: 'S.No.', bold: true, fillColor: '#000', color: '#fff', alignment: 'center' });
+                    body[0].unshift({ text: 'Sr.No.', bold: true, fillColor: '#000', color: '#fff', alignment: 'center' });
                     for (let i = 1; i < body.length; i++) {
                         body[i].unshift({ text: (++exportSerialCounter).toString(), alignment: 'center' });
                     }
@@ -202,38 +219,122 @@ $(document).ready(function () {
                 action: function (e, dt, btn, config) {
                     if (selectedCategories.size === 0) { showExportWarning(); return; }
                     $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, btn, config);
-                    showExportSuccess("PDF export completed.");
                 }
             },
-
-
-            // EXCEL
+            //excel
             {
                 extend: 'excelHtml5',
+                title: '',
+                filename: `Category_List_${moment().format("DD-MM-YYYY")}`,
                 text: '<i class="bi bi-file-earmark-excel fs-5 text-success"></i>',
-                title: 'Category List - ' + moment().format("DD-MM-YYYY"),
+                titleAttr: 'Export Excel',
+
+                action: function (e, dt, button, config) {
+                    if (selectedCategories.size === 0) {
+                        showExportWarning("Select at least one category to export.");
+                        return;
+                    }
+                    window.__excelSrCounter = 0;
+                    $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
+                },
+
                 exportOptions: {
-                    columns: [1,2,3,4],
+                    columns: [2, 3, 4],
                     rows: (idx, data) => selectedCategories.has(data.ItemCategoryId),
                     format: {
-                        body: function (data, row, column, node) {
-                            if (column === 0) return row + 1;
-                            return $('<div>').html(data).text();
+                        body: function (data, row, col, node) {
+                            return (typeof data === 'string'
+                                ? data.replace(/<\/?[^>]+(>|$)/g, "").trim()
+                                : data);
                         }
                     }
                 },
+
                 customize: function (xlsx) {
-                    let sheet = xlsx.xl.worksheets['sheet1.xml'];
-                    $('row:first c', sheet).attr('s', '2');
-                },
-                action: function (e, dt, btn, config) {
-                    if (selectedCategories.size === 0) { showExportWarning(); return; }
-                    $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, btn, config);
-                    showExportSuccess("Excel export completed.");
+                    const sheet = xlsx.xl.worksheets['sheet1.xml'];
+                    const styles = xlsx.xl['styles.xml'];
+                    const dateStr = moment().format("DD/MM/YYYY");
+                    let rowIndex = 0;
+                    $('row', sheet).each(function () {
+                        rowIndex++;
+                        const cells = $('c', this);
+
+                        if (rowIndex === 1) {
+                            $(this).prepend(`
+                    <c t="inlineStr" r="A${rowIndex}">
+                        <is><t>Sr.No.</t></is>
+                    </c>
+                `);
+                        } else {
+                            $(this).prepend(`
+                    <c t="inlineStr" r="A${rowIndex}">
+                        <is><t>${rowIndex - 1}</t></is>
+                    </c>
+                `);
+                        }
+                        cells.each(function () {
+                            const cellRef = $(this).attr('r');
+                            const col = cellRef.replace(/\d+/g, '');
+                            const row = cellRef.replace(/\D/g, '');
+                            const newCol = String.fromCharCode(col.charCodeAt(0) + 1);
+                            $(this).attr('r', newCol + row);
+                        });
+                    });
+
+                    $(sheet).find('row').each(function () {
+                        const r = parseInt($(this).attr('r'));
+                        $(this).attr('r', r + 2);
+                        $(this).find('c').each(function () {
+                            const cellRef = $(this).attr('r');
+                            const col = cellRef.replace(/\d+/g, '');
+                            const row = parseInt(cellRef.replace(/\D/g, '')) + 2;
+                            $(this).attr('r', col + row);
+                        });
+                    });
+
+                    const exportedCols = [2, 3, 4];
+                    const middleColIndex = Math.floor(exportedCols.length / 2);
+                    const colLetter = String.fromCharCode(65 + middleColIndex + 1);
+                    const titleRow = `<row r="1">
+            <c t="inlineStr" r="${colLetter}1" s="2"><is><t>Category List</t></is></c>
+        </row>`;
+                    const dateRow = `<row r="2">
+            <c t="inlineStr" r="${colLetter}2" s="2"><is><t>Generated Date: ${dateStr}</t></is></c>
+        </row>`;
+
+                    sheet.childNodes[0].childNodes[1].innerHTML =
+                        titleRow + dateRow + sheet.childNodes[0].childNodes[1].innerHTML;
+
+                    if (styles && $('xf', styles).length) {
+                        const styleCount = $('cellXfs xf', styles).length;
+                        const newStyle = `
+                <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1">
+                    <alignment horizontal="center" vertical="center"/>
+                </xf>`;
+                        $('cellXfs', styles).append(newStyle);
+                        const newStyleId = styleCount;
+                        $('c[r=' + colLetter + '1], c[r=' + colLetter + '2]', sheet).attr('s', newStyleId);
+                    }
+
+                    const colsXml = `
+            <cols>
+                <col min="1" max="1" width="8" customWidth="1"/>    <!-- Sr.No. -->
+                <col min="2" max="2" width="20" customWidth="1"/>   <!-- Category Name -->
+                <col min="3" max="3" width="40" customWidth="1"/>   <!-- Description -->
+                <col min="4" max="4" width="15" customWidth="1"/>   <!-- HSN Code -->
+            </cols>
+        `;
+
+                    $(sheet).find('cols').remove();
+                    $(sheet.childNodes[0]).prepend(colsXml);
                 }
             },
 
-            // CSV
+
+
+
+
+            // ✅ CSV
             {
                 extend: 'csvHtml5',
                 text: '<i class="bi bi-filetype-csv fs-5 text-success"></i>',
@@ -246,22 +347,23 @@ $(document).ready(function () {
                     let lines = csv.split('\n');
                     let counter = 0;
 
-                    let headerInfo = "Category List\nGenerated Date: " + moment().format("DD/MM/YYYY") + "\n";
-
                     lines = lines.map((line, idx) => {
-                        if (idx === 0) return "S.No.," + line;
+                        if (idx === 0) return "Sr.No.," + line;
                         if (line.trim() === '') return '';
                         return (++counter) + ',' + line;
                     });
 
-                    return headerInfo + lines.join('\n');
+                    return lines.join('\n');
                 },
                 action: function (e, dt, btn, config) {
-                    if (selectedCategories.size === 0) { showExportWarning(); return; }
+                    if (selectedCategories.size === 0) {
+                        showExportWarning();
+                        return;
+                    }
                     $.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, btn, config);
-                    showExportSuccess("CSV export completed.");
                 }
             }
+
         ],
 
         select: { style:'multi', selector:'td:first-child input' },
@@ -314,50 +416,6 @@ $(document).ready(function () {
             .fail(()=>$('#categoryModalBody').html('<p class="text-danger text-center">Failed to load form.</p>'));
     });
 
-    // Delete Category with SweetAlert
-    $(document).on('click', '.btnDeleteCategory', function () {
-        var categoryId = $(this).data('id');
-        var categoryName = $(this).data('name');
-        var row = $(this).closest('tr');
 
-        Swal.fire({
-            title: "Are you sure?",
-            text: "This will delete the category \"" + categoryName + "\"!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#3085d6",
-            confirmButtonText: "Yes, delete it!",
-            cancelButtonText: "No, cancel"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: '/Inventory/DeleteCategorySSG',
-                    type: 'POST',
-                    data: { ItemCategoryId: categoryId },
-                    success: function (res) {
-                        if (res && res.success) {
-                            row.remove();
-                            $('#categoryTable').DataTable().ajax.reload(null, false);
-
-                            Swal.fire({
-                                icon: "success",
-                                title: "Deleted!",
-                                text: "Category \"" + categoryName + "\" has been deleted.",
-                                timer: 2000,
-                                showConfirmButton: false
-                            });
-                        } else {
-                            Swal.fire({ icon: "error", title: "Error!", text: res.message || "Could not delete the category." });
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("Delete error:", error);
-                        Swal.fire({ icon: "error", title: "Oops...", text: "Something went wrong while deleting!" });
-                    }
-                });
-            }
-        });
-    });
 });
 </script>

@@ -1,8 +1,9 @@
 ﻿@{
-    ViewBag.Title = "Register QuotationVNK";
-    var rfq = (string)ViewBag.RFQCode ?? "";
-    var pr = (string)ViewBag.PRCode ?? "";
-}
+            ViewBag.Title = "Register QuotationVNK";
+            var rfq = (string)ViewBag.RFQCode ?? "";
+            var pr = (string)ViewBag.PRCode ?? "";
+        }
+
 
 <html>
 <head>
@@ -15,7 +16,7 @@
                 content: '';
                 position: fixed;
                 inset: 0;
-                background-color: rgba(0, 0, 0, 0.5);
+                background-color: rgba(0,0,0,0.5);
                 z-index: 1040;
                 pointer-events: none;
             }
@@ -49,6 +50,8 @@
 
         #btnAdd {
             margin-top: 32px;
+            height: 35px;
+            width: 80px;
         }
 
         .btn-remove {
@@ -62,463 +65,451 @@
                 border-color: darkred;
                 color: white;
             }
+
+        .required-star {
+            color: red;
+            font-size: 1.4em;
+            font-weight: bold;
+            vertical-align: middle;
+            position: relative;
+            top: -4px;
+        }
+
+        .toast-container {
+            z-index: 2000;
+        }
+
+        #itemDesc {
+            resize: none;
+            height: 70px;
+            overflow: hidden;
+        }
+
+        .field-error {
+            color: red;
+            font-size: 0.9em;
+            margin-top: 2px;
+            display: block;
+        }
+
+        .invalid {
+            border-color: red !important;
+        }
+
+        #gridError.visible {
+            color: red;
+            font-weight: bold;
+            margin-top: 5px;
+            display: block;
+        }
+
+        #gridError {
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="main-content">
         <div class="container my-4">
-            <div class="col-md-12 text-end mb-3">
-                <button type="button"
-                        class="btn btn-primary text-white"
-                        onclick="location.href='/Purchase/ShowAllRFQsVNK'">
-                    Back
-                </button>
-            </div>
-
-            <!-- Single main card -->
             <div class="card shadow-sm p-3">
-
-                <!-- Heading -->
-                <div class="card-header bg-primary text-white text-center fw-bold mb-3">
-                    Register Quotation
+                <div class="position-relative mb-3 mt-2">
+                    <h3 class="text-primary fw-bold mb-0 text-center">Register Quotations</h3>
+                    <button type="button" class="btn btn-primary text-white position-absolute end-0 top-50 translate-middle-y"
+                            onclick="location.href='/Purchase/ShowAllRFQsVNK'">
+                        <i class="bi bi-arrow-left"></i>Back
+                    </button>
                 </div>
-
-                <!-- Card Body -->
                 <div class="card-body">
-
-                    <!-- Vendor / RFQ details -->
-                    <div class="row g-3 mb-3">
-                        <div class="col-sm-3">
-                            <label class="form-label">RFQ No</label>
-                            <input id="rfq" class="form-control" readonly value="@rfq">
-                        </div>
-                        <div class="col-sm-3">
-                            <label class="form-label">PR No</label>
-                            <input id="prCode" class="form-control" readonly value="@pr">
-                        </div>
-                        <input type="hidden" id="rfqCode" value="@ViewBag.RFQCode" />
-                        <div class="col-sm-3">
-                            <label class="form-label">Select Vendor</label>
-                            <select id="vendorCode" class="form-select">
-                                <option value="0">--Select Vendor--</option>
-                            </select>
-                        </div>
-                        <div class="col-sm-3">
-                            <label class="form-label">Vendor Code</label>
-                            <input id="Vendor_Code" class="form-control" readonly>
-                        </div>
-                        <div class="col-sm-3">
-                            <label class="form-label">Vendor Company</label>
-                            <input id="Vendor_Company" class="form-control" readonly>
-                        </div>
-                        <div class="col-sm-3">
-                            <label class="form-label">Vendor Delivery Date</label>
-                            <input id="vendorDeliveryDate" type="date" class="form-control">
-                        </div>
-                    </div>
-
-                    <!-- Item entry -->
-                    <div class="row g-3 mb-3 align-items-end">
-                        <div class="col-md-3">
-                            <input type="hidden" id="prCode" value="@ViewBag.PRCode" />
-                            <label class="form-label">Item</label>
-                            <select id="itemCode" class="form-select"></select>
-                            <div class="form-text" id="itemUom"></div>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Quantity</label>
-                            <input id="qty" type="number" step="0.001" class="form-control">
-                            <small id="qtyError" class="text-danger" style="display: none;"></small>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Cost / Unit</label>
-                            <input id="cpu" type="number" step="0.01" class="form-control" value="0">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Discount (%)</label>
-                            <input id="disc" type="number" step="0.01" class="form-control" value="0">
-                        </div>
-                        <div class="col-md-3">
-                            <label>Description</label>
-                            <input type="text" id="itemDesc" class="form-control" readonly
-                                   data-bs-toggle="tooltip" data-bs-placement="top"
-                                   title="This shows the item description" />
-                        </div>
-                        <div class="col-md-2">
-                            <label>GST %</label>
-                            <input type="text" id="itemGst" class="form-control" readonly />
-                        </div>
-                        <div class="col-auto" style="margin-left: 1000px;">
-                            <button id="btnAdd" type="button" class="btn btn-success btn-sm d-flex justify-content-center align-items-center">
-                                ADD
-                            </button>
+                    <form id="quotationForm" novalidate>
+                        <div class="row g-3 mb-3">
+                            <div class="col-sm-4">
+                                <label class="form-label">RFQ No</label>
+                                <input id="rfq" class="form-control  small text-muted border rounded p-2 bg-light mb-2 mt-2" readonly value="@rfq">
+                            </div>
+                            <div class="col-sm-4">
+                                <label class="form-label">PR No</label>
+                                <input id="prCode" class="form-control  small text-muted border rounded p-2 bg-light mb-2 mt-2" readonly value="@pr">
+                            </div>
+                            <input type="hidden" id="rfqCode" value="@ViewBag.RFQCode" />
+                            <div class="col-sm-4">
+                                <label class="form-label">Select Vendor <span class="required-star">*</span></label>
+                                <select id="vendorCode" class="form-select">
+                                    <option value="0">--Select Vendor--</option>
+                                </select>
+                                <span id="vendor" class="field-error"></span>
+                            </div>
+                            <div class="col-sm-4">
+                                <label class="form-label">Vendor Code</label>
+                                <input id="Vendor_Code" class="form-control" readonly>
+                            </div>
+                            <div class="col-sm-4">
+                                <label class="form-label">Vendor Company</label>
+                                <input id="Vendor_Company" class="form-control" readonly>
+                            </div>
+                            <div class="col-sm-4">
+                                <label class="form-label">Vendor Delivery Date <span class="required-star">*</span></label>
+                                <input id="vendorDeliveryDate" type="date" class="form-control">
+                                <span id="delivery" class="field-error"></span>
+                            </div>
                         </div>
 
-
-                    </div>
-
-                    <!-- Grid -->
-                    <div class="mb-3">
-                        <table id="grid" class="table table-striped table-hover table-bordered align-middle">
-                            <thead class="table-dark">
-                                <tr class="text-center">
-                                    <th>#</th>
-                                    <th>Item Code</th>
-                                    <th>Item Name</th>
-                                    <th>Description</th>
-                                    <th>UOM</th>
-                                    <th>QTY</th>
-                                    <th>Cost/Unit</th>
-                                    <th>Discount</th>
-                                    <th>GST</th>
-                                    <th>Amount</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody class="text-center"></tbody>
-                            <tfoot>
-                                <tr>
-                                    <th colspan="9" class="text-end">Total:</th>
-                                    <th id="ftTotal">₹0.00</th>
-                                    <th></th>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-
-                    <!-- Shipping + Grand Total + Buttons -->
-                    <div class="row g-3 align-items-center">
-                        <div class="col-sm-4">
-                            <label class="form-label">Shipping Charges</label>
-                            <input id="shipping" type="number" step="0.01" class="form-control" value="0">
+                        <div class="row g-3 mb-3 align-items-center">
+                            <div class="col-md-3">
+                                <label class="form-label">Item <span class="required-star">*</span></label>
+                                <select id="itemCode" class="form-select"></select>
+                                <div class="form-text" id="itemUom"></div>
+                                <span id="itemError" class="field-error"></span>
+                            </div>
+                            <div class="col-md-5">
+                                <label>Description</label>
+                                <textarea id="itemDesc" class="form-control" rows="1" readonly placeholder="Description will appear here"></textarea>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Quantity <span class="required-star">*</span></label>
+                                <input id="qty" type="number" min="1" class="form-control">
+                                <span id="qtyError" class="field-error"></span>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Cost / Unit <span class="required-star">*</span></label>
+                                <input id="cpu" type="number" min="1" class="form-control">
+                                <span id="cpuError" class="field-error"></span>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Discount (%)</label>
+                                <input id="disc" type="number" min="0" class="form-control">
+                                <span id="discError" class="field-error"></span>
+                            </div>
+                            <div class="col-md-2">
+                                <label>GST (%)</label>
+                                <input type="text" id="itemGst" class="form-control" readonly />
+                            </div>
+                            <div class="col-auto">
+                                <button id="btnAdd" type="button" class="btn btn-success btn-sm d-flex justify-content-center align-items-center">
+                                    <i class="bi bi-plus-circle me-2"></i> ADD
+                                </button>
+                            </div>
                         </div>
-                        <div class="col-sm-4">
-                            <label class="form-label">Grand Total</label>
-                            <input id="grandTotal" class="form-control fw-bold" readonly value="₹0.00">
+
+                        <div class="mb-3">
+                            <table id="grid" class="table table-striped table-hover table-bordered align-middle">
+                                <thead class="table-dark">
+                                    <tr class="text-center">
+                                        <th>#</th>
+                                        <th>Item Code</th>
+                                        <th>Item Name</th>
+                                        <th>Description</th>
+                                        <th>UOM</th>
+                                        <th>QTY</th>
+                                        <th>Cost/Unit</th>
+                                        <th>Discount</th>
+                                        <th>GST</th>
+                                        <th>Amount</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-center"></tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th colspan="9" class="text-end">Total:</th>
+                                        <th id="ftTotal">₹0.00</th>
+                                        <th></th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                            <span id="gridError">Add at least one item to the grid</span>
                         </div>
-                        <div class="col-sm-4 d-flex gap-2 justify-content-end">
-                            <button id="btnCreate" class="btn btn-success">Register Quotation</button>
-                            <button id="btnClear" class="btn btn-danger text-white">Clear</button>
+
+                        <div class="row g-3 align-items-center">
+                            <div class="col-sm-4">
+                                <label class="form-label">Shipping Charges</label>
+                                <input id="shipping" type="number" step="0.01" class="form-control" value="" min="0">
+                                <span id="shippingError" class="field-error"></span>
+                            </div>
+                            <div class="col-sm-4">
+                                <label class="form-label">Grand Total</label>
+                                <input id="grandTotal" class="form-control fw-bold" readonly value="₹0.00">
+                            </div>
+                            <div class="col-sm-4 d-flex gap-2 justify-content-end">
+                                <button id="btnCreate" type="button" class="btn btn-success">Register Quotation</button>
+                                <button id="btnClear" type="button" class="btn btn-danger text-white">Clear</button>
+                            </div>
                         </div>
-                    </div>
-
-                </div> <!-- end card body -->
-
-            </div> <!-- end main card -->
-
+                    </form>
+                </div>
+            </div>
         </div>
 
-        <!-- Toast Container -->
-        <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3" style="z-index:2000;"></div>
+        <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
     </div>
 
     <script>
-    // toast
-    function showToast(message, type = 'success') {
-        const toastHTML = `
-        <div class="toast align-items-center text-white bg-${type} border-0 mb-2" role="alert">
-            <div class="d-flex">
-                <div class="toast-body">${message}</div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
-        </div>`;
-        const $toast = $(toastHTML);
-        $('#toastContainer').append($toast);
-        new bootstrap.Toast($toast[0], { delay: 3000 }).show();
-        $toast.on('hidden.bs.toast', function () { $(this).remove(); });
+$(document).ready(function(){
+    let gridItems = [], allItems = [];
+
+    const showError = (id,msg)=>{
+        $("#"+id).text(msg);
+        $("#"+id.replace("Error","")).addClass("invalid");
+    };
+    const clearError = (id)=>{
+        $("#"+id).text('');
+        $("#"+id.replace("Error","")).removeClass("invalid");
+    };
+    const validatePositive = (id)=>{
+        const val = Number($("#"+id).val()||0);
+        if(val<0){ showError(id+"Error","No negative values allowed"); return false; }
+        clearError(id+"Error"); return true;
+    };
+    $("#vendorDeliveryDate").attr("min", new Date().toISOString().split('T')[0]);
+
+    $("#vendorDeliveryDate").on("input change", function () {
+        clearError("delivery");
+    });
+
+  
+    // Clear error when user types in Quantity
+    $("#qty").on("input", function () {
+        if (Number($(this).val()) > 0) clearError("qtyError");
+    });
+
+    // Clear error when user types in Cost / Unit
+    $("#cpu").on("input", function () {
+        if (Number($(this).val()) > 0) clearError("cpuError");
+    });
+
+
+
+
+    // Clear error when user types in Cost / Unit
+    $("#cpu").on("input", function () {
+        if (Number($(this).val()) > 0) clearError("cpu");
+    });
+
+    // Load Vendors
+    $.get('@Url.Action("GetVendorsByRFQVNK","Purchase")',{rfqCode:$("#rfqCode").val()},function(data){
+        var ddl=$("#vendorCode");
+        ddl.empty().append($("<option>").val("0").text("--Select Vendor--"));
+        if(data) data.forEach(v=>ddl.append($("<option>").val(v.VendorCode).text(v.VendorName)));
+    });
+
+    // Load Items
+    $.get('/Purchase/GetItemsForRFQVNK',{prCode:$("#prCode").val()},function(rows){
+        allItems = rows; updateItemDropdown();
+    });
+
+    function updateItemDropdown(){
+        const ddl=$("#itemCode").empty().append('<option value="">--Select Item--</option>');
+        allItems.forEach(i=>{
+            if(!gridItems.find(g=>g.itemCode===i.ItemCode)){
+                ddl.append(`<option value="${i.ItemCode}" data-uom="${i.UOMName}" data-desc="${i.Description}">${i.ItemName}</option>`);
+            }
+        });
     }
 
-    $(document).ready(function () {
-        const today = new Date().toISOString().split('T')[0];
-        $("#vendorDeliveryDate").attr("min", today);
+    function calcLine(qty,cpu,disc,gst){
+        qty=Number(qty||0); cpu=Number(cpu||0); disc=Number(disc||0); gst=Number(gst||0);
+        const base=qty*cpu, discAmt=base*(disc/100), taxable=base-discAmt, gstAmt=taxable*(gst/100);
+        return {lineTotal:parseFloat((taxable+gstAmt).toFixed(2))};
+    }
+
+    function renderGrid(){
+        const $tb=$("#grid tbody").empty(); let total=0;
+        gridItems.forEach((r,idx)=>{
+            total+=r.amount;
+            $tb.append(`<tr>
+                <td>${idx+1}</td><td>${r.itemCode}</td><td>${r.itemName||''}</td>
+                <td><span data-bs-toggle="tooltip" data-bs-placement="top" title="${r.desc||''}">${r.desc||''}</span></td>
+                <td>${r.uom||''}</td><td class="text-end">${r.qty}</td><td class="text-end">₹${r.cpu.toFixed(2)}</td>
+                <td class="text-end">${r.disc}%</td><td class="text-end">${r.gst}%</td><td class="text-end">₹${r.amount.toFixed(2)}</td>
+                <td><button class="btn btn-sm btn-square btn-remove" data-i="${idx}"><i class="bi bi-trash"></i></button></td>
+            </tr>`);
+        });
+        $("#ftTotal").text(`₹${total.toFixed(2)}`);
+        const shipping=Number($("#shipping").val()||0);
+        $("#grandTotal").val(`₹${(total+shipping).toFixed(2)}`);
+        if(gridItems.length>0) $("#gridError").removeClass("visible");
+        updateItemDropdown();
+        $('[data-bs-toggle="tooltip"]').tooltip();
+    }
+
+    // Add Item
+    $("#btnAdd").click(function(){
+        clearError("itemError"); clearError("qtyError"); clearError("cpuError"); clearError("discError");
+
+        const opt=$("#itemCode option:selected"), itemCode=$("#itemCode").val();
+        const qty=Number($("#qty").val()||0), cpu=Number($("#cpu").val()||0), disc=Number($("#disc").val()||0);
+
+        let hasErr=false;
+        if(!itemCode){ showError("itemError","Please select an item"); hasErr=true; }
+        if(qty<=0){ showError("qtyError","Quantity must be greater than 0"); hasErr=true; }
+        if(cpu<=0){ showError("cpuError","Cost per unit must be greater than 0"); hasErr=true; }
+        if(disc<0){ showError("discError","No negative values allowed"); hasErr=true; }
+
+        if(hasErr) return;
+
+        const row={
+            itemCode, itemName:opt.text(), uom:opt.data("uom"), desc:opt.data("desc"),
+            qty, cpu, disc, gst:Number($("#itemGst").val()||0)
+        };
+        row.amount=calcLine(row.qty,row.cpu,row.disc,row.gst).lineTotal;
+        gridItems.push(row); renderGrid();
+
+        $("#qty,#cpu,#disc,#itemCode,#itemDesc,#itemGst").val('');
     });
 
-    // Your full script from original code goes here without changes
-    $(document).ready(function () {
-        const gridItems = [];
-        let allItems = [];
+    $("#grid").on("click",".btn-remove",function(){
+        const index=$(this).data("i");
+        gridItems.splice(index,1); renderGrid();
+    });
 
-        //$("#qty").on("input", function () {
-        //    const max = Number($(this).attr("max")) || 0;
-        //    const val = Number($(this).val()) || 0;
-        //    if (max > 0 && val > max) {
-        //        $(this).val(max);
-        //        Swal.fire("Warning", `You cannot enter more than ${max} quantity`, "warning");
-        //    }
-        //});
-        $("#qty").on("input", function () {
-            const max = Number($(this).attr("max")) || 0;
-            const val = Number($(this).val()) || 0;
-            const $error = $("#qtyError");
+    $("#shipping").on("input", function(){ validatePositive("shipping"); renderGrid(); });
 
-            if (max > 0 && val > max) {
-                $(this).val(max);
-                $error.text(`You cannot enter more than ${max} quantity`).show();
-            } else {
-                $error.hide();
-            }
-        });
+    // Register Quotation
+    $("#btnCreate").click(function(){
+        let hasErr=false;
 
+        if(!$("#vendorCode").val() || $("#vendorCode").val()==="0"){ showError("vendor","Please select a vendor"); hasErr=true; } else clearError("vendor");
+        if(!$("#vendorDeliveryDate").val()){ showError("delivery","Please select delivery date"); hasErr=true; } else clearError("delivery");
+        if(gridItems.length===0){ $("#gridError").addClass("visible"); hasErr=true; } else $("#gridError").removeClass("visible");
+        if(!validatePositive("shipping")) hasErr=true;
 
-        function round2(n) { return Number((n || 0).toFixed(2)); }
-
-        function calcLine(qty, cpu, discPct, gstPct) {
-            qty = Number(qty || 0);
-            cpu = Number(cpu || 0);
-            discPct = Number(discPct || 0);
-            gstPct = Number(gstPct || 0);
-            const base = qty * cpu;
-            const discAmt = base * (discPct / 100);
-            const taxable = base - discAmt;
-            const gstAmt = taxable * (gstPct / 100);
-            const lineTotal = taxable + gstAmt;
-            return { lineTotal: round2(lineTotal) };
+        if(hasErr){
+            const $first=$(".invalid, #gridError.visible").first();
+            if($first && $first.length){ $('html,body').animate({scrollTop:$first.offset().top-100},200); }
+            return;
         }
 
-        function renderGrid() {
-            const $tb = $("#grid tbody").empty();
-            let total = 0;
-            gridItems.forEach((r, idx) => {
-                total += r.amount;
-                $tb.append(`
-                  <tr>
-                    <td>${idx + 1}</td>
-                    <td>${r.itemCode}</td>
-                    <td>${r.itemName || ""}</td>
-<td>
-  <span data-bs-toggle="tooltip" data-bs-placement="top" title="${r.desc || ''}">
-    ${r.desc || ""}
-  </span>
-</td>
-                    <td>${r.uom || ""}</td>
-                    <td class="text-end">${r.qty}</td>
-                    <td class="text-end">₹${r.cpu.toFixed(2)}</td>
-                    <td class="text-end">${r.disc}%</td>
-                    <td class="text-end">${r.gst}%</td>
-                    <td class="text-end">₹${r.amount.toFixed(2)}</td>
-                    <td><button class="btn btn-sm btn-square btn-remove" data-i="${idx}"><i class="bi bi-trash"></i></button></td>
-                  </tr>
-                `);
-            });
-            $("#ftTotal").text(`₹${total.toFixed(2)}`);
-            const shipping = Number($("#shipping").val() || 0);
-            $("#grandTotal").val(`₹${(total + shipping).toFixed(2)}`);
-            updateItemDropdown();
-        }
+        const rq={ RFQCode:$("#rfqCode").val(), PRCode:$("#prCode").val(), VendorCode:$("#vendorCode").val(),
+            VendorDeliveryDateVK:$("#vendorDeliveryDate").val(), ShippingCharges:Number($("#shipping").val()||0),
+            Items:gridItems.map(x=>({ItemCode:x.itemCode, Quantity:x.qty, CostPerUnit:x.cpu, Discount:x.disc}))
+        };
 
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
-        })
+        //// Call your existing AJAX save logic here...
+        //const rq = {
+        //    RFQCode: $("#rfqCode").val(),
+        //    PRCode: $("#prCode").val(),
+        //    VendorCode: $("#vendorCode").val(),
+        //    VendorDeliveryDateVK: $("#vendorDeliveryDate").val(),
+        //    ShippingCharges: Number($("#shipping").val() || 0),
+        //    Items: gridItems.map(x => ({ ItemCode: x.itemCode, Quantity: x.qty, CostPerUnit: x.cpu, Discount: x.disc }))
+        //};
 
-
-        function updateItemDropdown() {
-            const ddl = $("#itemCode").empty().append('<option value="">--Select Item--</option>');
-            allItems.forEach(i => {
-                if (!gridItems.find(g => g.itemCode === i.ItemCode)) {
-                    ddl.append(`<option value="${i.ItemCode}" data-uom="${i.UOMName || ''}" data-desc="${i.Description || ''}">${i.ItemName}</option>`);
-                }
-            });
-        }
-
-        // Load Vendors
-        (function loadVendors() {
-            $.ajax({
-                url: '@Url.Action("GetVendorsByRFQVNK", "Purchase")',
-                type: 'GET',
-                data: { rfqCode: $("#rfqCode").val() },
-                success: function (data) {
-                    var ddl = $("#vendorCode");
-                    ddl.empty().append($("<option>").val("0").text("--Select Vendor--"));
-                    if (data && data.length > 0) {
-                        $.each(data, (i, vendor) =>
-                            ddl.append($("<option>").val(vendor.VendorCode).text(vendor.VendorName))
-                        );
-                    }
-                }
-            });
-        })();
-
-        // Load Items
-        (function loadItems() {
-            $.ajax({
-                url: '/Purchase/GetItemsForRFQVNK',
-                type: 'GET',
-                data: { prCode: $("#prCode").val() },
-                success: function (rows) {
-                    allItems = rows;
-                    updateItemDropdown();
-                }
-            });
-        })();
-
-        // Item change
-        $("#itemCode").on("change", function () {
-            $("#qty").val("");
-            var opt = $(this).find(":selected");
-            $("#itemDesc").val(opt.data("desc") || "");
-
-            const selectedItem = allItems.find(x => x.ItemCode === opt.val());
-            if (selectedItem) {
-                const maxQty = selectedItem.quantity || 0;
-                $("#qty").attr("max", maxQty);
-                $("#qty").attr("placeholder", "Max: " + maxQty);
-            } else {
-                $("#qty").removeAttr("max").attr("placeholder", "");
-            }
-
-            $.getJSON('/Purchase/GetItemGSTVNK', { itemCode: opt.val() })
-                .done(r => $("#itemGst").val(r?.TotalGST ?? "0.00"))
-                .fail(() => $("#itemGst").val("0.00"));
+        const swalWithBootstrapButtons = Swal.mixin({
+            customClass: { confirmButton: "btn btn-success", cancelButton: "btn btn-danger" },
+            buttonsStyling: false
         });
 
-        // Add item
-        $("#btnAdd").on("click", function () {
-            const opt = $("#itemCode").find(":selected");
-            const itemCode = $("#itemCode").val();
-            const qty = Number($("#qty").val() || 0);
-            const cpu = Number($("#cpu").val() || 0);
-            if (!itemCode) return Swal.fire("Warning", "Please select an item", "warning");
-            if (qty <= 0) return Swal.fire("Warning", "Quantity must be greater than 0", "warning");
-            if (cpu <= 0) return Swal.fire("Warning", "Cost per unit must be greater than 0", "warning");
+        // keep confirmation modal before save
+        swalWithBootstrapButtons.fire({
+            title: "Are you sure?",
+            text: "Do you want to create this quotation?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, create it!",
+            cancelButtonText: "No, cancel",
+            reverseButtons: false,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Purchase/SaveRegisterQuotationVNK",
+                    data: JSON.stringify(rq),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (res) {
+                        if (res.success) {
+                            Swal.fire({
+                                title: "Created!",
+                                text: "Quotation registered successfully.",
+                                icon: "success",
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
 
-            const row = {
-                itemCode,
-                itemName: opt.text(),
-                uom: opt.data("uom"),
-                desc: opt.data("desc"),
-                qty,
-                cpu,
-                disc: Number($("#disc").val() || 0),
-                gst: Number($("#itemGst").val() || 0)
-            };
-            row.amount = calcLine(row.qty, row.cpu, row.disc, row.gst).lineTotal;
-            gridItems.push(row);
-            renderGrid();
+                            setTimeout(() => {
+                                // Check how many vendors are left (excluding the default "--Select Vendor--")
+                                const remainingVendors = $("#vendorCode option").length - 1;
 
-            $("#qty").val(1); $("#cpu").val(0); $("#disc").val(0); $("#itemCode").val('');
-            $("#itemDesc").val(''); $("#itemGst").val('');
-        });
-
-        // Remove item
-        $("#grid").on("click", "button[data-i]", function () {
-            const index = Number($(this).data("i"));
-            gridItems.splice(index, 1);
-            renderGrid();
-        });
-
-        $("#shipping").on("input", renderGrid);
-
-        // Vendor change
-        $("#vendorCode").on("change", function () {
-            gridItems.splice(0, gridItems.length); renderGrid();
-            if ($(this).val() === "0") return;
-            $.getJSON('/Purchase/GetVendorDetailsVNK', { vendorCode: $(this).val() })
-                .done(r => {
-                    if (r?.length) {
-                        $("#Vendor_Code").val(r[0].VendorCode);
-                        $("#Vendor_Company").val(r[0].CompanyName);
+                                if (remainingVendors <= 1) {
+                                    // Only one vendor existed — redirect after saving
+                                    window.location.href = "/Purchase/ShowAllRFQsVNK";
+                                } else {
+                                    // Otherwise, just reload the current page
+                                    location.reload();
+                                }
+                            }, 1500);
+                        } else {
+                            Swal.fire({
+                                title: "Error",
+                                text: "Failed to save quotation",
+                                icon: "error",
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                        }
+                    },
+                    error: function () {
+                        Swal.fire({
+                            title: "Error",
+                            text: "Error while saving quotation",
+                            icon: "error",
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
                     }
                 });
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                Swal.fire({
+                    title: "Cancelled",
+                    text: "Quotation creation cancelled.",
+                    icon: "error",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            }
         });
 
-        // Clear form
-        $("#btnClear").on("click", function () {
-            $("#vendorCode").val('0'); $("#vendorDeliveryDate").val(''); $("#shipping").val(0);
-            gridItems.splice(0, gridItems.length); renderGrid();
-        });
+   
 
-        // Save quotation
-        $("#btnCreate").on("click", function () {
-            if ($("#vendorCode").val() === "0") return Swal.fire("Warning", "Please select a vendor", "warning");
-            if (!$("#vendorDeliveryDate").val()) return Swal.fire("Warning", "Please select vendor delivery date", "warning");
-            if (gridItems.length === 0) return Swal.fire("Warning", "Please add at least one item", "warning");
-
-            const rq = {
-                RFQCode: $("#rfqCode").val(),
-                PRCode: $("#prCode").val(),
-                VendorCode: $("#vendorCode").val(),
-                VendorDeliveryDateVK: $("#vendorDeliveryDate").val(),
-                ShippingCharges: Number($("#shipping").val() || 0),
-                Items: gridItems.map(x => ({ ItemCode: x.itemCode, Quantity: x.qty, CostPerUnit: x.cpu, Discount: x.disc }))
-            };
-
-            const swalWithBootstrapButtons = Swal.mixin({
-                customClass: { confirmButton: "btn btn-success", cancelButton: "btn btn-danger" },
-                buttonsStyling: false
-            });
-
-            swalWithBootstrapButtons.fire({
-                title: "Are you sure?",
-                text: "Do you want to create this quotation?",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonText: "Yes, create it!",
-                cancelButtonText: "No, cancel",
-
-                reverseButtons: true,
-            });
-
-          Swal.fire({
-              title: "Are you sure?",
-              text: "Do you want to create this quotation?",
-              icon: "warning",
-              showCancelButton: true,
-              confirmButtonText: "Yes, create it!",
-              cancelButtonText: "No, cancel",
-              reverseButtons: true
-          }).then((result) => {
-              if (result.isConfirmed) {
-                  $.ajax({
-                      type: "POST",
-                      url: "/Purchase/SaveRegisterQuotationVNK",
-                      data: JSON.stringify(rq),
-                      contentType: "application/json; charset=utf-8",
-                      dataType: "json",
-                      success: function (res) {
-                          if (res.success) {
-                              Swal.fire({
-                                  title: "Created!",
-                                  text: "Quotation registered successfully.",
-                                  icon: "success",
-                                  showConfirmButton: false,
-                                  timer: 1500
-                              });
-                              setTimeout(() => location.reload(), 1500);
-                          } else {
-                              Swal.fire({
-                                  title: "Error",
-                                  text: "Failed to save quotation",
-                                  icon: "error",
-                                  showConfirmButton: false,
-                                  timer: 1500
-                              });
-                          }
-                      },
-                      error: function () {
-                          Swal.fire({
-                              title: "Error",
-                              text: "Error while saving quotation",
-                              icon: "error",
-                              showConfirmButton: false,
-                              timer: 1500
-                          });
-                      }
-                  });
-              } else if (result.dismiss === Swal.DismissReason.cancel) {
-                  Swal.fire({
-                      title: "Cancelled",
-                      text: "Quotation creation cancelled.",
-                      icon: "error",
-                      showConfirmButton: false,
-                      timer: 1500
-                  });
-              }
-          })
-
-        });
 
     });
+    $("#qty").on("keypress", function (e) {
+        const key = e.which || e.keyCode;
+        if (key < 48 || key > 57) return; // Allow only digits
+        const current = $(this).val() + String.fromCharCode(key);
+        const max = Number($(this).attr("max") || 0);
+        if (Number(current) > max) e.preventDefault(); // Stop typing beyond max
+    });
+
+
+    // Clear button
+    $("#btnClear").click(function(){
+        $("#vendorCode,#vendorDeliveryDate,#itemCode,#qty,#cpu,#disc,#shipping").val('');
+        $("#Vendor_Code,#Vendor_Company,#itemDesc,#itemGst").val('');
+        gridItems=[]; renderGrid();
+        $(".field-error").text(''); $(".invalid").removeClass("invalid");
+    });
+
+    // Vendor change
+    $("#vendorCode").change(function(){
+        clearError("vendor");
+        const val=$(this).val(); gridItems=[]; renderGrid();
+        if(val==="0") return;
+        $.getJSON('/Purchase/GetVendorDetailsVNK',{vendorCode:val}, function(r){
+            if(r && r.length){ $("#Vendor_Code").val(r[0].VendorCode); $("#Vendor_Company").val(r[0].CompanyName); }
+        });
+    });
+
+    // Item change
+    $("#itemCode").change(function(){
+        clearError("itemError"); $("#qty,#cpu,#disc").val('');
+        const opt=$("#itemCode option:selected"); $("#itemDesc").val(opt.data("desc")||''); $("#itemGst").val('0.00');
+        if(opt.val()) $.getJSON('/Purchase/GetItemGSTVNK',{itemCode:opt.val()}).done(r=>$("#itemGst").val(r?.TotalGST||"0.00"));
+        const selected=allItems.find(x=>x.ItemCode===opt.val());
+        if(selected){ $("#qty").attr("max",selected.quantity||0).attr("placeholder","Max: "+(selected.quantity||0)); }
+        else $("#qty").removeAttr("max").attr("placeholder","");
+    });
+
+});
     </script>
 </body>
 </html>

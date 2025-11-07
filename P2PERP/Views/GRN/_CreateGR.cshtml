@@ -9,30 +9,30 @@
             <div class="col-md-3">
                 <label class="form-label fw-bold">GR No</label>
                 @Html.HiddenFor(m => m.GRNo)
-                <div class="form-control bg-light">@Model.GRNo</div>
+                <div class="form-control-sm bg-light">@Model.GRNo</div>
             </div>
             <div class="col-md-3">
                 <label class="form-label fw-bold">GRN Code</label>
                 @Html.HiddenFor(m => m.GRNCode)
-                <div class="form-control bg-light">@Model.GRNCode</div>
+                <div class="form-control-sm bg-light">@Model.GRNCode</div>
             </div>
             <div class="col-md-3">
                 <label class="form-label fw-bold">PO Code</label>
                 @Html.HiddenFor(m => m.POCode)
-                <div class="form-control bg-light">@Model.POCode</div>
+                <div class="form-control-sm bg-light">@Model.POCode</div>
             </div>
             <div class="col-md-3">
                 <label class="form-label fw-bold">Vendor</label>
                 @Html.HiddenFor(m => m.VendorName)
-                <div class="form-control bg-light">@Model.VendorName</div>
+                <div class="form-control-sm bg-light">@Model.VendorName</div>
             </div>
         </div>
 
         <!-- Reason Section -->
         <div class="row g-3 mb-4">
             <div class="col-md-6">
-                <label class="form-label fw-bold">Reason For GoodReturn</label>
-                @Html.TextBoxFor(m => m.ReasonForGoodReturn, new { @class = "form-control reason-return", placeholder = "Enter Reason For GoodReturn" })
+                <label class="form-label fw-bold">Reason For GoodReturn<span class="text-danger">*</span></label>
+                @Html.TextBoxFor(m => m.ReasonForGoodReturn, new { @class = "form-control form-control-sm reason-return", placeholder = "Enter Reason For GoodReturn" })
                 <span class="text-danger error-msg"></span>
             </div>
         </div>
@@ -42,6 +42,7 @@
             <table id="CreateGoods" class="table table-bordered table-hover align-middle shadow-sm">
                 <thead class="table-primary text-center table-dark">
                     <tr>
+                        <th>Sr. No</th>
                         <th>Item Name</th>
                         <th>Ordered Qty</th>
                         <th>UOM</th>
@@ -58,13 +59,17 @@
                     {
                         for (int i = 0; i < Model.Items.Count; i++)
                         {
+
+                          
+                            
                             <tr>
+                                <td>@(i + 1)</td>  <!-- Sr. No auto-filled by DataTable -->
                                 @Html.HiddenFor(m => m.Items[i].FailedQCCode)
                                 <td>@Html.HiddenFor(m => m.Items[i].ItemName) @Model.Items[i].ItemName</td>
                                 <td>@Html.DisplayFor(m => m.Items[i].Qty)</td>
                                 <td>@Html.HiddenFor(m => m.Items[i].UOM) @Model.Items[i].UOM</td>
-                                <td>@Html.DisplayFor(m => m.Items[i].UnitRate)</td>
-                                <td>@Html.DisplayFor(m => m.Items[i].Amount)</td>
+                                <td style="white-space: nowrap;">₹ @Html.DisplayFor(m => m.Items[i].Amount)</td>
+                                <td class="rupee-inline">₹@String.Format("{0:N2}", Model.Items[i].Amount)</td>
                                 <td>@Html.DisplayFor(m => m.Items[i].Reason)</td>
                                 <td>@Html.DisplayFor(m => m.Items[i].SampleTestFailed)</td>
                                 <td>@Html.DisplayFor(m => m.Items[i].SampleQualityChecked)</td>
@@ -85,10 +90,8 @@
 
         <!-- Footer Buttons -->
         <div class="d-flex justify-content-end gap-2">
-            <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
-                <i class="bi bi-x-circle"></i> Cancel
-            </button>
-            <button type="submit" class="btn btn-success px-4">
+          
+            <button type="submit" class="btn btn-sm btn-success px-4">
                 <i class="bi bi-check-circle"></i> Save Goods Return
             </button>
         </div>
@@ -103,69 +106,87 @@
         $('#CreateGoods').DataTable({
             dom: '<"d-flex justify-content-end mb-2"f>rt<"d-flex justify-content-between align-items-center mt-2"ip>',
             paging: true,
-            searching: true,  // disable textbox
+            searching: false,  // disable textbox
             ordering: false,   // disable sorting
             info: true,
             responsive: true,
             columnDefs: [
                 { targets: "_all", className: "text-center align-middle" }
-            ]
+            ],
+          
         });
 
-        //Form Submit with Validation
-        $("#createGRForm").on("submit", function (e) {
-            e.preventDefault();
 
-            $(".error-msg").text("");
-            $("input").removeClass("is-invalid");
+        
+        $(document).ready(function () {
 
-            let valid = true;
-            let reasonReturn = $(".reason-return").val().trim();
+    // -------- Validation Function --------
+    function validateReasonReturn() {
+        const input = $(".reason-return");
+        const reason = input.val().trim();
 
-            if (!reasonReturn) {
-                $(".reason-return").next(".error-msg").text("Reason for Good Return is required");
-                $(".reason-return").addClass("is-invalid");
-                valid = false;
-            }
+        if (!reason) {
+            input.next(".error-msg").text("Reason for Good Return is required");
+            input.addClass("is-invalid");
+            return false;
+        } else {
+            input.next(".error-msg").text("");
+            input.removeClass("is-invalid");
+            return true;
+        }
+    }
 
-            if (!valid) return false;
+    // -------- Real-time Validation --------
+    $(".reason-return").on("input", validateReasonReturn);
 
-            let form = $(this);
-            $.ajax({
-                url: form.attr("action"),
-                type: "POST",
-                data: form.serialize(),
-                success: function (response) {
-                    if (response.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Your Good Return List Created..!',
-                            text: response.message,
-                            showConfirmButton: false,
-                            timer: 2000
-                        }).then(() => {
+    // -------- Form Submit --------
+    $("#createGRForm").on("submit", function (e) {
+        e.preventDefault();
 
-                            // Close modal
-                            $("#staticBackdrop").modal("hide");
+        $(".error-msg").text("");
+        $("input").removeClass("is-invalid");
 
+        let valid = true;
+        if (!validateReasonReturn()) valid = false;
 
-                            form[0].reset();
+        if (!valid) return false;
 
-                            // Refresh table (Goods Return)
-                            $('#RejectGoods').DataTable().ajax.reload(null, false);
+        let form = $(this);
+        $.ajax({
+            url: form.attr("action"),
+            type: "POST",
+            data: form.serialize(),
+            success: function (response) {
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Your Good Return List Created..!',
+                        text: response.message,
+                        showConfirmButton: false,
+                        timer: 2000
+                    }).then(() => {
+                        // Close modal
+                        $("#staticBackdrop").modal("hide");
 
-                            window.location.href = '@Url.Action("RejectedGoods", "GRN")';
+                        // Reset form
+                        form[0].reset();
 
-                           
-                        });
-                    } else {
-                        Swal.fire("Error", response.message, "error");
-                    }
-                },
-                error: function () {
-                    Swal.fire("Error", "Something went wrong!", "error");
+                        // Refresh DataTable
+                        $('#RejectGoods').DataTable().ajax.reload(null, false);
+
+                        // Redirect to page
+                        window.location.href = '@Url.Action("RejectedGoods", "GRN")';
+                    });
+                } else {
+                    Swal.fire("Error", response.message, "error");
                 }
-            });
+            },
+            error: function () {
+                Swal.fire("Error", "Something went wrong!", "error");
+            }
         });
+    });
+});
+
     });
 </script>

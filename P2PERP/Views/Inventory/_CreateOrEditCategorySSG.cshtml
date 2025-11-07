@@ -1,42 +1,41 @@
 ﻿@model P2PLibray.Inventory.InventorySSG
 
-@{
-    var categoryNameAttrs = new Dictionary<string, object>
-{
-        { "class", "form-control" },
-        { "placeholder", "Enter category name" }
-    };
-
-    if (Model.ItemCategoryId > 0)
-    {
-        categoryNameAttrs.Add("readonly", "readonly");
-        categoryNameAttrs.Add("style", "background-color:#e9ecef;");
-    }
-    else
-    {
-        categoryNameAttrs.Add("required", "required");
-    }
-}
-
 <div class="modal-body">
     <form id="categoryForm">
         @Html.HiddenFor(m => m.ItemCategoryId)
 
+        <!-- Category Name -->
         <div class="mb-3">
-            <label class="form-label">Category Name <span class="text-danger">*</span></label>
-            @Html.TextBoxFor(m => m.ItemCategoryName, categoryNameAttrs)
+            <label class="form-label fw-bold text-dark">Category Name <span class="text-danger">*</span></label>
+            @Html.TextBoxFor(m => m.ItemCategoryName, new
+            {
+                @class = "form-control text-dark shadow-sm",
+                placeholder = "Enter category name",
+                id = "txtCategoryName",
+            })
+            <span id="categoryNameError" class="text-danger small fw-semibold"></span>
         </div>
 
+        <!-- Description -->
         <div class="mb-3">
-            <label class="form-label">Description <span class="text-danger">*</span></label>
-            @Html.TextBoxFor(m => m.Description, new { @class = "form-control", placeholder = "Enter description", required = "required" })
+            <label class="form-label fw-bold text-dark">Description <span class="text-danger">*</span></label>
+            @Html.TextAreaFor(m => m.Description, new
+            {
+                @class = "form-control text-dark shadow-sm",
+                placeholder = "Enter description",
+                rows = "3",
+                id = "txtDescription"
+            })
+            <span id="descriptionError" class="text-danger small fw-semibold"></span>
         </div>
 
+        <!-- HSN Code -->
         <div class="mb-3">
-            <label class="form-label">Tax Rate (HSN Code) <span class="text-danger">*</span></label>
-            <select id="cmbbxtaxrate" name="TaxRateId" class="form-control" style="cursor:pointer;" required>
-                <option value="0">--select HSNCode--</option>
+            <label class="form-label fw-bold text-dark">HSN Code <span class="text-danger">*</span></label>
+            <select id="cmbbxtaxrate" name="TaxRateId" class="form-select shadow-sm">
+                <option value="0">--Select HSN Code--</option>
             </select>
+            <span id="taxRateError" class="text-danger small fw-semibold"></span>
         </div>
 
         <div class="text-end">
@@ -44,7 +43,7 @@
             {
                 <!-- Edit Mode -->
                 <button type="submit" class="btn btn-success btn-lg" id="btnUpdateCategory">
-                    <i class="bi bi-check-circle me-1"></i> Update Category
+                    <i class="bi bi-pencil-square me-1"></i> Update
                 </button>
             }
             else
@@ -58,67 +57,227 @@
     </form>
 </div>
 
+<style>
+    .input-error {
+        border: 1.5px solid red !important;
+    }
+
+    .readonly-grey {
+        background-color: #e9ecef !important;
+        cursor: not-allowed;
+    }
+</style>
+
 <script>
-$(function () {
-    // --- Load Tax Rates ---
-    $.ajax({
-        url: '/Inventory/ALLTaxRatesSSG',
-        type: 'GET',
-        dataType: 'json',
-        success: function (data) {
-            var $ddl = $("#cmbbxtaxrate");
-            $ddl.empty().append('<option value="0">--select HSNCode--</option>');
+    $(function () {
 
-            $.each(data, function (i, item) {
-                var hsnFull = item.HSNCode ? item.HSNCode.toString() : "";
-                var hsnShort = hsnFull.substring(0, 4);
-                $ddl.append('<option value="' + item.TaxRateId + '" title="' + hsnFull + '">' + hsnShort + '</option>');
-            });
-
-            var selectedId = '@Model.TaxRateId';
-            if (selectedId && selectedId !== "0") $ddl.val(selectedId);
-        }
-    });
-
-    // --- Save /Update Category ---
-    $("#categoryForm").off("submit").on("submit", function (e) {
-        e.preventDefault();
-
-        var categoryName = $("input[name='ItemCategoryName']").val().trim();
-        var description = $("input[name='Description']").val().trim();
-        var taxId = $("#cmbbxtaxrate").val();
-
-        var isAdd = $("input[name='ItemCategoryId']").val() == 0;
-
-        if (isAdd) {
-            if (!categoryName) { Swal.fire('Error', 'Please enter Category Name.', 'error'); return; }
-            if (!description) { Swal.fire('Error', 'Please enter Description.', 'error'); return; }
-            if (!taxId || taxId == 0) { Swal.fire('Error', 'Please select HSN Code.', 'error'); return; }
+        // ✅ Check mode on modal load
+        const currentId = parseInt("@Model.ItemCategoryId");
+        if (currentId > 0) {
+            $("#txtCategoryName")
+                .prop("readonly", true)
+                .addClass("readonly-grey")
+                .css({ "background-color": "#e9ecef", "cursor": "not-allowed" });
+            $("#btnSaveCategory").addClass("d-none");
+            $("#btnUpdateCategory").removeClass("d-none");
+        } else {
+            $("#txtCategoryName")
+                .prop("readonly", false)
+                .removeClass("readonly-grey")
+                .css({ "background-color": "#fff", "cursor": "text" });
+            $("#btnUpdateCategory").addClass("d-none");
+            $("#btnSaveCategory").removeClass("d-none");
         }
 
-        var formData = $(this).serialize();
-        var id = $("input[name='ItemCategoryId']").val();
-        var url = (id && id > 0)
-            ? '@Url.Action("UpdateCategorySSG", "Inventory")'
-            : '@Url.Action("CreateCategoryySSG", "Inventory")';
-
-        $.post(url, formData, function (res) {
-            if (res.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success',
-                    text: res.message,
-                    timer: 1500,
-                    showConfirmButton: false
+        // 🔹 Load HSN dropdown
+        $.ajax({
+            url: '/Inventory/ALLTaxRatesSSG',
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                const $ddl = $("#cmbbxtaxrate");
+                $ddl.empty().append('<option value="0">--select HSNCode--</option>');
+                $.each(data, function (i, item) {
+                    const hsnFull = item.HSNCode || "";
+                    const hsnShort = hsnFull.substring(0, 4);
+                    $ddl.append(`<option value="${item.TaxRateId}" title="${hsnFull}">${hsnShort}</option>`);
                 });
-                var modalEl = document.getElementById('categoryModal');
-                var modal = bootstrap.Modal.getInstance(modalEl);
-                modal.hide();
-                $('#categoryTable').DataTable().ajax.reload(null, false);
-            } else {
-                Swal.fire('Error', res.message, 'error');
+
+                const selectedId = '@Model.TaxRateId';
+                const selectedHSN = '@Model.HSNCode';
+                if (selectedId && selectedId != "0" && $ddl.find(`option[value='${selectedId}']`).length === 0) {
+                    $ddl.append(`<option value="${selectedId}" title="${selectedHSN}">${selectedHSN}</option>`);
+                }
+                if (selectedId && selectedId != "0") {
+                    $ddl.val(selectedId);
+                }
+            },
+            error: function () {
+                Swal.fire('Error', 'Failed to load HSN Codes.', 'error');
             }
         });
+
+        // 🔹 Validation functions
+        function validateCategoryName() {
+            const isEdit = $("#ItemCategoryId").val() > 0;
+            const val = $("#txtCategoryName").val().trim();
+
+            if (!isEdit) {
+                if (!val) return "Please enter Category Name.";
+                if (val.length < 3) return "Category Name must be at least 3 characters.";
+
+                let existingNames = [];
+                if ($.fn.DataTable.isDataTable('#categoryTable')) {
+                    const table = $('#categoryTable').DataTable();
+                    existingNames = table.column(2).data().toArray().map(n => n.toLowerCase());
+                }
+
+                $('#categoryTable tbody tr').each(function () {
+                    const txt = $(this).find('td:eq(2)').text().trim().toLowerCase();
+                    if (txt) existingNames.push(txt);
+                });
+
+                if (existingNames.includes(val.toLowerCase()) && $("#btnSaveCategory").is(":visible")) {
+                    return "This category already exists!";
+                }
+            }
+
+            return "";
+        }
+
+        function validateDescription() {
+            const val = $("#txtDescription").val().trim();
+            if (!val) return "Please enter Description.";
+            if (val.length < 10) return "Description must be at least 10 characters.";
+            return "";
+        }
+  
+
+
+        function validateHSN() {
+            return $("#cmbbxtaxrate").val() === "0" ? "Please select HSN Code." : "";
+        }
+
+        function toggleError($field, errorMsg, $errorLabel) {
+            if (errorMsg) {
+                $field.addClass("input-error");
+                $errorLabel.text(errorMsg);
+            } else {
+                $field.removeClass("input-error");
+                $errorLabel.text("");
+            }
+        }
+
+        // 🔹 Live validation
+        $("#txtCategoryName").on("input", function () {
+            if (!$(this).prop("readonly")) {
+                toggleError($(this), validateCategoryName(), $("#categoryNameError"));
+            }
+        });
+
+        $("#txtDescription").on("input", function () {
+            const val = $(this).val();
+            $(this).val(val);
+            toggleError($(this), validateDescription(), $("#descriptionError"));
+        });
+
+        $("#cmbbxtaxrate").on("change", function () {
+            toggleError($(this), validateHSN(), $("#taxRateError"));
+        });
+
+// 🔹 Form submit
+$("#categoryForm").on("submit", function (e) {
+    e.preventDefault();
+
+    const categoryMsg = validateCategoryName();
+    const descMsg = validateDescription();
+    const hsnMsg = validateHSN();
+
+    toggleError($("#txtCategoryName"), categoryMsg, $("#categoryNameError"));
+    toggleError($("#txtDescription"), descMsg, $("#descriptionError"));
+    toggleError($("#cmbbxtaxrate"), hsnMsg, $("#taxRateError"));
+
+    if (categoryMsg || descMsg || hsnMsg) return;
+
+    const formData = $(this).serialize();
+    const isEdit = $("#btnUpdateCategory").is(":visible");
+    const url = isEdit
+        ? '@Url.Action("UpdateCategorySSG","Inventory")'
+        : '@Url.Action("CreateCategoryySSG","Inventory")';
+
+    Swal.fire({
+        title: isEdit ? "Are you sure?" : "Confirm Save?",
+        text: isEdit ? "Do you want to update this category?" : "Do you want to create this category?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: isEdit ? "Yes, update it!" : "Yes, save it!",
+        cancelButtonText: "No, cancel",
+        reverseButtons: false,
+        customClass: {
+            confirmButton: 'btn btn-success me-2',
+            cancelButton: 'btn btn-danger'        
+        },
+        buttonsStyling: false
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.post(url, formData, function (res) {
+                if (res.success) {
+                    Swal.fire({ icon: 'success', title: res.message, timer: 1500, showConfirmButton: false });
+                    $("#categoryForm")[0].reset();
+                    $(".input-error").removeClass("input-error");
+                    $(".text-danger.small.fw-semibold").text("");
+                    $("#txtCategoryName").prop("readonly", false).removeClass("readonly-grey").css("background-color", "#fff");
+                    $("#btnUpdateCategory").addClass("d-none");
+                    $("#btnSaveCategory").removeClass("d-none");
+
+                    const modalEl = document.getElementById('categoryModal');
+                    const modal = bootstrap.Modal.getInstance(modalEl);
+                    modal.hide();
+
+                    if ($.fn.DataTable.isDataTable('#categoryTable'))
+                        $('#categoryTable').DataTable().ajax.reload(null, false);
+                } else {
+                    Swal.fire('Error', res.message, 'error');
+                }
+            });
+        }
     });
 });
+
+
+        // 🔹 Edit category
+        window.editCategorySSG = function (id, name, desc, taxId) {
+            $("#ItemCategoryId").val(id);
+
+            $("#txtCategoryName")
+                .val(name)
+                .prop("readonly", true)
+                .removeClass("bg-white")         
+                .addClass("bg-light")             
+                .addClass("readonly-grey")        
+                .css({ "cursor": "not-allowed" });
+
+            $("#txtDescription").val(desc);
+            $("#cmbbxtaxrate").val(taxId);
+
+            $("#btnSaveCategory").addClass("d-none");
+            $("#btnUpdateCategory").removeClass("d-none");
+        };
+
+
+        // 🔹 Add new category
+        window.addNewCategorySSG = function () {
+            $("#categoryForm")[0].reset();
+            $("#ItemCategoryId").val(0);
+            $("#txtCategoryName")
+                .prop("readonly", false)
+                .removeClass("readonly-grey")
+                .css({ "background-color": "#fff", "cursor": "text" });
+            $("#btnUpdateCategory").addClass("d-none");
+            $("#btnSaveCategory").removeClass("d-none");
+            $(".input-error").removeClass("input-error");
+            $(".text-danger.small.fw-semibold").text("");
+        };
+
+    });
 </script>

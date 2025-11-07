@@ -14,6 +14,17 @@
         vertical-align: middle;
     }
 
+
+    button.dt-button.processing,
+    div.dt-button.processing {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        background: none !important;
+    }
+
+        button.dt-button.processing:after {
+            content: none !important;
+        }
   
 </style>
 
@@ -76,11 +87,11 @@
                 <div class="modal-header bg-primary text-white position-relative">
                     <div class="w-100 text-center">
 
-                        <h5 class="modal-title text-white fw-bold mb-0 " id="viewPlanModalLabel">Plan Details</h5>
+                        <h5 class="modal-title text-white fw-bold mb-2 " id="viewPlanModalLabel">Plan Details</h5>
 
 
                     </div>
-                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3 mb-2" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" id="viewPlanContent">
 
@@ -106,7 +117,7 @@
 
     let tableStartDate = null; // Start date for table filtering
     let tableEndDate = null;   // End date for table filtering
-    let dataTable; // More specific name // Declare dataTable variable globally
+    let stockMasterDataTable; // More specific name // Declare dataTable variable globally
 
 
 
@@ -211,7 +222,7 @@
 
     function initDataTable1() {
 
-        dataTable = $('#reqTable').DataTable({
+        stockMasterDataTable = $('#reqTable').DataTable({
             pageLength: 10,
             paging: true,
             ordering: false,
@@ -358,6 +369,7 @@
                     text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
                     className: 'btn btn-sm btn-outline-success',
                     title: "Stock Master",
+                    messageTop: 'Generated Date: ' + moment().format('DD/MM/YYYY'),
                     action: function (e, dt, button, config) {
                         if ($('#reqTable tbody input.row-select:checked').length === 0) {
                             showExportToast();
@@ -369,6 +381,7 @@
                         rows: function (idx, data, node) {
                             return $(node).find('.row-select').prop('checked');
                         },
+                        // Exclude first (checkbox) and last (actions) columns
                         columns: ':visible:not(:first-child):not(:last-child)',
                         format: {
                             body: function (data, row, column, node) {
@@ -380,6 +393,15 @@
                                     : data;
                             }
                         }
+                    },
+                    customize: function (xlsx) {
+                        const sheet = xlsx.xl.worksheets['sheet1.xml'];
+
+                        // 🔹 Center the Title ("Stock Master")
+                        $('row:first c', sheet).attr('s', '51');
+
+                        // 🔹 Center the "Generated Date"
+                        $('row:eq(1) c', sheet).attr('s', '51');
                     }
                 },
                 // 🔹 CSV
@@ -454,68 +476,78 @@
 
 
 
-
     function initDateRangePicker1() {
         $('#reportrange').daterangepicker({
             autoUpdateInput: false,
             locale: {
                 cancelLabel: 'Clear',
-                format: 'YYYY-MM-DD'
+                format: 'DD/MM/YYYY'
             },
             ranges: {
                 'Today': [moment(), moment()],
-                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
                 'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                'This Month': [moment().startOf('month'), moment().endOf('month')],
-                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                'Last 1 Month': [moment().subtract(1, 'months').startOf('day'), moment()],
+                'Last 3 Months': [moment().subtract(3, 'months').startOf('day'), moment()],
+                'Last 1 Year': [moment().subtract(12, 'months').startOf('day'), moment()]
             }
         });
 
-        // Apply date range when user selects
         $('#reportrange').on('apply.daterangepicker', function (ev, picker) {
             tableStartDate = picker.startDate;
             tableEndDate = picker.endDate;
-            $(this).val(tableStartDate.format('YYYY-MM-DD') + ' - ' + tableEndDate.format('YYYY-MM-DD'));
-
-            // Filter the table based on date range
+            $(this).val(tableStartDate.format('DD/MM/YYYY') + ' - ' + tableEndDate.format('DD/MM/YYYY'));
             filterTableByDate();
         });
 
-        // Clear date range on cancel
-        $('#reportrange').on('cancel.daterangepicker', function (ev, picker) {
+        $('#reportrange').on('cancel.daterangepicker', function () {
             tableStartDate = null;
             tableEndDate = null;
             $(this).val('');
-            dataTable.draw(); // Reset filtering
+            filterTableByDate();
+
+            // Remove the custom filter and redraw
+            $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(f => !f.name || f.name !== 'dateRangeFilter');
+            if (stockMasterDataTable) {
+                stockMasterDataTable.draw();
+            }
         });
     }
 
-
-
-
     function filterTableByDate() {
         if (tableStartDate && tableEndDate) {
-            // Custom filtering function for date range
-            $.fn.dataTable.ext.search.push(
-                function (settings, data, dataIndex) {
-                    var date = moment(data[3], 'YYYY-MM-DD'); // Assuming date is in 4th column (index 3)
+            // Remove any previous filters
+            $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(f =>
+                !f.name || f.name !== 'dateRangeFilter'
+            );
 
-                    if ((tableStartDate === null && tableEndDate === null) ||
-                        (tableStartDate === null && date <= tableEndDate) ||
-                        (tableStartDate <= date && tableEndDate === null) ||
-                        (tableStartDate <= date && date <= tableEndDate)) {
-                        return true;
-                    }
-                    return false;
+            const dateRangeFilter = function (settings, data, dataIndex) {
+                // Only apply to the main table (reqTable), not to modal tables
+                if (settings.nTable.id !== 'reqTable') {
+                    return true; // Don't filter other tables
                 }
+
+                // For Stock Master table, we only have Created Date (column 3)
+                const createdDate = moment(data[3], 'DD/MM/YYYY'); // Column 3 = Created Date
+
+                if (!createdDate.isValid()) return false;
+
+                return createdDate.isSameOrAfter(tableStartDate, 'day') &&
+                    createdDate.isSameOrBefore(tableEndDate, 'day');
+            };
+
+            dateRangeFilter.name = 'dateRangeFilter';
+            $.fn.dataTable.ext.search.push(dateRangeFilter);
+        } else {
+            // Remove filter when date range is cleared
+            $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(f =>
+                !f.name || f.name !== 'dateRangeFilter'
             );
         }
 
-        dataTable.draw();
-
-        // Remove the custom filter function after drawing
-        $.fn.dataTable.ext.search.pop();
+        // Only draw if it's the stock master table
+        if (stockMasterDataTable) {
+            stockMasterDataTable.draw();
+        }
     }
 
      

@@ -1,49 +1,163 @@
 ﻿
 @model P2PLibray.Inventory.InventoryMHB
 
-
-<div class="card p-3 bg-light">
-    <h4>Raise Order</h4>
-    <form id="raiseOrderForm" method="post" action="/Inventory/SubmitPRMHB">
+<div class="card p-3">
+    <form id="raiseOrderForm" method="post" action="/Inventory/SubmitPRMHB" novalidate>
         <div class="row mb-2">
             <div class="col">
-                <label>Item Name</label>
-                <input type="text" class="form-control" value="@Model.ItemName" readonly />
+                <label  class="form-label form-label-sm fw-bold text-dark">Item Name</label>
+                <input type="text" class="form-control form-control-sm  text-dark shadow-sm bg-light " value="@Model.ItemName" readonly />
             </div>
             <div class="col">
-                <label>Item Code</label>
-                <input type="text" name="ItemCode" class="form-control" value="@Model.ItemCode" readonly />
+                <label  class="form-label form-label-sm fw-bold text-dark">Item Code</label>
+                <input type="text" name="ItemCode" class="form-control form-control-sm  text-dark shadow-sm bg-light" value="@Model.ItemCode" readonly />
             </div>
         </div>
 
         <div class="row mb-2">
             <div class="col">
-                <label>Quantity</label>
-                <input type="number" name="Quantity" class="form-control" required />
+                <label  class="form-label form-label-sm fw-bold text-dark">Quantity <span class="required-star">*</span></label>
+                <input type="number" id="Quantity" name="Quantity" class="form-control form-control-sm  text-dark shadow-sm "
+                       placeholder="Order Quantity upto @Model.ReorderQuantity"
+                       min="1"
+                       max="@Model.ReorderQuantity"
+                       required />
+                <small class="text-danger d-none" id="qtyError"></small>
             </div>
             <div class="col">
-                <label>UOM</label>
-                <input type="text" class="form-control" value="@Model.UOMName" readonly />
+                <label  class="form-label form-label-sm fw-bold text-dark">UOM</label>
+                <input type="text" class="form-control form-control-sm  text-dark shadow-sm bg-light" value="@Model.UOMName" readonly />
             </div>
         </div>
 
         <div class="row mb-2">
             <div class="col">
-                <label>Description</label>
-                <textarea name="Description" class="form-control" readonly>@Model.Description</textarea>
+                <label  class="form-label form-label-sm fw-bold text-dark" >Description</label>
+                <textarea name="Description" class="form-control form-control-sm  text-dark shadow-sm bg-light" readonly>@Model.Description</textarea>
             </div>
             <div class="col">
-                <label for="RequiredDate">Required Date</label>
+                <label for="RequiredDate"  class="form-label form-label-sm fw-bold text-dark" >Required Date <span class="required-star">*</span></label>
                 <input type="date" id="RequiredDate" name="RequiredDate"
-                       class="form-control" required
-                       min="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                       class="form-control form-control-sm  text-dark shadow-sm "
+                       min="@DateTime.Now.ToString("yyyy-MM-dd")"
+                       required />
+                <small class="text-danger d-none" id="dateError"></small>
             </div>
-
         </div>
 
         <div class="text-end">
-            <button type="submit" class="btn btn-success">Submit for PR</button>
+            <button type="submit" class="btn btn-success btn-sm">Submit for PR</button>
         </div>
     </form>
 </div>
+
+<style>
+    .required-star {
+        color: red;
+        font-size: 1em;
+        font-weight: bold;
+        vertical-align: middle;
+        position: relative;
+        top: -4px;
+    }
+
+    /* red border + subtle glow */
+    .error-border {
+        border: 2px solid #dc3545 !important;
+        box-shadow: 0 0 6px rgba(220, 53, 69, 0.25);
+    }
+</style>
+
+
+    <script>
+    // -- Use jQuery to make sure DOM is ready and selectors exist --
+    $(function () {
+        console.log("raiseOrderForm script loaded"); // debug: should appear in browser console
+
+        var $form = $('#raiseOrderForm');
+        var $qty = $('#Quantity');
+        var $date = $('#RequiredDate');
+        var $qtyErr = $('#qtyError');
+        var $dateErr = $('#dateError');
+        var maxQty = parseFloat("@Model.ReorderQuantity") || Infinity;
+
+        // Defensive checks: ensure elements are found
+        if ($form.length === 0) { console.error("raiseOrderForm not found"); return; }
+        if ($qty.length === 0) { console.error("Quantity input not found"); }
+        if ($date.length === 0) { console.error("RequiredDate input not found"); }
+
+        // Remove error visuals when user changes input
+        $qty.on('input', function () {
+            clearError($qty, $qtyErr);
+        });
+        $date.on('change input', function () {
+            clearError($date, $dateErr);
+        });
+
+        // Submit handler
+        $form.on('submit', function (ev) {
+            console.log("submit clicked"); // debug
+            var valid = true;
+
+            // Validate quantity
+            var qtyVal = $qty.val();
+            // convert to number
+            var qtyNum = parseFloat(qtyVal);
+            if (isNaN(qtyNum) || qtyNum < 1 || qtyNum > maxQty) {
+                showError($qty, $qtyErr, ' Quantity must be between 1 and ' + maxQty + '.');
+                valid = false;
+            } else {
+                clearError($qty, $qtyErr);
+            }
+
+            // Validate date (non-empty and not before today)
+            var dateVal = $date.val();
+            if (!dateVal) {
+                showError($date, $dateErr, ' Please select a required date.');
+                valid = false;
+            } else {
+                // optional: ensure date is today or later
+                var selectedDate = new Date(dateVal);
+                var today = new Date();
+                // zero time part for comparison
+                today.setHours(0,0,0,0);
+                selectedDate.setHours(0,0,0,0);
+                if (selectedDate < today) {
+                    showError($date, $dateErr, '⚠️ Required date cannot be in the past.');
+                    valid = false;
+                } else {
+                    clearError($date, $dateErr);
+                }
+            }
+
+            if (!valid) {
+                ev.preventDefault();
+                ev.stopImmediatePropagation();
+                // focus first invalid field for UX
+                if ($qty.hasClass('error-border')) $qty.focus();
+                else if ($date.hasClass('error-border')) $date.focus();
+                return false;
+            }
+
+            // If everything valid let the form submit normally (or do your AJAX here)
+            // If you use AJAX, prevent default and call AJAX; else allow submit
+            // ev.preventDefault(); // uncomment if using AJAX submit
+        });
+
+        // helper functions
+        function showError($input, $errElem, message) {
+            if ($input && $input.length) $input.addClass('error-border');
+            if ($errElem && $errElem.length) {
+                $errElem.text(message).removeClass('d-none');
+            }
+        }
+
+        function clearError($input, $errElem) {
+            if ($input && $input.length) $input.removeClass('error-border');
+            if ($errElem && $errElem.length) {
+                $errElem.text('').addClass('d-none');
+            }
+        }
+    });
+    </script>
 

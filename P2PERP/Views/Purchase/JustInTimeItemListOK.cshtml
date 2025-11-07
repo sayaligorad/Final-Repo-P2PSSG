@@ -1,0 +1,1139 @@
+﻿@{
+    ViewBag.Title = "Just In Time Item List";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JIT Items</title>
+    <style>
+        /* Keep readonly fields visibles */
+        input[readonly],
+        textarea[readonly] {
+            background-color: #fff !important;
+            opacity: 1 !important;
+            cursor: default;
+        }
+
+        /* Equal button width inside table */
+        .table td .btn {
+            min-width: 80px;
+        }
+
+         Date range picker box
+        .daterangepicker-container {
+            cursor: pointer;
+            display: inline-block;
+            min-width: 180px !important;
+        }
+
+        /* Export + Create PO layout */
+        .export-po-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: nowrap;
+            gap: 10px;
+        }
+/*        #searchContainer {
+            min-width: 200px;
+        }
+
+*/
+        div.dataTables_filter {
+            display: flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+        }
+
+            div.dataTables_filter label {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin: 0;
+            }
+
+            div.dataTables_filter input {
+                margin-left: 8px;
+                border-radius: 6px;
+                padding: 5px 8px;
+                height: 32px;
+            }
+
+        /* Responsive stacking */
+        @@media (max-width: 768px) {
+            #exportContainer {
+                justify-content: center;
+            }
+        }
+        /* Table layout */
+        .table-container {
+            overflow-x: auto;
+            width: 100%;
+        }
+
+        table.dataTable {
+            width: 100% !important;
+            table-layout: auto;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+            table.dataTable thead th {
+                white-space: nowrap;
+                text-align: center;
+                vertical-align: middle;
+                font-weight: 600;
+                padding: 12px 10px;
+            }
+
+        #tblSelectedQuotationlst thead th:first-child,
+        #tblPOHistory thead th:first-child {
+            text-align: left;
+            vertical-align: middle;
+        }
+
+            #tblSelectedQuotationlst thead th:first-child input,
+            #tblPOHistory thead th:first-child input {
+                margin-right: 6px;
+            }
+
+        /* Hide DataTables length dropdown */
+        div.dt-length {
+            display: none;
+        }
+
+        .dt-paging nav {
+            float: right !important;
+        }
+        /* Create PO button styling */
+        .btn-create-po {
+            margin-top:15px;
+            z-index:2;
+        }
+
+        /* Export buttons inline */
+        #exportContainer .dt-buttons {
+            display: flex;
+            gap: 8px;
+/*            margin: 0;*/
+            margin-bottom:-40px;
+            z-index:2;
+        }
+        .dt-search{
+            margin-bottom:20px;
+            display:inline;
+            display:flex;
+            justify-content:flex-end;
+        }
+            .dt-search label{
+                margin-top:10px;
+            }
+            /* Right side container (column layout) */
+            .search-po-container {
+                display: flex;
+                flex-direction: column; /* stack vertically */
+                align-items: flex-end; /* align to right */
+                gap: 10px;
+            }
+
+
+        /* Align left block nicely */
+        .expbtndate {
+            margin-left: -10px;
+        }
+            /* Common container style for both */
+            .expbtndate .input-group
+            {
+                width: 230px !important; /* or match your preferred width */
+                min-width: 230px;
+            }
+
+        /* Optional: make exportContainer buttons fill width neatly */
+        #exportContainer {
+            display: flex;
+            justify-content: space-between; /* or center, as needed */
+            align-items: center;
+        }
+
+        /* Icon alignment inside input group */
+        .input-group-text {
+            height: 50px;
+            display: flex;
+            align-items: center;
+        }
+        .date-range-wrapper {
+            width: 260px !important; /* 👈 adjust width as needed */
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Toast container somewhere fixed, e.g. top right -->
+    <div id="toastContainer"
+         class="toast-container position-fixed top-0 end-0 p-3"
+         style="z-index: 2000;">
+    </div>
+    <div class="container-fluid px-4">
+        <div class="card shadow-lg mb-4 ps-3 pe-3 mt-3">
+            <h3 class="text-primary d-flex justify-content-center text-center mt-2">
+                Just In Time Items List
+            </h3>
+
+            <!--<div class="d-flex justify-content-between align-items-start mb-4 flex-wrap ps-3 pe-3 mt-0">-->
+            <!-- Left side: Date Picker + Export Buttons -->
+            <!--<div class="d-flex flex-column gap-3 expbtndate">-->
+            <!-- Date Range Picker -->
+            <!--<div class="input-group rounded shadow-sm">
+        <span class="input-group-text bg-primary text-white border-0">
+            <i class="bi bi-calendar-date"></i>
+        </span>
+        <input type="text" id="Selectedquotationdate"
+               class="form-control border-0 shadow-none"
+               placeholder="Select date range" readonly />
+    </div>-->
+            <!-- Export Buttons -->
+            <!--<div id="exportContainer" class="d-flex align-items-center gap-2"></div>
+    </div>-->
+            <!-- Right side: Create PO on top + Search below -->
+            <!--<div class="d-flex flex-column align-items-end gap-2 search-po-container">
+            <div id="searchContainer"></div>
+            <button class="btn btn-sm btn-success btn-create-po text-white">
+                <i class="bi bi-plus-circle me-2"></i>Create PO
+            </button>
+
+        </div>
+    </div>-->
+
+            <div class="container-fluid p-0 mt-2">
+                <!-- 🔹 Line 1: Date Range + Search -->
+                <div class="row align-items-center justify-content-between mb-2">
+                    <!-- Date Range Picker -->
+                    <!--<div class="col-4">
+        <div class="input-group">
+            <span class="input-group-text bg-primary text-white">
+                <i class="bi bi-calendar-event"></i>
+            </span>
+            <input type="text" id="Selectedquotationdate"
+                   class="form-control"
+                   placeholder="Select Date Range" readonly />
+        </div>
+    </div>-->
+                    <div class="col-auto">
+                        <div class="date-range-wrapper">
+                            <div class="input-group">
+                                <span class="input-group-text bg-primary text-white">
+                                    <i class="bi bi-calendar-event"></i>
+                                </span>
+                                <input type="text" id="Selectedquotationdate"
+                                       class="form-control"
+                                       placeholder="Select Date Range" readonly />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 col-sm-6 text-md-end text-center mt-2 mt-sm-0">
+                        <button class="btn btn-success btn-sm text-white btn-create-po">
+                            <i class="bi bi-plus-circle me-2"></i>Create PO
+                        </button>
+                    </div>
+                    <!-- Search Box -->
+                    @*<div class="col-md-3 col-sm-6 mt-2 p-0 mt-sm-0">
+            <div id="searchContainer" class="pe-0"></div>
+        </div>*@
+                </div>
+
+                <!-- 🔹 Line 2: Export + Create PO -->
+                <div class="row align-items-center justify-content-between">
+                    <!-- Export Buttons -->
+                    <div class="col-md-6 col-sm-6 d-flex align-items-center gap-2 flex-wrap" id="exportContainer"></div>
+
+                    <!-- Create PO Button -->
+                    
+                </div>
+            </div>
+
+
+
+            <!-- JIT Items Table -->
+            <div class="table-container mt-0">
+                <table class="table table-striped table-bordered text-center align-middle rounded-0" id="tblJITItems">
+                    <thead class="table-dark text-center align-middle">
+                        <tr>
+                            <th>
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <input type="checkbox" id="selectJITItems" class="me-1">
+                                    @*<label for="selectAllQuotation" class="m-0">Select All</label>*@
+                                </div>
+                            </th>
+                            <th>SRNO</th>
+                            <th>ItemName</th>
+                            <th>ItemCode</th>
+                            <th>Quantity</th>
+                            <th>FullName</th>
+                            <th>AddedDate</th>
+                            <th>RequiredDate</th>
+                            <th class="d-none">StockReqirementId</th>
+                            @*<th>Action</th>*@
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+    $(document).ready(function () {
+        var tblJITItems;
+
+        // Clear processing state for all DataTable buttons
+        window.__dt_clearAllProcessing = function () {
+            try {
+                // Try to clear via DataTables API
+                var tables = $.fn.dataTable.tables();
+                for (var i = 0; i < tables.length; i++) {
+                    try {
+                        var api = $(tables[i]).DataTable();
+                        if (!api || !api.buttons) continue;
+                        var btnCount = (api.buttons().nodes && api.buttons().nodes().length) || 0;
+                        for (var j = 0; j < btnCount; j++) {
+                            try { api.button(j).processing(false); } catch (e) { }
+                        }
+                    } catch (e) { }
+                }
+            } catch (e) { }
+
+            // Fallback DOM cleanup
+            try {
+                $('.dt-button').removeClass('dt-button-processing');
+                $('.dt-button').prop('disabled', false);
+            } catch (e) { }
+        };
+
+        // Listen for print-done message from print window
+        window.addEventListener('message', function (ev) {
+            if (ev && ev.data === 'dt_print_done') {
+                window.__dt_clearAllProcessing();
+            }
+        });
+
+        // Store original button actions if not already stored
+        if (!$.fn.dataTable.ext.buttons.pdfHtml5.__originalAction) {
+            $.fn.dataTable.ext.buttons.pdfHtml5.__originalAction =
+                $.fn.dataTable.ext.buttons.pdfHtml5.action;
+        }
+        if (!$.fn.dataTable.ext.buttons.print.__originalAction) {
+            $.fn.dataTable.ext.buttons.print.__originalAction =
+                $.fn.dataTable.ext.buttons.print.action;
+        }
+        if (!$.fn.dataTable.ext.buttons.excelHtml5.__originalAction) {
+            $.fn.dataTable.ext.buttons.excelHtml5.__originalAction =
+                $.fn.dataTable.ext.buttons.excelHtml5.action;
+        }
+        if (!$.fn.dataTable.ext.buttons.csvHtml5.__originalAction) {
+            $.fn.dataTable.ext.buttons.csvHtml5.__originalAction =
+                $.fn.dataTable.ext.buttons.csvHtml5.action;
+        }
+
+        // Reusable PDF/Print customization function
+        function customizeDoc(doc) {
+            // Title Styling
+            doc.styles.title = {
+                color: '#000000',
+                fontSize: 16,
+                bold: true,
+                alignment: 'center'
+            };
+
+            // ✅ Generate date in dd/mm/yyyy format
+            var now = new Date();
+            var day = String(now.getDate()).padStart(2, '0');
+            var month = String(now.getMonth() + 1).padStart(2, '0');
+            var year = now.getFullYear();
+            var formattedDate = day + '/' + month + '/' + year;
+
+            // ✅ Insert generated date
+            doc.content.splice(1, 0, {
+                text: 'Generated Date: ' + formattedDate,
+                fontSize: 10,
+                italics: true,
+                alignment: 'center',
+                margin: [0, 0, 0, 12]
+            });
+
+            // Table Header Styling
+            doc.styles.tableHeader = {
+                fillColor: '#000000',
+                color: 'white',
+                bold: true,
+                fontSize: 11,
+                alignment: 'center'
+            };
+
+            // Table Border + Padding
+            var objLayout = {};
+            objLayout['hLineWidth'] = function () { return .5; };
+            objLayout['vLineWidth'] = function () { return .5; };
+            objLayout['hLineColor'] = function () { return '#aaa'; };
+            objLayout['vLineColor'] = function () { return '#aaa'; };
+            objLayout['paddingLeft'] = function () { return 6; };
+            objLayout['paddingRight'] = function () { return 6; };
+
+            // Get the table
+            var tableNode = doc.content[doc.content.length - 1];
+            tableNode.layout = objLayout;
+
+            // Set fixed widths for all columns
+            var colCount = tableNode.table.body[0].length;
+            tableNode.table.widths = Array(colCount).fill('*');
+
+            // Wrap in margin to simulate center alignment
+            tableNode.alignment = 'center';
+            tableNode.margin = [0, 0, 0, 0];
+        }
+
+        // Toast notification configuration
+        toastr.options = {
+            closeButton: true,
+            progressBar: true,
+            newestOnTop: true,
+            positionClass: "toast-top-right",
+            preventDuplicates: true,
+            timeOut: 3000,
+            extendedTimeOut: 1000,
+            showDuration: 300,
+            hideDuration: 300,
+            showMethod: "slideDown",
+            hideMethod: "fadeOut"
+        };
+
+        // Helper function for warning toast
+        function showExportToast() {
+            toastr.warning("Please select at least one row before exporting.");
+        }
+
+        // Initialize Quotation DataTable
+        tblJITItems = $('#tblJITItems').DataTable({
+            ajax: {
+                url: '@Url.Action("FetchJustInTimeItemListOK", "Purchase")',
+                type: "GET",
+                dataSrc: function (json) {
+                    console.log("JITItems JSON:", json);
+                    return json.data;
+                },
+                error: function (xhr, error, thrown) {
+                    console.error("JITItems AJAX Error:", error, thrown, xhr.responseText);
+                    alert("Failed to load JITItems. Check console for details.");
+                }
+            },
+            columns: [
+                {
+                    data: null,
+                    orderable: false,
+                    className: 'select-checkbox',
+                    render: function (data, type, row) {
+                        return `<input type="checkbox" class="row-select" value="${row.QuotationID}" />`;
+                    }
+                },
+                { data: "SRNO", title: "Sr.No" },
+                { data: "ItemName", title: "Item Name" },
+                { data: "ItemCode", title: "Item Code" },
+                { data: "Quantity", title: "Quantity" },
+                { data: "AddedBy", title: "Created By" },
+                {
+                    data: "AddedDate", title: "Created Date",
+                    "render": function (data) {
+                        if (!data) return "";
+
+                        // .NET JSON format: /Date(1736985600000)/
+                        var match = /Date\((\d+)\)/.exec(data);
+                        if (match) {
+                            var dt = new Date(parseInt(match[1], 10));
+                            return dt.toLocaleDateString("en-GB"); // dd/mm/yyyy
+                        }
+
+                        // Agar normal ISO string hai to
+                        var dt2 = new Date(data);
+                        if (!isNaN(dt2.getTime())) {
+                            return dt2.toLocaleDateString("en-GB");
+                        }
+
+                        return data; // fallback
+                    }
+                },
+                {
+                    data: "RequiredDate", title: "Required Date",
+                    "render": function (data) {
+                        if (!data) return "";
+
+                        // .NET JSON format: /Date(1736985600000)/
+                        var match = /Date\((\d+)\)/.exec(data);
+                        if (match) {
+                            var dt = new Date(parseInt(match[1], 10));
+                            return dt.toLocaleDateString("en-GB"); // dd/mm/yyyy
+                        }
+
+                        // Agar normal ISO string hai to
+                        var dt2 = new Date(data);
+                        if (!isNaN(dt2.getTime())) {
+                            return dt2.toLocaleDateString("en-GB");
+                        }
+
+                        return data; // fallback
+                    }
+                },
+                { data: "StockReqirementId", "visible": false},
+               
+            ],
+            drawCallback: function () {
+                // Initialize tooltips for all dynamically created elements after every table draw
+                const tooltipTriggerList = [].slice.call(
+                    document.querySelectorAll('[data-bs-toggle="tooltip"]')
+                );
+                tooltipTriggerList.map(function (tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl, {
+                        customClass: 'tooltip-dark'
+                    });
+                });
+            },
+            paging: true,
+            searching: true,
+            lengthChange: false,
+            pageLength: 10,
+            ordering: false,
+            select: {
+                style: 'multi',
+                selector: 'td:first-child input[type="checkbox"]'
+            },
+            dom: 'Bfrtip',
+            buttons: [
+                // Print button
+                {
+                    extend: 'print',
+                    text: '<i class="bi bi-printer-fill text-dark fs-5"></i>',
+                    titleAttr: 'Print',
+                    title: 'Just In Time Item List',
+                    exportOptions: {
+                        columns: [1, 2, 3, 4, 5, 6,7],
+                        rows: function (idx, data, node) {
+                            return $(tblJITItems.row(idx).node()).find('input.row-select').prop('checked');
+                        },
+                        format: {
+                            body: function (data, rowIdx, colIdx, node) {
+                                if (colIdx === 1) return getExportSrNo(rowIdx, tblJITItems);
+                                return data;
+                            }
+                        }
+                    },
+                    customize: function (win) {
+                        var $body = $(win.document.body);
+
+                        // Inject custom CSS for print
+                        $body.append(`
+                            <style>
+                                thead th {
+                                    background-color: black !important;
+                                    color: white !important;
+                                    text-align: center !important;
+                                    -webkit-print-color-adjust: exact !important;
+                                    print-color-adjust: exact !important;
+                                }
+                                table {
+                                    border-collapse: collapse !important;
+                                    width: 100% !important;
+                                }
+                                td, th {
+                                    border: 1px solid #000 !important;
+                                    padding: 6px !important;
+                                }
+                            </style>
+                        `);
+
+                        // Center title
+                        $body.find('h1').css('text-align', 'center');
+
+                        // Insert generated date in dd/mm/yyyy format
+                        $body.find('h1').after(
+                            '<div style="text-align:center;font-style:italic;font-size:10pt;margin-bottom:12px;">Generated Date: ' +
+                            (function () {
+                                const d = new Date();
+                                const day = String(d.getDate()).padStart(2, '0');
+                                const month = String(d.getMonth() + 1).padStart(2, '0');
+                                const year = d.getFullYear();
+                                return `${day}/${month}/${year}`;
+                            })() +
+                            '</div>'
+                        );
+
+
+                        // Add bootstrap table styles
+                        $body.find('table')
+                            .addClass('table table-bordered table-striped')
+                            .css('width', '100%');
+
+                        // Font size
+                        $body.css('font-size', '12pt');
+                    },
+                    action: function (e, dt, button, config) {
+                        var selected = dt.rows().nodes().to$().find('input.row-select:checked').length;
+                        var btnApi = dt.button(button);
+
+                        if (selected === 0) {
+                            showExportToast();
+                            try { btnApi.processing(false); } catch (err) { }
+                            return;
+                        }
+
+                        // Show spinner
+                        try { btnApi.processing(true); } catch (err) { }
+
+                        // Call original print action
+                        try {
+                            $.fn.dataTable.ext.buttons.print.__originalAction.call(this, e, dt, button, config);
+                        } catch (err) {
+                            // Ensure spinner not left running
+                            setTimeout(function () { try { btnApi.processing(false); } catch (e) { } }, 300);
+                            throw err;
+                        }
+
+                        // Final fallback: if print window never reports, clear after 2s
+                        setTimeout(function () { try { btnApi.processing(false); } catch (err) { } }, 2000);
+                    }
+                },
+                // PDF Export button
+                {
+                    extend: 'pdfHtml5',
+                    text: '<i class="bi bi-file-earmark-pdf-fill text-danger fs-5"></i>',
+                    titleAttr: 'PDF',
+                    title: 'Just In Time Item List',
+                    orientation: 'landscape',
+                    pageSize: 'A4',
+                    exportOptions: {
+                        columns: [1, 2, 3, 4, 5, 6, 7],
+                        rows: function (idx, data, node) {
+                            return $(tblJITItems.row(idx).node()).find('input.row-select').prop('checked');
+                        },
+                        format: {
+                            body: function (data, rowIdx, colIdx, node) {
+                                if (colIdx === 1) return getExportSrNo(rowIdx, tblJITItems);
+                                return data;
+                            }
+                        }
+                    },
+                    action: function (e, dt, button, config) {
+                        var selected = dt.rows().nodes().to$().find('input.row-select:checked').length;
+                        var btnApi = dt.button(button);
+
+                        if (selected === 0) {
+                            showExportToast();
+                            btnApi.processing(false);
+                            return;
+                        }
+
+                        btnApi.processing(true);
+
+                        // If pdfMake exists, wrap its download so we can stop spinner when done
+                        if (window.pdfMake && pdfMake.createPdf && !pdfMake._patchedForDT) {
+                            (function () {
+                                var origCreate = pdfMake.createPdf;
+                                pdfMake.createPdf = function (docDefinition) {
+                                    var pdfDoc = origCreate.call(pdfMake, docDefinition);
+                                    var origDownload = pdfDoc.download;
+                                    pdfDoc.download = function (filename, cb) {
+                                        origDownload.call(pdfDoc, filename, function () {
+                                            try { btnApi.processing(false); } catch (err) { }
+                                            if (typeof cb === 'function') cb();
+                                        });
+                                    };
+                                    return pdfDoc;
+                                };
+                                pdfMake._patchedForDT = true; // only patch once
+                            })();
+                        }
+
+                        // Call original action
+                        $.fn.dataTable.ext.buttons.pdfHtml5.__originalAction.call(this, e, dt, button, config);
+
+                        // Final fallback: clear after timeout just in case
+                        setTimeout(function () { try { btnApi.processing(false); } catch (err) { } }, 1500);
+                    },
+                    customize: customizeDoc
+                },
+                // Excel Export button
+                {
+                    extend: 'excelHtml5',
+                    text: '<i class="bi bi-file-earmark-excel-fill text-success fs-5"></i>',
+                    titleAttr: 'Excel',
+                    title: ' ', //Just In Time Item List
+                    exportOptions: {
+                        columns: [1, 2, 3, 4, 5, 6, 7],
+                        rows: function (idx, data, node) {
+                            return $(tblJITItems.row(idx).node()).find('input.row-select').prop('checked');
+                        },
+                        format: {
+                            body: function (data, rowIdx, colIdx, node) {
+                                if (colIdx === 1) return getExportSrNo(rowIdx, tblJITItems);
+                                return data;
+                            }
+                        }
+                    },
+                    action: function (e, dt, button, config) {
+                        var selected = dt.rows().nodes().to$().find('input.row-select:checked').length;
+                        var btnApi = dt.button(button);
+
+                        if (selected === 0) {
+                            showExportToast();
+                            try { btnApi.processing(false); } catch (err) { }
+                            return;
+                        }
+
+                        try { btnApi.processing(true); } catch (err) { }
+
+                        // Call original excelHtml5 action
+                        $.fn.dataTable.ext.buttons.excelHtml5.__originalAction.call(this, e, dt, button, config);
+
+                        // Fallback clear spinner after 1.5s
+                        setTimeout(function () { try { btnApi.processing(false); } catch (err) { } }, 300);
+                    },
+                    customize: function (xlsx) {
+                        // ✅ Rename worksheet
+                        var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                        $('sheet', xlsx.xl['workbook.xml']).attr('name', 'JIT Item List');
+
+                        // ✅ Date in dd/mm/yyyy format
+                        var now = new Date();
+                        var day = String(now.getDate()).padStart(2, '0');
+                        var month = String(now.getMonth() + 1).padStart(2, '0');
+                        var year = now.getFullYear();
+                        var formattedDate = day + '/' + month + '/' + year;
+
+                        var sheetData = $('sheetData', sheet);
+
+                        // Shift all data rows down by 2 (for title + date)
+                        sheetData.find('row').each(function () {
+                            var r = parseInt($(this).attr('r'));
+                            $(this).attr('r', r + 2);
+                            $(this).find('c').each(function () {
+                                var cellRef = $(this).attr('r');
+                                var col = cellRef.replace(/[0-9]/g, '');
+                                $(this).attr('r', col + (r + 2));
+                            });
+                        });
+
+                        // ✅ Insert Title row (now in A1, will be merged A1:G1 for centering across 7 columns)
+                        var titleRow =
+                            '<row r="1">' +
+                            '<c t="inlineStr" r="A1">' +
+                            '<is><t>Just In Time Item List</t></is>' +
+                            '</c>' +
+                            '</row>';
+
+                        // ✅ Insert Generated Date row (now in A2, will be merged A2:G2 for centering)
+                        var dateRow =
+                            '<row r="2">' +
+                            '<c t="inlineStr" r="A2">' +
+                            '<is><t>Generated Date: ' + formattedDate + '</t></is>' +
+                            '</c>' +
+                            '</row>';
+
+                        // Add rows to the top
+                        sheetData.prepend(dateRow);
+                        sheetData.prepend(titleRow);
+
+                        // ✅ Add merge cells for centering title and date across columns A:G (7 columns from export)
+                        var mergeCells = $('mergeCells', sheet);
+                        if (mergeCells.length === 0) {
+                            // If no mergeCells exist, create the element
+                            $('worksheet', sheet).append('<mergeCells count="2"/>');
+                            mergeCells = $('mergeCells', sheet);
+                        } else {
+                            // Update existing count
+                            var currentCount = parseInt(mergeCells.attr('count') || 0);
+                            mergeCells.attr('count', currentCount + 2);
+                        }
+                        // Add title merge (A1:G1)
+                        mergeCells.append('<mergeCell ref="A1:G1"/>');
+                        // Add date merge (A2:G2)
+                        mergeCells.append('<mergeCell ref="A2:G2"/>');
+
+                        // ✅ Add styles for centering + font (fonts, fills, etc.)
+                        var styles = xlsx.xl['styles.xml'];
+                        var cellXfs = $('cellXfs', styles);
+                        var fonts = $('fonts', styles);
+
+                        // Count existing fonts (default is usually 1: fontId=0)
+                        var fontCount = $('font', fonts).length;
+
+                        // Add new font for title (bold, size 14)
+                        fonts.append(
+                            '<font>' +
+                            '<sz val="14"/>' +  // Font size 14
+                            '<b/>' +             // Bold
+                            '<color rgb="000000"/>' +  // Black (default)
+                            '</font>'
+                        );
+
+                        // Add new font for date (italic, size 11)
+                        fonts.append(
+                            '<font>' +
+                            '<sz val="11"/>' +   // Font size 11 (default size)
+                            '<i/>' +             // Italic
+                            '<color rgb="000000"/>' +  // Black (default)
+                            '</font>'
+                        );
+
+                        // Count existing cellXfs
+                        var styleCount = $('xf', cellXfs).length;
+
+                        // Add new style for title (use new bold/large font, center alignment)
+                        cellXfs.append(
+                            '<xf numFmtId="0" fontId="' + fontCount + '" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1">' +
+                            '<alignment horizontal="center" vertical="center" wrapText="1"/>' +  // Center, wrap for long text
+                            '</xf>'
+                        );
+
+                        // Add new style for date (use new italic font, center alignment)
+                        cellXfs.append(
+                            '<xf numFmtId="0" fontId="' + (fontCount + 1) + '" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1">' +
+                            '<alignment horizontal="center" vertical="center" wrapText="1"/>' +  // Center, wrap for long text
+                            '</xf>'
+                        );
+
+                        // Apply new style indexes to the cells
+                        $('c[r=A1]', sheet).attr('s', styleCount);       // Title style
+                        $('c[r=A2]', sheet).attr('s', styleCount + 1);   // Date style
+                    }
+                },
+                // CSV Export button
+                {
+                    extend: 'csvHtml5',
+                    text: '<i class="bi bi-filetype-csv text-success fs-5"></i>',
+                    titleAttr: 'CSV',
+                    title: 'Just In Time Item List',
+                    exportOptions: {
+                        columns: [1, 2, 3, 4, 5, 6, 7],
+                        rows: function (idx, data, node) {
+                            return $(tblJITItems.row(idx).node()).find('input.row-select').prop('checked');
+                        },
+                        format: {
+                            body: function (data, rowIdx, colIdx, node) {
+                                if (colIdx === 1) return getExportSrNo(rowIdx, tblJITItems);
+                                return data;
+                            }
+                        }
+                    },
+                    action: function (e, dt, button, config) {
+                        var selected = dt.rows().nodes().to$().find('input.row-select:checked').length;
+                        var btnApi = dt.button(button);
+
+                        if (selected === 0) {
+                            showExportToast();
+                            try { btnApi.processing(false); } catch (err) { }
+                            return;
+                        }
+
+                        try { btnApi.processing(false); } catch (err) { }
+
+                        $.fn.dataTable.ext.buttons.csvHtml5.__originalAction.call(this, e, dt, button, config);
+
+                        // Stop spinner almost immediately (no real callback exists)
+                        setTimeout(function () {
+                            try { btnApi.processing(false); } catch (err) { }
+                        }, 300);
+                    }
+                }
+            ]
+        }); // End DataTable Ajax Call
+
+        initTooltips();
+
+        // Move export buttons into export container (LEFT)
+        tblJITItems.buttons().container().appendTo('#exportContainer');
+
+        // Move default DataTables search input to the right container
+        $('.dt-search label').appendTo('#searchContainer');
+        $('.dt-search input[type="search"]').appendTo('#searchContainer');
+
+        // Toast notification function
+        function showToast(message, type = 'danger') {
+            const toastHTML = `
+                <div class="toast align-items-center text-white bg-${type} border-0 mb-2" role="alert">
+                  <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                  </div>
+                </div>`;
+            const $toast = $(toastHTML);
+            $('#toastContainer').append($toast);
+            new bootstrap.Toast($toast[0], { delay: 3000 }).show();
+            $toast.on('hidden.bs.toast', function () { $(this).remove(); });
+        }
+
+        // Select All for quotation table
+        $("#selectJITItems").on("change", function () {
+            console.log("Active Check");
+            let isChecked = $(this).is(":checked");
+            $("#tblJITItems tbody input[type='checkbox']").prop("checked", isChecked);
+        });
+
+        // Auto-uncheck when any single checkbox unchecked
+        $("#tblJITItems").on("change", "tbody input[type='checkbox']", function () {
+            if (!$(this).is(":checked")) {
+                $("#selectJITItems").prop("checked", false);
+            }
+        });
+
+        // Search functionality
+        $('#vendorSearch').on('keyup', function () {
+            tblJITItems.search(this.value).draw();
+        }); // This closing bracket was missing
+
+        let startDate = null;
+        let endDate = null;
+
+        // Custom filter function (persistent)
+        $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+            if (!startDate || !endDate) return true;
+
+            // Change index depending on which column to filter
+            var requiredDate = moment(data[7], 'DD/MM/YYYY'); // index 7 = RequiredDate
+
+            if (!requiredDate.isValid()) return true;
+
+            return requiredDate.isBetween(startDate, endDate, undefined, '[]');
+        });
+
+        $('#Selectedquotationdate').daterangepicker({
+            autoUpdateInput: false,
+            opens: 'center',
+            drops: 'down',
+            locale: {
+                cancelLabel: 'Clear',
+                format: 'DD/MM/YYYY'
+            },
+            ranges: {
+                'Today': [moment(), moment()],
+                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                'Last 1 Month': [moment().subtract(1, 'months').startOf('day'), moment()],
+                'Last 3 Months': [moment().subtract(3, 'months').startOf('day'), moment()],
+                'Last 1 Year': [moment().subtract(12, 'months').startOf('day'), moment()]
+            }
+        }, function (start, end) {
+            startDate = start;
+            endDate = end;
+            $('#Selectedquotationdate').val(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
+            tblJITItems.draw(); // redraw table with filter applied
+        });
+
+        $('#Selectedquotationdate').on('cancel.daterangepicker', function () {
+            startDate = null;
+            endDate = null;
+            $(this).val('');
+            tblJITItems.draw(); // clear filter
+        });
+
+
+
+
+        // View quotation details
+        $(document).on("click", ".btn-view", function () {
+            const rowData = $(this).data('row');
+            console.log("Function Active");
+
+            // If it's a JSON string, parse it
+            const row = typeof rowData === "string" ? JSON.parse(rowData) : rowData;
+
+            console.log("View button clicked, row:", row);
+
+            let subamount = 0;
+            console.log("Quotation row:", row);
+
+            // Populate modal fields
+            $("#quotationIdLarge").val(row.QuotationID);
+            $("#vendorNameLarge").val(row.VendorName);
+            $("#vendorCodeLarge").val(row.VendorCode);
+            $("#rfqCodeLarge").val(row.RFQCode);
+            $("#companyName").val(row.CompanyName);
+            $("#vendordeliverydate").val(row.VendorDeliveryDateString);
+            $("#priority").val(row.Priority);
+            $("#shippingLarge").text('₹' + row.ShippingCharges);
+            $("#TotalAmount").text('₹' + row.TotalAmount);
+            $("#subAmount").text('₹' + row.NetAmount);
+            console.log("SubAmount= ", row.NetAmount);
+
+            // Convert RequiredDateString to dd/mm/yyyy
+            if (row.RequiredDateString) {
+                $("#requireddate").val(moment(row.RequiredDateString, "YYYY-MM-DD").format("DD/MM/YYYY"));
+            }
+
+            // Convert QuotationDateString to dd/mm/yyyy
+            if (row.QuotationDateString) {
+                $("#quotationDateLarge").val(moment(row.QuotationDateString, "YYYY-MM-DD").format("DD/MM/YYYY"));
+            }
+            if (row.VendorDeliveryDateString) {
+                $("#vendordeliverydate").val(moment(row.VendorDeliveryDateString, ["YYYY-MM-DD", "YYYY-MM-DDTHH:mm:ss"]).format("DD/MM/YYYY"));
+            }
+
+            // Fetch quotation items
+            $.get('@Url.Action("FetchJustInTimeItemListOK", "Purchase")', { RQCode: row.QuotationID })
+                .done(function (response) {
+                    console.log("Full Response:", response);
+                    console.log("Items Array:", response.items);
+
+                    // Destroy previous DataTable instance if exists
+                    if ($.fn.DataTable.isDataTable("#tblQuotationItems")) {
+                        $('#tblQuotationItems').DataTable().clear().destroy();
+                    }
+
+                    // Initialize DataTable with new data
+                    $('#tblQuotationItems').DataTable({
+                        data: response.items,
+                        columns: [
+                            { data: "SRNO", defaultContent: "" },
+                            { data: "RegisterQuotationCode", visible: false, defaultContent: "" },
+                            { data: "ItemCode", defaultContent: "" },
+                            { data: "ItemName", defaultContent: "" },
+                            {
+                                data: "Description",
+                                defaultContent: "",
+                                render: function (data) {
+                                    const safeData = (data || "").replace(/"/g, '&quot;');
+                                    return `<span data-bs-toggle="tooltip" title="${safeData}">${data}</span>`;
+                                }
+                            },
+                            { data: "Quantity", defaultContent: "" },
+                            { data: "UOM", defaultContent: "" },
+                            {
+                                data: "CostPerUnit",
+                                defaultContent: "",
+                                render: function (data, type, row) {
+                                    if (type === 'display' || type === 'filter') {
+                                        return '₹' + parseFloat(data || 0).toFixed(2);
+                                    }
+                                    return data;
+                                }
+                            },
+                            { data: "Discount", defaultContent: "" },
+                            { data: "GST", defaultContent: "" },
+                            {
+                                data: "Amount",
+                                defaultContent: "",
+                                render: function (data, type, row) {
+                                    if (type === 'display' || type === 'filter') {
+                                        return '₹' + parseFloat(data || 0).toFixed(2);
+                                    }
+                                    return data;
+                                }
+                            }
+                        ],
+                        paging: true,
+                        searching: true,
+                        ordering: false,
+                        drawCallback: function () {
+                            $('#tblQuotationItems [data-bs-toggle="tooltip"]').each(function () {
+                                const t = bootstrap.Tooltip.getInstance(this);
+                                if (t) t.dispose();
+                                new bootstrap.Tooltip(this, {
+                                    customClass: 'tooltip-dark',
+                                    trigger: 'hover focus'
+                                });
+                            });
+                        }
+                    });
+
+                    // Show modal after table is ready
+                    let modal = new bootstrap.Modal(document.getElementById('largeModal'));
+                    modal.show();
+                })
+                .fail(function (xhr, status, error) {
+                    console.error("Error fetching items:", error);
+                });
+        });
+        // Handle Create PO button click
+        $(document).on("click", ".btn-create-po", function () {
+            let selectedItems = [];
+
+            // ✅ Use DataTable API properly
+            $("#tblJITItems tbody input.row-select:checked").each(function () {
+                let row = $(this).closest("tr");
+                let rowData = tblJITItems.row(row).data();
+
+                if (rowData) {
+                    selectedItems.push({
+                        ItemCode: rowData.ItemCode,
+                        StockReqirementId: rowData.StockReqirementId
+                    });
+                }
+            });
+
+            console.log("Selected items:", selectedItems);
+
+            // ✅ Toast configuration
+            toastr.options = {
+                closeButton: true,
+                progressBar: true,
+                newestOnTop: true,
+                positionClass: "toast-top-right",
+                preventDuplicates: true,
+                timeOut: 3000,
+                extendedTimeOut: 1000,
+                showDuration: 300,
+                hideDuration: 300,
+                showMethod: "slideDown",
+                hideMethod: "fadeOut"
+            };
+
+            if (selectedItems.length === 0) {
+                toastr.warning("Please select at least one item to create PO.");
+                return;
+            }
+
+            // ⚠️ More than one item selected
+            if (selectedItems.length > 1) {
+                toastr.error("Please select only one item to create PO.");
+                return;
+            }
+            // ✅ Store data
+            document.cookie = "POMode=JIT; path=/; max-age=" + 20 * 60;
+            localStorage.setItem("SelectedJITItems", JSON.stringify(selectedItems));
+
+            window.location.href = '/Purchase/CreatePOOK';
+        });
+
+    }); // End of $(document).ready()
+
+    // Tooltip click handler
+    $(document).on('click', '[data-bs-toggle="tooltip"]', function () {
+        let tooltip = bootstrap.Tooltip.getInstance(this);
+        if (tooltip) tooltip.hide();
+    });
+
+    // Initialize Bootstrap tooltips
+    function initTooltips() {
+        const tooltipTriggerList = [].slice.call(
+            document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        );
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl, {
+                customClass: 'tooltip-dark',
+                trigger: 'hover'
+            });
+        });
+    }
+
+
+
+
+    // Helper function to recalc SrNo for export across all pages
+    function getExportSrNo(rowIdx, tbl) {
+        // Get all rows nodes
+        let allRows = tbl.rows({ order: 'applied', search: 'applied' }).nodes().toArray();
+        // Filter only the checked rows
+        let checkedRows = allRows.filter(row => $(row).find('input.row-select').prop('checked'));
+        // Find the position of this row in the checkedRows array
+        let sr = checkedRows.findIndex(row => tbl.row(row).index() === rowIdx) + 1;
+        return sr; // consecutive Sr.No
+    }
+    </script>
+</body>
+</html>

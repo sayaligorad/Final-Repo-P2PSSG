@@ -1,143 +1,191 @@
-﻿@* Partial view for Pending Purchase Orders *@
-<!-- Header -->
-<html>
+﻿@{
+    ViewBag.Title = "Pending Purchase Orders";
+}
 
-<head>
-    <style>
+<style>
+    button.dt-button.processing,
+    div.dt-button.processing {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        background: none !important;
+    }
 
-        .badge-status {
-            font-size: 12px;
-            padding: 0.35em 0.5em;
-            font-weight: 500;
+        button.dt-button.processing:after {
+            content: none !important;
         }
 
-        .badge-pending {
-            background-color: #ffc107;
-            color: #212529;
-        }
 
-        .badge-approved {
-            background-color: #28a745;
-            color: white;
-        }
+    .badge-status {
+        font-size: 12px;
+        padding: 0.35em 0.5em;
+        font-weight: 500;
+    }
 
-        .btn-view {
-            background-color: mediumpurple;
-            border-color: mediumpurple;
-            color: white;
-            margin-left: 40px;
-        }
+    .badge-pending {
+        background-color: #ffc107;
+        color: #212529;
+    }
+</style>
 
-            .btn-view:hover {
-                background-color: darkviolet;
-                border-color: darkviolet;
-                color: white;
-            }
-    </style>
 
-</head>
-<body>
-    <div class="text-center mb-3">
-        <h3 class="text-primary fw-bold">Pending Purchase Order</h3>
+<div class="text-center mb-3">
+    <h3 class="text-primary fw-bold">Pending Purchase Order</h3>
+
+</div>
+
+<!-- Date Range Picker -->
+<div class="mb-3">
+    <div class="input-group" style="max-width: 280px;">
+        <span class="input-group-text bg-primary text-white">
+            <i class="bi bi-calendar-date"></i>
+        </span>
+        <input type="text" id="PendingDatepicker" class="form-control" placeholder="Select date range" readonly />
     </div>
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-striped table-hover table-bordered mb-0" id="tblPending">
-                    <thead class="table-dark">
-                        <tr>
-                            <th class="text-center"><input type="checkbox" id="selectAllPending" /></th>
-                            <th class="text-center">SR NO</th>
-                            <th class="text-center">PO NO</th>
-                            <th class="text-center">PO Date</th>
-                            <th class="text-center">PO Cost</th>
-                            <th class="text-center">Created By</th>
-                            <th class="text-center">Status</th>
-                            <th class="text-center">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+</div>
+
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover table-bordered mb-0" id="tblPending">
+        <thead class="table-dark">
+            <tr>
+                <th class="text-center"><input type="checkbox" id="selectAllPending" /></th>
+                <th class="text-center">SR NO</th>
+                <th class="text-center">PO NO</th>
+                <th class="text-center">PO Date</th>
+                <th class="text-center">PO Cost</th>
+                <th class="text-center">Created By</th>
+                <th class="text-center">Status</th>
+                <th class="text-center">Action</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+
+<!-- PO Details Modal -->
+<div class="modal fade" id="poModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <!-- Card Header -->
+            <div class="modal-header bg-primary text-white justify-content-center">
+                <h3 class="modal-title fw-bold w-100 text-center mb-3 text-white">Pending Purchase Order Details</h3>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+
+            <!-- Card Body -->
+            <div class="modal-body" id="poModalBody">
+                <div class="text-center p-3">Loading...</div>
+            </div>
+
+
+
         </div>
     </div>
+</div>
 
-    <!-- Toast container -->
-    <div id="toastContainer" class="position-fixed top-0 end-0 p-3" style="z-index:2000;"></div>
-
-    <div class="modal fade" id="poModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h2 class="modal-title w-100 text-center">Pending Purchase Order Details Screen</h2>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body" id="poModalBody"></div>
-            </div>
-        </div>
-    </div>
+<script>
+    $(function () {
 
 
+        // Toastr for messages
+        toastr.options = {
+            closeButton: true, progressBar: true, newestOnTop: true,
+            positionClass: "toast-top-right", preventDuplicates: true,
+            timeOut: 3000, extendedTimeOut: 1000,
+            showDuration: 300, hideDuration: 300,
+            showMethod: "slideDown", hideMethod: "fadeOut"
+        };
 
-    <script>
-        $(function () {
-            let pendingTable;
+        function showToast(message, type = 'warning') {
+            if (type === 'success') toastr.success(message);
+            else if (type === 'error') toastr.error(message);
+            else if (type === 'info') toastr.info(message);
+            else toastr.warning(message);
+        }
 
-            // Toast Notification
-            function showToast(message, type = 'warning') {
-                const toastHTML = `<div class="toast align-items-center text-white bg-${type} border-0 mb-2" role="alert">
-                        <div class="d-flex">
-                            <div class="toast-body small">${message}</div>
-                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-                        </div>
-                    </div>`;
-                const $toast = $(toastHTML);
-                $('#toastContainer').append($toast);
-                new bootstrap.Toast($toast[0], { delay: 3000 }).show();
-                $toast.on('hidden.bs.toast', function () { $(this).remove(); });
+        function exportColumns(idx) { return idx !== 0 && idx !== 7; }
+
+        let pendingTable;
+
+        function initializePendingPOs() {
+            if ($.fn.DataTable.isDataTable('#tblPending')) {
+                $('#tblPending').DataTable().destroy();
+                $('#tblPending tbody').empty();
             }
 
-            // Load DataTable
-            function loadPendingPOs() {
-                // Destroy existing DataTable if initialized
-                if ($.fn.DataTable.isDataTable('#tblPending')) {
-                    $('#tblPending').DataTable().destroy();
-                    $('#tblPending tbody').empty(); // clear old data
-                }
+            pendingTable = $('#tblPending').DataTable({
+                dom: '<"d-flex justify-content-between mb-2 flex-wrap align-items-center"<"dt-buttons"B><"dt-search"f>>rt<"d-flex justify-content-between align-items-center mt-2"ip>',
+                ordering: false,
+                ajax: { url: '/Purchase/GetPendingPOsNAM', dataSrc: '' },
 
-                const pendingTable = $('#tblPending').DataTable({
-                    dom: '<"d-flex justify-content-between mb-2 flex-wrap align-items-center"<"dt-buttons"B><"dt-search"f>>rt<"d-flex justify-content-between align-items-center mt-2"ip>', buttons: [
+                columns: [
+                    { data: null, orderable: false, className: 'text-center', render: (d, t, r) => `<input type="checkbox" class="row-select" value="${r.POCode}"/>` },
+                    { data: null, orderable: false, className: 'text-center', render: (d, t, r, meta) => meta.row + 1 },
+                    { data: 'POCode', className: 'text-center' },
+                    { data: 'PODateVK', className: 'text-center', render: d => d ? moment(d).format('DD/MM/YYYY') : '' },
 
-                        // Print
-                        {
-                            extend: 'print',
-                            title: '',
-                            text: '<i class="bi bi-printer-fill text-dark fs-5"></i>',
-                            titleAttr: 'Print',
-                            action: function (e, dt, button, config) {
-                                if ($('#tblPending .row-select:checked').length === 0) {
-                                    showToast("Please select at least one PO to Print");
-                                    return;
-                                }
-                                $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config);
-                            },
-                            exportOptions: {
-                                columns: exportColumns,
-                                rows: (idx, d, node) => $(node).find('.row-select').prop('checked')
-                            },
-                            customize: function (win) {
-                                const title = 'Purchase Orders';
-                                const today = new Date();
-                                const formattedDate = today.toLocaleDateString('en-GB');
+                    // ✅ Added ₹ sign in PO Cost column (display only)
+                    { data: 'POCost', className: 'text-center', render: d => d ? `₹ ${parseFloat(d).toFixed(2)}` : '₹ 0.00' },
 
-                                $(win.document.body).prepend(`
+                    { data: 'CreatedBy', className: 'text-center' },
+                    { data: 'StatusName', className: 'text-center', render: d => `<span class="badge badge-pending">${d || 'Pending'}</span>` },
+                    {
+                        data: null,
+                        orderable: false,
+                        className: 'text-center',
+                        render: (data, type, row) => {
+                            let pocode = row.POCode;
+                            let amount = parseFloat(row.POCost);
+                            let buttons = '';
+
+                            if (amount < 500000) {
+                                buttons += `<button class="btn btn-sm btn-success btn-approve" data-pocode="${pocode}"><i class="bi bi-check-circle text-white" 
+                  data-bs-toggle="tooltip" 
+                  data-bs-placement="top" 
+                  title="Approve" 
+                  style="cursor:pointer; font-size:18px;" 
+                  "></i></button>`;
+                            }
+
+                            buttons += `<button class="btn btn-sm btn-view btn-primary ms-1" data-pocode="${pocode}"><i class="bi bi-eye-fill"></i></button>`;
+                            return buttons;
+                        }
+                    }
+                ],
+
+                buttons: [
+                    // Print
+                    {
+                        extend: 'print',
+                        title: '',
+                        text: '<i class="bi bi-printer-fill text-dark fs-5"></i>',
+                        titleAttr: 'Print',
+                        action: function (e, dt, button, config) {
+                            if ($('#tblPending .row-select:checked').length === 0) {
+                                showToast("Please select at least one PO to Print");
+                                return;
+                            }
+                            $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config);
+                        },
+                        exportOptions: {
+                            columns: exportColumns,
+                            rows: (idx, d, node) => $(node).find('.row-select').prop('checked')
+                        },
+                        customize: function (win) {
+                            const title = ' Pending Purchase Orders';
+                            const today = new Date();
+                            const formattedDate = today.toLocaleDateString('en-GB');
+
+                            $(win.document.body).prepend(`
         <div style="text-align:center; margin-bottom:10px;">
             <h2 style="margin:0;">${title}</h2>
-            <div style="font-size:12px;">Generated on: ${formattedDate}</div>
+            <div style="font-size:12px;">Generated Date: ${formattedDate}</div>
         </div>
 `);
 
-                                $(win.document.body).append(`
+                            $(win.document.body).append(`
         <style>
             thead th {
                 background-color: black !important;
@@ -157,210 +205,338 @@
         </style>
 `);
 
-                                $(win.document.body).find('table')
-                                    .addClass('table table-bordered table-striped')
-                                    .css('width', '100%')
-                                    .css('font-size', '14px');
+                            $(win.document.body).find('table')
+                                .addClass('table table-bordered table-striped')
+                                .css('width', '100%')
+                                .css('font-size', '14px');
 
-                                $(win.document.body).find('table tbody tr').each(function (i) {
-                                    $(this).find('td:first').text(i + 1);
-                                });
-                            }
-                        },
-                        // PDF, Excel, CSV (unchanged)
-                        {
-                            extend: 'pdfHtml5', title: 'Purchase Orders',
-                            text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>', titleAttr: 'Export PDF',
-                            action: function (e, dt, button, config) {
-                                if ($('#tblPending .row-select:checked').length === 0) { showToast("Please select at least one PO to export PDF"); return; }
-                                $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, button, config);
-                            },
-                            exportOptions: {
-                                columns: exportColumns,
-                                rows: (idx, d, node) => $(node).find('.row-select').prop('checked'),
-                                format: { body: (data, row, col) => typeof data === 'string' ? data.replace(/<\/?[^>]+(>|$)/g, "").trim() : data }
-                            },
-                            customize: function (doc) {
-                                doc.content[0].alignment = 'center'; doc.content[0].fontSize = 14;
-                                doc.content.splice(1, 0, { text: 'Export Date: ' + new Date().toLocaleDateString('en-GB'), alignment: 'center', margin: [0, 0, 0, 8], fontSize: 10 });
-                                var tableNode = doc.content.find(c => c.table); if (!tableNode) return;
-                                doc.styles.tableHeader = { alignment: 'center', fillColor: '#212529', color: '#ffffff', bold: true };
-                                tableNode.table.body.forEach((row, i) => { if (i > 0) row[0] = { text: String(i), alignment: 'center' }; });
-                                tableNode.layout = { paddingLeft: () => 30, paddingRight: () => 6 };
-                            }
-                        },
-                        {
-                            extend: 'excelHtml5',
-                            title: '',
-                            filename: 'pending Purchase Orders',
-                            text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
-                            titleAttr: 'Export Excel',
-                            action: function (e, dt, button, config) {
-                                if ($('#tblPending .row-select:checked').length === 0) {
-                                    showToast("Please select at least one PO to export Excel");
-                                    return;
-                                }
-                                window.__excelSrCounter = 0;
-                                $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
-                            },
-                            exportOptions: {
-                                columns: exportColumns,
-                                rows: (idx, d, node) => $(node).find('.row-select').prop('checked'),
-                                format: {
-                                    body: function (data, rowIdx, colIdx, node) {
-                                        if (colIdx === 1) return ++window.__excelSrCounter;
-                                        return typeof data === 'string' ? data.replace(/<\/?[^>]+(>|$)/g, "").trim() : data;
-                                    }
-                                }
-                            }
-                        },
-                        {
-                            extend: 'csvHtml5',
-                            text: '<i class="bi bi-filetype-csv text-success fs-5"></i>',
-                            titleAttr: 'Export CSV',
-                            title: '',
-                            filename: function () { return 'PurchaseOrders_' + new Date().toISOString().slice(0, 10).replace(/-/g, ""); },
-                            action: function (e, dt, button, config) {
-                                if ($('#tblPending .row-select:checked').length === 0) { showToast("Please select at least one row to export CSV"); return; }
-                                window.__srnoCounter = 0;
-                                $.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, button, config);
-                                dt.processing(false);
-                            },
-                            exportOptions: {
-                                rows: function (idx, data, node) { return $(node).find('.row-select').prop('checked'); },
-                                columns: exportColumns,
-                                format: {
-                                    body: function (data, row, column, node) {
-                                        data = typeof data === 'string' ? data.replace(/<[^>]*>/g, '').trim() : data;
-                                        if (column === 1) return ++window.__srnoCounter;
-                                        return data;
-                                    }
-                                }
-                            }
-                        }
-
-                    ], initComplete: function () {
-                        $('#tblPending_filter input').addClass("form-control").attr("placeholder", "Search...").css("height", "40px");
-                        // Add date filter container only once
-                        if ($('#pendingDateFilterContainer').length === 0) {
-                            $('<div id="pendingDateFilterContainer" class="mb-2"></div>').prependTo($('#tblPending_wrapper .dt-left').length ? '#tblPending_wrapper .dt-left' : '#tblPending_wrapper');
-                            $('#pendingDateFilterContainer').html(`
-                                <div class="input-group" style="height: 40px; max-width: 280px;">
-                                    <span class="input-group-text bg-primary text-white"><i class="bi bi-calendar-date"></i></span>
-                                    <input type="text" id="PendingDatepicker" class="form-control" placeholder="Select date range" readonly />
-                                </div>
-                            `);
+                            $(win.document.body).find('table tbody tr').each(function (i) {
+                                $(this).find('td:first').text(i + 1);
+                            });
                         }
                     },
-                    processing: true, serverSide: false,
-                    ajax: { url: '/Purchase/GetPendingPOsNAM', dataSrc: '' },
-                    columns: [
-                        { data: null, orderable: false, className: 'text-center', render: (d, t, r) => `<input type="checkbox" class="row-select" value="${r.POCode}"/>` },
-                        { data: null, orderable: false, className: 'text-center', render: (d, t, r, meta) => meta.row + 1 },
-                        { data: 'POCode', className: 'text-center' },
-                        {
-                            data: 'PODateVK', defaultContent: '', className: 'text-center',
-                            render: d => d ? moment(d).format('DD/MM/YYYY') : ''
-                        },
-                        { data: 'POCost', defaultContent: '' },
-                        { data: 'CreatedBy', defaultContent: '' },
-                        { data: 'StatusName', render: d => `<span class="badge badge-pending">${d || 'Pending'}</span>` },
-                        {
-                            data: 'POCode', orderable: false, className: 'text-center', render: d => `
-                    <button class="btn btn-sm btn-success btn-approve" data-pocode="${d}">Approve</button>
-                    <button class="btn btn-sm btn-view" data-pocode="${d}" title="View"><i class="bi bi-eye-fill"></i></button>`
-                        }
-                    ]
-                });
-                // delegated handlers for elements inside pending table
-                // Select-all for pending (checkbox inside header)
-                $(document).off('change', '#selectAllPending').on('change', '#selectAllPending', function () {
-                    $('#tblPending .row-select').prop('checked', this.checked);
-                });
 
-                // view details (delegate)
-                $(document).off('click', '#tblPending .btn-view').on('click', '#tblPending .btn-view', function () {
-                    //alert("clicked")
-                    $("#NewModalBody").empty();
-                    $("#POModalBody").empty();
-                    const poCode = $(this).data('pocode');
-                    $("#poModalBody").html("<div class='text-center p-3 small'>Loading...</div>");
-                    $.get("/Purchase/ViewPendingPoDetailsNAM", { poCode }, function (html) {
-                        $("#poModalBody").html(html);
-                        $("#poModal").modal('show');
-                    });
-                });
-
-
-
-
-
-                // approve
-                $(document).off('click', '#tblPending .btn-approve').on('click', '#tblPending .btn-approve', function () {
-                    const poCode = $(this).data('pocode');
-                    Swal.fire({
-                        title: 'Are you sure?',
-                        text: "Do you want to approve PO " + poCode + "?",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonText: 'Yes, approve it!',
-                        cancelButtonText: 'Cancel'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            $.get('/Purchase/ApprovePONAM', { poCode: poCode }, function (res) {
-                                if (res.success) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'PO ' + poCode + ' is approved successfully',
-                                        showConfirmButton: false,
-                                        timer: 2000
-                                    });
-                                    $('#poModal').modal('hide');
-                                    $('#tblPending').DataTable().ajax.reload();
-                                } else {
-                                    Swal.fire('Error!', 'Failed to approve PO.', 'error');
-                                }
-                            });
-                        }
-                    });
-                });
-
-                // Pending: date filter initialization (delegated to focus event)
-                $(document).off('focus', '#PendingDatepicker').on('focus', '#PendingDatepicker', function () {
-                    const $this = $(this);
-                    if (!$this.data('daterangepicker')) {
-                        $this.daterangepicker({
-                            autoUpdateInput: false,
-                            opens: "center",
-                            drops: "down",
-                            alwaysShowCalendars: true,
-                            locale: { cancelLabel: 'Clear' },
-                            ranges: {
-                                'Today': [moment(), moment()],
-                                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-                                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                                'This Month': [moment().startOf('month'), moment().endOf('month')],
-                                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                    // PDF
+                    {
+                        extend: 'pdfHtml5',
+                        title: 'Pending Purchase Orders',
+                        text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
+                        titleAttr: 'Export PDF',
+                        action: function (e, dt, button, config) {
+                            if ($('#tblPending .row-select:checked').length === 0) {
+                                showToast("Please select at least one PO to export PDF");
+                                return;
                             }
-                        }, function (start, end) {
-                            $this.val(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
-                            $.fn.dataTable.ext.search.push(function (settings, data) {
-                                if (settings.nTable.id !== 'tblPending') return true;
-                                const poDate = moment(data[3], 'YYYY-MM-DD');
-                                return poDate.isBetween(start, end, undefined, '[]');
-                            });
-                            $('#tblPending').DataTable().draw();
-                            $.fn.dataTable.ext.search.pop();
-                        });
+                            $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, button, config);
+                        },
+                        exportOptions: {
+                            columns: exportColumns,
+                            rows: (idx, d, node) => $(node).find('.row-select').prop('checked'),
+                            format: {
+                                body: (data, row, col) =>
+                                    typeof data === 'string'
+                                        ? data.replace(/<\/?[^>]+(>|$)/g, "").trim()
+                                        : data
+                            }
+                        },
+                        customize: function (doc) {
+                            // Title formatting
+                            doc.content[0].alignment = 'center';
+                            doc.content[0].fontSize = 14;
 
-                        $this.on('cancel.daterangepicker', function () { $this.val(''); $('#tblPending').DataTable().draw(); });
+                            // Add export date
+                            doc.content.splice(1, 0, {
+                                text: 'Genrated Date: ' + new Date().toLocaleDateString('en-GB'),
+                                alignment: 'center',
+                                margin: [0, 0, 0, 8],
+                                fontSize: 10
+                            });
+
+                            // Find table content
+                            const tableNode = doc.content.find(c => c.table);
+                            if (!tableNode) return;
+
+                            // Table header style
+                            doc.styles.tableHeader = {
+                                alignment: 'center',
+                                fillColor: '#212529',
+                                color: '#ffffff',
+                                bold: true
+                            };
+
+                            // Add serial number column formatting
+                            tableNode.table.body.forEach((row, i) => {
+                                if (i > 0) row[0] = { text: String(i), alignment: 'center' };
+                            });
+
+                            // Adjust padding for better layout
+                            tableNode.layout = {
+                                paddingLeft: () => 30,
+                                paddingRight: () => 6
+                            };
+                        }
+                    },
+
+
+                    // Excel
+                    {
+                        extend: 'excelHtml5',
+                        title: '',
+                        filename: 'Pending_POs',
+                        text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
+                        titleAttr: 'Export Excel',
+                        action: function (e, dt, button, config) {
+                            if ($('#tblPending .row-select:checked').length === 0) {
+                                showToast("Please select at least one PO to export Excel");
+                                return;
+                            }
+                            window.__excelSrCounter = 0;
+                            $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
+                        },
+                        exportOptions: {
+                            columns: exportColumns,
+                            rows: (idx, d, node) => $(node).find('.row-select').prop('checked'),
+                            format: {
+                                body: (data, row, col, node) =>
+                                    col === 1
+                                        ? ++window.__excelSrCounter
+                                        : (typeof data === 'string' ? data.replace(/<\/?[^>]+(>|$)/g, "").trim() : data)
+                            }
+                        },
+                        customize: function (xlsx) {
+                            var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                            var $sheet = $(sheet);
+
+                            // 🔹 Count columns
+                            var colCount = $('row:first c', sheet).length;
+                            if (colCount === 0) colCount = 5;
+
+                            var title = 'Pending Purchase Orders';
+                            var dateStr = 'Generated Date: ' + moment().format('DD/MM/YYYY');
+
+                            // 🔹 Shift all existing rows down by 2
+                            $sheet.find('sheetData row').each(function () {
+                                var r = parseInt($(this).attr('r'));
+                                $(this).attr('r', r + 2);
+                                $(this).find('c').each(function () {
+                                    var cellRef = $(this).attr('r');
+                                    var col = cellRef.replace(/[0-9]/g, '');
+                                    var rowNum = parseInt(cellRef.replace(/[A-Z]/g, '')) + 2;
+                                    $(this).attr('r', col + rowNum);
+                                });
+                            });
+
+                            // 🔹 Create Title & Date rows (top)
+                            var titleRow = `
+<row r="1">
+    <c t="inlineStr" r="A1" s="55"><is><t>${title}</t></is></c>
+</row>`;
+                            var dateRow = `
+<row r="2">
+    <c t="inlineStr" r="A2" s="56"><is><t>${dateStr}</t></is></c>
+</row>`;
+
+                            $sheet.find('sheetData').prepend(titleRow + dateRow);
+
+                            // 🔹 Merge cells (so title/date are centered across columns)
+                            var mergeCells = $sheet.find('mergeCells');
+                            if (mergeCells.length === 0) {
+                                mergeCells = $('<mergeCells count="0"></mergeCells>');
+                                $sheet.append(mergeCells);
+                            }
+
+                            var lastCol = String.fromCharCode(64 + colCount);
+                            mergeCells.append(`<mergeCell ref="A1:${lastCol}1"/>`);
+                            mergeCells.append(`<mergeCell ref="A2:${lastCol}2"/>`);
+                            mergeCells.attr('count', mergeCells.find('mergeCell').length);
+
+                            // 🔹 Add centered style for title & date
+                            var styles = xlsx.xl['styles.xml'];
+                            var $styles = $(styles);
+                            var cellXfs = $styles.find('cellXfs');
+                            var count = parseInt(cellXfs.attr('count'));
+                            var newStyleIndex1 = count;
+                            var newStyleIndex2 = count + 1;
+
+                            // Style for center alignment
+                            cellXfs.append(`
+<xf numFmtId="0" fontId="0" fillId="0" borderId="0" applyAlignment="1">
+    <alignment horizontal="center" vertical="center"/>
+</xf>`);
+                            cellXfs.append(`
+<xf numFmtId="0" fontId="0" fillId="0" borderId="0" applyAlignment="1">
+    <alignment horizontal="center" vertical="center"/>
+</xf>`);
+                            cellXfs.attr('count', count + 2);
+
+                            // Apply new styles
+                            $sheet.find('c[r="A1"]').attr('s', newStyleIndex1);
+                            $sheet.find('c[r="A2"]').attr('s', newStyleIndex2);
+                        }
                     }
+                    ,
+
+                    // CSV
+                    // CSV
+                    {
+                        extend: 'csvHtml5',
+                        text: '<i class="bi bi-filetype-csv text-success fs-5"></i>',
+                        titleAttr: 'Export CSV',
+                        action: function (e, dt, button, config) {
+                            if ($('#tblPending .row-select:checked').length === 0) {
+                                showToast("Please select at least one PO to export CSV");
+                                return;
+                            }
+                            window.__srnoCounter = 0;
+                            $.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, button, config);
+                        },
+                        exportOptions: {
+                            columns: exportColumns,
+                            rows: (idx, d, node) => $(node).find('.row-select').prop('checked'),
+                            format: {
+                                body: (data, row, col, node) => {
+                                    data = typeof data === 'string' ? data.replace(/<[^>]*>/g, '').trim() : data;
+                                    if (col === 1) return ++window.__srnoCounter; // Serial No.
+                                    return data;
+                                }
+                            }
+                        },
+                        filename: () => 'PendingPO_List_' + new Date().toISOString().slice(0, 10).replace(/-/g, ""),
+                        customize: function (csv) {
+                            // Add UTF-8 BOM at the start to ensure proper encoding of ₹ symbol
+                            return '\uFEFF' + csv;
+                        }
+                    }
+                ],
+
+
+
+                initComplete: function () { $('#tblPending_filter input').addClass("form-control").attr("placeholder", "Search...").css("height", "40px"); }
+            });
+        }
+
+        initializePendingPOs();
+
+
+        $(document).on('change', '#selectAllPending', function () {
+            $('#tblPending .row-select').prop('checked', this.checked);
+        });
+
+        $(document).on('change', '.row-select', function () {
+            const allChecked = $('#tblPending .row-select').length === $('#tblPending .row-select:checked').length;
+            $('#selectAllPending').prop('checked', allChecked);
+        });
+
+
+        //approve button
+        $(document).on('click', '#tblPending .btn-approve', function () {
+            const poCode = $(this).data('pocode');
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to approve PO " + poCode + "?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, approve it!',
+                cancelButtonText: 'Cancel',
+                customClass: {
+                    confirmButton: 'swal2-confirm btn btn-success',
+                    cancelButton: 'swal2-cancel btn btn-danger'
+                },
+                buttonsStyling: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+                    
+                    Swal.fire({
+                        title: 'Sending POS...',
+                        text: 'Please wait while email is sending to Vendor .',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                   
+                    $.post('/Purchase/ApprovePONAM', { poCode }, function (res) {
+
+                      
+                        Swal.close();
+
+                        if (res.success) {
+                            
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'PO ' + poCode + ' approved!',
+                                showConfirmButton: false,
+                                timer: 2000
+                            }).then(() => {
+                                
+                                Swal.fire({
+                                    icon: 'info',
+                                    title: 'Email sent to vendor',
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                });
+                            });
+
+                            pendingTable.ajax.reload();
+                        } else {
+                            Swal.fire('Error!', 'Failed to approve PO.', 'error');
+                        }
+                    });
+                }
+            });
+        });
+
+        // View PO
+        $(document).on('click', '#tblPending .btn-view', function () {
+            const poCode = $(this).data('pocode');
+            $("#poModalBody").html("<div class='text-center p-3 small'>Loading...</div>");
+            $.get("/Purchase/ViewPendingPoDetailsNAM", { poCode }, function (html) {
+                $("#poModalBody").html(html);
+                $("#poModal").modal('show');
+            });
+        });
+
+        // Date Range Picker filter
+        // ✅ Date filter with custom ranges for Pending PO
+        $(document).off('focus', '#PendingDatepicker').on('focus', '#PendingDatepicker', function () {
+            if (!$(this).data('daterangepicker')) {
+                $(this).daterangepicker({
+                    autoUpdateInput: false,
+                    opens: "center",
+                    drops: "down",
+                    alwaysShowCalendars: false,
+                    locale: { cancelLabel: 'Clear' },
+                    ranges: {
+                        'Today': [moment(), moment()],
+                        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                        'Last 1 Month': [moment().subtract(1, 'month'), moment()],
+                        'Last 3 Months': [moment().subtract(3, 'month'), moment()],
+                        'Last 1 Year': [moment().subtract(1, 'year'), moment()],
+                    }
+                }, function (start, end) {
+                    $('#PendingDatepicker').val(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
+
+                    // ✅ Filter table by PO Date column (index 3)
+                    $.fn.dataTable.ext.search.push(function (settings, data) {
+                        if (settings.nTable.id !== 'tblPending') return true;
+                        const poDate = moment(data[3], 'DD/MM/YYYY');
+                        return poDate.isBetween(start, end, undefined, '[]');
+                    });
+
+                    if (pendingTable) pendingTable.draw();
+                    $.fn.dataTable.ext.search.pop();
+                });
+
+                $('#PendingDatepicker').on('cancel.daterangepicker', function () {
+                    $(this).val('');
+                    if (pendingTable) pendingTable.draw();
                 });
             }
-    </script>
-</body>
-
-    </html>
+        });
 
 
+    });
+</script>

@@ -14,7 +14,9 @@
         vertical-align: middle !important;
     }
 
-
+    thead th {
+        white-space: nowrap !important;
+    }
     .control-container {
         display: flex;
         justify-content: space-between;
@@ -39,10 +41,23 @@
         right: 0;
         z-index: 9999;
     }
+    button.dt-button.processing,
+    div.dt-button.processing {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        background: none !important;
+    }
+
+        button.dt-button.processing:after {
+            content: none !important;
+        }
+
+
+
 </style>
 <div class="container-fluid">
     <div class="container bg-white rounded m-2 shadow p-2">
-        <h2 class="mb-4 text-center text-primary">Inhouse Transfer Report</h2>
+        <h3 class="mb-4 text-center text-primary">Inhouse Transfer Report</h3>
 
         <!-- Chart -->
         <div class="card p-3 mb-4">
@@ -90,16 +105,19 @@
 
     <!-- Modal -->
     <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header  bg-primary text-center">
-                    <h5 class="modal-title text-center  text-white" id="detailModalLabel">Items Detail</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content shadow-lg rounded-3">
+                <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-1">
+                    <h5 class="modal-title fw-bold text-white mb-0 fs-5" id="detailModalLabel">
+                        Items Detail
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <table class="table table-bordered table-striped" id="detailTable">
                         <thead class="table-dark text-white text-center fw-bold">
                             <tr>
+                                <th>Sr No</th>
                                 <th>Item Name</th>
                                 <th>Department</th>
                                 <th>Category</th>
@@ -178,6 +196,7 @@
         if (table) table.destroy();
 
         table = $('#reportTable').DataTable({
+            ordering: false,
             ajax: { url: '/Inventory/InhouseTransferReportDataAMG', data: { fromDate, toDate }, dataSrc: '' },
             dom: '<"d-flex justify-content-between align-items-center mt-1 mb-2"Bf>rt<"d-flex justify-content-between mt-2"<"datatable-info"i><"datatable-pagination"p>>', pageLength: 10,
             lengthMenu: [10, 25, 50, 100],
@@ -232,7 +251,10 @@
 
 
                         `)
-
+                        // Update serial numbers
+                        //for (var i = 1; i < win.content[2].table.body.length; i++) {
+                        //    win.content[2].table.body[i][0].text = i;
+                        //}
 
                         // Find the table created by DataTables print
                         const $table = $(win.document.body).find('table');
@@ -259,13 +281,26 @@
                             });
                         });
 
+
+                        $table.find('tbody tr').each(function (i) {
+                            // set first td (index 0) to sequence number
+                            $(this).find('td').eq(0).text(i + 1);
+                        });
+
                     },
                     format: {
                         body: function (data, row, column, node) {
                             if (column === 1) {
                                 return $('#reportTable tbody input.row-check:checked')
                                     .index($(node).closest('tr').find('.row-check')) + 1;
+
+
+
                             }
+
+                           
+
+
                             if (column === 2 && data) { // date column
                                 let parts = data.split("-");
                                 if (parts.length === 3) data = `${parts[0]}/${parts[1]}/${parts[2]}`;
@@ -280,6 +315,7 @@
                     extend: 'pdfHtml5',
                     text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
                     title: 'Inhouse Transfer',
+
                     action: function (e, dt, button, config) {
                         if ($('#reportTable tbody input.row-check:checked').length === 0) {
                             showToast('Please select at least one row to export PDF!'); return;
@@ -330,6 +366,11 @@
                                 return $('#reportTable tbody input.row-check:checked')
                                     .index($(node).closest('tr').find('.row-check')) + 1;
                             }
+
+                           
+
+
+
                             if (column === 2 && data) { // date column
                                 let parts = data.split("-");
                                 if (parts.length === 3) data = `${parts[0]}/${parts[1]}/${parts[2]}`;
@@ -342,6 +383,8 @@
                     extend: 'excelHtml5',
                     text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
                     title: 'Inhouse Transfer',
+                    messageTop: 'Generated Date: ' + moment().format('DD/MM/YYYY'),
+
                     action: function (e, dt, button, config) {
                         if ($('#reportTable tbody input.row-check:checked').length === 0) {
                             showToast('Please select at least one row to export Excel!');
@@ -349,6 +392,20 @@
                         }
                         $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
                     },
+                    customize: function (xlsx) {
+                        // Access the first sheet
+                        const sheet = xlsx.xl.worksheets['sheet1.xml'];
+
+                        // Find the cell containing the messageTop text (usually in row 2)
+                        $('row c[r^="A2"] t', sheet).each(function () {
+                            // Center align text in that cell
+                            $(this).closest('c').attr('s', '51'); // style 51 = center alignment (built-in style)
+                        });
+
+                        // Optional: make the text bold
+                        $('row c[r^="A2"]', sheet).attr('s', '51');
+                    }
+                    ,
                     exportOptions: {
                         rows: function (idx, data, node) { return $(node).find('.row-check').prop('checked'); },
                         columns: ':visible:not(:first-child)',
@@ -424,12 +481,59 @@
             },
             initComplete: function () {
                 this.api().buttons().container().appendTo('#dtButtonsContainer');
-                $('#selectAllRows').off('change').on('change', function () { $('#reportTable tbody input.row-check').prop('checked', $(this).prop('checked')); });
+                //$('#selectAllRows').off('change').on('change', function () { $('#reportTable tbody input.row-check').prop('checked', $(this).prop('checked')); });
+
+                $('#selectAllRows').off('change').on('change', function () {
+                    const isChecked = $(this).prop('checked');
+                    $('#reportTable tbody input.row-check').prop('checked', isChecked);
+                });
+
+                $('#reportTable tbody').off('change', 'input.row-check').on('change', 'input.row-check', function () {
+                    const total = $('#reportTable tbody input.row-check').length;
+                    const checked = $('#reportTable tbody input.row-check:checked').length;
+
+                    // If all rows selected → check header checkbox, else uncheck it
+                    $('#selectAllRows').prop('checked', total === checked);
+                });
+
+
+
+
+
+
+
+
             }
         });
 
         $.getJSON('/Inventory/InhouseTransferReportDataAMG', { fromDate, toDate }, function (data) {
             fullData = data;
+
+            if (!data || data.length === 0) {
+                // Destroy any existing chart if it exists
+                if (Highcharts.charts && Highcharts.charts.length) {
+                    Highcharts.charts.forEach(chart => {
+                        if (chart && chart.renderTo && chart.renderTo.id === 'deptCatChart') {
+                            chart.destroy();
+                        }
+                    });
+                }
+
+                // Show a clean "No data" message
+                const noDataHTML = `
+        <div class="d-flex flex-column align-items-center justify-content-center" style="height:300px;">
+            <i class="bi bi-emoji-frown text-secondary" style="font-size:2rem;"></i>
+            <span class="mt-2 text-muted fw-semibold">No data found for the selected date range</span>
+        </div>
+    `;
+
+                $('#deptCatChart').html(noDataHTML);
+
+                return; // stop chart rendering
+            }
+
+
+
             const matrix = {}, categoriesSet = new Set(), departmentsSet = new Set();
             data.forEach(d => {
                 const dept = d.TransferTo || 'Unknown';
@@ -514,26 +618,35 @@
         const tbody = $('#detailTable tbody');
         tbody.empty();
 
-        filtered.forEach(item => {
+        filtered.forEach((item, index) => {
             tbody.append(`<tr>
+                    <td>${index + 1}</td>
+
             <td>${item.ItemName}</td>
             <td>${item.TransferTo}</td>
             <td>${item.ItemCategory}</td>
             <td>${item.Quantity}</td>
             <td>${item.UOM}</td>
-            <td>${item.TransferDate ? new Date(item.TransferDate).toLocaleDateString() : ''}</td>
+            <td>${item.TransferDate ? formatDate(item.TransferDate) : ''}</td>
+
         </tr>`);
         });
-
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // month is 0-based
+            const year = String(date.getFullYear()).slice(-2); // last 2 digits
+            return `${day}/${month}/${year}`;
+        }
         // Initialize DataTable
         $('#detailTable').DataTable({
             paging: true,
             searching: true,
-            ordering: true,
+            ordering: false,
             order: [[0, 'asc']],
             lengthMenu: [5, 10, 25, 50],
             pageLength: 5,
-            dom: '<"top d-flex justify-content-end"f>rtip', // simple layout: filter + table + info + pagination
+            dom: '<"d-flex justify-content-end align-items-center mt-1 mb-2"f>rt<"d-flex justify-content-between mt-2"<"datatable-info"i><"datatable-pagination"p>>',
             // dom: '<"top d-flex justify-content-end mb-2">',
             columnDefs: [
                 { className: "text-center", targets: "_all" } // center all columns
@@ -551,11 +664,10 @@
             drops: "down",
             ranges: {
                 'Today': [moment(), moment()],
-                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
                 'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                'This Month': [moment().startOf('month'), moment().endOf('month')],
-                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                'Last 1 Month': [moment().subtract(1, 'months').startOf('day'), moment()],
+                'Last 3 Months': [moment().subtract(3, 'months').startOf('day'), moment()],
+                'Last 1 Year': [moment().subtract(12, 'months').startOf('day'), moment()]
             },
             locale: { cancelLabel: 'Clear' }
         }, function (start, end) {

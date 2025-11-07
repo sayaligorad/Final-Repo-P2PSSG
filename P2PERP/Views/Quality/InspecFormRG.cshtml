@@ -11,14 +11,6 @@
     <title>@ViewBag.Title</title>
 
     <style>
-/*        #ncModal::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.6);
-            z-index: 1045;
-            display: none;
-        }*/
 
         #ncModal.show::before {
             display: block;
@@ -26,6 +18,30 @@
 
         #ncModal .modal-dialog {
             z-index: 1050;
+
+        }
+        #ncModal {
+            z-index: 2000 !important;
+        }
+
+            #ncModal .modal-dialog {
+                z-index: 2001 !important;
+            }
+
+        .modal-backdrop.modal-stack {
+            z-index: 1999 !important;
+        }
+        #paramTable thead th {
+            padding-top: 4px !important;
+            padding-bottom: 4px !important;
+            line-height: 1.1 !important;
+            vertical-align: middle !important;
+            font-size: 0.9rem; /* optional: make text slightly smaller */
+        }
+
+        /* Optional: make header look clean and compact */
+        #paramTable thead {
+            height: auto !important;
         }
     </style>
 </head>
@@ -34,58 +50,60 @@
 
         <div class="card shadow-lg border-0 rounded-4">
             <div class="card-body p-4">
-                <form class="row g-4">
+                <form id="inspectionForm"class="row g-4">
                     <input type="hidden" id="itemcode" value="@ViewBag.ItemCode" />
                     <input type="hidden" id="GRNItemCode" value="@ViewBag.GRNItemCode" />
 
                     <!-- GRN & Item Type -->
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold">GRN No</label>
-                        <input type="text" class="form-control" id="GRN" value="@ViewBag.GRN" readonly>
+                        <label class="form-label fw-bold text-dark">GRN No</label>
+                        <input type="text" class="form-control form-control-sm text-dark shadow-sm " id="GRN" value="@ViewBag.GRN" readonly>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold">Item Type</label>
-                        <input type="text" class="form-control" value="@ViewBag.ItemType" readonly>
+                        <label class="form-label fw-bold text-dark">Item Type</label>
+                        <input type="text" class="form-control form-control-sm text-dark shadow-sm" value="@ViewBag.ItemType" readonly>
                     </div>
 
                     <!-- Item & Plan -->
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold">Item Name</label>
-                        <input type="text" class="form-control" value="@ViewBag.ItemName" readonly>
+                        <label class="form-label fw-bold text-dark">Item Name</label>
+                        <input type="text" class="form-control form-control-sm text-dark shadow-sm" value="@ViewBag.ItemName" readonly>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold">Plan Name</label>
-                        <input type="text" class="form-control" value="@ViewBag.PlanName"readonly>
+                        <label class="form-label fw-bold text-dark">Plan Name</label>
+                        <input type="text" class="form-control form-control-sm text-dark shadow-sm" value="@ViewBag.PlanName" readonly>
                     </div>
 
                     <!-- Parameters & Inspection -->
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold">Parameters</label>
-                        <input type="text" class="form-control" id="parameter" value="@ViewBag.Parameters"readonly>
+                        <label class="form-label fw-bold text-dark">Parameters</label>
+                        <input type="text" class="form-control form-control-sm text-dark shadow-sm" id="parameter" value="@ViewBag.Parameters" readonly>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold">Inspection Type</label>
-                        <input type="text" class="form-control" value="@ViewBag.InspectionType"readonly>
+                        <label class="form-label fw-bold text-dark">Inspection Type</label>
+                        <input type="text" class="form-control form-control-sm text-dark shadow-sm" value="@ViewBag.InspectionType" readonly>
                     </div>
 
                     <!-- Assigned Date -->
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold">Assigned Date</label>
-                        <input type="text" class="form-control" value="@ViewBag.AddedDate" readonly>
+                        <label class="form-label fw-bold text-dark">Assigned Date</label>
+                        <input type="text" class="form-control form-control-sm text-dark shadow-sm"
+                               value="@(ViewBag.AddedDate?.ToString().Replace("-", "/"))" readonly>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold">Quantity</label>
-                        <input type="text" class="form-control" value="@ViewBag.Quantity" readonly>
+                        <label class="form-label fw-bold text-dark">Quantity</label>
+                        <input type="text" id="txtQuantity" class="form-control form-control-sm text-dark shadow-sm" value="@ViewBag.Quantity" readonly>
                     </div>
 
                     <!-- Frequency & Sample -->
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold">Inspection Frequency</label>
-                        <input type="number" id="txtinspfreq" class="form-control" placeholder="Enter Inspection Frequency" />
+                        <label class="form-label fw-bold text-dark">Inspection Frequency<span class="text-danger">*</span></label>
+                        <input type="number" id="txtinspfreq" class="form-control form-control-sm text-dark shadow-sm" placeholder="Enter Inspection Frequency" />
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold">Sample Quality Checked</label>
-                        <input type="number" id="txtSamplequalitycheck" class="form-control" placeholder="Enter Sample Quality" />
+                        <label class="form-label fw-bold text-dark">Sample Quality Checked <span class="text-danger">*</span></label>
+                        <input type="number" id="txtSamplequalitycheck" class="form-control form-control-sm text-dark shadow-sm" placeholder="Enter Sample Quality" />
+                        <span id="sampleError" class="text-danger small mt-1 d-none">Sample checked cannot be greater than Quantity.</span>
                     </div>
 
                     <!-- Parameter Table -->
@@ -105,13 +123,13 @@
 
                     <!-- Buttons -->
                     <div class="col-12 d-flex justify-content-end gap-2 mt-3">
-                        <button type="button" class="btn btn-success px-4" onclick="confirmModal()">
+                        <button type="button" class="btn btn-success px-2 py-1 btn-sm" onclick="confirmModal()">
                             <i class="bi bi-check-circle me-1"></i> Confirm
                         </button>
-                        <button type="button" class="btn btn-warning text-white px-4" onclick="InitiateNc()">
+                        <button type="button" class="btn btn-warning text-white px-2 py-1 btn-sm" onclick="InitiateNc()">
                             <i class="bi bi-exclamation-triangle me-1"></i> Initiate NC
                         </button>
-                      
+
                     </div>
                 </form>
             </div>
@@ -119,19 +137,13 @@
 
         <!-- NonConfirm Modal -->
         <div class="modal fade" data-bs-backdrop="false" id="ncModal" tabindex="-1" aria-labelledby="ncModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable">
                 <div class="modal-content shadow-lg rounded-4">
-                    <div class="modal-header bg-primary text-white position-relative">
-                        <h4 class="modal-title w-100 text-center text-white" id="ncModalLabel">
+                    <div class="card-header bg-primary text-white d-flex justify-content-center align-items-center rounded-top p-1">
+                        <h3 class="modal-title fw-bold text-white mb-0 fs-5 p-1" id="ncModalLabel">
                             Non Confirmation Form
-                        </h4>
-                        <button type="button"
-                                class="btn  position-absolute top-50 end-0 translate-middle-y btn-lg fw-bold text-white"
-                                style="width:40px; height:40px; font-size:24px; line-height:1;"
-                                data-bs-dismiss="modal"
-                                aria-label="Close">
-                            &times;
-                        </button>
+                        </h3>
+                        <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body" id="ncModalBody">
                         <div class="text-center text-muted">Loading...</div>
@@ -142,13 +154,45 @@
     </div>
 
     @* Scripts *@
-    <script>
-        // (Your existing jQuery/AJAX scripts here...)
-    </script>
+   
     <script>
         // Load parameter list
         $(document).ready(function () {
             var id = $('#itemcode').val();
+
+
+            $('#txtinspfreq, #txtSamplequalitycheck').on('input', function () {
+                const $this = $(this);
+                const val = parseFloat($this.val()) || 0;
+                const quantity = parseFloat($('#txtQuantity').val()) || 0;
+
+                // Remove any previous error text if user starts typing
+                $this.removeClass('is-invalid');
+                $this.siblings('.error-text').remove();
+
+                // Re-validate basic rules (to show/hide dynamically)
+                if ($this.attr('id') === 'txtSamplequalitycheck') {
+                    if (val < 0) {
+                        $this.addClass('is-invalid')
+                            .after('<span class="text-danger small error-text">  Sample Quality cannot be negative.</span>');
+                    } else if (val > quantity) {
+                        $this.addClass('is-invalid')
+                            .after(`<span class="text-danger small error-text">  Sample Quality Checked cannot be greater than Quantity (${quantity}).</span>`);
+                    }
+                }
+
+                if ($this.attr('id') === 'txtinspfreq') {
+                    if (val < 0) {
+                        $this.addClass('is-invalid')
+                            .after('<span class="text-danger small error-text">  Inspection Frequency cannot be negative.</span>');
+                    } else if (val > quantity) {
+                        $this.addClass('is-invalid')
+                            .after(`<span class="text-danger small error-text">  Inspection Frequency cannot be greater than Quantity (${quantity}).</span>`);
+                    }
+                }
+            });
+
+            //parameter load in table
 
             $.ajax({
                 url: '/Quality/ParameterTableRG',
@@ -161,11 +205,11 @@
                     if (res && res.length > 0) {
                         res.forEach((item, index) => {
                             $('#tbody').append(`
-                                <tr>
-                                    <td class="text-center">${index + 1}</td>
-                                    <td>${item.Parameters || ''}</td>
-                                </tr>
-                            `);
+                                    <tr>
+                                        <td class="text-center">${index + 1}</td>
+                                        <td>${item.Parameters || ''}</td>
+                                    </tr>
+                                `);
                         });
                     } else {
                         $('#tbody').append('<tr><td colspan="2" class="text-center text-muted">No parameters found</td></tr>');
@@ -180,15 +224,80 @@
 
         // Confirm QC
         function confirmModal() {
+
+
+            // Remove old error messages
+            $('.error-text').remove();
+            $('.is-invalid').removeClass('is-invalid');
+
+            let hasError = false;
+
+
+            // Get values
+
             var id = $('#GRNItemCode').val();
-            var sqc = $('#txtSamplequalitycheck').val();
+            var sqc = $('#txtSamplequalitycheck').val().trim();
             var Inf = $('#txtinspfreq').val();
+            const quantity = parseFloat($('#txtQuantity').val()) || 0;
             var GRNCode = $('#GRN').val();
 
-            if (!sqc || !Inf) {
-                Swal.fire("⚠️ Missing Data", "Please enter Inspection Frequency and Sample Quality Checked.", "warning");
+
+
+            // ---------- 1️⃣ Mandatory Field Validation ----------
+            if (!sqc) {
+                $('#txtSamplequalitycheck')
+                    .addClass('is-invalid')
+                    .after('<span class="text-danger small error-text">  Please enter Sample Quality Checked.</span>');
+                hasError = true;
+            }
+            if (!Inf) {
+                $('#txtinspfreq')
+                    .addClass('is-invalid')
+                    .after('<span class="text-danger small error-text">  Please enter Inspection Frequency.</span>');
+                hasError = true;
+            }
+
+            // ---------- 2️⃣ Number Validation (no letters / negative) ----------
+            const numericValueSqc = parseFloat(sqc);
+            const numericValueInf = parseFloat(Inf);
+
+            if (sqc && (isNaN(numericValueSqc) || numericValueSqc < 0)) {
+                $('#txtSamplequalitycheck')
+                    .addClass('is-invalid')
+                    .after('<span class="text-danger small error-text">  Please enter a valid positive number for Sample Quality Checked.</span>');
+                hasError = true;
+            }
+
+            if (Inf && (isNaN(numericValueInf) || numericValueInf < 0)) {
+                $('#txtinspfreq')
+                    .addClass('is-invalid')
+                    .after('<span class="text-danger small error-text">  Please enter a valid positive number for Inspection Frequency.</span>');
+                hasError = true;
+            }
+
+            // ---------- 3️⃣ Logical Validation ----------
+            if (parseFloat(sqc) > quantity) {
+                $('#txtSamplequalitycheck')
+                    .addClass('is-invalid')
+                    .after(`<span class="text-danger small error-text">  Sample Quality Checked cannot be greater than Quantity (${quantity}).</span>`);
+                hasError = true;
+            }
+
+            if (parseFloat(Inf) > quantity) {
+                $('#txtinspfreq')
+                    .addClass('is-invalid')
+                    .after(`<span class="text-danger small error-text">  Inspection Frequency cannot be greater than Quantity (${quantity}).</span>`);
+                hasError = true;
+            }
+            /*---------- 4️⃣ Stop if Validation Fails ----------*/
+            if (hasError) {
+
                 return;
             }
+
+
+
+            //confirm button function for update status and some fields
 
             $.ajax({
                 url: '/Quality/qualitycheckitemRG',
@@ -219,7 +328,7 @@
                             new bootstrap.Tab($('#completed-task-tab')).show();
                             $("#completedTaskContent").load(`/Quality/CompletedTaskListRG?id=${grnCode}`);
                         }
-                        
+
                     }, 1500);
                 },
                 error: function () {
@@ -228,56 +337,45 @@
             });
         }
 
-        // Initiate NC
-        //function InitiateNc() {
-        //    console.log("Btn Active");
-        //    debugger
-        //    var GRIcode = $('#GRNItemCode').val();
-        //    var sqc = $('#txtSamplequalitycheck').val();
-        //    var Inf = $('#txtinspfreq').val();
-        //    var itemcode = $('#itemcode').val();
-
-        //    if (!sqc || !Inf) {
-        //        Swal.fire("⚠️ Missing Data", "Please enter Inspection Frequency and Sample Quality Checked before initiating NC.", "warning");
-        //        return;
-        //    }
-
-        //    $.ajax({
-        //        url: '/Quality/NonconfirmRG',
-        //        type: 'GET',
-        //        dataType: 'html',
-        //        data: { GRIcode: GRIcode, sqc: sqc, Inf: Inf, itemcode: itemcode },
-        //        success: function (resp) {
-        //            $('#ncModalBody').html(resp);
-
-        //            var ncModalEl = $('#ncModal');
-        //            var ncModal = new bootstrap.Modal(ncModalEl);
-        //            ncModal.show();
-
-        //            // ✅ Show custom backdrop automatically
-        //            $(ncModalEl).addClass("show");
-
-        //            $('#ncModal').on('hidden.bs.modal', function () {
-        //                $(this).removeClass("show");
-        //            });
-
-        //            initGrnTable();
-        //        },
-        //        error: function () {
-        //            Swal.fire("❌ Error", "Failed to load Non-confirmation form.", "error");
-        //        }
-        //    });
-        //}
+        //non confirm form will open
         function InitiateNc() {
             const GRIcode = $('#GRNItemCode').val();
             const sqc = $('#txtSamplequalitycheck').val();
             const Inf = $('#txtinspfreq').val();
             const itemcode = $('#itemcode').val();
             const grnnumber = $('#GRN').val();
-            if (!sqc || !Inf) {
-                Swal.fire("⚠️ Missing Data", "Please enter Inspection Frequency and Sample Quality Checked before initiating NC.", "warning");
+            //if (!sqc || !Inf) {
+            //    Swal.fire(" Missing Data", "Please enter Inspection Frequency and Sample Quality Checked before initiating NC.", "warning");
+            //    return;
+            //}
+            // Remove any existing inline errors
+            $('.error-text').remove();
+            $('.is-invalid').removeClass('is-invalid');
+
+            let hasError = false;
+
+            // 🔹 Validate Sample Quality Checked
+            if (!sqc) {
+                $('#txtSamplequalitycheck')
+                    .addClass('is-invalid')
+                    .after('<span class="text-danger small error-text">  Please enter Sample Quality Checked.</span>');
+                hasError = true;
+            }
+
+            // 🔹 Validate Inspection Frequency
+            if (!Inf) {
+                $('#txtinspfreq')
+                    .addClass('is-invalid')
+                    .after('<span class="text-danger small error-text">  Please enter Inspection Frequency.</span>');
+                hasError = true;
+            }
+
+            // 🔹 Stop execution if validation fails
+            if (hasError) {
                 return;
             }
+
+           
 
             // Step 1: Close current Inspection Form modal
             const parentModalEl = window.parent.document.getElementById('inspecModal');

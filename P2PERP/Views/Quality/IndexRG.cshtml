@@ -9,7 +9,9 @@
     <style>
         #mainCard {
             box-shadow: none;
+
         }
+
     </style>
 </head>
 <body class="bg-light">
@@ -20,18 +22,13 @@
         <!-- 🔹 Entire Page wrapped in one card -->
         <div class="card shadow-lg rounded-3 border-0">
 
-            <!-- Card Header -->
-            <div class="card-header text-primary text-center">
-                <h3 class="mb-0 text-primary fw-bolder text-white ">Check Quality</h3>
-            </div>
-
             <!-- Card Body -->
-            <div class="card-body">
+            <div>
 
                 <!-- Task Section -->
                 <div id="taskSection" class="mt-4" style="display:none;">
                     <!-- Nav Pills -->
-                    <ul class="nav nav-pills mb-3" id="taskTabs" role="tablist">
+                    <ul class="nav nav-pills mb-4 ms-4" id="taskTabs" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active fw-medium"
                                     id="new-task-tab"
@@ -71,721 +68,80 @@
                     </div>
                 </div>
 
-                <!-- Date Range + Export Buttons -->
-                <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap">
-                    <!-- Date Picker -->
-                    <div class="mt-2" id="dtp">
-                        <div class="input-group" style="height: 40px; max-width: 280px;">
-                            <span class="input-group-text bg-primary text-white"><i class="bi bi-calendar-date"></i></span>
-                            <input type="text" id="grnlistdatepicker" class="form-control"
-                                   placeholder="Select date range" readonly />
-                        </div>
-                    </div>
-                    <!-- Export Buttons -->
-                    <div id="exportContainer" class="d-flex mt-2" style="height: 40px; align-items: center;"></div>
-                </div>
-
-                <!-- GRN Grid -->
-                <div id="grnGridSection">
-                    <div class="table-responsive">
-                        <table id="grnTable" class="table table-striped table-hover table-bordered align-middle text-center">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th><input type="checkbox" id="selectAll" /></th>
-                                    <th>Sr.No</th>
-                                    <th>GRN Code</th>
-                                    <th>Added Date</th>
-                                    <th>PO Code</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
 
             </div> <!-- End Card Body -->
         </div> <!-- End Card -->
 
     </div> <!-- End Container -->
 
+    <style>
 
-
-
-
-
-
-<script>
-    //  Toast function
-
-
-
-
-    function showToast(message, type = 'error') {
-        // Map to Bootstrap contextual colors
-        let icon = '';
-        let progressColor = '';
-
-        switch (type) {
-            case 'success':
-                icon = '<i class="bi bi-check-circle-fill me-2"></i>';
-                progressColor = 'bg-light';
-                break;
-            case 'warning':
-                icon = '<i class="bi bi-exclamation-triangle-fill me-2"></i>';
-                progressColor = 'bg-dark';
-                break;
-            case 'info':
-                icon = '<i class="bi bi-info-circle-fill me-2"></i>';
-                progressColor = 'bg-light';
-                break;
-            default: // error
-                icon = '<i class="bi bi-x-circle-fill me-2"></i>';
-                progressColor = 'bg-light';
+        .white-header {
+            background: white !important;
         }
 
-        const toastId = `toast-${Date.now()}`;
-
-        //  Toast HTML with white text for all
-        const toastHTML = `
-                     <div id="${toastId}" class="toast align-items-center bg-${type} border-0 mb-2 shadow-lg"
-                             role="alert" aria-live="assertive" aria-atomic="true"
-                             data-bs-delay="3000" data-bs-animation="true">
-                            <div class="d-flex">
-                                <div class="toast-body d-flex align-items-center text-white">
-                                    ${icon} ${message}
-                                </div>
-                                <button type="button" class="btn-close btn-close-white me-2 m-auto"
-                                        data-bs-dismiss="toast" aria-label="Close"></button>
-                            </div>
-                            <div class="progress" style="height: 3px; margin:0; background: rgba(255,255,255,0.3);">
-                        <div class="progress-bar" role="progressbar"></div>
-                          </div>
-                          </div>`;
-
-        const $toast = $(toastHTML);
-        $('#toastContainer').prepend($toast); // newestOnTop
-
-        //  Initialize bootstrap toast
-        const toast = new bootstrap.Toast($toast[0], { delay: 3000 });
-        toast.show();
-
-        //  Animate progress bar
-        $toast.find('.progress-bar')
-            .css({
-                width: "100%",
-                float: "right",
-                backgroundColor: "grey"
-            })
-            .animate(
-                { width: "0%" },
-                { duration: 3000, easing: "linear" }
-            );
-
-
-
-        //  Auto-remove
-        $toast.on('hidden.bs.toast', function () {
-            $(this).remove();
-        });
-    }
-
-
-    let MainGRNCode;
-
-    //  Initialize DataTable
-    function initGrnTable() {
-        if ($.fn.DataTable.isDataTable('#grnTable')) {
-            $('#grnTable').DataTable().clear().destroy(); // destroy old instance
-        }
-        var table = $('#grnTable').DataTable({
-            
-            ajax: {
-                url: '/Quality/AllgriddataRG',
-                type: 'GET',
-                dataSrc: ''
-            },
-            columns: [
-                {
-                    data: null,
-                    orderable: false,
-                    className: 'select-checkbox text-center',
-                    render: function (data, type, row) {
-                        return `<input type="checkbox" class="row-select" value="${row.GRNCode}">`;
-                    }
-                },
-                {
-                    data: null,
-                    render: function (data, type, row, meta) {
-                        return meta.row + 1;
-                    }
-                },
-                { data: 'GRNCode' },
-                {
-                    data: 'strAddedDate',
-                    render: function (data, type, row) {
-                        if (!data) return "";
-                        // Try to parse both "YYYY-MM-DD" and "DD-MM-YYYY"
-                        let date = moment(data, ["YYYY-MM-DD", "DD-MM-YYYY", "DD/MM/YYYY"]);
-                        return date.isValid() ? date.format("DD/MM/YYYY") : data;
-                    }
-                },
-                { data: 'POcode' },
-
-                {
-                    data: 'GRNCode',
-                    render: function (data, type, row) {
-                        return `<button class="btn btn-sm btn-primary"
-                         onclick="MainGRNCode='${row.GRNCode}'; openTask('${row.GRNCode}', '${row.Status}');"
-                        data-bs-toggle="tooltip"
-                        data-bs-placement="top"
-                        title="Open Task">
-                    <i class="bi bi-box-arrow-up-right me-1"></i>
-                </button>`;
-                    }
-                }
-            ],
-            columnDefs: [{ targets: "_all", className: "text-center" }],
-            layout: {
-                topStart: {
-                    buttons: getExportButtons()
-                }
-            },
-            responsive: true,
-            paging: true,
-            searching: true,
-            ordering: false
-        });
-
-        // Stop spinner after export
-        table.on('buttons-processing.dt', function (e, btn, processing) {
-            if (!processing) {
-                table.processing(false);
+            .white-header h3 {
+                color: var(--bs-primary) !important;
             }
-        });
 
-        // Master checkbox select all
-        $('#selectAll').on('click', function () {
-            $('.row-select').prop('checked', this.checked);
-        });
+        button.dt-button.processing,
+        div.dt-button.processing {
+            pointer-events: auto !important;
+            opacity: 1 !important;
+            background: none !important;
+        }
 
-        return table;
-    }
-
-    //  Export button definitions
-    function getExportButtons() {
-        return [
-            {
-                extend: 'print',
-                text: '<i class="bi bi-printer-fill text-dark fs-5"></i>',
-                titleAttr: 'Print Selected',
-                attr: {
-                    'data-bs-toggle': 'tooltip',
-                    'data-bs-placement': 'bottom',
-                    'title': 'Export to print'
-                },
-                action: function (e, dt, button, config) {
-                    if ($('#grnTable .row-select:checked').length === 0) {
-                        showToast("Please select at least one row to print!", "warning");
-                        return;
-                    }
-                    $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config);
-                    dt.processing(false);
-                },
-                exportOptions: {
-                    rows: function (idx, data, node) {
-                        return $(node).find('.row-select').prop('checked');
-                    },
-                    columns: ':visible:not(:first-child):not(:last-child)',
-                    format: {
-                        body: (function () {
-                            let counter = 0; // ✅ counter reset for every print
-                            return function (data, row, column, node) {
-                                data = typeof data === 'string'
-                                    ? data.replace(/<[^>]*>/g, '').trim()
-                                    : data;
-
-                                // ✅ For SR.NO column (first visible after checkbox)
-                                if (column === 1) {
-                                    counter++;
-                                    return counter;
-                                }
-                                return data;
-                            };
-                        })()
-                    }
-                },
-                title: '',
-                customize: function (win) {
-                    $(win.document.body).find('h1').remove();
-
-                    $(win.document.body).prepend(`
-                            <h2 style="text-align:center; font-size:20pt; font-weight:bold; margin-bottom:5px;">
-                                GRN List
-                            </h2>
-                            <div style="text-align:center; font-size:12pt; font-style:italic; margin-bottom:15px;">
-                                Generated on: ${new Date().toLocaleDateString()}
-                            </div>
-                        `);
-
-                    var css = `
-                            page {
-                                margin: 0 !important;
-                            }
-                            body {
-                                margin: 0 !important;
-                                padding: 0 !important;
-                            }
-                            table.dataTable thead th {
-                                background-color: black !important;
-                                color: white !important;
-                                font-weight: bold !important;
-                                text-align: center !important;
-                                -webkit-print-color-adjust: exact !important;
-                                print-color-adjust: exact !important;
-                            }
-                            table.dataTable tbody td {
-                                text-align: center !important;
-                            }
-                        `;
-                    $(win.document.head).append('<style>' + css + '</style>');
-                }
-            },
-
-            //code for Pdf
-
-            {
-                extend: 'pdfHtml5',
-                text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
-                titleAttr: 'Export to PDF',
-                attr: {
-                    'data-bs-toggle': 'tooltip',
-                    'data-bs-placement': 'bottom',
-                    'title': 'Export to PDF'
-                },
-                action: function (e, dt, button, config) {
-                    if ($('#grnTable .row-select:checked').length === 0) {
-                        showToast("Please select at least one row to export!", "warning");
-                        return;
-                    }
-                    $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, button, config);
-                    dt.processing(false); // ✅ force remove buffering spinner
-                },
-                exportOptions: {
-                    rows: function (idx, data, node) {
-                        return $(node).find('.row-select').prop('checked');
-                    },
-                    columns: ':visible:not(:first-child):not(:last-child)',
-                    format: {
-                        body: (function () {
-                            let counter = 0;
-                            return function (data, row, column, node) {
-                                data = typeof data === 'string'
-                                    ? data.replace(/<[^>]*>/g, '').trim()
-                                    : data;
-                                if (column === 1) {
-                                    counter++;
-                                    return counter;
-                                }
-                                return data;
-                            };
-                        })()
-                    }
-                },
-                title: 'GRN List',
-                filename: function () {
-                    return 'GRN_List_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
-                },
-                customize: function (doc) {
-                    doc.styles.title = {
-                        fontSize: 16,
-                        bold: true,
-                        alignment: 'center',
-                        color: 'black',
-
-                    };
-
-                    doc.content.splice(1, 0, {
-                        text: 'Generated on: ' + new Date().toLocaleDateString(),
-                        fontSize: 12,
-                        italics: true,
-                        alignment: 'center',
-                        margin: [0, 0, 0, 10]
-                    });
-                    var tableNode = doc.content[doc.content.length - 1].table;
-                    var headerCells = tableNode.body[0];
-                    headerCells.forEach(function (cell) {
-                        cell.fillColor = 'black';
-                        cell.color = 'white';
-                        cell.bold = true;
-                        cell.alignment = 'center';
-                    });
-                    tableNode.layout = {
-                        paddingLeft: () => 30, paddingLeft: () => 6,
-
-                    };
-                    var colCount = tableNode.body[0].length;
-                    tableNode.widths = new Array(colCount).fill('*'); // distribute evenly
-                }
-            },
-            //code for excel
-
-            {
-                extend: 'excelHtml5',
-                text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
-                titleAttr: 'Export to Excel',
-                attr: {
-                    'data-bs-toggle': 'tooltip',
-                    'data-bs-placement': 'bottom',
-                    'title': 'Export to Excel'
-                },
-                action: function (e, dt, button, config) {
-                    if ($('#grnTable  .row-select:checked').length === 0) {
-                        showToast("Please select at least one row to export!", "warning");
-                        return;
-                    }
-                    $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
-                    dt.processing(false); // ✅ force remove buffering spinner
-                },
-                exportOptions: {
-                    rows: function (idx, data, node) {
-                        return $(node).find('.row-select').prop('checked'); // ✅ only checked rows
-                    },
-                    columns: ':visible:not(:last-child)',
-                    format: {
-                        body: (function () {
-                            let counter = 0;
-                            return function (data, row, column, node) {
-                                data = typeof data === 'string'
-                                    ? data.replace(/<[^>]*>/g, '').trim()
-                                    : data;
-                                if (column === 1) {
-                                    if (!window.__srnoCounter) window.__srnoCounter = 0;
-                                    return ++window.__srnoCounter;
-                                }
-                                return data;
-                            };
-                        })()
-                    }
-                },
-                title: '',
-                filename: function () {
-                    return 'GRN_List_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
-                },
-                customize: function (xlsx) {
-                    var sheet = xlsx.xl.worksheets['sheet1.xml'];
-                    var $sheet = $(sheet);
-
-                    // Count number of columns
-                    var colCount = $('row:first c', sheet).length;
-                    if (colCount === 0) colCount = 5; // fallback
-
-                    // Title & date text
-                    var title = 'GRN List';
-                    var generatedDate = 'Generated on: ' + moment().format('DD/MM/YYYY');
-
-                    // 🔹 Shift all existing rows down by 2 (to make space for title + date)
-                    $sheet.find('sheetData row').each(function () {
-                        var r = parseInt($(this).attr('r'));
-                        $(this).attr('r', r + 2);
-
-                        $(this).find('c').each(function () {
-                            var cellRef = $(this).attr('r');
-                            var col = cellRef.replace(/[0-9]/g, '');
-                            var rowNum = parseInt(cellRef.replace(/[A-Z]/g, '')) + 2;
-                            $(this).attr('r', col + rowNum);
-                        });
-                    });
-
-                    // 🔹 Create Title row
-                    var titleRow = `
-                                           <row r="1">
-                               <c t="inlineStr" r="A1" s="2"><is><t>${title}</t></is></c>
-                                     </row>`;
-
-                    // 🔹 Create Date row
-                    var dateRow = `
-         <row r="2">
-          <c t="inlineStr" r="A2" s="0"><is><t>${generatedDate}</t></is></c>
-            </row>`;
-
-                    // Prepend title + date rows
-                    $sheet.find('sheetData').prepend(titleRow + dateRow);
-
-                    // 🔹 Merge cells for title & date across all columns
-                    var mergeCells = $sheet.find('mergeCells');
-                    if (mergeCells.length === 0) {
-                        mergeCells = $('<mergeCells count="0"></mergeCells>');
-                        $sheet.append(mergeCells);
-                    }
-
-                    mergeCells.append(`<mergeCell ref="A1:${String.fromCharCode(64 + colCount)}1"/>`);
-                    mergeCells.append(`<mergeCell ref="A2:${String.fromCharCode(64 + colCount)}2"/>`);
-                    mergeCells.attr('count', mergeCells.find('mergeCell').length);
-                }
-            },
-            //code for csv
-
-            {
-                extend: 'csvHtml5',
-                text: '<i class="bi bi-filetype-csv text-success fs-5"></i>',
-                titleAttr: 'Export to CSV',
-                attr: {
-                    'data-bs-toggle': 'tooltip',
-                    'data-bs-placement': 'bottom',
-                    'title': 'Export to CSV'
-                },
-                action: function (e, dt, button, config) {
-                    if ($('#grnTable  .row-select:checked').length === 0) {
-                        showToast("Please select at least one row to export!", "warning");
-                        return;
-                    }
-                    window.__srnoCounter = 0; // reset counter after export
-
-                    $.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, button, config);
-                    dt.processing(false); // ✅ force remove buffering spinner
-                },
-                exportOptions: {
-                    rows: function (idx, data, node) {
-                        return $(node).find('.row-select').prop('checked'); // ✅ only checked rows
-                    },
-                    columns: ':visible',
-                    format: {
-                        body: (function () {
-                            let counter = 0;
-                            return function (data, row, column, node) {
-                                data = typeof data === 'string'
-                                    ? data.replace(/<[^>]*>/g, '').trim()
-                                    : data;
-                                if (column === 1) {
-                                    if (!window.__srnoCounter) window.__srnoCounter = 0;
-                                    return ++window.__srnoCounter;
-                                }
-                                if (column === 3) {
-                                    // Convert to proper DD-MM-YYYY
-                                    if (moment(data, 'DD-MM-YYYY', true).isValid()) {
-                                        return moment(data, 'DD-MM-YYYY').format('DD-MM-YYYY');
-                                    }
-                                    if (moment(data).isValid()) {
-                                        return moment(data).format('DD-MM-YYYY'); // only date
-                                    }
-                                    return data;
-                                }
-                                return data;
-                            };
-                        })()
-                    }
-                },
-                title: null, // disable default single-line title
-                filename: function () {
-                    return 'GRN_List_' + new Date().toISOString().slice(0, 10); // date only
-                },
-                customize: function (csv) {
-                    const title = 'GRN List';
-                    const generatedDate = 'Generated on: ' + moment().format('DD/MM/YYYY'); // only date
-
-                    // Estimate spaces to center (adjust if needed)
-                    const spaces = '          '; // 10 spaces for rough centering
-                    return spaces + title + '\n' + spaces + generatedDate + '\n' + csv;
-                }
+            button.dt-button.processing:after {
+                content: none !important;
             }
-        ];
-    }
+    </style>
 
-    //  Require selection before export
-    function requireSelection(e, dt, button, config) {
-        if ($('#grnTable .row-select:chcked').length === 0) {
-            showToast("Please select at least one row!", "warning");
-            return;
-        }
-        $.fn.dataTable.ext.buttons[button[0].className.split(' ')[0]].action.call(this, e, dt, button, config);
-        dt.processing(false);
-    }
 
-    //  Export options with custom row filtering
-    function getExportOptions(columns) {
-        return {
-            rows: (idx, data, node) => $(node).find('.row-select').prop('checked'),
-            columns: columns,
-            format: {
-                body: (() => {
-                    let counter = 0;
-                    return (data, row, column, node) => {
-                        data = typeof data === 'string' ? data.replace(/<[^>]*>/g, '').trim() : data;
-                        if (column === 1) {
-                            counter++;
-                            return counter;
-                        }
-                        return data;
-                    };
-                })()
+
+
+
+    <script>
+        let MainGRNCode;
+
+        $(document).ready(function () {
+            $("#taskSection").show();
+            openTasks();
+        });
+
+        //  Initialize DataTable
+        function initGrnTable() {
+            //  Task Section
+            function openTask(grnCode, status) {
+                debugger
+                $("#grnGridSection").hide();
+                $("#taskSection").show();
+                $('#dtp').hide();
+
+                if (status.toLowerCase().trim() === "completed") {
+                    $('#completed-task-tab').tab('show'); // Activate Completed tab
+                } else {
+                    $('#new-task-tab').tab('show'); // Default to New Task tab
+                }
+
+                $("#newTaskContent").load(`/Quality/NewTaskListRG?id=${grnCode}`);
+                $("#completedTaskContent").load(`/Quality/CompletedTaskListRG?id=${grnCode}`);
             }
-        };
-    }
-
-
-    //  Customize PDF
-    function customizePdf(doc) {
-        const today = new Date();
-        const generatedDate = today.getFullYear() + '-' +
-            String(today.getMonth() + 1).padStart(2, '0') + '-' +
-            String(today.getDate()).padStart(2, '0'); // yyyy-mm-dd
-
-        doc.styles.title = { fontSize: 16, bold: true, alignment: 'center', color: 'black' };
-
-        doc.content.splice(1, 0, {
-            text: 'Generated on: ' + generatedDate,
-            fontSize: 12,
-            italics: true,
-            alignment: 'center',
-            margin: [0, 0, 0, 10]
-        });
-
-        let tableNode = doc.content[doc.content.length - 1].table;
-        tableNode.body[0].forEach(cell => {
-            cell.fillColor = 'black';
-            cell.color = 'white';
-            cell.bold = true;
-            cell.alignment = 'center';
-        });
-    }
-    //  Customize Excel
-    function customizeExcel(xlsx) {
-        var sheet = xlsx.xl.worksheets['sheet1.xml'];
-        var $sheet = $(sheet);
-
-        // Count columns (all columns in the first row)
-        var colCount = $('row:first c', sheet).length;
-        if (colCount === 0) colCount = 5; // fallback if table is empty
-
-        // Title and date
-        var title = 'GRN List';
-        var generatedDate = 'Generated on: ' + moment().format('DD/MM/YYYY');
-
-        // Shift existing rows down by 2
-        $sheet.find('sheetData row').each(function () {
-            var r = parseInt($(this).attr('r'));
-            $(this).attr('r', r + 2);
-            $(this).find('c').each(function () {
-                var cellRef = $(this).attr('r');
-                var col = cellRef.replace(/[0-9]/g, '');
-                var rowNum = parseInt(cellRef.replace(/[A-Z]/g, '')) + 2;
-                $(this).attr('r', col + rowNum);
-            });
-        });
-
-        // Create title row (row 1)
-        var titleRow = `<row r="1">
-            <c t="inlineStr" r="A1" s="2"><is><t>${title}</t></is></c>
-        </row>`;
-
-        // Create date row (row 2)
-        var dateRow = `<row r="2">
-            <c t="inlineStr" r="A2" s="0"><is><t>${generatedDate}</t></is></c>
-        </row>`;
-
-        // Prepend title and date
-        $sheet.find('sheetData').prepend(titleRow + dateRow);
-
-        // Merge title and date across all columns
-        var mergeCells = $sheet.find('mergeCells');
-        if (mergeCells.length === 0) {
-            mergeCells = $('<mergeCells count="0"></mergeCells>');
-            $sheet.prepend(mergeCells);
         }
 
-        mergeCells.html('');
-        mergeCells.append(`<mergeCell ref="A1:${String.fromCharCode(64 + colCount)}1"/>`);
-        mergeCells.append(`<mergeCell ref="A2:${String.fromCharCode(64 + colCount)}2"/>`);
-        mergeCells.attr('count', 2);
-    }
 
-
-
-    //  Date Range Picker
-    function initDatePicker(table) {
-        $('#grnlistdatepicker').daterangepicker({
-            autoUpdateInput: false,
-            opens: "center",
-            drops: "down",
-            locale: { cancelLabel: 'Clear' },
-            ranges: {
-                'Today': [moment(), moment()],
-                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                'This Month': [moment().startOf('month'), moment().endOf('month')],
-                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-            }
-        }, function (start, end) {
-            $('#grnlistdatepicker').val(start.format('DD-MM-YYYY') + ' - ' + end.format('DD-MM-YYYY'));
-
-            $.fn.dataTable.ext.search.push(function (settings, data) {
-                var addedDate = moment(data[3], 'DD-MM-YYYY');
-                return addedDate.isBetween(start, end, undefined, '[]');
-            });
-
-            table.draw();
-            $.fn.dataTable.ext.search.pop();
-        });
-
-        $('#grnlistdatepicker').on('cancel.daterangepicker', function () {
-            $(this).val('');
-            table.draw();
-        });
-    }
-
-    //  Task Section
-    function openTask(grnCode, status) {
-        debugger
-        $("#grnGridSection").hide();
-        $("#taskSection").show();
-        $('#dtp').hide();
-
-        if (status.toLowerCase().trim() === "completed") {
-
-            $('#completed-task-tab').tab('show'); // Activate Completed tab
-        }
-        else {
-
-            $('#new-task-tab').tab('show'); // Default to New Task tab
+        function openTasks() {
+            debugger;
+            $("#newTaskContent").load(`/Quality/NewTaskListRG?id=${MainGRNCode}`);
+            $('#new-task-tab').tab('show');
         }
 
-        $("#newTaskContent").load(`/Quality/NewTaskListRG?id=${grnCode}`);
-        $("#completedTaskContent").load(`/Quality/CompletedTaskListRG?id=${grnCode}`);
+        function openTaskCom() {
+            debugger;
+            $("#completedTaskContent").load(`/Quality/CompletedTaskListRG?id=${MainGRNCode}`);
+            $('#completed-task-tab').tab('show');
+        }
+    </script>
 
-
-
-    }
-    function openTasks() {
-        debugger
-        //$("#mainCard").hide();
-        $("#newTaskContent").load(`/Quality/NewTaskListRG?id=${MainGRNCode}`);
-    }
-    function openTaskCom() {
-        debugger
-        $("#completedTaskContent").load(`/Quality/CompletedTaskListRG?id=${MainGRNCode}`);
-    }
-    //  Initialize everything
-    $(document).ready(function () {
-        const table = initGrnTable();
-        $('#grnTable').on('draw.dt', function () {
-            $('[data-bs-toggle="tooltip"]').tooltip();
-        });
-        initDatePicker(table);
-
-        // 🔹 Initialize tooltips for export buttons
-        $('#exportContainer [data-bs-toggle="tooltip"]').tooltip({
-            template: '<div class="tooltip" role="tooltip"><div class="tooltip-inner bg-dark text-white"></div></div>'
-        });
-
-        table.on('buttons-action.dt', function () {
-            $('#exportContainer [data-bs-toggle="tooltip"]').tooltip({
-                template: '<div class="tooltip" role="tooltip"><div class="tooltip-inner bg-dark text-white"></div></div>'
-            });
-        });
-    });
-</script>
 
 </body>
 </html>

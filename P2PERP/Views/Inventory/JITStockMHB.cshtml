@@ -5,74 +5,143 @@
     ViewBag.Title = "JITStockMHB";
 }
 
+<div class="container mt-4 container-fluid">
 
-<div class="container mt-4  container-fluid ">
+    <form id="stockForm" class="bg-white p-4 rounded shadow-sm" novalidate>
+        <h3 class="text-center text-primary mb-4 fw-bold">Just In Time - Stock Request</h3>
 
-
-    <!-- ✅ Alert Messages -->
-    <div id="alertSuccess" class="alert alert-success d-none" role="alert">
-        ✅ Stock request submitted successfully!
-    </div>
-    <div id="alertError" class="alert alert-danger d-none" role="alert">
-        ❌ Failed to submit stock request.
-    </div>
-
-    <!-- 📋 Form -->
-    <form id="stockForm" class="bg-white p-4 rounded shadow-sm">
-        <h2 class="text-center text-primary mb-4 fw-bold"> Just In Time - Stock Request</h2>
-        <div class="row g-3">
-
+        <div class="row g-4">
+            <!-- 🔹 g-4 adds spacing between fields -->
             <!-- 🔽 Item Name Dropdown -->
-            <div class="col-md-6">
-                <label for="itemName" class="form-label fw-semibold">Item Name</label>
-                <select id="itemName" class="form-select" name="ItemId" required>
+            <div class="col-md-5">
+                <label for="itemName" class="form-label fw-bold text-dark">Item Name <span class="text-danger">*</span></label>
+                <select id="itemName" class="form-select form-select-sm shadow-sm" name="ItemId" required>
                     <option value="">-- Select Item --</option>
-                    @* Populated via AJAX *@
                 </select>
+                <div class="invalid-feedback">Please select an item.</div>
             </div>
 
             <!-- 🔐 Item Code -->
-            <div class="col-md-6">
-                <label for="itemCode" class="form-label fw-semibold">Item Code</label>
-                <input type="text" class="form-control" id="itemCode" name="ItemCode" readonly>
+            <div class="col-md-5">
+                <label for="itemCode" class="form-label fw-bold text-dark">Item Code</label>
+                <input type="text" class="form-control form-control-sm shadow-sm text-dark bg-light" id="itemCode" name="ItemCode" readonly>
             </div>
 
             <!-- 📏 UOM -->
-            <div class="col-md-6">
-                <label for="uom" class="form-label fw-semibold">UOM</label>
-                <input type="text" class="form-control" id="uom" name="UOM" readonly>
+            <div class="col-md-5">
+                <label for="uom" class="form-label fw-bold text-dark">UOM</label>
+                <input type="text" class="form-control form-control-sm shadow-sm text-dark bg-light" id="uom" name="UOM" readonly>
             </div>
 
             <!-- 🔢 Quantity -->
-            <div class="col-md-6">
-                <label for="quantity" class="form-label fw-semibold">Quantity</label>
-                <input type="number" class="form-control" id="quantity" name="Quantity" min="1" required>
+            <div class="col-md-5">
+                <label for="quantity" class="form-label fw-bold text-dark">Quantity <span class="text-danger">*</span></label>
+                <input type="number" class="form-control form-control-sm shadow-sm text-dark" id="quantity" name="Quantity"
+                       min="1" placeholder="Enter order quantity" required>
+                <div class="invalid-feedback">Please enter a valid quantity.</div>
             </div>
 
             <!-- 📝 Description -->
-            <div class="col-md-6">
-                <label for="description" class="form-label fw-semibold">Description</label>
-                <textarea class="form-control" id="description" name="Description" rows="3" readonly></textarea>
+            <div class="col-md-5">
+                <label for="description" class="form-label fw-bold text-dark">Description</label>
+                <textarea class="form-control form-control-sm shadow-sm text-dark bg-light" id="description" name="Description" rows="3" readonly></textarea>
             </div>
 
             <!-- 📅 Required Date -->
-            <div class="col-md-6">
-                <label for="RequiredDate">Required Date</label>
+            <div class="col-md-5">
+                <label for="RequiredDate" class="form-label fw-bold text-dark">Required Date <span class="text-danger">*</span></label>
                 <input type="date" id="RequiredDate" name="RequiredDate"
-                       class="form-control" required
-                       min="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                       class="form-control form-control-sm shadow-sm text-dark"
+                       min="@DateTime.Now.ToString("yyyy-MM-dd")" required>
+                <div class="invalid-feedback">Please select a valid date.</div>
             </div>
 
-            <!-- ✅ Submit Button -->
-            <div class="col-12 text-end mt-4">
-                <button type="submit" class="btn btn-success px-4">Submit</button>
+            <!-- ✅ Submit -->
+            <div class="col-12 text-end mt-3">
+                <button type="submit" class="btn btn-success px-5 py-2 btn-sm " style="margin-right:60px;">Submit</button>
             </div>
+
         </div>
     </form>
 </div>
 
 
+
+<!--<div class="container mt-4 container-fluid">-->
+<!-- ✅ Alert Messages -->
+<!--<div id="alertSuccess" class="alert alert-success d-none" role="alert">
+    ✅ Stock request submitted successfully!
+</div>
+<div id="alertError" class="alert alert-danger d-none" role="alert">
+    ❌ Failed to submit stock request.
+</div>-->
+<!-- 📋 Form -->
+<!--<form id="stockForm" class="bg-white p-4 rounded shadow-sm" novalidate>
+    <h3 class="text-center text-primary mb-1 fw-bold">Just In Time - Stock Request</h3>
+    <div class="row g-3">-->
+<!-- 🔽 Item Name Dropdown -->
+<!--<div class="col-md-6">
+    <label for="itemName" class="form-label form-label-sm fw-bold text-dark ">Item Name <span class="text-danger">*</span></label>
+    <select id="itemName" class="form-select form-select-sm item-select shadow-sm" name="ItemId" required>
+        <option value="">-- Select Item --</option>
+    </select>
+    <div class="invalid-feedback">Please select an item.</div>
+</div>-->
+<!-- 🔐 Item Code -->
+<!--<div class="col-md-6">
+    <label for="itemCode" class="form-label form-label-sm fw-bold text-dark ">Item Code</label>
+    <input type="text" class="form-control form-control-sm  text-dark shadow-sm" id="itemCode" name="ItemCode" readonly>
+</div>-->
+<!-- 📏 UOM -->
+<!--<div class="col-md-6">
+    <label for="uom"class="form-label form-label-sm fw-bold text-dark ">UOM</label>
+    <input type="text" class="form-control form-control-sm  text-dark shadow-sm" id="uom" name="UOM" readonly>
+</div>-->
+<!-- 🔢 Quantity -->
+<!--<div class="col-md-6">
+    <label for="quantity" class="form-label form-label-sm fw-bold text-dark ">
+        Quantity <span class="text-danger">*</span>
+    </label>
+    <input type="number" class="form-control form-control-sm  text-dark shadow-sm " id="quantity" name="Quantity"
+           min="1" placeholder="Enter order quantity" required>
+    <div class="invalid-feedback">
+        Please enter a valid quantity greater than 0 and within allowed limit.
+    </div>
+</div>-->
+<!-- 📝 Description -->
+<!--<div class="col-md-6">
+    <label for="description" class="form-label form-label-sm fw-bold text-dark ">Description</label>
+    <textarea class="form-control form-control-sm  text-dark shadow-sm " id="description" name="Description" rows="3" readonly></textarea>
+</div>-->
+<!-- 📅 Required Date -->
+<!--<div class="col-md-6">
+    <label for="RequiredDate" class="form-label form-label-sm fw-bold text-dark ">
+        Required Date <span class="text-danger">*</span>
+    </label>
+    <input type="date" id="RequiredDate" name="RequiredDate"
+           class="form-control form-control-sm  text-dark shadow-sm" required
+           min="@DateTime.Now.ToString("yyyy-MM-dd")" />
+    <div class="invalid-feedback">
+        Please select a valid date .
+    </div>
+</div>-->
+<!-- ✅ Submit Button -->
+<!--<div class="col-12 text-end mt-4">
+                <button type="submit" class="btn btn-success px-4">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>-->
 <style>
+    .required-star {
+        color: red;
+        font-size: 1em;
+        font-weight: bold;
+        vertical-align: middle;
+        position: relative;
+        top: -4px;
+    }
+
     label {
         font-weight: 600;
     }
@@ -85,9 +154,23 @@
         max-width: 1200px;
         margin: 0 auto;
     }*/
+    /* Maintain uniform spacing and layout for col-md-5 */
+    #stockForm .col-md-5 {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Make text areas and inputs visually consistent */
+    #stockForm textarea {
+        height: 70px;
+    }
+
+    /* Optional: improve visual spacing between rows */
+    #stockForm .row.g-4 > [class*='col-'] {
+        padding-bottom: 0.5rem;
+    }
+
 </style>
-
-
 <script>
     $(document).ready(function () {
         // 🔄 Load Item Dropdown
@@ -100,6 +183,8 @@
         // 🔄 Fetch Item Details on Change
         $('#itemName').on('change', function () {
             const itemId = $(this).val();
+            $('#itemName').removeClass('is-invalid'); // clear invalid state
+
             if (!itemId) {
                 $('#itemCode, #uom, #description').val('');
                 return;
@@ -109,14 +194,55 @@
                 $('#itemCode').val(item.ItemCode);
                 $('#uom').val(item.UOMName);
                 $('#description').val(item.Description);
+                $('#quantity').val('');
+                $('#quantity')
+                    .attr('placeholder', 'Order quantity upto ' + item.ReorderQuantity)
+                    .attr('max', item.ReorderQuantity)
+                    .data('maxqty', item.ReorderQuantity); // store for validation
             });
         });
 
-        // ✅ Handle Form Submission
-        $(document).on("submit", "#stockForm", function (e) {
+        // ✅ Unified validation + submission
+        $('#stockForm').on('submit', function (e) {
             e.preventDefault();
-            let form = this;
+            const form = this;
+            let isValid = true;
 
+            const itemSelect = $('#itemName');
+            const qtyInput = $('#quantity');
+            const dateInput = $('#RequiredDate');
+
+            const maxQty = parseFloat(qtyInput.data('maxqty')) || Infinity;
+            const qty = parseFloat(qtyInput.val());
+            const today = new Date().toISOString().split('T')[0];
+
+            // 🔹 Reset previous validation states
+            itemSelect.removeClass('is-invalid');
+            qtyInput.removeClass('is-invalid');
+            dateInput.removeClass('is-invalid');
+
+            // 🔹 Validate Item Selection
+            if (!itemSelect.val()) {
+                itemSelect.addClass('is-invalid');
+                isValid = false;
+            }
+
+            // 🔹 Validate Quantity
+            if (isNaN(qty) || qty <= 0 || qty > maxQty) {
+                qtyInput.addClass('is-invalid');
+                isValid = false;
+            }
+
+            // 🔹 Validate Required Date
+            if (!dateInput.val() || dateInput.val() < today) {
+                dateInput.addClass('is-invalid');
+                isValid = false;
+            }
+
+            // ❌ Stop if invalid
+            if (!isValid) return;
+
+            // ✅ SweetAlert confirmation after validation
             Swal.fire({
                 title: 'Are you sure?',
                 text: "Do you want to submit this stock request?",
@@ -138,8 +264,8 @@
 
                     const formData = {
                         ItemCode: $('#itemCode').val(),
-                        Quantity: $('#quantity').val(),
-                        RequiredDate: $('#RequiredDate').val()
+                        Quantity: qtyInput.val(),
+                        RequiredDate: dateInput.val()
                     };
 
                     $.ajax({
@@ -155,8 +281,8 @@
                                     timer: 1800,
                                     showConfirmButton: false
                                 }).then(() => {
-                                    form.reset(); // Reset the form
-                                    location.reload(); // Optional: Reload page
+                                    form.reset();
+                                    location.reload();
                                 });
                             } else {
                                 Swal.fire({
@@ -178,6 +304,10 @@
             });
         });
 
+        // 🔹 Remove red border when user changes input
+        $('#itemName, #quantity, #RequiredDate').on('input change', function () {
+            $(this).removeClass('is-invalid');
+        });
     });
 </script>
 

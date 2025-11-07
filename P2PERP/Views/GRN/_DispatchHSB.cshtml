@@ -9,22 +9,22 @@
             <div class="col-md-3">
                 <label class="form-label fw-bold">GR No</label>
                 @Html.HiddenFor(m => m.GoodReturnCode)
-                <div class="form-control bg-light">@Model.GoodReturnCode</div>
+                <div class="form-control form-control-sm bg-light">@Model.GoodReturnCode</div>
             </div>
             <div class="col-md-3">
                 <label class="form-label fw-bold">GRN Code</label>
                 @Html.HiddenFor(m => m.GRNCode)
-                <div class="form-control bg-light">@Model.GRNCode</div>
+                <div class="form-control form-control-sm bg-light">@Model.GRNCode</div>
             </div>
             <div class="col-md-3">
                 <label class="form-label fw-bold">PO Code</label>
                 @Html.HiddenFor(m => m.POCode)
-                <div class="form-control bg-light">@Model.POCode</div>
+                <div class="form-control form-control-sm bg-light">@Model.POCode</div>
             </div>
             <div class="col-md-3">
                 <label class="form-label fw-bold">Vendor</label>
                 @Html.HiddenFor(m => m.VendorName)
-                <div class="form-control bg-light">@Model.VendorName</div>
+                <div class="form-control form-control-sm bg-light">@Model.VendorName</div>
             </div>
         </div>
 
@@ -32,33 +32,33 @@
         <div class="row g-3 mb-4">
             <div class="col-md-6">
                 <label class="form-label fw-bold">Company Address</label>
-                <div class="form-control bg-light address"></div>
+                <div class="form-control form-control-sm bg-light address"></div>
             </div>
         </div>
 
         <!-- Transport Details Section -->
         <div class="row g-3 mb-4">
             <div class="col-md-6">
-                <label class="form-label fw-bold">Transport Name</label>
-                @Html.TextBoxFor(m => m.TransportName, new { @class = "form-control transport-name", placeholder = "Enter Transporter Name" })
+                <label class="form-label fw-bold">Transport Name<span class="text-danger">*</span></label>
+                @Html.TextBoxFor(m => m.TransportName, new { @class = "form-control form-control-sm transport-name", placeholder = "Enter Transporter Name" })
                 <span class="text-danger error-msg"></span>
             </div>
             <div class="col-md-6">
-                <label class="form-label fw-bold">Transport Contact</label>
-                @Html.TextBoxFor(m => m.TransportContact, new { @class = "form-control transport-contact", placeholder = "Enter Transport Contact" })
+                <label class="form-label fw-bold">Transport Contact<span class="text-danger">*</span></label>
+                @Html.TextBoxFor(m => m.TransportContact, new { @class = "form-control form-control-sm transport-contact", placeholder = "Enter Transport Contact" , type="number"})
                 <span class="text-danger error-msg"></span>
             </div>
             <div class="col-md-6">
-                <label class="form-label fw-bold">Vehicle Type</label>
+                <label class="form-label fw-bold">Vehicle Type<span class="text-danger">*</span></label>
                 @Html.DropDownListFor(m => m.VehicleType,
                     Enumerable.Empty<SelectListItem>(),
                     "Select Vehicle Type",
-                    new { @class = "form-select vehicle-type", id = "vehicleType" })
+                    new { @class = "form-select form-select-sm vehicle-type", id = "vehicleType" })
                 <span class="text-danger error-msg"></span>
             </div>
             <div class="col-md-6">
-                <label class="form-label fw-bold">Vehicle No</label>
-                @Html.TextBoxFor(m => m.VehicleNo, new { @class = "form-control vehicle-no", placeholder = "Enter Vehicle No" })
+                <label class="form-label fw-bold">Vehicle No<span class="text-danger">*</span></label>
+                @Html.TextBoxFor(m => m.VehicleNo, new { @class = "form-control form-control-sm vehicle-no", placeholder = "Enter Vehicle No" })
                 <span class="text-danger error-msg"></span>
             </div>
         </div>
@@ -68,6 +68,7 @@
             <table id="DispatchGoods" class="table table-bordered table-hover align-middle shadow-sm">
                 <thead class="table-primary text-center table-dark">
                     <tr>
+                        <th>Sr.No</th>
                         <th>Item Name</th>
                         <th>Ordered Qty</th>
                         <th>UOM</th>
@@ -81,11 +82,12 @@
                         for (int i = 0; i < Model.Items.Count; i++)
                         {
                             <tr>
+                                <td>@(i + 1)</td>
                                 <td>@Html.HiddenFor(m => m.Items[i].ItemName) @Model.Items[i].ItemName</td>
                                 <td>@Html.DisplayFor(m => m.Items[i].Qty)</td>
                                 <td>@Html.HiddenFor(m => m.Items[i].UOM) @Model.Items[i].UOM</td>
-                                <td>@Html.DisplayFor(m => m.Items[i].UnitRate)</td>
-                                <td>@Html.DisplayFor(m => m.Items[i].Amount)</td>
+                                <td>₹@Html.DisplayFor(m => m.Items[i].UnitRate)</td>
+                                <td>₹@Html.DisplayFor(m => m.Items[i].Amount)</td>
                             </tr>
                         }
                     }
@@ -101,9 +103,7 @@
 
         <!-- Footer Buttons -->
         <div class="d-flex justify-content-end gap-2">
-            <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
-                <i class="bi bi-x-circle"></i> Cancel
-            </button>
+           
             <button type="submit" class="btn btn-success px-4">
                 <i class="bi bi-check-circle"></i> Dispatch
             </button>
@@ -116,11 +116,48 @@
 <script>
     $(document).ready(function () {
 
+        // Function to clean invalid characters
+        function cleanTransportName() {
+            let value = $(".transport-name").val();
+            value = value.replace(/[^A-Za-z\s]/g, ''); // Allow only letters & spaces
+            $(".transport-name").val(value);
+        }
+
+        // Function to validate the transport name
+        function validateTransportName() {
+            let value = $(".transport-name").val().trim();
+            let errorMsg = $(".transport-name").next(".error-msg");
+
+            if (value.length === 0) {
+                errorMsg.text("Transport Name is required");
+                $(".transport-name").addClass("is-invalid");
+                return false;
+            } else if (value.length < 2) {
+                errorMsg.text("Transport Name must be at least 2 characters");
+                $(".transport-name").addClass("is-invalid");
+                return false;
+            } else {
+                errorMsg.text("");
+                $(".transport-name").removeClass("is-invalid");
+                return true;
+            }
+        }
+
+        // Apply cleanup immediately on page load
+        cleanTransportName();
+
+        // Apply cleanup and validation while typing
+        $(".transport-name").on("input", function () {
+            cleanTransportName();
+            validateTransportName();
+        });
+
+        
         // Initialize DataTable
         $('#DispatchGoods').DataTable({
             dom: '<"d-flex justify-content-end mb-2"f>rt<"d-flex justify-content-between align-items-center mt-2"ip>',
             paging: true,
-            searching: true,
+            searching: false,
             ordering: false,
             info: true,
             responsive: true,
@@ -130,86 +167,131 @@
         });
 
         // Form Submit
-        $("#DispatchGRForm").on("submit", function (e) {
-            e.preventDefault();
-            $(".error-msg").text("");
-            $("input, select").removeClass("is-invalid");
+        $(document).ready(function () {
 
-            let valid = true;
-            let transportName = $(".transport-name").val().trim();
-            let transportContact = $(".transport-contact").val().trim();
-            let vehicleType = $(".vehicle-type").val().trim();
-            let vehicleNo = $(".vehicle-no").val().trim();
-
-            if (!transportName) {
-                $(".transport-name").next(".error-msg").text("Transport Name is required");
-                $(".transport-name").addClass("is-invalid");
-                valid = false;
-            }
-            if (!/^[0-9]{10}$/.test(transportContact)) {
-                $(".transport-contact").next(".error-msg").text("Enter valid 10-digit contact number");
-                $(".transport-contact").addClass("is-invalid");
-                valid = false;
-            }
-            if (!vehicleType) {
-                $(".vehicle-type").next(".error-msg").text("Vehicle Type is required");
-                $(".vehicle-type").addClass("is-invalid");
-                valid = false;
-            }
-            if (!/^[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}$/.test(vehicleNo)) {
-                $(".vehicle-no").next(".error-msg").text("Enter valid Vehicle No (e.g., MH12AB1234)");
-                $(".vehicle-no").addClass("is-invalid");
-                valid = false;
-            }
-
-            if (!valid) return false;
-
-            let form = $(this);
-            Swal.fire({
-                title: "Are you sure?",
-                text: "Do you want to dispatch these items?",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#198754",
-                cancelButtonColor: "#6c757d",
-                confirmButtonText: "Yes, Dispatch",
-                cancelButtonText: "No, Cancel"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: form.attr("action"),
-                        type: "POST",
-                        data: form.serialize(),
-                        success: function (res) {
-                            if (res.success) {
-                                Swal.fire({
-                                    title: "Success!",
-                                    text: res.message,
-                                    icon: "success",
-                                    showConfirmButton: false,
-                                    timer: 2000
-                                }).then(() => {
-                                    // Close modal
-                                    $("#packingSlipModal").modal("hide");
-
-                                  
-                                    form[0].reset();
-
-                                    // Refresh table (Goods Return)
-                                    $('#ReturnGoods').DataTable().ajax.reload(null, false); 
-
-                                });
-                            } else {
-                                Swal.fire("Error", res.message, "error");
-                            }
-                        },
-                        error: function () {
-                            Swal.fire("Error", "Something went wrong!", "error");
-                        }
-                    });
+            // ---------- Validation Functions ----------
+            function validateTransportName() {
+                const input = $(".transport-name");
+                if (!input.val().trim()) {
+                    input.next(".error-msg").text("Transport Name is required");
+                    input.addClass("is-invalid");
+                    return false;
+                } else {
+                    input.next(".error-msg").text("");
+                    input.removeClass("is-invalid");
+                    return true;
                 }
+            }
+
+            function validateTransportContact() {
+                const input = $(".transport-contact");
+                const contact = input.val().trim();
+                if (!/^[0-9]{10}$/.test(contact)) {
+                    input.next(".error-msg").text("Enter valid 10-digit contact number");
+                    input.addClass("is-invalid");
+                    return false;
+                } else {
+                    input.next(".error-msg").text("");
+                    input.removeClass("is-invalid");
+                    return true;
+                }
+            }
+
+            function validateVehicleType() {
+                const input = $(".vehicle-type");
+                const vehicleType = input.val().trim();
+                if (!vehicleType) {
+                    input.next(".error-msg").text("Vehicle Type is required");
+                    input.addClass("is-invalid");
+                    return false;
+                } else {
+                    input.next(".error-msg").text("");
+                    input.removeClass("is-invalid");
+                    return true;
+                }
+            }
+
+            function validateVehicleNo() {
+                const input = $(".vehicle-no");
+                const vehicleNo = input.val().trim();
+                if (!/^[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}$/.test(vehicleNo)) {
+                    input.next(".error-msg").text("Enter valid Vehicle No (e.g., MH12AB1234)");
+                    input.addClass("is-invalid");
+                    return false;
+                } else {
+                    input.next(".error-msg").text("");
+                    input.removeClass("is-invalid");
+                    return true;
+                }
+            }
+
+            // ---------- Real-time Event Bindings ----------
+            $(".transport-name").on("input", validateTransportName);
+            $(".transport-contact").on("input", validateTransportContact);
+            $(".vehicle-type").on("change", validateVehicleType);
+            $(".vehicle-no").on("input", validateVehicleNo);
+
+            // ---------- Form Submit ----------
+            $("#DispatchGRForm").on("submit", function (e) {
+                e.preventDefault();
+                $(".error-msg").text("");
+                $("input, select").removeClass("is-invalid");
+
+                let valid = true;
+                if (!validateTransportName()) valid = false;
+                if (!validateTransportContact()) valid = false;
+                if (!validateVehicleType()) valid = false;
+                if (!validateVehicleNo()) valid = false;
+
+                if (!valid) return false;
+
+                let form = $(this);
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "Do you want to dispatch these items?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#198754",
+                    cancelButtonColor: "#6c757d",
+                    confirmButtonText: "Yes, Dispatch",
+                    cancelButtonText: "No, Cancel"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: form.attr("action"),
+                            type: "POST",
+                            data: form.serialize(),
+                            success: function (res) {
+                                if (res.success) {
+                                    Swal.fire({
+                                        title: "Success!",
+                                        text: res.message,
+                                        icon: "success",
+                                        showConfirmButton: false,
+                                        timer: 2000
+                                    }).then(() => {
+                                        // Close modal
+                                        $("#packingSlipModal").modal("hide");
+
+                                        // Reset form
+                                        form[0].reset();
+
+                                        // Refresh table (Goods Return)
+                                        $('#ReturnGoods').DataTable().ajax.reload(null, false);
+                                    });
+                                } else {
+                                    Swal.fire("Error", res.message, "error");
+                                }
+                            },
+                            error: function () {
+                                Swal.fire("Error", "Something went wrong!", "error");
+                            }
+                        });
+                    }
+                });
             });
         });
+
 
 
         // Populate Vehicle Types

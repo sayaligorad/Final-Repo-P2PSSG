@@ -6,7 +6,7 @@
 
 
     <div class="container mt-4 bg-white">
-        <h2 class="mb-4 text-center text-primary"> Manager Approval Panel</h2>
+        <h3 class=" mb-1 text-center text-primary"> Manager Approval Panel</h3>
         <div class="mb-3">
             <div class="input-group" style="max-width: 280px;">
                 <span class="input-group-text bg-primary text-white">
@@ -42,25 +42,25 @@
     <!-- ✅ Plan Details Modal -->
     <div class="modal fade" id="planDetailsModal" tabindex="-1" aria-labelledby="planDetailsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title text-center w-100 text-white"> Plan Details</h5>
-                    <button type="button" class="btn-close btn-close-white" onclick="closePlanModal()" aria-label="Close"></button>
+            <div class="modal-content shadow-lg rounded-3">
+                <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-1">
+                    <h5 class="modal-title text-center w-100 text-white  mb-0 fs-5 "> Plan Details</h5>
+                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2 " onclick="closePlanModal()" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
 
                     <div class="row mb-3">
                         <div class="col-md-4">
-                            <label class="fw-bold">Plan Name:</label>
-                            <div id="modalPlanName" class="text-muted form-control"></div>
+                            <label class="form-label form-label-sm fw-bold text-dark">Plan Name:</label>
+                            <div id="modalPlanName" class=" form-control bg-light form-control-sm  text-dark shadow-sm"></div>
                         </div>
                         <div class="col-md-4">
-                            <label class="fw-bold">MRP Code:</label>
-                            <div id="modalPlanCode" class="text-muted form-control"></div>
+                            <label class="form-label form-label-sm fw-bold text-dark">MRP Code:</label>
+                            <div id="modalPlanCode" class=" form-control bg-light form-control-sm  text-dark shadow-sm"></div>
                         </div>
                         <div class="col-md-4">
-                            <label class="fw-bold">Year:</label>
-                            <div id="modalPlanyear" class="text-muted form-control"></div>
+                            <label class="form-label form-label-sm fw-bold text-dark">Year:</label>
+                            <div id="modalPlanyear" class=" form-control bg-light form-control-sm  text-dark shadow-sm"></div>
                         </div>
                     </div>
 
@@ -83,18 +83,18 @@
 
                     <div class="row mb-3 text-center">
                         <div class="col-md-6">
-                            <label class="fw-bold">From Date:</label>
+                            <label class="form-label form-label-sm fw-bold text-dark">From Date:</label>
                             <div id="modalfromdate" class="text-muted"></div>
                         </div>
                         <div class="col-md-6">
-                            <label class="fw-bold">To Date:</label>
+                            <label class="form-label form-label-sm fw-bold text-dark">To Date:</label>
                             <div id="modaltodate" class="text-muted"></div>
                         </div>
                     </div>
 
                     <div class="text-center mt-4 ">
-                        <button id="approveBtn" class="btn btn-success px-4 me-3">Approve</button>
-                        <button id="rejectBtn" class="btn btn-danger px-4"> Reject</button>
+                        <button id="rejectBtn" class="btn btn-danger px-4 btn-sm"> Reject</button>
+                        <button id="approveBtn" class="btn btn-success px-4 me-3 btn-sm">Approve</button>
                     </div>
                 </div>
             </div>
@@ -104,18 +104,19 @@
     </div>
     <!-- ✅ Reject Reason Modal -->
     <div class="modal fade" id="rejectReasonModal" tabindex="-1" aria-labelledby="rejectReasonModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content shadow">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title">❌ Reason for Rejection</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        <div class="modal-dialog ">
+            <div class="modal-content shadow-lg rounded-3">
+                <div class="modal-header bg-danger d-flex justify-content-center align-items-center rounded-top p-1 ">
+                    <h5 class="modal-title fw-bold text-white mb-0 fs-5">Reason for Rejection</h5>
+                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2" data-bs-dismiss="modal"></button>
                 </div>
+
                 <div class="modal-body">
                     <textarea id="rejectReasonText" class="form-control" rows="4" placeholder="Enter reason for rejection..."></textarea>
                 </div>
                 <div class="modal-footer">
-                    <button id="submitRejectBtn" class="btn btn-danger">Submit</button>
-                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button id="submitRejectBtn" class="btn btn-danger btn-sm">Submit</button>
+                    @*<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>*@
                 </div>
             </div>
         </div>
@@ -124,65 +125,65 @@
     @*edit plan modal*@
     <div class="modal fade" id="editPlanModal" tabindex="-1" aria-labelledby="editPlanModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title text-center w-100 text-white" id="editPlanModalLabel"> Edit Plan</h5>
+            <div class="modal-content shadow-lg rounded-3">
+                <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-1">
+                    <h5 class="modal-title fw-bold text-white mb-0 fs-5" id="editPlanModalLabel"> Edit Plan</h5>
 
-                    <button type="button" class="btn-close btn-close-white" onclick="closeEditModal()" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2" onclick="closeEditModal()" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
 
                     <!-- Plan Metadata -->
                     <div class="row mb-3">
                         <div class="col-md-4">
-                            <label>Year:</label>
-                            <input type="text" class="form-control" id="editYear" readonly />
+                            <label class="form-label form-label-sm fw-bold text-dark" >Year:</label>
+                            <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light" id="editYear" readonly />
                         </div>
                         <div class="col-md-4">
-                            <label>Plan Name:</label>
-                            <input type="text" class="form-control" id="editPlanName" readonly />
+                            <label class="form-label form-label-sm fw-bold text-dark">Plan Name:</label>
+                            <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light" id="editPlanName" readonly />
                         </div>
                         <div class="col-md-4">
-                            <label>Plan Code:</label>
-                            <input type="text" class="form-control" id="editMRPCode" readonly />
+                            <label class="form-label form-label-sm fw-bold text-dark">Plan Code:</label>
+                            <input type="text" class="form-control  form-control-sm text-dark shadow-sm bg-light" id="editMRPCode" readonly />
                         </div>
                     </div>
 
                     <!-- Item Form -->
                     <div class="row mb-3">
                         <div class="col-md-3">
-                            <label>Item Name:</label>
-                            <select class="form-control" id="editItemName">
+                            <label class="form-label fw-bold text-dark">Item Name:<span class="required-star">*</span></label>
+                            <select class="form-control form-select-sm item-select shadow-sm " id="editItemName">
                                 <option value="">Select Item</option>
                             </select>
                         </div>
                         <div class="col-md-2">
-                            <label>Item Code:</label>
-                            <input type="text" class="form-control" id="editItemCode" readonly />
+                            <label class="form-label fw-bold text-dark">Item Code:</label>
+                            <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light" id="editItemCode" readonly />
                         </div>
                         <div class="col-md-2">
-                            <label>Quantity:</label>
-                            <input type="number" class="form-control" id="editQuantity" />
+                            <label class="form-label fw-bold text-dark">Quantity:<span class="required-star">*</span></label>
+                            <input type="number" class="form-control form-control-sm text-dark shadow-sm " id="editQuantity" />
                         </div>
                         <div class="col-md-2">
-                            <label>UOM:</label>
-                            <input type="text" class="form-control" id="editUOM" readonly />
+                            <label class="form-label fw-bold text-dark">UOM:</label>
+                            <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light" id="editUOM" readonly />
                         </div>
                         <div class="col-md-2">
-                            <label>Request Type:</label>
-                            <input type="text" class="form-control" id="editRequestType" readonly />
+                            <label class="form-label fw-bold text-dark">Request Type:</label>
+                            <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light" id="editRequestType" readonly />
                         </div>
                         <div class="col-md-1 d-flex align-items-end">
-                            <button class="btn btn-primary w-100" onclick="addItemToEditTable()">Add</button>
+                            <button class="btn btn-success w-100 btn-sm mb-2" onclick="addItemToEditTable()"><i class="bi bi-plus-circle me-2"></i>Add</button>
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-12">
-                            <label>Description:</label>
-                            <input type="text" class="form-control" id="editItemDescription" readonly />
+                            <label class="form-label fw-bold text-dark">Description:</label>
+                            <input type="text" class="form-control  form-control-sm text-dark shadow-sm bg-light" id="editItemDescription" readonly />
                         </div>
                     </div>
-
+                    
                     <!-- Item Table -->
                     <div class="table-responsive mb-3">
                         <table id="editItemTable" class="table table-bordered text-center table-striped">
@@ -202,19 +203,19 @@
                     </div>
 
                     <!-- Date Range -->
-                    <div class="row mb-3 text-center">
+                    <div class="row mb-3 ">
                         <div class="col-md-6">
-                            <label>From Date:</label>
-                            <input type="date" class="form-control" id="editFromDate" />
+                            <label class="form-label fw-bold text-dark">From Date:<span class="required-star">*</span></label>
+                            <input type="date" class="form-control form-control-sm text-dark shadow-sm" id="editFromDate"  min="@DateTime.Now.ToString("yyyy-MM-dd")"/>
                         </div>
                         <div class="col-md-6">
-                            <label>To Date:</label>
-                            <input type="date" class="form-control" id="editToDate" />
+                            <label class="form-label fw-bold text-dark" >To Date:<span class="required-star">*</span></label>
+                            <input type="date" class="form-control form-control-sm text-dark shadow-sm" id="editToDate"  min="@DateTime.Now.ToString("yyyy-MM-dd")"/>
                         </div>
                     </div>
 
                     <div class="text-center">
-                        <button type="button" class="btn btn-success px-4" id="sendForApprovalBtn">
+                        <button type="button" class="btn btn-success px-4 btn-sm" id="sendForApprovalBtn">
                             Save Changes
                         </button>
                     </div>
@@ -274,10 +275,30 @@
         text-align: center !important;
         vertical-align: middle !important;
     }
+
+    .required-star {
+        color: red;
+        font-size: 1em;
+        font-weight: bold;
+        vertical-align: middle;
+        position: relative;
+        top: -4px;
+    }
+
+    button.dt-button.processing,
+    div.dt-button.processing {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        background: none !important;
+    }
+        button.dt-button.processing:after {
+            content: none !important;
+        }
 </style>
 
 <script>
 
+    let allItems = []; // will hold all items from server
 
 
     function fetchPlans() {
@@ -317,7 +338,7 @@
                                 $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config);
                             },
                             exportOptions: {
-                                columns: [1, 2, 3, 4, 5, 6],
+                                columns: [1, 2, 3, 4, 5],
                                 rows: function (idx, data, node) {
                                     return $(node).find('.row-select').prop('checked');
                                 }
@@ -337,6 +358,21 @@
                                 $(win.document.body).find('table tbody tr').each(function (i) {
                                     $(this).find('td:first').text(i + 1);
                                 });
+                            },
+                            customize: function (win) {
+                                $(win.document.body).find('h1').remove();
+                                const today = new Date().toLocaleDateString('en-GB');
+                                $(win.document.body).prepend(`
+    <div style="text-align:center; margin-bottom:10px;">
+        <h2 style="margin:0;">Manager Approval Panel</h2>
+        <div style="font-size:12px;">Generated Date: ${today}</div>
+    </div>
+`);
+                                const $table = $(win.document.body).find('table');
+                                $table.addClass('table table-bordered table-striped').css({ 'font-size': '14px', 'width': '100%', 'border-collapse': 'collapse', 'margin-top': '20px' });
+                                $table.find('thead th').css({ 'background-color': '#000', 'color': '#fff', 'text-align': 'center' });
+                                $table.find('tbody td').css('text-align', 'center');
+                                $table.find('tbody tr').each(function (i) { $(this).find('td:first').text(i + 1); });
                             }
                         },
                         // ✅ PDF
@@ -374,7 +410,7 @@
                                     // Add export date
                                     var exportDate = new Date().toLocaleDateString('en-GB');
                                     doc.content.splice(1, 0, {
-                                        text: 'Export Date: ' + exportDate,
+                                        text: 'Generated Date: ' + exportDate,
                                         alignment: 'center',
                                         margin: [0, 0, 0, 8],
                                         fontSize: 10
@@ -393,7 +429,7 @@
                                         hLineWidth: () => .5, vLineWidth: () => .5,
                                         hLineColor: () => '#dddddd', vLineColor: () => '#dddddd',
                                         paddingLeft: () => 50, paddingRight: () => 6,
-                                        paddingTop: () => 4, paddingBottom: () => 4
+                                        paddingTop: () => 3, paddingBottom: () => 4
                                     };
 
                                     // Re-number Sr No column
@@ -420,7 +456,7 @@
                                 $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
                             },
                             exportOptions: {
-                                columns: [1, 2, 3, 4, 5, 6],
+                                columns: [1, 2, 3, 4, 5],
                                 rows: function (idx, data, node) {
                                     return $(node).find('.row-select').prop('checked');
                                 },
@@ -431,7 +467,55 @@
                                         return data;
                                     }
                                 }
+                            },
+                            customize: function (xlsx) {
+                                const sheet = xlsx.xl.worksheets['sheet1.xml'];
+                                const now = new Date();
+                                const formattedDate = now.toLocaleDateString('en-GB'); // DD/MM/YYYY
+
+                                const newRowNumber = 2;
+
+                                // Create "Generated Date" row
+                                const dateRow = `
+<row r="${newRowNumber}">
+    <c t="inlineStr" r="A${newRowNumber}">
+        <is><t>Generated Date: ${formattedDate}</t></is>
+    </c>
+</row>`;
+
+                                // Shift existing rows down by +1
+                                $('row', sheet).each(function () {
+                                    const r = parseInt($(this).attr('r'));
+                                    if (r >= newRowNumber) $(this).attr('r', r + 1);
+                                });
+                                $('c', sheet).each(function () {
+                                    const cellRef = $(this).attr('r');
+                                    const col = cellRef.replace(/[0-9]/g, '');
+                                    const row = parseInt(cellRef.replace(/[A-Z]/g, ''));
+                                    if (row >= newRowNumber) $(this).attr('r', col + (row + 1));
+                                });
+
+                                // Add the new date row right after the title
+                                $('row[r="1"]', sheet).after(dateRow);
+
+                                // ✅ Merge cells from A to last column
+                                const totalCols = $('row c', sheet).last().attr('r').replace(/[0-9]/g, '');
+                                let mergeCells = $('mergeCells', sheet);
+                                if (mergeCells.length === 0) {
+                                    $('worksheet', sheet).prepend(`<mergeCells count="1"><mergeCell ref="A${newRowNumber}:${totalCols}${newRowNumber}"/></mergeCells>`);
+                                } else {
+                                    const count = parseInt(mergeCells.attr('count')) + 1;
+                                    mergeCells.attr('count', count);
+                                    mergeCells.append(`<mergeCell ref="A${newRowNumber}:${totalCols}${newRowNumber}"/>`);
+                                }
+
+                                // ✅ Center align the merged cell
+                                const styles = xlsx.xl['styles.xml'];
+                                const styleIndex = $('cellXfs xf', styles).length;
+                                $('cellXfs', styles).append('<xf xfId="0" applyAlignment="1"><alignment horizontal="center"/></xf>');
+                                $(`c[r="A${newRowNumber}"]`, sheet).attr('s', styleIndex);
                             }
+
                         },
                         // ✅ CSV
                         {
@@ -447,15 +531,23 @@
                                 $.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, button, config);
                             },
                             exportOptions: {
-                                columns: [1, 2, 3, 4, 5, 6],
+                                columns: [1, 2, 3, 4, 5],
                                 rows: function (idx, data, node) {
                                     return $(node).find('.row-select').prop('checked');
                                 },
                                 format: {
                                     body: function (data, rowIdx, colIdx) {
-                                        if (colIdx === 1) return rowIdx + 1;
-                                        if (typeof data === 'string') return data.replace(/<\/?[^>]+(>|$)/g, "").trim();
-                                        return data;
+                                        // Remove HTML tags and trim
+                                        if (typeof data === 'string') data = data.replace(/<[^>]*>/g, '').trim();
+
+                                        // Serial number column
+                                        if (colIdx === 0 || colIdx === 1) {
+                                            // Initialize counter once
+                                            if (typeof this.srnoCounter === 'undefined') this.srnoCounter = 0;
+                                            return ++this.srnoCounter;
+                                        }
+
+                                        return data; // fallback
                                     }
                                 }
                             }
@@ -494,7 +586,7 @@
                     if (plan.StatusName === "Pending") {
                         actionButtons += `
                             <!-- Edit Button -->
-                            <button class="btn btn-sm btn-warning d-flex align-items-center justify-content-center"
+                            <button class="btn btn-sm btn-secondary d-flex align-items-center justify-content-center"
                                     style="width: 32px; height: 32px;"
                                     onclick="openEditModal('${plan.MaterialReqPlanningCode}', '${plan.PlanName}')"
                                     data-bs-toggle="tooltip"  title="Edit">
@@ -528,6 +620,7 @@
 
 
                 });
+             
 
                 table.draw();
                 $('[data-bs-toggle="tooltip"]').tooltip();
@@ -571,24 +664,47 @@
             type: 'GET',
             data: { MRPcode: mrpCode },
             success: function (data) {
+
+              
+                 
                 $('#modalPlanName').text(data.PlanName || '');
                 $('#modalPlanCode').text(data.MRPCode || '');
-                $('#modalPlanyear').text(data.Year || '');
-                function formatDate(dateStr) {
-                    if (!dateStr) return "";
-                    let d = new Date(dateStr);
-                    if (isNaN(d)) return dateStr; // fallback if invalid
-                    let day = String(d.getDate()).padStart(2, '0');
-                    let month = String(d.getMonth() + 1).padStart(2, '0');
-                    let year = String(d.getFullYear()).slice(-4); // last 2 digits
-                    return `${day}/${month}/${year}`;
+                $('#modalPlanyear').text(data.Year || '');  
+                
+       
+                //$('#modalfromdate').text(data.FromDate);
+                //$('#modaltodate').text(data.ToDate);
+
+                function formatDateOnly(dateString) {
+                    if (!dateString) return '';
+
+                    // Handle both "dd/mm/yyyy hh:mm:ss" and ISO date formats
+                    const parts = dateString.split(' ')[0].split(/[-/]/); // works with '-' or '/'
+
+                    if (parts.length === 3) {
+                        // Detect if it's yyyy-mm-dd or dd-mm-yyyy
+                        let day, month, year;
+                        if (parts[0].length === 4) {
+                            // yyyy-mm-dd
+                            [year, month, day] = parts;
+                        } else {
+                            // dd-mm-yyyy
+                            [day, month, year] = parts;
+                        }
+                        return `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`;
+                    }
+                    return '';
                 }
 
-                $('#modalfromdate').text(formatDate(data.FromDate || ''));
-                $('#modaltodate').text(formatDate(data.ToDate || ''));
+                // ✅ Apply to your elements
+                $('#modalfromdate').text(formatDateOnly(data.FromDate));
+                $('#modaltodate').text(formatDateOnly(data.ToDate));
 
+
+               
                 const tbody = $('#modalItemTableBody');
                 tbody.empty();
+               
 
 
                 if (data.ItemList && data.ItemList.length > 0) {
@@ -635,27 +751,26 @@
                                 columns: ':not(:last-child)' // exclude actions column
                             },
                             customize: function (win) {
-                                $(win.document.body).prepend(
-                                    `<div style="text-align:center; font-size:12px; margin-bottom:10px;">
-                    Generated on: ${new Date().toLocaleString()}
-                </div>`
-                                );
-                                $(win.document.body).find('table')
-                                    .addClass('table table-bordered table-striped')
-                                    .css('font-size', '14px');
-                                $(win.document.body).find('thead')
-                                    .css('background-color', '#0d6efd')
-                                    .css('color', 'white');
-                                $(win.document.body).find('table tbody tr').each(function (i) {
-                                    $(this).find('td:first').text(i + 1); // ✅ Sr No
-                                });
+                                $(win.document.body).find('h1').remove();
+                                const today = new Date().toLocaleDateString('en-GB');
+                                $(win.document.body).prepend(`
+    <div style="text-align:center; margin-bottom:10px;">
+        <h2 style="margin:0;">Stocl Level</h2>
+        <div style="font-size:12px;">Generated Date: ${today}</div>
+    </div>
+`);
+                                const $table = $(win.document.body).find('table');
+                                $table.addClass('table table-bordered table-striped').css({ 'font-size': '14px', 'width': '100%', 'border-collapse': 'collapse', 'margin-top': '20px' });
+                                $table.find('thead th').css({ 'background-color': '#000', 'color': '#fff', 'text-align': 'center' });
+                                $table.find('tbody td').css('text-align', 'center');
+                                $table.find('tbody tr').each(function (i) { $(this).find('td:first').text(i + 1); });
                             }
                         },
                         // ✅ PDF
                         {
                             extend: 'pdfHtml5',
                             title: 'Plan Items',
-                            text: '<i class="bi bi-file-earmark-pdf-fill text-danger fs-5" data-bs-toggle="tooltip" title="Export to PDF"></i>',
+                            text: '<i class="bi bi-file-earmark-pdf text-danger fs-5" data-bs-toggle="tooltip" title="Export to PDF"></i>',
                             titleAttr: 'Export PDF',
                             exportOptions: {
                                 columns: ':not(:last-child)',
@@ -668,25 +783,44 @@
                                 }
                             },
                             customize: function (doc) {
-                                doc.content[0].alignment = 'center';
-                                doc.content[0].fontSize = 14;
+                                try {
+                                    // Center and enlarge title
+                                    doc.content[0].alignment = 'center';
+                                    doc.content[0].fontSize = 14;
 
-                                doc.content.splice(1, 0, {
-                                    text: 'Export Date: ' + new Date().toLocaleDateString('en-GB'),
-                                    alignment: 'center',
-                                    margin: [0, 0, 0, 8],
-                                    fontSize: 10
-                                });
+                                    // Add export date below title
+                                    var exportDate = new Date().toLocaleDateString('en-GB');
+                                    doc.content.splice(1, 0, {
+                                        text: 'Generated Date: ' + exportDate,
+                                        alignment: 'center',
+                                        margin: [0, 0, 0, 8],
+                                        fontSize: 10
+                                    });
 
-                                var tableNode = doc.content.find(c => c.table);
-                                if (tableNode) {
+                                    // Find table node
+                                    var tableNode = doc.content.find(c => c.table);
+                                    if (!tableNode) return;
+
+                                    // Apply styling
+                                    doc.styles = doc.styles || {};
                                     doc.styles.tableHeader = { alignment: 'center', fillColor: '#212529', color: '#ffffff', bold: true };
+                                    doc.styles.tableBodyEven = { alignment: 'center' };
+                                    doc.styles.tableBodyOdd = { alignment: 'center' };
+
+                                    // Table borders + padding
                                     tableNode.layout = {
                                         hLineWidth: () => .5, vLineWidth: () => .5,
                                         hLineColor: () => '#dddddd', vLineColor: () => '#dddddd',
                                         paddingLeft: () => 6, paddingRight: () => 6,
                                         paddingTop: () => 4, paddingBottom: () => 4
                                     };
+
+                                    // Re-number Sr No column
+                                    tableNode.table.body.forEach((row, i) => {
+                                        if (i > 0) row[0] = { text: String(i), alignment: 'center' };
+                                    });
+                                } catch (err) {
+                                    console.error('PDF customize error:', err);
                                 }
                             }
                         },
@@ -694,7 +828,7 @@
                         {
                             extend: 'excelHtml5',
                             title: 'Plan Items',
-                            text: '<i class="bi bi-file-earmark-excel-fill text-success fs-5" data-bs-toggle="tooltip" title="Export to Excel"></i>',
+                            text: '<i class="bi bi-file-earmark-excel text-success fs-5" data-bs-toggle="tooltip" title="Export to Excel"></i>',
                             titleAttr: 'Export Excel',
                             exportOptions: {
                                 columns: ':not(:last-child)',
@@ -705,6 +839,53 @@
                                         return data;
                                     }
                                 }
+                            },
+                            customize: function (xlsx) {
+                                const sheet = xlsx.xl.worksheets['sheet1.xml'];
+                                const now = new Date();
+                                const formattedDate = now.toLocaleDateString('en-GB'); // DD/MM/YYYY
+
+                                const newRowNumber = 2;
+
+                                // Create "Generated Date" row
+                                const dateRow = `
+<row r="${newRowNumber}">
+    <c t="inlineStr" r="A${newRowNumber}">
+        <is><t>Generated Date: ${formattedDate}</t></is>
+    </c>
+</row>`;
+
+                                // Shift existing rows down by +1
+                                $('row', sheet).each(function () {
+                                    const r = parseInt($(this).attr('r'));
+                                    if (r >= newRowNumber) $(this).attr('r', r + 1);
+                                });
+                                $('c', sheet).each(function () {
+                                    const cellRef = $(this).attr('r');
+                                    const col = cellRef.replace(/[0-9]/g, '');
+                                    const row = parseInt(cellRef.replace(/[A-Z]/g, ''));
+                                    if (row >= newRowNumber) $(this).attr('r', col + (row + 1));
+                                });
+
+                                // Add the new date row right after the title
+                                $('row[r="1"]', sheet).after(dateRow);
+
+                                // ✅ Merge cells from A to last column
+                                const totalCols = $('row c', sheet).last().attr('r').replace(/[0-9]/g, '');
+                                let mergeCells = $('mergeCells', sheet);
+                                if (mergeCells.length === 0) {
+                                    $('worksheet', sheet).prepend(`<mergeCells count="1"><mergeCell ref="A${newRowNumber}:${totalCols}${newRowNumber}"/></mergeCells>`);
+                                } else {
+                                    const count = parseInt(mergeCells.attr('count')) + 1;
+                                    mergeCells.attr('count', count);
+                                    mergeCells.append(`<mergeCell ref="A${newRowNumber}:${totalCols}${newRowNumber}"/>`);
+                                }
+
+                                // ✅ Center align the merged cell
+                                const styles = xlsx.xl['styles.xml'];
+                                const styleIndex = $('cellXfs xf', styles).length;
+                                $('cellXfs', styles).append('<xf xfId="0" applyAlignment="1"><alignment horizontal="center"/></xf>');
+                                $(`c[r="A${newRowNumber}"]`, sheet).attr('s', styleIndex);
                             }
                         },
                         // ✅ CSV
@@ -739,7 +920,9 @@
                 if (status === "Approved" || status === "Rejected") {
                     $('#approveBtn').hide();
                     $('#rejectBtn').hide();
-                } else {
+                }
+
+                else {
                     $('#approveBtn').show();
                     $('#rejectBtn').show();
                 }
@@ -754,6 +937,11 @@
 
 
     function closePlanModal() {
+
+        if ($.fn.DataTable.isDataTable('#modalItemTable')) {
+            $('#modalItemTable').DataTable().destroy();
+        }
+
         const modal = bootstrap.Modal.getInstance(document.getElementById('planDetailsModal'));
         modal.hide();
     }
@@ -810,16 +998,24 @@
             });
         });
 
-
-
         $('#rejectBtn').click(function () {
             currentMRPCode = $('#modalPlanCode').text();
-            //$('#planDetailsModal').modal('hide');
+
+            // ✅ Don't hide the main modal — just lower its z-index
+            $('#planDetailsModal').css('z-index', '1040');
+            $('.modal-backdrop').last().css('z-index', '1039');
+
+            // Clear and show rejection modal
             $('#rejectReasonText').val('');
-            $('#rejectReasonModal').modal('show');       // Show rejection modal
+            $('#rejectReasonModal').modal('show');
         });
 
-        // Submit Rejection
+        // ✅ When Reject modal closes, restore Plan modal z-index and focus it again
+        $('#rejectReasonModal').on('hidden.bs.modal', function () {
+            $('#planDetailsModal').css('z-index', '1050');  // Bring back above backdrop
+            $('body').addClass('modal-open');               // Prevent background scroll
+        });
+
         // Submit Rejection
         $('#submitRejectBtn').click(function () {
             const reason = $('#rejectReasonText').val().trim();
@@ -905,8 +1101,51 @@
             data: { MRPcode: mrpCode },
             success: function (data) {
                 $('#editYear').val(data.Year || '');
-                $('#editFromDate').val(formatDate(data.FromDate));
-                $('#editToDate').val(formatDate(data.ToDate));
+
+               
+                function formatDateForInput(dateString) {
+                    // This one is for <input type="date">
+                    if (!dateString) return '';
+
+                    let day, month, year;
+
+                    if (dateString.includes('-')) {
+                        const parts = dateString.split(' ')[0].split('-');
+                        [day, month, year] = parts;
+                        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`; // ✅ yyyy-MM-dd
+                    } else if (dateString.includes('-')) {
+                        return dateString.split('T')[0]; // already yyyy-MM-dd
+                    }
+
+                    return '';
+                }
+      
+                $('#editFromDate').val(formatDateForInput(data.FromDate));
+                $('#editToDate').val(formatDateForInput(data.ToDate));
+
+                 $(document).ready(function () {
+        const today = new Date().toISOString().split("T")[0];
+        $('#editFromDate').attr("min", today);
+        $('#editToDate').attr("min", today);
+
+        // When From Date changes, set To Date min accordingly
+        $('#editFromDate').on('change', function () {
+            const fromDate = $(this).val();
+            $('#editToDate').attr("min", fromDate);
+
+            // Optional: Clear To Date if it's before the new From Date
+            const toDate = $('#editToDate').val();
+            if (toDate && toDate < fromDate) {
+                $('#editToDate').val('');
+            }
+        });
+    });
+
+               
+
+              
+
+
 
                 const tbody = $('#editItemTableBody');
                 tbody.empty();
@@ -922,11 +1161,11 @@
                       <td data-bs-toggle="tooltip" data-bs-placement="top" title="${item.Description}">${item.Description}</td>
                         <td>${item.RequestType}</td>
                       <td>
-                            <button class="btn btn-outline-danger btn-sm d-flex align-items-center justify-content-center p-0"
+                            <button class="btn btn-outline-danger btn-sm d-flex  bg-danger align-items-center justify-content-center p-0"
                                     style="width: 32px; height: 32px;"
                                     data-bs-toggle="tooltip" data-bs-placement="top" title="Remove"
                                     onclick="$(this).closest('tr').remove()">
-                                <i class="bi bi-trash-fill" style="font-size:16px; line-height:1;"></i>
+                                <i class="bi bi-trash text-white" ></i>
                             </button>
                         </td>
 
@@ -942,9 +1181,7 @@
                 }
 
                 // ✅ Reinitialize DataTable
-                if ($.fn.DataTable.isDataTable('#editItemTable')) {
-                    $('#editItemTable').DataTable().destroy();
-                }
+              
 
                 $('#editItemTable').DataTable({
                     paging: true,
@@ -965,6 +1202,11 @@
     }
 
     function closeEditModal() {
+
+        if ($.fn.DataTable.isDataTable('#editItemTable')) {
+            $('#editItemTable').DataTable().destroy();
+        }
+
         const modal = bootstrap.Modal.getInstance(document.getElementById('editPlanModal'));
         modal.hide();
     }
@@ -977,11 +1219,46 @@
         const reqType = $('#editRequestType').val();
         const description = $('#editItemDescription').val() || '–';
 
-        if (!itemName || !itemCode || !qty || !uom || !reqType) {
-            alert("⚠️ Fill all fields before adding.");
+
+        if (!itemName || !itemCode ||  !uom || !reqType) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'please Select Item ',
+                text: '⚠️ Please fill in all required fields before adding.',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#d33'
+            });
             return;
+
+        }
+        if ( !qty) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Please Fill Quantity',
+                text: '⚠️ Please fill required fields Quantity.',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#d33'
+            });
+            return;
+
         }
 
+        // ✅ Duplicate check (based on ItemCode or ItemName)
+        let duplicateFound = false;
+        $('#editItemTableBody tr').each(function () {
+            const existingItemName = $(this).find('td:eq(0)').text().trim();
+            const existingItemCode = $(this).find('td:eq(1)').text().trim();
+            if (existingItemName === itemName || existingItemCode === itemCode) {
+                duplicateFound = true;
+                return false; // stop loop
+            }
+        });
+
+        if (duplicateFound) {
+            Swal.fire('Duplicate', 'This item is already added.', 'warning');
+            return;
+        }
+      
         $('#editItemTableBody').append(`
             <tr>
                 <td>${itemName}</td>
@@ -991,11 +1268,11 @@
                   <td data-bs-toggle="tooltip" data-bs-placement="top" title="${description}">${description}</td>
                 <td>${reqType}</td>
                 <td>
-                    <button class="btn btn-outline-danger btn-sm btn-delete d-flex align-items-center justify-content-center"
+                    <button class="btn btn-outline-danger btn-sm btn-delete bg-danger d-flex align-items-center justify-content-center"
                             style="width: 32px; height: 32px;"
                             data-bs-toggle="tooltip" data-bs-placement="top" title="Remove"
                             onclick="$(this).closest('tr').remove()">
-                        <i class="bi bi-trash-fill"></i>
+                        <i class="bi bi-trash-fill text-white"></i>
                     </button>
                   </td>
             </tr>
@@ -1007,26 +1284,38 @@
     }
 
 
-
-
-
-    function formatDate(dateString) {
-        const date = new Date(dateString);
-        return date.toISOString().split('T')[0];
-    }
+ 
+    
     function populateItemDropdown() {
         $.ajax({
             url: '/Inventory/GetItemListMHB', // Your endpoint
             type: 'GET',
             success: function (items) {
-                $('#editItemName').empty().append('<option value="">Select</option>');
-                items.forEach(item => {
-                    $('#editItemName').append(`<option value="${item.ItemId}">${item.ItemName}</option>`);
-                });
-
+                allItems = items; // store globally
+                updateItemDropdown(); // populate with filtered data
             }
         });
     }
+
+    function updateItemDropdown() {
+        const ddl = $("#editItemName");
+        ddl.empty().append('<option value="">Select Item</option>');
+
+        // get all existing ItemCodes in table
+        const existingCodes = [];
+        $("#editItemTableBody tr").each(function () {
+            const itemCode = $(this).find("td:nth-child(2)").text().trim();
+            if (itemCode) existingCodes.push(itemCode);
+        });
+
+        // now fill dropdown excluding those already added
+        allItems.forEach(i => {
+            if (!existingCodes.includes(i.ItemCode)) {
+                ddl.append(`<option value="${i.ItemId}">${i.ItemName}</option>`);
+            }
+        });
+    }
+
 
     $(document).on('change', '#editItemName', function () {
         const selectedItemId = $(this).val();
@@ -1052,7 +1341,7 @@
                 $('#editRequestType').val('MRPItems');
             },
             error: function () {
-                alert("⚠️ Failed to fetch item details.");
+                Swal.fire("⚠️ Failed to fetch item details.");
             }
         });
     });
@@ -1083,6 +1372,9 @@
         // ✅ Prepare the payload
         let payload = {
             MRPCode: $('#editMRPCode').val(),
+            Fromdate: $('#editFromDate').val(),
+            ToDate: $('#editToDate').val(),
+
             ItemList: items
         };
 
@@ -1159,11 +1451,10 @@
                 locale: { cancelLabel: 'Clear' },
                 ranges: {
                     'Today': [moment(), moment()],
-                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
                     'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                    'This Month': [moment().startOf('month'), moment().endOf('month')],
-                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                    'Last 1 Month': [moment().subtract(1, 'months').startOf('day'), moment()],
+                    'Last 3 Months': [moment().subtract(3, 'months').startOf('day'), moment()],
+                    'Last 1 Year': [moment().subtract(12, 'months').startOf('day'), moment()]
                 }
             });
 
@@ -1203,6 +1494,6 @@
         return new bootstrap.Tooltip(tooltipTriggerEl)
     })
 
-
+  
 
 </script>

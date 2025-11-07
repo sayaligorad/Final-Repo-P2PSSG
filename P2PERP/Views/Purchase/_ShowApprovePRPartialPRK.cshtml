@@ -2,32 +2,60 @@
     Layout = null; // No layout for partial view
 }
 
-<!-- Table Container -->
-<div class="table-responsive">
-    <table id="approvedPrTable" class="table table-bordered table-hover align-middle shadow-sm">
-        <thead class="table-dark text-center">
-            <tr>
-                <th>Sr No</th>
-                <th>PR Code</th>
-                <th>Added Date</th>
-                <th>Approved/Rejected Date</th>
-                <th>Priority</th>
-            </tr>
-        </thead>
-        <tbody id="tbodyPartial" class="text-center">
-            <tr>
-                <td colspan="5" class="text-muted py-3">Loading...</td>
-            </tr>
-        </tbody>
-    </table>
+<!-- Date Filter + Table Container -->
+<div class="p-3 bg-white rounded shadow-sm">
+   
+    <!-- Table -->
+    <div class="table-responsive">
+        <table id="approvedPrTable" class="table table-bordered table-hover align-middle shadow-sm">
+            <thead class="table-dark text-center">
+                <tr>
+                    <th><input type="checkbox" id="selectAll" data-bs-toggle="tooltip" title="Select All" /></th>
+                    <th>Sr No</th>
+                    <th>PR Code</th>
+                    <th>Added Date</th>
+                    <th>Approved Date</th>
+                    <th>REQUIRED DATE</th>
+                    <th>Priority</th>
+                </tr>
+            </thead>
+            <tbody id="tbodyPartial" class="text-center">
+                <tr>
+                    <td colspan="6" class="text-muted py-3">Loading...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<!-- Center align all cells -->
+<!-- Styles -->
 <style>
     #approvedPrTable thead th,
     #approvedPrTable tbody td {
         text-align: center;
         vertical-align: middle;
+    }
+
+    .dt-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+    button.dt-button.processing,
+    div.dt-button.processing {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        background: none !important;
+    }
+
+        button.dt-button.processing:after {
+            content: none !important;
+        }
+    thead th {
+        white-space: nowrap !important;
     }
 </style>
 
@@ -36,89 +64,421 @@
     $(document).ready(function () {
         const tableId = "#approvedPrTable";
 
-        // Load approved PR list
+        // ✅ Toast setup
+        function showToast(message, type = "info") {
+            toastr.options = {
+                closeButton: true,
+                progressBar: true,
+                positionClass: "toast-top-right",
+                timeOut: "3000"
+            };
+            toastr[type](message);
+        }
+
+                                        function destroyDataTable(tableSelector) {
+    if ($.fn.DataTable.isDataTable(tableSelector)) {
+        $(tableSelector).DataTable().clear().destroy(true); // destroy completely
+
+    }
+    $(tableSelector).find('tbody').empty();
+}
+
+const startDate = "@ViewBag.StartDate";
+const endDate = "@ViewBag.EndDate";
+
+
+
+        let table;
+
+        // ✅ Fetch data
         $.ajax({
-            url: '/Purchase/ShowApprovPRK',
+            url: '/Purchase/ShowApprovPRDashPRK',
             type: 'GET',
+            data: { startDate: startDate, endDate: endDate },
+            dataType: "json",
+            cache: false,
             success: function (data) {
                 const $tbody = $("#tbodyPartial");
                 $tbody.empty();
 
+
+                // ✅ Properly destroy any existing DataTable
+                if ($.fn.DataTable.isDataTable(tableId)) {
+                    $(tableId).DataTable().clear().destroy();
+                }
+
                 if (!data || data.length === 0) {
-                    $tbody.append('<tr><td colspan="5" class="text-center text-muted">No records found</td></tr>');
+                    $tbody.append('<tr><td colspan="6" class="text-center text-muted">No records found</td></tr>');
                     return;
                 }
 
                 data.forEach(function (i, index) {
-                    // Format dates using moment.js
                     const addedDate = i.AddedDate ? moment(i.AddedDate).format('DD/MM/YYYY') : '';
+                    const expectedDate = i.ExpectedDate ? moment(i.ExpectedDate).format("DD/MM/YYYY") : "";
+
                     const approvedDate = i.ApprovedRejectedDate ? moment(i.ApprovedRejectedDate).format('DD/MM/YYYY') : '';
+                    const priorityBadge = i.Priority
+                        ? `<span class="${i.Priority.toLowerCase() === 'cold' ? 'badge bg-success' :
+                            i.Priority.toLowerCase() === 'warm' ? 'badge bg-warning' :
+                                i.Priority.toLowerCase() === 'hot' ? 'badge bg-danger' :
+                                    'badge bg-secondary'
+                        }">${i.Priority}</span>`
+                        : '';
 
                     $tbody.append(`
                         <tr>
+                            <td><input type="checkbox" class="row-select" value="${i.PRCode}" /></td>
                             <td>${index + 1}</td>
                             <td>${i.PRCode}</td>
                             <td>${addedDate}</td>
                             <td>${approvedDate}</td>
-                           <td>${
-                        i.Priority
-                            ? `<span class="${i.Priority.toLowerCase() === 'cold' ? 'badge bg-success' :
-                                i.Priority.toLowerCase() === 'warm' ? 'badge bg-warning' :
-                                    i.Priority.toLowerCase() === 'hot' ? 'badge bg-danger' :
-                                        'badge bg-secondary'
-                            }">${i.Priority}</span>`
-                            : ''
-        }</td>
+                            <td>${expectedDate}</td>
+                            <td>${priorityBadge}</td>
                         </tr>
                     `);
                 });
 
-                // Initialize or re-initialize DataTable
-                if ($.fn.DataTable.isDataTable(tableId)) {
-                    $(tableId).DataTable().destroy();
-                }
+                // ✅ Initialize DataTable
+                if ($.fn.DataTable.isDataTable(tableId)) $(tableId).DataTable().destroy();
 
-                $(tableId).DataTable({
-                    paging: true,
-                    searching: true,
+                table = $(tableId).DataTable({
+                    dom: '<"dt-toolbar"<"dt-left"B><"dt-search"f>>rt<"bottom d-flex justify-content-between align-items-center mt-2"ip>',
                     ordering: false,
                     responsive: true,
-                    lengthChange: false,   // ✅ Show "entries per page"
-                    info: true,           // ✅ Show "Showing 1 to 10 of N entries"
                     pageLength: 10,
-                    lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+                    buttons: [
 
-                    // ✅ Custom layout: entries on left, pagination on right
-                    dom: '<"row mb-2"<"col-sm-6"l><"col-sm-6 text-end"f>>' +
-                        'rt' +
-                        '<"row mt-2"<"col-sm-6"i><"col-sm-6 text-end"p>>',
+                           {
+                            extend: 'print',
+                            text: '<i class="bi bi-printer-fill text-dark fs-5" data-bs-toggle="tooltip" title="Print Selected Rows"></i>',
+                            titleAttr: 'Print',
+                            title: 'Approved Purchase Requisition',
 
-                    columnDefs: [
-                        { orderable: false, targets: 0 }
-                    ]
+                            action: function (e, dt, button, config) {
+                                if ($('.row-select:checked').length === 0) {
+                                    showToast("Please select at least one row to Print", "warning");
+                                    return;
+                                }
+                                $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config);
+                            },
+
+                            exportOptions: {
+                                columns: ':not(:first-child)', // exclude checkbox column
+                                rows: function (idx, data, node) {
+                                    return $(node).find('.row-select').prop('checked');
+                                }
+                            },
+
+                            customize: function (win) {
+                                // ✅ Format date as DD/MM/YYYY
+                                const today = new Date();
+                                const generatedDate = today.toLocaleDateString('en-GB');
+
+                                // ❌ Remove default DataTables title
+                                $(win.document.body).find('h1').remove();
+
+                                // ✅ Add custom header
+                                $(win.document.body).prepend(`
+            <div style="text-align:center; margin-bottom:10px;">
+                <h2 style="margin:0;">Approved Purchase Requisition</h2>
+                <div style="font-size:12px;">Generated Date: ${generatedDate}</div>
+            </div>
+        `);
+
+                                // ✅ Style the table
+                                const $table = $(win.document.body).find('table');
+                                $table.addClass('table table-bordered table-striped').css({
+                                    'font-size': '14px',
+                                    'width': '100%',
+                                    'border-collapse': 'collapse',
+                                    'margin-top': '20px'
+                                });
+
+                                // ✅ Style header
+                                $table.find('thead th').css({
+                                    'background-color': '#000000',
+                                    'color': '#ffffff',
+                                    'text-align': 'center'
+                                });
+
+                                // ✅ Center align body cells
+                                $table.find('tbody td').css('text-align', 'center');
+
+                                // ✅ Add correct serial numbers
+                                $table.find('tbody tr').each(function (i) {
+                                    $(this).find('td:first').text(i + 1);
+                                });
+                            }
+                        },
+
+                        //PDF Start
+
+                        {
+                            extend: 'pdfHtml5',
+                            text: '<i class="bi bi-file-earmark-pdf text-danger fs-5" data-bs-toggle="tooltip" title="Export to PDF"></i>',
+                            titleAttr: 'Export PDF',
+                            title: 'Approved Purchase Requisition',
+
+                            action: function (e, dt, button, config) {
+                                if ($('.row-select:checked').length === 0) {
+                                    showToast("Please select at least one row to export PDF", "warning");
+                                    return;
+                                }
+                                $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, button, config);
+                            },
+
+                            exportOptions: {
+                                columns: ':not(:first-child)', // ✅ exclude checkbox column
+                                rows: function (idx, data, node) {
+                                    return $(node).find('.row-select').prop('checked');
+                                },
+                                format: {
+                                    body: function (data, rowIdx, colIdx) {
+                                        // ✅ Convert dates to DD/MM/YYYY
+                                        //if (colIdx === 3 || colIdx === 4) return moment(data).format('DD/MM/YYYY');
+                                        // ✅ Add serial numbers in first column
+                                        if (colIdx === 0) return rowIdx + 1;
+                                        // ✅ Strip HTML tags
+                                        if (typeof data === 'string') return data.replace(/<\/?[^>]+(>|$)/g, "").trim();
+                                        return data;
+                                    }
+                                }
+                            },
+
+                            customize: function (doc) {
+                                try {
+                                    // ✅ Title formatting
+                                    doc.content[0].alignment = 'center';
+                                    doc.content[0].fontSize = 14;
+
+                                    // ✅ Add export date below title
+                                    const exportDate = new Date().toLocaleDateString('en-GB');
+                                    doc.content.splice(1, 0, {
+                                        text: 'Generated Date: ' + exportDate,
+                                        alignment: 'center',
+                                        margin: [0, 0, 0, 8],
+                                        fontSize: 10
+                                    });
+
+                                    // ✅ Find table node
+                                    const tableNode = doc.content.find(c => c.table);
+                                    if (!tableNode) return;
+
+                                    // ✅ Table styles
+                                    doc.styles = doc.styles || {};
+                                    doc.styles.tableHeader = {
+                                        alignment: 'center',
+                                        fillColor: '#212529', // dark header background
+                                        color: '#ffffff',     // white text
+                                        bold: true
+                                    };
+                                    doc.styles.tableBodyEven = { alignment: 'center' };
+                                    doc.styles.tableBodyOdd = { alignment: 'center' };
+
+                                    // ✅ Table layout adjustments
+                                    tableNode.layout = {
+                                        hLineWidth: () => 0.5,
+                                        vLineWidth: () => 0.5,
+                                        hLineColor: () => '#dddddd',
+                                        vLineColor: () => '#dddddd',
+                                        paddingLeft: () => 30,
+                                        paddingRight: () => 30,
+                                        paddingTop: () => 4,
+                                        paddingBottom: () => 4
+                                    };
+
+                                    // ✅ Add serial numbers manually
+                                    tableNode.table.body.forEach((row, i) => {
+                                        if (i > 0) row[0] = { text: String(i), alignment: 'center' };
+                                    });
+
+                                } catch (err) {
+                                    console.error('PDF customize error:', err);
+                                }
+                            }
+                        },
+
+
+                        //Excel Start
+                        {
+                            extend: 'excelHtml5',
+                            text: '<i class="bi bi-file-earmark-excel text-success fs-5" data-bs-toggle="tooltip" title="Export to Excel"></i>',
+                            titleAttr: 'Export Excel',
+                            title: 'Approved Purchase Requisition',
+
+                            action: function (e, dt, button, config) {
+                                // ✅ Validate row selection before export
+                                if ($('.row-select:checked').length === 0) {
+                                    showToast("Please select at least one row to export Excel", "warning");
+                                    return;
+                                }
+
+                                // ✅ Initialize serial counter for export
+                                window.__excelSrCounter = 0;
+
+                                // ✅ Proceed with DataTable’s default Excel export action
+                                $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
+                            },
+
+                            exportOptions: {
+                                columns: ':not(:first-child)', // Exclude checkbox column
+                                rows: function (idx, data, node) {
+                                    return $(node).find('.row-select').prop('checked');
+                                },
+                                format: {
+                                    body: function (data, rowIdx, colIdx) {
+                                        // ✅ Add serial number in first visible column
+                                        if (colIdx === 1) return ++window.__excelSrCounter;
+
+                                        // ✅ Clean HTML tags from text
+                                        if (typeof data === "string") {
+                                            return data.replace(/<\/?[^>]+(>|$)/g, "").trim();
+                                        }
+
+                                        return data;
+                                    }
+                                }
+                            },
+                            customize: function (xlsx) {
+                                const sheet = xlsx.xl.worksheets['sheet1.xml'];
+                                const now = new Date();
+                                const formattedDate = now.toLocaleDateString('en-GB'); // DD/MM/YYYY
+                                const newRowNumber = 2;
+
+                                // Create "Generated On" row
+                                const dateRow = `
+            <row r="${newRowNumber}">
+                <c t="inlineStr" r="A${newRowNumber}">
+                    <is><t>Generated Date: ${formattedDate}</t></is>
+                </c>
+            </row>`;
+
+                                // Shift existing rows down by +1
+                                $('row', sheet).each(function () {
+                                    const r = parseInt($(this).attr('r'));
+                                    if (r >= newRowNumber) $(this).attr('r', r + 1);
+                                });
+                                $('c', sheet).each(function () {
+                                    const cellRef = $(this).attr('r');
+                                    const col = cellRef.replace(/[0-9]/g, '');
+                                    const row = parseInt(cellRef.replace(/[A-Z]/g, ''));
+                                    if (row >= newRowNumber) $(this).attr('r', col + (row + 1));
+                                });
+
+                                // Add the new date row right after the title
+                                $('row[r="1"]', sheet).after(dateRow);
+
+                                // Merge across all columns
+                                const totalCols = $('row[r="3"] c', sheet).length; // Look at next row to get column count
+                                const lastCol = String.fromCharCode(64 + totalCols); // Convert to letter
+                                let mergeCells = $('mergeCells', sheet);
+                                if (mergeCells.length === 0) {
+                                    $('worksheet', sheet).prepend(`<mergeCells count="1"><mergeCell ref="A${newRowNumber}:${lastCol}${newRowNumber}"/></mergeCells>`);
+                                } else {
+                                    const count = parseInt(mergeCells.attr('count')) + 1;
+                                    mergeCells.attr('count', count);
+                                    mergeCells.append(`<mergeCell ref="A${newRowNumber}:${lastCol}${newRowNumber}"/>`);
+                                }
+
+                                // Center align the merged cell
+                                const styles = xlsx.xl['styles.xml'];
+                                const styleIndex = $('cellXfs xf', styles).length;
+                                $('cellXfs', styles).append('<xf xfId="0" applyAlignment="1"><alignment horizontal="center"/></xf>');
+                                $(`c[r="A${newRowNumber}"]`, sheet).attr('s', styleIndex);
+                            }
+                        },
+
+                        //CSV
+                        {
+                            extend: 'csvHtml5',
+                            title: 'Approved_Purchase_Requisition',
+                            text: '<i class="bi bi-filetype-csv text-primary fs-5" data-bs-toggle="tooltip" title="Export to CSV"></i>',
+                            titleAttr: 'Export CSV',
+
+                            action: function (e, dt, button, config) {
+                                // ✅ Validate that at least one row is selected
+                                if ($('.row-select:checked').length === 0) {
+                                    showToast("Please select at least one row to export CSV", "warning");
+                                    return;
+                                }
+
+                                // ✅ Proceed with DataTables built-in CSV export
+                                $.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, button, config);
+                            },
+
+                            exportOptions: {
+                                columns: ':not(:first-child)', // Exclude checkbox column
+                                rows: function (idx, data, node) {
+                                    return $(node).find('.row-select').prop('checked');
+                                },
+                                format: {
+                                    body: function (data, rowIdx, colIdx) {
+                                        // Remove HTML tags and trim
+                                        if (typeof data === 'string') data = data.replace(/<[^>]*>/g, '').trim();
+
+                                        // Serial number column
+                                        if (colIdx === 0 || colIdx === 1) {
+                                            // Initialize counter once
+                                            if (typeof this.srnoCounter === 'undefined') this.srnoCounter = 0;
+                                            return ++this.srnoCounter;
+                                        }
+
+                                        return data; // fallback
+                                    }
+                                }
+                            }
+                        }
+
+                    ],
+                    initComplete: function () {
+                        $('#approvedPrTable_filter input')
+                            .addClass("form-control")
+                            .attr("placeholder", "Search...")
+                            .css("height", "40px");
+                    }
                 });
 
+                // ✅ Checkbox: select all
+                $(document).on("change", "#selectAll", function () {
+                    $(".row-select").prop("checked", $(this).prop("checked"));
+                });
+                $(document).on("change", ".row-select", function () {
+                    $("#selectAll").prop("checked",
+                        $(".row-select:checked").length === $(".row-select").length);
+                });
+
+                // ✅ Date Range Picker Filter
+                $('#prDateFilter').daterangepicker({
+                    autoUpdateInput: false,
+                    opens: "center",
+                    drops: "down",
+                    locale: { cancelLabel: 'Clear', applyLabel: 'Apply' },
+                    ranges: {
+                        'Today': [moment(), moment()],
+                        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                        'Last 1 Month': [moment().subtract(1, 'months').startOf('day'), moment()],
+                        'Last 3 Months': [moment().subtract(3, 'months').startOf('day'), moment()],
+                        'Last 1 Year': [moment().subtract(12, 'months').startOf('day'), moment()]
+                    }
+                }, function (start, end) {
+                    $('#prDateFilter').val(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
+                    $.fn.dataTable.ext.search.push(function (settings, data) {
+                        if (settings.nTable.id !== 'approvedPrTable') return true;
+                        const addedDate = moment(data[3], 'DD/MM/YYYY');
+                        return addedDate.isBetween(start, end, undefined, '[]');
+                    });
+                    table.draw();
+                    $.fn.dataTable.ext.search.pop();
+                });
+
+                $('#prDateFilter').on('cancel.daterangepicker', function () {
+                    $(this).val('');
+                    table.draw();
+                });
             },
             error: function () {
-                $("#tbodyPartial").html('<tr><td colspan="5" class="text-danger text-center">Error loading records</td></tr>');
+                $("#tbodyPartial").html('<tr><td colspan="6" class="text-danger text-center">Error loading records</td></tr>');
             }
-        });
-
-        // View PR items in modal
-        $(document).on("click", ".btnActionPartial", function () {
-            let prCode = $(this).data("id");
-
-            $.ajax({
-                url: '/Purchase/ShowApporvePRItemPRK',
-                type: 'GET',
-                data: { prCode: prCode },
-                success: function (partialView) {
-                    $("#prModalBody").html(partialView); // reuse modal
-                },
-                error: function () {
-                    alert("⚠ Error loading PR items");
-                }
-            });
         });
     });
 </script>

@@ -62,6 +62,10 @@ namespace P2PLibray.GRN
         public string ItemName { get; set; }
         public string ItemCode { get; set; }
         public int Quantity { get; set; }
+        public int OrderQuantity { get; set; }
+
+        public int RecievedQuantity { get; set; }
+        public int PendingQuantity { get; set; }
 
         public string OrderedBy { get; set; }
         public DateTime? ExpectedDate { get; set; }

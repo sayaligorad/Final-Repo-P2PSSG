@@ -135,6 +135,13 @@ namespace P2PLibray.Account
         public string ItemName { get; set; }
         public long? Quantity { get; set; }
 
+        //Material Requirenment Planning
+        public string MaterialReqPlanningCode { get; set; }
+        public string PlanName { get; set; }
+        public int PlanYear { get; set; }
+        public DateTime? FromDate { get; set; }
+        public DateTime? ToDate { get; set; }
+
         // Items table for modules that have multiple items
         public List<ItemData> Items { get; set; } = new List<ItemData>();
     }
@@ -159,6 +166,7 @@ namespace P2PLibray.Account
         public decimal? FinalAmount { get; set; }
         public string TaxRate { get; set; }
         public string StatusName { get; set; }
+        public int IssueItemsId { get; set; }
     }
     public class CountryDto
     {

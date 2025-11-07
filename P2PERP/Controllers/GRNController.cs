@@ -4,10 +4,14 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Globalization;
 using System.Linq;
+using System.Net.Mail;
+using System.Net;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using System.IO;
 
 namespace P2PERP.Controllers
 {
@@ -98,7 +102,6 @@ namespace P2PERP.Controllers
                     ReturnGoodsClass ReturnGoods = new ReturnGoodsClass
                     {
                         GRNCode = dr["GRNCode"].ToString(),
-                        StatusName = dr["StatusName"].ToString(),
                         AddedDate = Convert.ToDateTime(dr["AddedDate"]).ToString("yyyy-MM-dd"),
                         FullName = dr["FullName"].ToString()
                     };
@@ -204,6 +207,54 @@ namespace P2PERP.Controllers
                 return Json(new { success = false, message = "Error: " + ex.Message });
             }
         }
+
+        [Route("GRN/SendMail")]
+        [HttpGet]
+        public ActionResult SendMailHSB()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult SendMailHSB(HttpPostedFileBase attachment, string toEmail, string subject, string messageBody)
+        {
+            try
+            {
+                string fromEmail = System.Configuration.ConfigurationManager.AppSettings["SenderEmail"];
+                string password = System.Configuration.ConfigurationManager.AppSettings["SenderPassword"];
+
+                MailMessage mail = new MailMessage();
+                mail.From = new MailAddress(fromEmail);
+                mail.To.Add(toEmail);
+                mail.Subject = subject;
+                mail.Body = messageBody;
+                mail.IsBodyHtml = true;
+
+                // Add attachment if provided
+                if (attachment != null && attachment.ContentLength > 0)
+                {
+                    string fileName = Path.GetFileName(attachment.FileName);
+                    mail.Attachments.Add(new Attachment(attachment.InputStream, fileName));
+                }
+
+                SmtpClient smtp = new SmtpClient("smtp.gmail.com")
+                {
+                    Port = 587,
+                    Credentials = new NetworkCredential(fromEmail, password),
+                    EnableSsl = true
+                };
+
+                smtp.Send(mail);
+                ViewBag.Status = "Email sent successfully!";
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Status = "Error: " + ex.Message;
+            }
+
+            return View();
+        }
+
         #endregion
 
         #region Pravin
@@ -215,38 +266,39 @@ namespace P2PERP.Controllers
         }
 
 
-
-        // Fetch Pie Chart GRN summary
+        //Total GRN Count
         [HttpGet]
-        public async Task<JsonResult> GRNPieChartPSM(DateTime? fromDate, DateTime? toDate)
+        public async Task<JsonResult> GRNPieChartPSM(string fromDate, string toDate)
         {
             BALGRN obj = new BALGRN();
-            DataTable dt = await obj.GRNSummaryPSM(); // returns AddedDate, TotalGRN per day
+            DataTable dt = await obj.GRNSummaryPSM();
 
             int totalGRN = 0;
+            DateTime? from = null, to = null;
+
+            if (DateTime.TryParse(fromDate, out DateTime fd)) from = fd;
+            if (DateTime.TryParse(toDate, out DateTime td)) to = td;
 
             if (dt != null && dt.Rows.Count > 0)
             {
-                if (fromDate.HasValue && toDate.HasValue)
+                var filteredRows = dt.AsEnumerable();
+
+                if (from.HasValue && to.HasValue)
                 {
-                    // Sum TotalGRN for rows within the date range
-                    totalGRN = dt.AsEnumerable()
-                                 .Where(r =>
-                                 {
-                                     var date = r.Field<DateTime>("AddedDate");
-                                     return date.Date >= fromDate.Value.Date && date.Date <= toDate.Value.Date;
-                                 })
-                                 .Sum(r => r.Field<int>("TotalGRN"));
+                    filteredRows = filteredRows.Where(r =>
+                    {
+                        var date = r.Field<DateTime>("AddedDate").Date;
+                        return date >= from.Value.Date && date <= to.Value.Date;
+                    });
                 }
-                else
-                {
-                    // No filter, sum all TotalGRN
-                    totalGRN = dt.AsEnumerable().Sum(r => r.Field<int>("TotalGRN"));
-                }
+
+                totalGRN = filteredRows.Sum(r => r.Field<int>("TotalGRN"));
             }
 
             return Json(new { TotalGRN = totalGRN }, JsonRequestBehavior.AllowGet);
         }
+
+
 
         //Retrieves GRN item details by GRN code for display.
         [HttpGet]
@@ -270,10 +322,14 @@ namespace P2PERP.Controllers
 
         // Fetch GRN Reoprt list in Datatable
         [HttpGet]
-        public async Task<JsonResult> AllGRNSummaryListPSM(DateTime? fromDate, DateTime? toDate)
+        public async Task<JsonResult> AllGRNSummaryListPSM(string fromDate, string toDate)
         {
             BALGRN obj = new BALGRN();
             List<object> materials = new List<object>();
+
+            DateTime? from = null, to = null;
+            if (DateTime.TryParse(fromDate, out DateTime fd)) from = fd.Date;
+            if (DateTime.TryParse(toDate, out DateTime td)) to = td.Date;
 
             SqlDataReader dr = await obj.GRNSummaryListPSM();
 
@@ -282,8 +338,11 @@ namespace P2PERP.Controllers
                 if (!DateTime.TryParse(dr["AddedDate"].ToString(), out DateTime addedDate))
                     continue;
 
-                if ((!fromDate.HasValue || addedDate >= fromDate.Value) &&
-                    (!toDate.HasValue || addedDate <= toDate.Value))
+                // ✅ Compare only the Date part
+                DateTime addedDateOnly = addedDate.Date;
+
+                if ((!from.HasValue || addedDateOnly >= from.Value) &&
+                    (!to.HasValue || addedDateOnly <= to.Value))
                 {
                     materials.Add(new
                     {
@@ -292,7 +351,7 @@ namespace P2PERP.Controllers
                         VendorName = dr["VendorName"]?.ToString() ?? "",
                         CompanyName = dr["CompanyName"]?.ToString() ?? "",
                         AddedBy = dr["AddedBy"]?.ToString() ?? "",
-                        AddedDate = addedDate.ToString("yyyy-MM-dd"),
+                        AddedDate = addedDateOnly.ToString("yyyy-MM-dd"),
                         TotalAmount = dr["TotalAmount"]?.ToString() ?? ""
                     });
                 }
@@ -304,80 +363,149 @@ namespace P2PERP.Controllers
 
 
 
+
         //Return Good Report Action Methods
         public ActionResult GoodsReturnSummaryReportPSM()
         {
             return View();
         }
 
-        //Return Good Data Show in Bar Chart
+        //Alternative - Use same approach as table method
         public async Task<JsonResult> GoodsReturnChartsPSM(string fromDate, string toDate)
         {
-            BALGRN obj = new BALGRN();
-            DataTable dt = await obj.GoodsReturnSummaryPSM();
+            try
+            {
+                BALGRN obj = new BALGRN();
+                List<object> goodsReturns = new List<object>();
 
-            DateTime? fDate = string.IsNullOrEmpty(fromDate) ? (DateTime?)null : DateTime.Parse(fromDate);
-            DateTime? tDate = string.IsNullOrEmpty(toDate) ? (DateTime?)null : DateTime.Parse(toDate);
+                SqlDataReader dr = await obj.GoodsReturnSummaryListPSM();
 
-            var result = dt.AsEnumerable()
-                .Where(row =>
+                DateTime? fDate = null;
+                DateTime? tDate = null;
+
+                // Parse dates safely (same as table method)
+                if (!string.IsNullOrEmpty(fromDate))
                 {
-                    if (!DateTime.TryParse(row["AddedDate"].ToString(), out DateTime addedDate))
-                        return false;
+                    if (DateTime.TryParseExact(fromDate, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedFromDate))
+                        fDate = parsedFromDate;
+                }
 
-                    return (!fDate.HasValue || addedDate >= fDate.Value) &&
-                           (!tDate.HasValue || addedDate <= tDate.Value);
-                })
-                .GroupBy(row => new
+                if (!string.IsNullOrEmpty(toDate))
                 {
-                    DayName = row["DayName"].ToString(),
-                    StatusName = row["StatusName"].ToString()
-                })
-                .Select(g => new
-                {
-                    DayName = g.Key.DayName,
-                    StatusName = g.Key.StatusName,
-                    Count = g.Count()
-                })
-                .ToList();
+                    if (DateTime.TryParseExact(toDate, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedToDate))
+                        tDate = parsedToDate;
+                }
 
-            return Json(result, JsonRequestBehavior.AllowGet);
+                // Count statuses directly from the data reader
+                int assignCount = 0;
+                int dispatchCount = 0;
+
+                while (await dr.ReadAsync())
+                {
+                    if (!DateTime.TryParse(dr["AddedDate"]?.ToString(), out DateTime addedDate))
+                        continue;
+
+                    // Apply date filtering (same as table method)
+                    bool include = true;
+                    if (fDate.HasValue)
+                        include = include && (addedDate.Date >= fDate.Value.Date);
+                    if (tDate.HasValue)
+                        include = include && (addedDate.Date <= tDate.Value.Date);
+
+                    if (include)
+                    {
+                        var statusName = dr["StatusName"]?.ToString() ?? "";
+                        if (statusName.Equals("Assign", StringComparison.OrdinalIgnoreCase))
+                            assignCount++;
+                        else if (statusName.Equals("Dispatch", StringComparison.OrdinalIgnoreCase))
+                            dispatchCount++;
+                    }
+                }
+
+                dr.Close();
+
+                var result = new List<object>
+        {
+            new { StatusName = "Assign", Count = assignCount },
+            new { StatusName = "Dispatch", Count = dispatchCount }
+        };
+
+                return Json(result, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error in GoodsReturnChartsPSM: {ex.Message}");
+                return Json(new[] {
+            new { StatusName = "Assign", Count = 0 },
+            new { StatusName = "Dispatch", Count = 0 }
+           }, JsonRequestBehavior.AllowGet);
+            }
         }
 
-
-        // Goods return summary report show in Datatable
+        // Goods return summary report show in Datatable with Date Filtering
         [HttpGet]
-        public async Task<JsonResult> GetGoodsReturnSummaryPSM(DateTime? fromDate, DateTime? toDate)
+        public async Task<JsonResult> GetGoodsReturnSummaryPSM(string fromDate, string toDate)
         {
-            BALGRN obj = new BALGRN();
-            List<object> goodsReturns = new List<object>();
-
-            SqlDataReader dr = await obj.GoodsReturnSummaryListPSM();
-
-            while (await dr.ReadAsync())
+            try
             {
-                if (!DateTime.TryParse(dr["AddedDate"].ToString(), out DateTime addedDate))
-                    continue;
-                if ((!fromDate.HasValue || addedDate >= fromDate.Value) &&
-                    (!toDate.HasValue || addedDate <= toDate.Value))
+                BALGRN obj = new BALGRN();
+                List<object> goodsReturns = new List<object>();
+
+                SqlDataReader dr = await obj.GoodsReturnSummaryListPSM();
+
+                DateTime? fDate = null;
+                DateTime? tDate = null;
+
+                // Parse dates safely
+                if (!string.IsNullOrEmpty(fromDate))
                 {
-                    goodsReturns.Add(new
-                    {
-                        GoodsReturnCode = dr["GoodsReturnCode"]?.ToString() ?? "",
-                        TransporterName = dr["TransporterName"]?.ToString() ?? "",
-                        TransportContactNo = dr["TransportContactNo"]?.ToString() ?? "",
-                        VehicleNo = dr["VehicleNo"]?.ToString() ?? "",
-                        VehicleTypeName = dr["VehicleTypeName"]?.ToString() ?? "",
-                        Reason = dr["Reason"]?.ToString() ?? "",
-                        StatusName = dr["StatusName"]?.ToString() ?? "",
-                        AddedDate = addedDate.ToString("yyyy-MM-dd")
-                    });
+                    if (DateTime.TryParseExact(fromDate, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedFromDate))
+                        fDate = parsedFromDate;
                 }
+
+                if (!string.IsNullOrEmpty(toDate))
+                {
+                    if (DateTime.TryParseExact(toDate, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedToDate))
+                        tDate = parsedToDate;
+                }
+
+                while (await dr.ReadAsync())
+                {
+                    if (!DateTime.TryParse(dr["AddedDate"]?.ToString(), out DateTime addedDate))
+                        continue;
+
+                    // Apply date filtering
+                    bool include = true;
+                    if (fDate.HasValue)
+                        include = include && (addedDate.Date >= fDate.Value.Date);
+                    if (tDate.HasValue)
+                        include = include && (addedDate.Date <= tDate.Value.Date);
+
+                    if (include)
+                    {
+                        goodsReturns.Add(new
+                        {
+                            GoodsReturnCode = dr["GoodsReturnCode"]?.ToString() ?? "",
+                            TransporterName = dr["TransporterName"]?.ToString() ?? "",
+                            TransportContactNo = dr["TransportContactNo"]?.ToString() ?? "",
+                            VehicleNo = dr["VehicleNo"]?.ToString() ?? "",
+                            VehicleTypeName = dr["VehicleTypeName"]?.ToString() ?? "",
+                            Reason = dr["Reason"]?.ToString() ?? "",
+                            StatusName = dr["StatusName"]?.ToString() ?? "",
+                            AddedDate = addedDate.ToString("yyyy-MM-dd")
+                        });
+                    }
+                }
+
+                dr.Close();
+
+                return Json(new { data = goodsReturns }, JsonRequestBehavior.AllowGet);
             }
-
-            dr.Close();
-
-            return Json(new { data = goodsReturns }, JsonRequestBehavior.AllowGet);
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error in GetGoodsReturnSummaryPSM: {ex.Message}");
+                return Json(new { data = new List<object>() }, JsonRequestBehavior.AllowGet);
+            }
         }
 
 
@@ -920,7 +1048,9 @@ namespace P2PERP.Controllers
                     POCode = dr["POCode"].ToString(),
                     ItemCode = dr["ItemCode"].ToString(),
                     ItemName = dr["ItemName"].ToString(),
-                    Quantity = Convert.ToInt32(dr["Quantity"]),
+                    OrderQuantity = Convert.ToInt32(dr["OrderedQty"]),
+                    RecievedQuantity = Convert.ToInt32(dr["ReceivedQty"]),
+                    PendingQuantity = Convert.ToInt32(dr["PendingQty"]),
                     ExpectedDate = Convert.ToDateTime(dr["VendorDeliveryDate"]),
                     OrderedBy = dr["AddedBy"].ToString(),
                 });
@@ -1071,8 +1201,15 @@ namespace P2PERP.Controllers
         {
             try
             {
-                DateTime? from = string.IsNullOrEmpty(fromDate) ? (DateTime?)null : DateTime.Parse(fromDate);
-                DateTime? to = string.IsNullOrEmpty(toDate) ? (DateTime?)null : DateTime.Parse(toDate);
+                DateTime? from = null;
+                DateTime? to = null;
+
+                if (!string.IsNullOrEmpty(fromDate))
+                    from = DateTime.ParseExact(fromDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+
+                if (!string.IsNullOrEmpty(toDate))
+                    to = DateTime.ParseExact(toDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+
                 DataSet ds = await bal.ShowGRNListSSG();
                 List<GRN> grnList = new List<GRN>();
 
@@ -1080,10 +1217,13 @@ namespace P2PERP.Controllers
                 {
                     foreach (DataRow row in ds.Tables[0].Rows)
                     {
-                        DateTime? grnDate = row["GRNDate"] != DBNull.Value ? Convert.ToDateTime(row["GRNDate"]) : (DateTime?)null;
+                        DateTime? grnDate = row["GRNDate"] != DBNull.Value
+                            ? Convert.ToDateTime(row["GRNDate"])
+                            : (DateTime?)null;
 
-                        if (from.HasValue && grnDate < from) continue;
-                        if (to.HasValue && grnDate > to) continue;
+                        // ✅ Compare only date part, ignore time
+                        if (from.HasValue && grnDate.HasValue && grnDate.Value.Date < from.Value.Date) continue;
+                        if (to.HasValue && grnDate.HasValue && grnDate.Value.Date > to.Value.Date) continue;
 
                         grnList.Add(new GRN
                         {
@@ -1105,6 +1245,7 @@ namespace P2PERP.Controllers
                 return Json(new { data = new List<GRN>(), error = ex.Message }, JsonRequestBehavior.AllowGet);
             }
         }
+
 
 
 
@@ -1176,6 +1317,9 @@ namespace P2PERP.Controllers
                         ViewBag.CompanyAddress = row["CompanyAddress"].ToString();
                         ViewBag.BillingAddress = row["BillingAddress"].ToString();
                         ViewBag.GRNCode = row["NewGRNCode"].ToString();
+                        ViewBag.WarehouseName = row["WarehouseName"].ToString();
+                        ViewBag.WareHouseId = row["WareHouseId"].ToString();
+
                     }
                 }
 
@@ -1235,7 +1379,7 @@ namespace P2PERP.Controllers
                     ViewBag.GRNCode = row["GRNCode"].ToString();
                     ViewBag.POCode = row["POCode"].ToString();
                     ViewBag.PODate = row["PODate"] != DBNull.Value
-                        ? Convert.ToDateTime(row["PODate"]).ToString("yyyy-MM-dd") : "";
+                        ? Convert.ToDateTime(row["PODate"]).ToString("dd-MM-yyyy") : "";
                     ViewBag.VendorName = row["VenderName"].ToString();
                     ViewBag.InvoiceNo = row["InvoiceNo"].ToString();
                     ViewBag.InvoiceDate = row["GRNDate"] != DBNull.Value
@@ -1374,8 +1518,13 @@ namespace P2PERP.Controllers
         {
             try
             {
+                // Get staff code from session
+                var staffcode = Session["StaffCode"] as string;
+                if (string.IsNullOrEmpty(staffcode))
+                    return Json(new { success = false, message = "Staff code not found in session. Please login again." });
+
                 if (string.IsNullOrEmpty(GRNCode) || GRNItemCodes == null || !GRNItemCodes.Any())
-                    return Json(new { success = false, message = "GRNCode and items required" });
+                    return Json(new { success = false, message = "GRNCode and items are required." });
 
                 int insertedCount = 0;
 
@@ -1386,7 +1535,9 @@ namespace P2PERP.Controllers
                         GRNCode = GRNCode,
                         GRNItemCode = itemCode
                     };
-                    insertedCount += await bal.AssignQCSSG(objGRN);
+
+                    // Pass staffcode to BAL method
+                    insertedCount += await bal.AssignQCSSG(objGRN, staffcode);
                 }
 
                 return Json(new
@@ -1402,6 +1553,7 @@ namespace P2PERP.Controllers
                 return Json(new { success = false, message = "Error assigning QC: " + ex.Message });
             }
         }
+
 
 
 

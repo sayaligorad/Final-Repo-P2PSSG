@@ -8,7 +8,9 @@
         text-align: center !important;
         vertical-align: middle !important;
     }
-
+    thead th {
+        white-space: nowrap !important;
+    }
     .chart-card {
         background: #fff;
         border-radius: 12px;
@@ -45,12 +47,26 @@
 
     .dt-buttons {
     }
+
+    button.dt-button.processing,
+    div.dt-button.processing {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        background: none !important;
+    }
+
+        button.dt-button.processing:after {
+            content: none !important;
+        }
+
+
+
 </style>
 
 <div id="receivedSection" class="container-fluid">
 
     <div class="container bg-white rounded m-2 shadow p-2">
-        <h2 class="text-center text-primary">Received Material Report</h2>
+        <h3 class="text-center text-primary">Received Material Report</h3>
 
         <!-- Charts -->
         <div class="row mb-4">
@@ -64,6 +80,8 @@
                 <div class="chart-card">
                     <div class="chart-title">Bin Assignment Status</div>
                     <div id="binStatusChart" style="width:100%; height:100%;"></div>
+                    <div id="binChartLegend" class="text-center mt-2"></div> <!-- ✅ Legend added -->
+
                 </div>
             </div>
         </div>
@@ -102,10 +120,10 @@
                     <th>Item Code</th>
                     <th>Item Name</th>
                     <th>Item Category</th>
-                    <th>Ordered Qty</th>
+                    
                     <th>Received Qty</th>
                     <th>Warehouse</th>
-                    <th>Bin Code</th>
+                    <th>Bin Assigned</th>
                     <th>Received Date</th>
 
                 </tr>
@@ -147,6 +165,8 @@
 
 <script>
     let receivedTable, allData = [];
+    let currentFromDate = null, currentToDate = null;
+
 
     function showToast(message, type = 'warning') {
         const toastId = 'toast-' + Date.now();
@@ -206,7 +226,12 @@
     function loadReceivedTable(fromDate, toDate) {
         if (receivedTable) receivedTable.destroy();
         receivedTable = $('#receivedTable').DataTable({
-            ajax: { url: '/Inventory/GetReceivedMaterialReportAMG', data: { fromDate, toDate }, dataSrc: 'data' },
+            ordering:false,
+            ajax: {
+                url: '/Inventory/GetReceivedMaterialReportAMG',
+                data: { fromDate: fromDate || '', toDate: toDate || '' },
+                dataSrc: 'data'
+},
             //dom: '<"top d-flex justify-content-between mt-3 mb-2"Bf>rtip',
             dom: '<"d-flex justify-content-between align-items-center mt-1 mb-2"Bf>rt<"d-flex justify-content-between mt-2"<"datatable-info"i><"datatable-pagination"p>>',
             buttons: [
@@ -355,6 +380,7 @@
                             return $(node).find('.row-check').prop('checked');
                         },
                         columns: ':visible:not(:first-child)',
+
                         format: {
                             body: function (data, row, column, node) {
                                 if (column === 1) {
@@ -369,6 +395,7 @@
                                 }
                                 return data;
                             }
+
                         }
                     }
                 },
@@ -384,6 +411,20 @@
                         }
                         $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
                     },
+                    customize: function (xlsx) {
+                        // Access the first sheet
+                        const sheet = xlsx.xl.worksheets['sheet1.xml'];
+
+                        // Find the cell containing the messageTop text (usually in row 2)
+                        $('row c[r^="A2"] t', sheet).each(function () {
+                            // Center align text in that cell
+                            $(this).closest('c').attr('s', '51'); // style 51 = center alignment (built-in style)
+                        });
+
+                        // Optional: make the text bold
+                        $('row c[r^="A2"]', sheet).attr('s', '51');
+                    }
+                    ,
                     exportOptions: {
                         rows: function (idx, data, node) {
                             return $(node).find('.row-check').prop('checked');
@@ -406,6 +447,7 @@
                         }
                     }
                 },
+
 
 
                 {
@@ -440,7 +482,7 @@
                 { data: 'ItemCode' },
                 { data: 'ItemName' },
                 { data: 'ItemCategory' },
-                { data: 'GRNQuantity' },
+                
                 { data: 'ReceivedQuantity' },
                 { data: 'WarehouseName' },
                 { data: 'BinCode' },
@@ -467,15 +509,32 @@
             ],
             initComplete: function () {
                 this.api().buttons().container().appendTo('#dtButtonsContainer');
+                //$('#selectAllReceived').off('change').on('change', function () {
+                //    $('#receivedTable tbody input.row-check').prop('checked', $(this).prop('checked'));
+                //});
+
+
+                //// bind select all checkbox
+                //$('#selectAllReceived').off('change').on('change', function () {
+                //    $('#receivedTable tbody input.row-check').prop('checked', $(this).prop('checked'));
+                //});
+
+
                 $('#selectAllReceived').off('change').on('change', function () {
-                    $('#receivedTable tbody input.row-check').prop('checked', $(this).prop('checked'));
+                    const isChecked = $(this).prop('checked');
+                    $('#receivedTable tbody input.row-check').prop('checked', isChecked);
+                });
+
+                $('#receivedTable tbody').off('change', 'input.row-check').on('change', 'input.row-check', function () {
+                    const total = $('#receivedTable tbody input.row-check').length;
+                    const checked = $('#receivedTable tbody input.row-check:checked').length;
+
+                    // If all rows selected → check header checkbox, else uncheck it
+                    $('#selectAllReceived').prop('checked', total === checked);
                 });
 
 
-                // bind select all checkbox
-                $('#selectAllReceived').off('change').on('change', function () {
-                    $('#receivedTable tbody input.row-check').prop('checked', $(this).prop('checked'));
-                });
+
             }
         });
     }
@@ -495,7 +554,7 @@
         const binFilter = function (settings, data/*row array*/, dataIndex) {
             if (settings.nTable.id !== 'receivedTable') return true; // other tables unaffected
             // BinCode column index is 11 (0-based array of displayed columns)
-            const bin = (data[11] || "").toString().trim().toLowerCase();
+            const bin = (data[9] || "").toString().trim().toLowerCase();
             return showAssigned
                 ? (bin !== "" && bin !== "bin not assigned yet")
                 : (bin === "" || bin === "bin not assigned yet");
@@ -512,10 +571,38 @@
         $.getJSON('/Inventory/GetReceivedMaterialReportAMG', { fromDate, toDate }, function (result) {
             allData = result.data || [];
 
-            // Top 10 Items
+            // Clear any previous charts if no data
+            if (!allData.length) {
+                // Destroy previous charts if they exist
+                Highcharts.charts.forEach(chart => {
+                    if (chart && chart.renderTo && chart.renderTo.id) {
+                        chart.destroy();
+                    }
+                });
+
+                // ✅ Show unified “No Data” message
+                const noDataMsg = `
+        <div class="d-flex flex-column align-items-center justify-content-center" style="height:240px;">
+            <i class="bi bi-emoji-frown text-muted" style="font-size:2rem;"></i>
+            <div class="text-muted mt-2">No data found for the selected date range</div>
+        </div>
+    `;
+
+                $('#itemsChart').html(noDataMsg);
+                $('#binStatusChart').html(noDataMsg);
+                $('#binChartLegend').empty(); // clear old legend
+
+                return; // stop further chart rendering
+            }
+
+            // ---------- Top 10 Items ----------
             const itemMap = {};
-            allData.forEach(d => { itemMap[d.ItemName] = (itemMap[d.ItemName] || 0) + (Number(d.ReceivedQuantity) || 0); });
-            const topItems = Object.entries(itemMap).sort((a, b) => b[1] - a[1]).slice(0, 10);
+            allData.forEach(d => {
+                itemMap[d.ItemName] = (itemMap[d.ItemName] || 0) + (Number(d.ReceivedQuantity) || 0);
+            });
+            const topItems = Object.entries(itemMap)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10);
 
             Highcharts.chart('itemsChart', {
                 chart: { type: 'column', height: 300 },
@@ -526,16 +613,22 @@
                 credits: { enabled: false }
             });
 
-            // Bin Status counts
+            // ---------- Bin Status ----------
             let assigned = 0, notAssigned = 0;
             allData.forEach(d => {
                 const bin = d.BinCode ? d.BinCode.toString().trim().toLowerCase() : "";
-                if (bin !== "" && bin !== "bin not assigned yet") assigned++; else notAssigned++;
+                if (bin !== "" && bin !== "bin not assigned yet") assigned++;
+                else notAssigned++;
             });
 
-            // Create pie chart and keep reference
+            const chartData = [
+                { name: 'Assigned to Bin', y: assigned, color: '#00bfa6' },   // aqua green
+                { name: 'Not Assigned to Bin', y: notAssigned, color: '#ff6b6b' } // coral red
+            ];
+
+
             const binChart = Highcharts.chart('binStatusChart', {
-                chart: { type: 'pie', height: 300 },
+                chart: { type: 'pie', height: 260 },
                 title: { text: '' },
                 tooltip: { pointFormat: '<b>{point.y}</b>' },
                 plotOptions: {
@@ -543,33 +636,48 @@
                         allowPointSelect: true,
                         cursor: 'pointer',
                         dataLabels: { enabled: true, format: '{point.name}: {point.y}' },
-                        // use point.events.click inside plotOptions.point
                         point: {
                             events: {
                                 click: function () {
-                                    // When user clicks a slice -> apply filter on main table
                                     const showAssigned = this.name === 'Assigned to Bin';
                                     applyBinFilter(showAssigned);
+                                    highlightLegend(this.name);
                                 }
                             }
                         }
                     }
                 },
-                series: [{
-                    name: 'Count', colorByPoint: true, data: [
-                        { name: 'Assigned to Bin', y: assigned },
-                        { name: 'Not Assigned to Bin', y: notAssigned }
-                    ]
-                }],
+                series: [{ name: 'Count', colorByPoint: true, data: chartData }],
                 credits: { enabled: false }
             });
 
-            // Double-click on the chart container resets the bin filter
+            // ---------- Legend below chart ----------
+            const legendHTML = chartData.map(p =>
+                `<span class="badge px-3 py-2 mx-1" 
+            style="background:${p.color}; color:#fff; font-size:0.9rem;">
+            ${p.name} (${p.y})
+        </span>`).join('');
+            $('#binChartLegend').html(legendHTML);
+
+            // ---------- Double-click reset ----------
             if (binChart && binChart.container) {
-                // remove previous dblclick listeners to avoid duplicates
-                try { binChart.container.removeEventListener('dblclick', binChart._dblClickHandler); } catch (e) { }
-                binChart._dblClickHandler = function () { applyBinFilter(null); };
+                try { binChart.container.removeEventListener('dblclick', binChart._dblClickHandler); } catch { }
+                binChart._dblClickHandler = function () {
+                    applyBinFilter(null);
+                    highlightLegend(null);
+                };
                 binChart.container.addEventListener('dblclick', binChart._dblClickHandler);
+            }
+
+            // ---------- Legend highlight helper ----------
+            function highlightLegend(activeName) {
+                $('#binChartLegend span').each(function () {
+                    const name = $(this).text().split('(')[0].trim();
+                    if (activeName && name === activeName)
+                        $(this).css({ border: '2px solid #000', transform: 'scale(1.05)' });
+                    else
+                        $(this).css({ border: 'none', transform: 'scale(1)' });
+                });
             }
         });
     }
@@ -585,34 +693,42 @@
             drops: "down",
             ranges: {
                 'Today': [moment(), moment()],
-                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
                 'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                'This Month': [moment().startOf('month'), moment().endOf('month')],
-                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                'Last 1 Month': [moment().subtract(1, 'months').startOf('day'), moment()],
+                'Last 3 Months': [moment().subtract(3, 'months').startOf('day'), moment()],
+                'Last 1 Year': [moment().subtract(12, 'months').startOf('day'), moment()]
             },
             locale: { cancelLabel: 'Clear' }
         }, function (start, end) {
             $('#ReceivedDatepicker').val(start.format('DD-MM-YYYY') + ' - ' + end.format('DD-MM-YYYY'));
 
+            currentFromDate = start.clone().startOf('day');
+            currentToDate = end.clone().endOf('day');
+
             // Apply date filter for table display (this filter only active for immediate draw)
             $.fn.dataTable.ext.search.push(function (settings, data) {
                 if (settings.nTable.id !== 'receivedTable') return true;
-                const receivedDate = moment(data[11], 'DD-MM-YYYY');
+                const receivedDate = moment(data[10], 'DD-MM-YYYY');
                 return receivedDate.isBetween(start, end, undefined, '[]');
             });
             receivedTable.draw();
             // remove that date filter (so it doesn't persist accidentally)
             $.fn.dataTable.ext.search.pop();
+            loadReceivedTable(start.format('YYYY-MM-DD'), end.format('YYYY-MM-DD'));
 
             // reload charts using the selected date range
-            loadCharts(start.format('DD-MM-YYYY'), end.format('DD-MM-YYYY'));
+            loadCharts(start.format('YYYY-MM-DD'), end.format('YYYY-MM-DD'));
         });
 
         $('#ReceivedDatepicker').on('cancel.daterangepicker', function () {
             $(this).val('');
-            receivedTable.draw();
+            currentFromDate = null;
+            currentToDate = null;
+            loadReceivedTable(); // reload all
             loadCharts();
+
+
+
         });
         // Assuming your first column (index 0) is Serial No
         receivedTable.on('draw.dt', function () {

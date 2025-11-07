@@ -3,47 +3,48 @@
 
 
 
+<div class="d-flex mt-5">
+    <!-- Date Filters -->
+    <div class="mb-3 d-flex gap-2">
+        <div class="input-group" style="max-width: 280px;">
+            <span class="input-group-text bg-primary text-white">
+                <i class="bi bi-calendar-date"></i> <!-- Bootstrap icon -->
+            </span>
+            <input type="text" id="Rejectedrange" placeholder="Select date Range" class="form-control" readonly />
+        </div>
+    </div>
+
+    <div style="margin-left:190px;">
         <h4 class="text-center text-primary fw-bold">Rejected Goods List</h4>
 
-        <div class="row">
-            <div class="col-12">
-                <div class="table-responsive">
+    </div>
+</div>
 
-                    <!-- Date Filters -->
-                    <div class="mb-3 d-flex gap-2">
-                        <div class="input-group" style="max-width: 280px;">
-                            <span class="input-group-text bg-primary text-white">
-                                <i class="bi bi-calendar-date"></i> <!-- Bootstrap icon -->
-                            </span>
-                            <input type="text" id="Rejectedrange" placeholder="Select date Range" class="form-control" readonly />
-                        </div>
-                        <!-- Reset Filter Button -->
-                        @*<button id="resetFilter" class="btn btn-primary">
-                            <i class="bi bi-arrow-repeat"></i> Reset
-                        </button>*@
-                    </div>
+<div class="row">
+    <div class="col-12">
+        <div class="table-responsive">
 
-                    <!-- DataTable -->
-                    <table id="RejectGoods" class="table table-striped table-bordered">
-                        <thead class="table-dark">
-                            <tr>
-                                <!-- changed ID to avoid clash -->
-                                <th><input type="checkbox" id="selectAllReject"></th>
-                                <th>Sr.No</th>
-                                <th>GRN Code</th>
-                                @*<th>Status</th>*@
-                                <th>Added Date</th>
-                                <th>Full Name</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
 
-                </div>
-            </div>
+            <!-- DataTable -->
+            <table id="RejectGoods" class="table table-striped table-bordered text-center align-middle">
+                <thead class="table-dark text-center align-middle">
+                    <tr>
+                        <!-- changed ID to avoid clash -->
+                        <th><input type="checkbox" id="selectAllReject"></th>
+                        <th>Sr.No</th>
+                        <th>GRN Code</th>
+                        <th>Added Date</th>
+                        <th>Full Name</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
         </div>
-  
+    </div>
+</div>
+
 
 
 <!-- Modal for Create GR -->
@@ -52,15 +53,15 @@
         <div class="modal-content text-center">
 
             <!-- Modal Header -->
-            <div class="modal-header bg-primary text-white d-flex justify-content-center position-relative p-0">
+            <div class="modal-header bg-primary text-white d-flex justify-content-center position-relative p-1 fs-5">
 
                 <!-- Title Centered -->
-                <h5 class="modal-title m-0 flex-grow-1 text-center text-white py-3">
+                <h5 class="modal-title m-0 flex-grow-1 text-center text-white py-1 fs-5">
                     Create Goods Return
                 </h5>
 
                 <!-- Close Button Full Height -->
-                <button type="button" class="btn-close btn-close-white m-0 p-3 h-100 position-absolute end-0 top-0"
+                <button type="button" class="btn-close top-0 end-0 rounded-end-3 fs-5 position-absolute btn-close-white m-1"
                         data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
@@ -73,363 +74,505 @@
 
 
 <script>
+
+
     $(document).ready(function () {
 
-        // date range vars (no initial filter -> show all rows)
-        let startDate = null;
-        let endDate = null;
 
-        // Row selector for exports (used by exportOptions.rows)
-        function selectedRows(idx, data, node) {
-            return $(node).find('.row-select').prop('checked');
+        // Reusable PDF/Print customization function
+        function customizeDoc(doc) {
+            // Title Styling
+            doc.styles.title = {
+                color: '#000000',
+                fontSize: 16,
+                bold: true,
+                alignment: 'center'
+            };
+
+            // Generated on date
+            doc.content.splice(1, 0, {
+                text: 'Generated on: ' + new Date().toISOString().split('T')[0],
+                fontSize: 10,
+                italics: true,
+                alignment: 'center',
+                margin: [0, 0, 0, 12]
+            });
+
+            // Table Header Styling
+            doc.styles.tableHeader = {
+                fillColor: '#000000',
+                color: 'white',
+                bold: true,
+                fontSize: 11,
+                alignment: 'center'
+            };
+
+            // Table Border + Padding
+            var objLayout = {};
+            objLayout['hLineWidth'] = function () { return .5; };
+            objLayout['vLineWidth'] = function () { return .5; };
+            objLayout['hLineColor'] = function () { return '#aaa'; };
+            objLayout['vLineColor'] = function () { return '#aaa'; };
+            objLayout['paddingLeft'] = function () { return 6; };
+            objLayout['paddingRight'] = function () { return 6; };
+
+            // Get the table
+            var tableNode = doc.content[doc.content.length - 1];
+            tableNode.layout = objLayout;
+
+            // Set fixed widths for all columns
+            var colCount = tableNode.table.body[0].length;
+            tableNode.table.widths = Array(colCount).fill('*');
+
+            // Wrap in margin to simulate center alignment
+            tableNode.alignment = 'center';
+            tableNode.margin = [0, 0, 0, 0];
         }
 
-        
-
-        // Custom Date Filter (only active when startDate & endDate are set)
-        $.fn.dataTable.ext.search.push(function (settings, data) {
-            if (settings.nTable.id !== 'RejectGoods') return true; // only apply to this table
-            if (!startDate || !endDate) return true; // no filter => show all
-            const addedDate = moment(data[3], ["DD/MM/YYYY", "DD/MM/YYYY HH:mm:ss"]);
-            if (!addedDate.isValid()) return true;
-            return addedDate.isSameOrAfter(startDate, 'day') && addedDate.isSameOrBefore(endDate, 'day');
-        });
-
-        // Initialize DataTable (exports include formatting)
-        var table = $('#RejectGoods').DataTable({
-            dom: '<"d-flex justify-content-between align-items-center mb-2"Bf>rt<"d-flex justify-content-between align-items-center mt-2"ip>',
-            responsive: true,
-            ajax: "/GRN/getRejectedGoods",
-            columns: [
-                {
-                    data: null,
-                    orderable: false,
-                    render: (data, type, row) =>
-                        `<input type="checkbox" class="row-select" value="${row.GRNCode}">`
-                },
-                {
-                    data: null,
-                    title: "SR.NO",
-                    orderable: false,
-                    render: (data, type, row, meta) => meta.row + 1 // Auto numbering on UI
-                },
-                { data: "GRNCode", title: "GRN Code" },
-                //{ data: "StatusName", title: "Status" },
-                {
-                    data: "AddedDate",
-                    title: "Added Date",
-                    render: function (data, type, row) {
-                        // Check if date is valid
-                        if (!data) return "";
-                        return moment(data).format("DD/MM/YYYY"); // Change to your desired format
-                    }
-
-                },
-                { data: "FullName", title: "Added By" },
-                {
-                    data: null,
-                    orderable: false,
-                    title: "Action",
-                    render: (data, type, row) =>
-                        `<button type="button"
-                        class="btn btn-primary btn-sm btn-grn square-pill d-inline-flex align-items-center px-3 shadow-sm"
-                        data-grn="${row.GRNCode}"
-                        data-bs-toggle="tooltip"
-                        data-bs-placement="top"
-                        title="Create Good Return">
-                        <i class="bi bi-file-earmark-plus-fill fs-5"></i>
-                    </button>`
+        // Clear processing state for all DataTable buttons
+        window.__dt_clearAllProcessing = function () {
+            try {
+                // Try to clear via DataTables API
+                var tables = $.fn.dataTable.tables();
+                for (var i = 0; i < tables.length; i++) {
+                    try {
+                        var api = $(tables[i]).DataTable();
+                        if (!api || !api.buttons) continue;
+                        var btnCount = (api.buttons().nodes && api.buttons().nodes().length) || 0;
+                        for (var j = 0; j < btnCount; j++) {
+                            try { api.button(j).processing(false); } catch (e) { }
+                        }
+                    } catch (e) { }
                 }
-            ],
-            columnDefs: [
-                { targets: "_all", className: "text-center" } // center all columns
-            ],
-            ordering: false,
+            } catch (e) { }
 
-            buttons: [
-                // Print
-                {
-                    extend: 'print',
-                    text: '<i class="bi bi-printer-fill text-dark fs-5"></i>',
-                    exportOptions: {
-                        rows: selectedRows,
-                        columns: [1, 2, 3, 4],
-                        modifier: { search: 'applied', order: 'applied' },
-                        format: {
-                            body: (function () {
-                                let counter = 0;
-                                return function (data, row, column, node) {
-                                    if (column === 1) return ++counter;
-                                    return data;
-                                };
-                            })()
-                        }
-                    },
-                    title: '',
-                    action: function (e, dt, button, config) {
-                        let selected = dt.$('.row-select:checked', { page: 'all' }).length;
-                        if (!selected) {
-                            showExportToast();
-                            return;
-                        }
-                        exportRowIndex = 0;
-                        $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config);
-                    },
-                    customize: function (win) {
-                        $(win.document.body).css({
-                            'font-size': '12px',
-                            'font-family': 'Arial, sans-serif'
-                        });
-                        $(win.document.body).prepend(
-                            `<h3 style="text-align:center;">Rejected GRN Report</h3>
-          <p style="text-align:center;">Generated on: ${moment().format("YYYY-MM-DD")}</p>`
-                        );
-                        $(win.document.body).find('table')
-                            .addClass('compact')
-                            .css({
-                                'font-size': '12px',
-                                'border': '1px solid black',
-                                'width': 'auto',
-                                'margin-left': 'auto',
-                                'margin-right': 'auto',
-                                'border-collapse': 'collapse'
-                            });
-                        $(win.document.body).find('thead').css({
-                            'background-color': '#343a40',
-                            'color': 'white'
-                        });
-                        $(win.document.body).find('table td, table th').css({
-                            'text-align': 'center',
-                            'padding': '6px'
-                        });
-                    }
-                },
+            // Fallback DOM cleanup
+            try {
+                $('.dt-button').removeClass('dt-button-processing');
+                $('.dt-button').prop('disabled', false);
+            } catch (e) { }
+        };
 
-                // PDF
-                {
-                    extend: 'pdf',
-                    text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
-                    exportOptions: {
-                        rows: selectedRows,
-                        columns: [1, 2, 3, 4],
-                        modifier: { search: 'applied', order: 'applied' },
-                        format: {
-                            body: (function () {
-                                let counter = 0;
-                                return function (data, row, column, node) {
-                                    if (column === 1) return ++counter;
-                                    return data;
-                                };
-                            })()
-                        }
-                    },
-                    title: 'Rejected GRN Report',
-                    messageTop: `Generated on: ${moment().format("YYYY-MM-DD")}`,
-                    action: function (e, dt, button, config) {
-                        let selected = dt.$('.row-select:checked', { page: 'all' }).length;
-                        if (!selected) {
-                            showExportToast();
-                            return;
-                        }
-                        exportRowIndex = 0;
-                        $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, button, config);
-                    },
-                    customize: function (doc) {
-                        // margins + title style
-                        doc.pageMargins = [40, 60, 40, 40];
-                        doc.styles.title = {
-                            fontSize: 16,
-                            bold: true,
-                            alignment: 'center',
-                            margin: [0, 0, 0, 12]
-                        };
-
-                        // Insert subtitle / generated on
-                        doc.content.splice(1, 0, {
-                            text: `Generated on: ${moment().format("YYYY-MM-DD")}`,
-                            alignment: 'center',
-                            margin: [0, 0, 0, 8],
-                            fontSize: 10,
-                            italics: true
-                        });
-
-                        // style table
-                        var tableNode = doc.content.find(n => n.table);
-                        if (tableNode) {
-                            // adjust widths (same number of exported columns)
-                            tableNode.table.widths = ['10%', '20%', '20%', '20%', '30%'];
-
-                            tableNode.layout = {
-                                fillColor: function (rowIndex) {
-                                    return rowIndex === 0 ? '#343a40' : null;
-                                },
-                                hLineColor: () => '#ccc',
-                                vLineColor: () => '#ccc',
-                                hLineWidth: () => 0.5,
-                                vLineWidth: () => 0.5
-                            };
-
-                            // Header styling
-                            tableNode.table.body[0].forEach(cell => {
-                                cell.color = 'white';
-                                cell.alignment = 'center';
-                                cell.bold = true;
-                                cell.fontSize = 11;
-                            });
-
-                            // Body styling
-                            tableNode.table.body.slice(1).forEach((row, idx) => {
-                                row.forEach((cell, colIndex) => {
-                                    cell.fontSize = 10;
-                                    cell.alignment = 'center';
-                                    cell.margin = colIndex === 0 ? [6, 3, 6, 3] : [4, 3, 4, 3];
-                                });
-                                if (idx % 2 === 0) {
-                                    row.forEach(cell => { cell.fillColor = '#f9f9f9'; });
-                                }
-                            });
-                        }
-                    }
-                },
-                // Excel
-                {
-                    extend: 'excel',
-                    text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
-                    exportOptions: {
-                        rows: selectedRows,
-                        columns: [1, 2, 3, 4],
-                        modifier: { search: 'applied', order: 'applied' },
-                        format: {
-                            body: (function () {
-                                let counter = 0;
-                                return function (data, row, column, node) {
-                                    if (column === 1) return ++counter;
-                                    return data;
-                                };
-                            })()
-                        }
-                    },
-                    title: `Rejected GRN Report - ${moment().format("YYYY-MM-DD")}`,
-                    action: function (e, dt, button, config) {
-                        let selected = dt.$('.row-select:checked', { page: 'all' }).length;
-                        if (!selected) {
-                            showExportToast();
-                            return;
-                        }
-                        exportRowIndex = 0;
-                        $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
-                    }
-                },
-                // CSV
-                {
-                    extend: 'csv',
-                    text: '<i class="bi bi-filetype-csv text-success fs-5"></i>',
-                    exportOptions: {
-                        rows: selectedRows,
-                        columns: [1, 2, 3, 4],
-                        modifier: { search: 'applied', order: 'applied' },
-                        format: {
-                            body: (function () {
-                                let counter = 0;
-                                return function (data, row, column, node) {
-                                    if (column === 1) return ++counter;
-                                    return data;
-                                };
-                            })()
-                        }
-                    },
-                    title: `Rejected_GRN_Report_${moment().format("YYYY-MM-DD")}`,
-                    action: function (e, dt, button, config) {
-                        // validation: any selected rows?
-                        let selected = dt.$('.row-select:checked', { page: 'all' }).length;
-                        if (!selected) {
-                            showExportToast();
-                            return;
-                        }
-                        exportRowIndex = 0; // reset counter
-                        $.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, button, config);
-                    }
-                },
-   
-            ]
+        // Listen for print-done message from print window
+        window.addEventListener('message', function (ev) {
+            if (ev && ev.data === 'dt_print_done') {
+                window.__dt_clearAllProcessing();
+            }
         });
 
-        // Configure toastr once
+        // Store original button actions if not already stored
+        if (!$.fn.dataTable.ext.buttons.pdfHtml5.__originalAction) {
+            $.fn.dataTable.ext.buttons.pdfHtml5.__originalAction =
+                $.fn.dataTable.ext.buttons.pdfHtml5.action;
+        }
+        if (!$.fn.dataTable.ext.buttons.print.__originalAction) {
+            $.fn.dataTable.ext.buttons.print.__originalAction =
+                $.fn.dataTable.ext.buttons.print.action;
+        }
+        if (!$.fn.dataTable.ext.buttons.excelHtml5.__originalAction) {
+            $.fn.dataTable.ext.buttons.excelHtml5.__originalAction =
+                $.fn.dataTable.ext.buttons.excelHtml5.action;
+        }
+        if (!$.fn.dataTable.ext.buttons.csvHtml5.__originalAction) {
+            $.fn.dataTable.ext.buttons.csvHtml5.__originalAction =
+                $.fn.dataTable.ext.buttons.csvHtml5.action;
+        }
+
+        // Toast notification function
+        // ✅ Configure toastr once
         toastr.options = {
             closeButton: true,
             progressBar: true,
-            preventDuplicates: true,
             newestOnTop: true,
             positionClass: "toast-top-right",
-            timeOut: "3000" // 3 seconds
+            preventDuplicates: true,
+            timeOut: 3000,
+            extendedTimeOut: 1000,
+            showDuration: 300,
+            hideDuration: 300,
+            showMethod: "slideDown",
+            hideMethod: "fadeOut"
         };
 
-        // Helper function for warning toast
+        // Helper: show toast warning
         function showExportToast() {
             toastr.warning("Please select at least one row before exporting.");
         }
 
-        // Initialize DateRangePicker AFTER table so cb uses table.draw safely
+        // Date range filter variables
+        let startDate = null, endDate = null;
+
+        // Custom filter for date column
+        $.fn.dataTable.ext.search.push(function (settings, data) {
+            if (settings.nTable.id !== 'RejectGoods') return true; // only this table
+            if (!startDate || !endDate) return true;
+            const addedDate = moment(data[3], "DD/MM/YYYY");
+            return addedDate.isSameOrAfter(startDate, 'day') && addedDate.isSameOrBefore(endDate, 'day');
+        });
+
+        //  Initialize Reject Goods DataTable
+        var table = $('#RejectGoods').DataTable({
+            ajax: "/GRN/getRejectedGoods",
+            responsive: true,
+            ordering: false,
+            fixedHeader: true,
+            dom: '<"d-flex justify-content-between align-items-center mb-2"Bf>rt<"d-flex justify-content-between align-items-center mt-2"ip>',
+            columns: [
+                { // Checkbox
+                    data: null,
+                    orderable: false,
+                    className: "dt-body-center",
+                    render: (data, type, row) =>
+                        `<input type="checkbox" class="row-select" value="${row.GRNCode}">`
+                },
+                { // Sr No
+                    data: null,
+                    title: "SR.NO",
+                    orderable: false,
+                    render: (data, type, row, meta) => meta.row + 1
+                },
+                { data: "GRNCode", title: "GRN Code" },
+                { // Date
+                    data: "AddedDate",
+                    title: "Added Date",
+                    render: data => data ? moment(data).format("DD/MM/YYYY") : ""
+                },
+                { data: "FullName", title: "Added By" },
+                { // Action
+                    data: null,
+                    orderable: false,
+                    title: "Action",
+                    render: (data, type, row) => `
+                <button type="button"
+                    class="btn btn-primary btn-sm btn-grn"
+                    data-grn="${row.GRNCode}"
+                    data-bs-toggle="tooltip"
+                    title="Create Good Return">
+                    <i class="bi bi-file-earmark-plus-fill"></i>
+                </button>`
+                }
+            ],
+            columnDefs: [
+                { targets: "_all", className: "text-center" }
+            ],
+            buttons: [
+                //  Print Export
+                {
+                    extend: 'print',
+                    text: '<i class="bi bi-printer-fill text-dark fs-5"></i>',
+                    title: '',
+                    exportOptions: {
+                        columns: [1, 2, 3, 4],
+                        rows: selectedRows,
+                        format: {
+                            body: (data, rowIdx, colIdx, node) =>
+                                colIdx === 1 ? getExportSrNo(rowIdx, table) : data
+                        }
+                    },
+                    customize: function (win) {
+                        var $body = $(win.document.body);
+                        $body.prepend(`
+                    <h1 style="text-align:center;">Rejected GRN Report</h1>
+                    <div style="text-align:center;font-style:italic;font-size:10pt;margin-bottom:12px;">
+                        Generated on: ${moment().format("DD/MM/YYYY")}
+                    </div>
+                `);
+                        $body.find('table')
+                            .addClass('table table-bordered table-striped')
+                            .css({ width: '100%', 'border-collapse': 'collapse' });
+                        $body.append(`
+                    <style>
+                        thead th {
+                            background-color: black !important;
+                            color: white !important;
+                            text-align: center !important;
+                            -webkit-print-color-adjust: exact !important;
+                            print-color-adjust: exact !important;
+                        }
+                        td, th {
+                            border: 1px solid #000 !important;
+                            padding: 6px !important;
+                            text-align:center !important;
+                        }
+                    </style>
+                `);
+                    },
+                    action: function (e, dt, button, config) {
+                        var selected = dt.rows().nodes().to$().find('input.row-select:checked').length;
+                        var btnApi = dt.button(button);
+
+                        if (selected === 0) {
+                            showExportToast();
+                            try { btnApi.processing(false); } catch (err) { }
+                            return;
+                        }
+
+                        // Show spinner
+                        try { btnApi.processing(true); } catch (err) { }
+
+                        // Call original print action
+                        try {
+                            $.fn.dataTable.ext.buttons.print.__originalAction.call(this, e, dt, button, config);
+                        } catch (err) {
+                            // Ensure spinner not left running
+                            setTimeout(function () { try { btnApi.processing(false); } catch (e) { } }, 300);
+                            throw err;
+                        }
+
+                        // Final fallback: if print window never reports, clear after 2s
+                        setTimeout(function () { try { btnApi.processing(false); } catch (err) { } }, 2000);
+                    }
+                },
+
+                // PDF Export
+                {
+                    extend: 'pdfHtml5',
+                    text: '<i class="bi bi-file-earmark-pdf-fill text-danger fs-5"></i>',
+                    title: 'Rejected GRN Report',
+                    orientation: 'landscape',
+                    pageSize: 'A4',
+                    exportOptions: {
+                        columns: [1, 2, 3, 4],
+                        rows: selectedRows,
+                        format: {
+                            body: (data, rowIdx, colIdx, node) =>
+                                colIdx === 1 ? getExportSrNo(rowIdx, table) : data
+                        }
+                    },
+                    customize: function (doc) {
+                        doc.pageMargins = [40, 60, 40, 40];
+                        doc.styles.title = { fontSize: 16, bold: true, alignment: 'center', margin: [0, 0, 0, 12] };
+                        doc.content.splice(1, 0, {
+                            text: `Generated on: ${moment().format("DD/MM/YYYY")}`,
+                            alignment: 'center',
+                            italics: true,
+                            fontSize: 10
+                        });
+                        let tableNode = doc.content.find(n => n.table);
+                        if (tableNode) {
+                            tableNode.table.widths = ['10%', '25%', '35%', '30%'];
+                            tableNode.layout = {
+                                hLineWidth: () => 0.5,
+                                vLineWidth: () => 0.5,
+                                hLineColor: () => '#ccc',
+                                vLineColor: () => '#ccc',
+                                fillColor: rowIdx => rowIdx === 0 ? '#343a40' : null
+                            };
+                            tableNode.table.body.forEach((row, rowIdx) => {
+                                row.forEach(cell => {
+                                    cell.alignment = 'center';
+                                    if (rowIdx === 0) {
+                                        cell.color = 'white';
+                                        cell.bold = true;
+                                    }
+                                });
+                            });
+                        }
+                    },
+                    action: function (e, dt, button, config) {
+                        var selected = dt.$('.row-select:checked', { page: 'all' }).length;
+                        var btnApi = dt.button(button);
+                        if (selected === 0) { showExportToast(); btnApi.processing(false); return; }
+                        btnApi.processing(true);
+
+                        if (window.pdfMake && pdfMake.createPdf && !pdfMake._patchedForDT) {
+                            (function () {
+                                var origCreate = pdfMake.createPdf;
+                                pdfMake.createPdf = function (docDefinition) {
+                                    var pdfDoc = origCreate.call(pdfMake, docDefinition);
+                                    var origDownload = pdfDoc.download;
+                                    pdfDoc.download = function (filename, cb) {
+                                        origDownload.call(pdfDoc, filename, function () {
+                                            try { btnApi.processing(false); } catch (err) { }
+                                            if (typeof cb === 'function') cb();
+                                        });
+                                    };
+                                    return pdfDoc;
+                                };
+                                pdfMake._patchedForDT = true;
+                            })();
+                        }
+
+                        $.fn.dataTable.ext.buttons.pdfHtml5.__originalAction.call(this, e, dt, button, config);
+                        setTimeout(function () { try { btnApi.processing(false); } catch (err) { } }, 1500);
+                    }
+                },
+
+                // Excel Export
+                {
+                    extend: 'excelHtml5',
+                    text: '<i class="bi bi-file-earmark-excel-fill text-success fs-5"></i>',
+                    title: null,
+                    sheetName: 'Rejected Goods',
+                    filename: 'RejectedGoods',
+                    exportOptions: {
+                        columns: [1, 2, 3, 4],
+                        rows: selectedRows,
+                        format: {
+                            body: (data, rowIdx, colIdx, node) =>
+                                colIdx === 1 ? getExportSrNo(rowIdx, table) : data
+                        }
+                    },
+                    action: function (e, dt, button, config) {
+                        var selected = dt.$('.row-select:checked', { page: 'all' }).length;
+                        var btnApi = dt.button(button);
+                        if (selected === 0) { showExportToast(); try { btnApi.processing(false); } catch (err) { } return; }
+                        try { btnApi.processing(true); } catch (err) { }
+                        $.fn.dataTable.ext.buttons.excelHtml5.__originalAction.call(this, e, dt, button, config);
+                        setTimeout(function () { try { btnApi.processing(false); } catch (err) { } }, 300);
+                    },
+                    customize: function (xlsx) {
+                        var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                        var stylesXml = xlsx.xl['styles.xml'];
+
+
+
+
+                        // ===== Create a centered text style =====
+                        var cellXfs = $('cellXfs xf', stylesXml);
+                        var centerStyleIndex = cellXfs.length;
+                        cellXfs.last().after(
+                            '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1">' +
+                            '<alignment horizontal="center" vertical="center"/></xf>'
+                        );
+
+                        // ===== Detect number of exported columns dynamically =====
+                        var numCols = $('cols col', sheet).length;
+                        if (numCols === 0) numCols = 7; // fallback if DataTables doesn't generate <cols>
+
+                        // Calculate last column letter (A, B, C, ...)
+                        function getExcelColumn(colNum) {
+                            var dividend = colNum, columnName = "", modulo;
+                            while (dividend > 0) {
+                                modulo = (dividend - 1) % 26;
+                                columnName = String.fromCharCode(65 + modulo) + columnName;
+                                dividend = Math.floor((dividend - modulo) / 26);
+                            }
+                            return columnName;
+                        }
+                        var lastColLetter = getExcelColumn(numCols);
+
+                        // ===== Ensure <mergeCells> exists =====
+                        if ($('mergeCells', sheet).length === 0) {
+                            $('worksheet', sheet).prepend('<mergeCells count="0"></mergeCells>');
+                        }
+
+                        var mergeCells = $('mergeCells', sheet);
+                        var count = parseInt(mergeCells.attr('count') || 0);
+
+                        // ===== Add merged cells for Title and Date =====
+                        mergeCells.append(`<mergeCell ref="A1:${lastColLetter}1"/>`);
+                        mergeCells.append(`<mergeCell ref="A2:${lastColLetter}2"/>`);
+                        mergeCells.attr('count', count + 2);
+
+                        // ===== Create Title & Date rows =====
+                        var title = "Rejected Goods List";
+                        var dateText = "Generated Date: " + moment().format("DD/MM/YYYY");
+
+                        var titleRow = `
+    <row r="1">
+        <c r="A1" t="inlineStr" s="${centerStyleIndex}">
+            <is><t>${title}</t></is>
+        </c>
+    </row>
+    <row r="2">
+        <c r="A2" t="inlineStr" s="${centerStyleIndex}">
+            <is><t>${dateText}</t></is>
+        </c>
+    </row>
+`;
+
+                        // ===== Shift existing rows down by 2 =====
+                        $('row', sheet).each(function () {
+                            var r = parseInt($(this).attr('r'));
+                            $(this).attr('r', r + 2);
+                            $(this).find('c').each(function () {
+                                var ref = $(this).attr('r');
+                                var col = ref.replace(/[0-9]/g, '');
+                                $(this).attr('r', col + (r + 2));
+                            });
+                        });
+
+                        // ===== Insert new rows at top =====
+                        var sheetData = $('sheetData', sheet);
+                        sheetData.prepend(titleRow);
+                    },
+
+                },
+
+                // CSV Export
+                {
+                    extend: 'csvHtml5',
+                    text: '<i class="bi bi-filetype-csv text-success fs-5"></i>',
+                    title: 'Rejected_GRN_Report',
+                    exportOptions: {
+                        columns: [1, 2, 3, 4],
+                        rows: selectedRows,
+                        format: {
+                            body: (data, rowIdx, colIdx, node) =>
+                                colIdx === 1 ? getExportSrNo(rowIdx, table) : data
+                        }
+                    },
+                    action: function (e, dt, button, config) {
+                        var selected = dt.rows().nodes().to$().find('input.row-select:checked').length;
+                        var btnApi = dt.button(button);
+
+                        if (selected === 0) {
+                            showExportToast();
+                            try { btnApi.processing(false); } catch (err) { }
+                            return;
+                        }
+
+                        try { btnApi.processing(false); } catch (err) { }
+
+                        $.fn.dataTable.ext.buttons.csvHtml5.__originalAction.call(this, e, dt, button, config);
+
+                        // Stop spinner almost immediately (no real callback exists)
+                        setTimeout(function () {
+                            try { btnApi.processing(false); } catch (err) { }
+                        }, 300);
+                    }
+                }
+            ],
+            drawCallback: function (settings) {
+                var api = this.api();
+                api.column(1, { page: 'current' }).nodes()
+                    .each((cell, i) => cell.innerHTML = i + 1 + settings._iDisplayStart);
+                $('[data-bs-toggle="tooltip"]').tooltip({ customClass: 'tooltip-dark' });
+            }
+        });
+
+        // DateRangePicker
         $('#Rejectedrange').daterangepicker({
             autoUpdateInput: false,
             locale: { cancelLabel: 'Clear' },
             ranges: {
                 'Today': [moment(), moment()],
-                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
                 'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                'This Month': [moment().startOf('month'), moment().endOf('month')],
-                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                'Last 1 Month': [moment().subtract(1, 'months').startOf('day'), moment()],
+                'Last 3 Months': [moment().subtract(3, 'months').startOf('day'), moment()],
+                'Last 1 Year': [moment().subtract(12, 'months').startOf('day'), moment()]
             }
-        });
-
-        // Apply date range when user selects
-        $('#Rejectedrange').on('apply.daterangepicker', function (ev, picker) {
-            startDate = picker.startDate;
-            endDate = picker.endDate;
+        }).on('apply.daterangepicker', function (ev, picker) {
+            startDate = picker.startDate; endDate = picker.endDate;
             $(this).val(startDate.format('YYYY-MM-DD') + ' - ' + endDate.format('YYYY-MM-DD'));
             table.draw();
-        });
+        }).on('cancel.daterangepicker', function () { startDate = endDate = null; $(this).val(''); table.draw(); });
 
-        // Clear date range on cancel
-        $('#Rejectedrange').on('cancel.daterangepicker', function (ev, picker) {
-            startDate = null;
-            endDate = null;
-            $(this).val('');
-            table.draw();
-        });
+        // Reset filter button
+        $('#resetFilter').on('click', function () { startDate = endDate = null; $('#Rejectedrange').val(''); table.search('').columns().search('').draw(); });
 
-        // Reset Filter Button (clears date range and reloads all)
-        $('#resetFilter').on('click', function () {
-            startDate = null;
-            endDate = null;
-            $('#Rejectedrange').val('');
-            table.search('').columns().search('').draw();
-        });
-
-        // Re-init tooltips after every table draw
-        $('#RejectGoods').on('draw.dt', function () {
-            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            tooltipTriggerList.map(el => new bootstrap.Tooltip(el));
-        });
-
-        // Init tooltips on page load
-        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        tooltipTriggerList.map(el => new bootstrap.Tooltip(el));
-
-        // Row Selection (select all)
+        // Select all / row checkboxes
         $('#RejectGoods thead').on('change', '#selectAllReject', function () {
-            const isChecked = $(this).is(':checked');
-            $('#RejectGoods .row-select').prop('checked', isChecked);
+            $('#RejectGoods .row-select').prop('checked', $(this).is(':checked'));
         });
-
         $('#RejectGoods tbody').on('change', '.row-select', function () {
             const all = $('#RejectGoods .row-select').length;
             const checked = $('#RejectGoods .row-select:checked').length;
             $('#selectAllReject').prop('checked', all === checked);
         });
 
-        // Create GR Button
+        // GR Button
         $('#RejectGoods tbody').on('click', '.btn-grn', function () {
             const rowData = table.row($(this).closest('tr')).data();
             $.get("/GRN/CreateGRForm", { grnCode: rowData.GRNCode }, function (html) {
@@ -438,45 +581,19 @@
             });
         });
 
-        // simple toast
-        function showToast(message, type = 'danger') {
-            const toastHTML = `
-        <div class="toast align-items-center text-white bg-${type} border-0 role="alert">
-            <div class="d-flex">
-                <div class="toast-body">${message}</div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
-        </div>`;
-            const $toast = $(toastHTML);
-            $('#toastContainer').append($toast);
-            new bootstrap.Toast($toast[0], { delay: 3000 }).show();
-            $toast.on('hidden.bs.toast', function () { $(this).remove(); });
-        }
-
     });
 
-    // Row selector function
-    function selectedRows(idx, data, node) {
-        return $(node).find('.row-select').prop('checked');
+    // Helper function to recalc SrNo for export across all pages
+    function getExportSrNo(rowIdx, tbl) {
+        // Get all rows nodes
+        let allRows = tbl.rows({ order: 'applied', search: 'applied' }).nodes().toArray();
+        // Filter only the checked rows
+        let checkedRows = allRows.filter(row => $(row).find('input.row-select').prop('checked'));
+        // Find the position of this row in the checkedRows array
+        let sr = checkedRows.findIndex(row => tbl.row(row).index() === rowIdx) + 1;
+        return sr; // consecutive Sr.No
     }
 
-    // Validation wrapper for export
-    function exportWithValidation(buttonType) {
-        return function (e, dt, button, config) {
-            if ($('#RejectGoods .row-select:checked').length === 0) {
-                showToast("⚠️ Please select at least one row before exporting!", "warning");
-                e.preventDefault();
-                e.stopImmediatePropagation();
-                return false;
-            }
-            const buttonsApi = dt.button(buttonType);
-            if (buttonsApi) {
-                const originalAction = $.fn.dataTable.ext.buttons[buttonType].action;
-                if (originalAction) {
-                    originalAction.call(this, e, dt, button, config);
-                }
-            }
-        };
-    }
 </script>
+
 

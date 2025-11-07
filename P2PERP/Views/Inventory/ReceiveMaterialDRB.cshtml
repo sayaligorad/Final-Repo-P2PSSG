@@ -1,5 +1,22 @@
-﻿<div class="container">
+﻿@{
+    ViewBag.Title = "Receive Material";
+}
+
+
+<style>
+    /* ✅ Compact row height for ReturnGoods table */
+    #ReturnGoods.table td,
+    #ReturnGoods.table th {
+        padding: 0.35rem 0.50rem !important;
+        font-size: 0.80rem !important;
+        vertical-align: middle;
+    }
+
+</style>
+
+<div class="container pt-2">
     <div class="card p-4">
+
         <!-- Date Filters -->
         <div class="mb-3 d-flex gap-2">
             <div class="input-group" style="max-width: 280px;">
@@ -8,6 +25,7 @@
                 </span>
                 <input type="text" id="Rejectedrange" class="form-control" placeholder="Select date range" readonly />
             </div>
+            <h3 class="text-center text-primary" style="margin-left:140px;">Receive Material</h3>
 
         </div>
 
@@ -58,7 +76,7 @@
         let endDate = null;
 
         function cb(start, end) {
-            $('#Rejectedrange').val(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+            $('#Rejectedrange').val(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
             startDate = start;
             endDate = end;
             table.draw();
@@ -67,13 +85,13 @@
         $('#Rejectedrange').daterangepicker({
             autoUpdateInput: false,
             locale: { cancelLabel: 'Clear' },
+            format: 'DD/MM/YYYY',
             ranges: {
                 'Today': [moment(), moment()],
-                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
                 'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                'This Month': [moment().startOf('month'), moment().endOf('month')],
-                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                'Last 1 Month': [moment().subtract(1, 'months').startOf('day'), moment()],
+                'Last 3 Months': [moment().subtract(3, 'months').startOf('day'), moment()],
+                'Last 1 Year': [moment().subtract(12, 'months').startOf('day'), moment()]
             }
         }, cb);
 
@@ -113,66 +131,91 @@
             dom: '<"d-flex justify-content-between align-items-center mb-2"Bf>rt<"d-flex justify-content-between align-items-center"i p>',
             buttons: [
 
-
                 // ==== Print ====
                 {
                     extend: 'print',
                     text: '<i class="bi bi-printer-fill fs-5"></i>',
-                    title: '',
+                    title: 'GRN Details',
                     exportOptions: {
                         rows: function (idx, data, node) {
                             return $(node).find('input.rowCheckbox').prop('checked');
                         },
-                        columns: [2, 3],
+                        columns: [2, 3], // adjust columns as per your DataTable
                         modifier: { search: 'applied', order: 'applied' }
                     },
                     action: function (e, dt, button, config) {
+                        var btnApi = dt.button(button);
+
                         if ($('.rowCheckbox:checked').length === 0) {
-                            toastr.warning("Please select at least one row before printing!");
-                        } else {
-                            $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config);
+                            toastr.warning("Please select at least one row before printing!", "", {
+                                onHidden: function () { btnApi.processing(false); }
+                            });
+                            return;
                         }
+
+                        btnApi.processing(true);
+                        setTimeout(() => {
+                            try {
+                                $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config);
+                            } finally {
+                                btnApi.processing(false);
+                            }
+                        }, 50);
                     },
+
                     customize: function (win) {
-                        // Add title & generated date
-                        $(win.document.body).prepend(
-                            `<h3 style="text-align:center;margin-top:10px">Rejected GRN Report</h3>
-                             <p style="text-align:center;margin-top:0;margin-bottom:12px">Generated on: ${moment().format("YYYY-MM-DD")}</p>`
+                        var $body = $(win.document.body);
+
+                        // ========== Inject custom CSS ==========
+                        $body.append(`
+            <style>
+                thead th {
+                    background-color: black !important;
+                    color: white !important;
+                    text-align: center !important;
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                }
+                table {
+                    border-collapse: collapse !important;
+                    width: 100% !important;
+                }
+                td, th {
+                    border: 1px solid #000 !important;
+                    padding: 6px !important;
+                    text-align: center !important;
+                }
+                h1 {
+                    text-align: center !important;
+                }
+            </style>
+        `);
+
+                        // ========== Add sqTitle & Date ==========
+                        $body.find('h1').after(
+                            `<div style="text-align:center;font-style:italic;font-size:10pt;margin-bottom:12px;">
+                Generated Date: ${moment().format("DD/MM/YYYY")}
+            </div>`
                         );
 
-                        // Find printed table
-                        var $table = $(win.document.body).find('table');
+                        // ========== Add Sr No ==========
+                        var $table = $body.find('table');
 
-                        // Prepend Sr No header
-                        $table.find('thead tr').each(function () {
-                            $(this).prepend('<th style="text-align:center;padding:6px">Sr No</th>');
-                        });
+                        // Add "Sr No" header to first column
+                        $table.find('thead tr').prepend('<th>Sr No</th>');
 
-                        // Prepend Sr No cells to each tbody row
-                        $table.find('tbody tr').each(function (idx) {
-                            $(this).prepend(`<td style="text-align:center;padding:6px">${idx + 1}</td>`);
+                        // Add numbering to each row in tbody
+                        $table.find('tbody tr').each(function (index) {
+                            $(this).prepend(`<td>${index + 1}</td>`);
                         });
 
-                        // Styling
-                        $table.addClass('compact').css({
-                            'font-size': '12px',
-                            'border-collapse': 'collapse',
-                            'margin-left': 'auto',
-                            'margin-right': 'auto'
-                        });
-                        $table.find('thead').css({
-                            'background-color': '#343a40',
-                            'color': 'white'
-                        });
-                        $table.find('table td, table th, td, th').css({
-                            'text-align': 'center',
-                            'padding': '6px',
-                            'border': '1px solid #ddd'
-                        });
+                        // ========== Apply Bootstrap-like styling ==========
+                        $table.addClass('table table-bordered table-striped');
+                        $body.css('font-size', '12pt');
                     }
                 },
 
-                // ==== PDF (with Sr No column, styled, full width) ====
+                // ==== PDF ====
                 {
                     extend: 'pdfHtml5',
                     text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
@@ -185,153 +228,243 @@
                         modifier: { search: 'applied', order: 'applied' }
                     },
                     action: function (e, dt, button, config) {
+                        var btnApi = dt.button(button);
+
                         if ($('.rowCheckbox:checked').length === 0) {
-                            toastr.warning("Please select at least one row before exporting!");
-                        } else {
-                            $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, button, config);
+                            toastr.warning("Please select at least one row before exporting!", "", {
+                                onHidden: function () { btnApi.processing(false); }
+                            });
+                            return;
                         }
+
+                        btnApi.processing(true);
+
+                        setTimeout(() => {
+                            try {
+                                if (!$.fn.dataTable.ext.buttons.pdfHtml5.__originalAction) {
+                                    $.fn.dataTable.ext.buttons.pdfHtml5.__originalAction =
+                                        $.fn.dataTable.ext.buttons.pdfHtml5.action;
+                                }
+                                $.fn.dataTable.ext.buttons.pdfHtml5.__originalAction.call(this, e, dt, button, config);
+                            } finally {
+                                btnApi.processing(false);
+                            }
+                        }, 50);
                     },
                     customize: function (doc) {
                         var tableNode = doc.content && doc.content.find(n => n.table);
                         if (!tableNode) return;
 
-                        // === Insert Generated Date below heading ===
                         doc.content.splice(1, 0, {
-                            text: `Generated on: ${moment().format("YYYY-MM-DD")}`,
+                            text: `Generated Date: ${moment().format("DD/MM/YYYY")}`,
                             alignment: 'center',
                             margin: [0, 0, 0, 12],
                             fontSize: 10,
                             italics: true
                         });
 
-                        // Insert "Sr No" header
-                        tableNode.table.body[0].unshift({
-                            text: 'Sr No',
-                            style: 'tableHeader',
-                            alignment: 'center'
-                        });
-
-                        // Insert Sr No values
+                        tableNode.table.body[0].unshift({ text: 'Sr No', style: 'tableHeader', alignment: 'center' });
                         for (var r = 1; r < tableNode.table.body.length; r++) {
-                            tableNode.table.body[r].unshift({
-                                text: String(r),
-                                alignment: 'center',
-                                margin: [0, 4, 0, 4],
-                                fontSize: 10
-                            });
+                            tableNode.table.body[r].unshift({ text: String(r), alignment: 'center', margin: [0, 4, 0, 4], fontSize: 10 });
                         }
 
-                        // === Force table to fit full A4 width ===
                         let colCount = tableNode.table.body[0].length;
-                        tableNode.table.widths = Array(colCount).fill('*'); // distribute evenly
+                        tableNode.table.widths = Array(colCount).fill('*');
 
-                        // Header styling
-                        tableNode.table.body[0].forEach(function (cell) {
-                            cell.color = 'white';
-                            cell.fillColor = '#343a40';
-                            cell.bold = true;
-                            cell.fontSize = 11;
-                            cell.alignment = 'center';
-                            cell.margin = [4, 6, 4, 6];
-                        });
-
-                        // Body styling + zebra striping
+                        tableNode.table.body[0].forEach(function (cell) { cell.color = 'white'; cell.fillColor = '#343a40'; cell.bold = true; cell.fontSize = 11; cell.alignment = 'center'; cell.margin = [4, 6, 4, 6]; });
                         for (var i = 1; i < tableNode.table.body.length; i++) {
                             var row = tableNode.table.body[i];
-                            row.forEach(function (cell) {
-                                cell.alignment = 'center';
-                                cell.fontSize = 10;
-                                cell.margin = [4, 4, 4, 4];
-                            });
-
-                            // Zebra striping
-                            if (i % 2 === 0) {
-                                row.forEach(cell => {
-                                    cell.fillColor = '#f9f9f9';
-                                });
-                            }
+                            row.forEach(function (cell) { cell.alignment = 'center'; cell.fontSize = 10; cell.margin = [4, 4, 4, 4]; });
+                            if (i % 2 === 0) row.forEach(cell => { cell.fillColor = '#f9f9f9'; });
                         }
 
-                        // Page layout
+                        tableNode.layout = {
+                            hLineWidth: () => 0.5, vLineWidth: () => 0.5,
+                            hLineColor: (i, node) => (i === 0 || i === node.table.body.length) ? '#000000' : '#999999',
+                            vLineColor: (i, node) => (i === 0 || i === node.table.widths.length) ? '#000000' : '#999999',
+                            paddingLeft: () => 6, paddingRight: () => 6, paddingTop: () => 4, paddingBottom: () => 4
+                        };
+
                         doc.pageMargins = [40, 60, 40, 40];
                         doc.defaultStyle.fontSize = 10;
-                        doc.styles.tableHeader = {
-                            bold: true,
-                            fontSize: 11,
-                            color: 'white',
-                            fillColor: '#343a40',
-                            alignment: 'center'
-                        };
-                        doc.styles.title = {
-                            fontSize: 16,
-                            bold: true,
-                            alignment: 'center',
-                            margin: [0, 0, 0, 6]
-                        };
+                        doc.styles.tableHeader = { bold: true, fontSize: 11, color: 'white', fillColor: '#343a40', alignment: 'center' };
+                        doc.styles.title = { fontSize: 16, bold: true, alignment: 'center', margin: [0, 0, 0, 6] };
                     }
                 },
 
-
-                // ==== Excel ====
+                //excel
                 {
                     extend: 'excelHtml5',
                     text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
-                    title: `Rejected GRN Report - ${moment().format("YYYY-MM-DD")}`,
+                    title: null,
+                    sheetName: 'GRN Details',
+                    filename: 'GRN Details',
                     exportOptions: {
+                        columns: [1, 2, 3],
                         rows: function (idx, data, node) {
-                            return $(node).find('input.rowCheckbox').prop('checked');
+                            return $(node).find('input.rowCheckbox').prop('checked'); // only selected rows
                         },
-                        columns: [2, 3,],
-                        modifier: { search: 'applied', order: 'applied' }
+                        format: {
+                            body: function (data, rowIdx, colIdx, node) {
+                                if (colIdx === 1) { // Sr No column
+                                    // Get all selected rows' data
+                                    var selectedData = table.rows({ order: 'applied', search: 'applied' }).data().toArray()
+                                        .filter((d, i) => {
+                                            var n = table.row(i).node();
+                                            return $(n).find('input.rowCheckbox').prop('checked');
+                                        });
+
+                                    // Find this row's position among selected rows using unique GRNCode
+                                    var rowData = table.row(node).data();
+                                    var srNo = selectedData.findIndex(d => d.GRNCode === rowData.GRNCode) + 1;
+                                    return srNo;
+                                }
+                                return data;
+                            }
+                        }
+                    },
+                    customize: function (xlsx) {
+                        var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                        var stylesXml = xlsx.xl['styles.xml'];
+
+                        // Create a centered text style
+                        var cellXfs = $('cellXfs xf', stylesXml);
+                        var centerStyleIndex = cellXfs.length;
+                        cellXfs.last().after(
+                            '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1">' +
+                            '<alignment horizontal="center" vertical="center"/></xf>'
+                        );
+
+                        // ===== Define merge range =====
+                        // Merge across 3 columns
+                        var mergeAcross = 3; // total export columns
+                        var lastColLetter = String.fromCharCode(64 + mergeAcross);
+
+                        // Add merge cells section if not exists
+                        if ($('mergeCells', sheet).length === 0) {
+                            $('worksheet', sheet).prepend('<mergeCells count="0"></mergeCells>');
+                        }
+
+                        var mergeCells = $('mergeCells', sheet);
+                        var count = parseInt(mergeCells.attr('count') || 0);
+
+                        // Add two merged rows (A1:C1 and A2:C2)
+                        mergeCells.append(`<mergeCell ref="A1:${lastColLetter}1"/>`);
+                        mergeCells.append(`<mergeCell ref="A2:${lastColLetter}2"/>`);
+                        mergeCells.attr('count', count + 2);
+
+                        // ===== Add Title + Date rows =====
+                        var titleRow = `
+            <row r="1">
+                <c r="A1" t="inlineStr" s="${centerStyleIndex}">
+                    <is><t>GRN Details</t></is>
+                </c>
+            </row>
+            <row r="2">
+                <c r="A2" t="inlineStr" s="${centerStyleIndex}">
+                    <is><t>Generated Date: ${moment().format("DD/MM/YYYY")}</t></is>
+                </c>
+            </row>
+        `;
+
+                        // ===== Move existing rows down by 2 =====
+                        var rows = $('row', sheet);
+                        rows.each(function () {
+                            var r = parseInt($(this).attr('r'));
+                            $(this).attr('r', r + 2);
+                            $(this).find('c').each(function () {
+                                var ref = $(this).attr('r');
+                                var col = ref.replace(/[0-9]/g, '');
+                                $(this).attr('r', col + (r + 2));
+                            });
+                        });
+
+                        // ===== Insert new rows at the top =====
+                        sheet.childNodes[0].childNodes[1].innerHTML =
+                            titleRow + sheet.childNodes[0].childNodes[1].innerHTML;
                     },
                     action: function (e, dt, button, config) {
-                        if ($('.rowCheckbox:checked').length === 0) {
+                        var selected = dt.rows().nodes().to$().find('input.rowCheckbox:checked').length;
+                        var btnApi = dt.button(button);
+
+                        if (selected === 0) {
                             toastr.warning("Please select at least one row before exporting!");
-                        } else {
-                            $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
+                            try { btnApi.processing(false); } catch (err) { }
+                            return;
                         }
-                    },
-                    customizeData: function (data) {
-                        data.header.unshift('Sr No');
-                        for (var i = 0; i < data.body.length; i++) {
-                            data.body[i].unshift(i + 1);
+
+                        try { btnApi.processing(true); } catch (err) { }
+
+                        // Call original excelHtml5 action
+                        if (!$.fn.dataTable.ext.buttons.excelHtml5.__originalAction) {
+                            $.fn.dataTable.ext.buttons.excelHtml5.__originalAction =
+                                $.fn.dataTable.ext.buttons.excelHtml5.action;
                         }
+                        $.fn.dataTable.ext.buttons.excelHtml5.__originalAction.call(this, e, dt, button, config);
+
+                        setTimeout(function () {
+                            try { btnApi.processing(false); } catch (err) { }
+                        }, 50);
                     }
                 },
+
 
                 // ==== CSV ====
                 {
                     extend: 'csvHtml5',
                     text: '<i class="bi bi-filetype-csv text-success fs-5"></i>',
-                    title: `Rejected_GRN_Report_${moment().format("YYYY-MM-DD")}`,
+
                     exportOptions: {
-                        // export only data columns (skip checkbox and Action)
                         rows: function (idx, data, node) {
                             return $(node).find('input.rowCheckbox').prop('checked');
                         },
-                        columns: [2, 3,``],
-                        modifier: { search: 'applied', order: 'applied' }
+                        columns: [1, 2, 3],
+                        modifier: { search: 'applied', order: 'applied' },
+                        format: {
+                            body: function (data, rowIdx, colIdx, node) {
+                                if (colIdx === 1) { // Sr No column
+                                    // Get all selected rows
+                                    var selectedData = table.rows({ order: 'applied', search: 'applied' }).data().toArray()
+                                        .filter((d, i) => {
+                                            var n = table.row(i).node();
+                                            return $(n).find('input.rowCheckbox').prop('checked');
+                                        });
+
+                                    var rowData = table.row(node).data();
+                                    var srNo = selectedData.findIndex(d => d.GRNCode === rowData.GRNCode) + 1;
+                                    return srNo;
+                                }
+                                return data;
+                            }
+                        }
                     },
                     action: function (e, dt, button, config) {
-                        if ($('.rowCheckbox:checked').length === 0) {
-                            toastr.warning("Please select at least one row before exporting!");
-                        } else {
-                            $.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, button, config);
-                        }
-                    },
-                    // Insert Sr No column into csv data (header + rows)
-                    customizeData: function (data) {
-                        // Prepend header
-                        data.header.unshift('Sr No');
+                        var selected = dt.rows().nodes().to$().find('input.rowCheckbox:checked').length;
+                        var btnApi = dt.button(button);
 
-                        // Prepend incrementing SrNo to each body row
-                        for (var i = 0; i < data.body.length; i++) {
-                            data.body[i].unshift(String(i + 1));
+                        if (selected === 0) {
+                            toastr.warning("Please select at least one row before exporting!");
+                            try { btnApi.processing(false); } catch (err) { }
+                            return;
                         }
+
+                        try { btnApi.processing(true); } catch (err) { }
+
+                        // Call original excelHtml5 action
+                        if (!$.fn.dataTable.ext.buttons.excelHtml5.__originalAction) {
+                            $.fn.dataTable.ext.buttons.excelHtml5.__originalAction = $.fn.dataTable.ext.buttons.excelHtml5.action;
+                        }
+                        $.fn.dataTable.ext.buttons.excelHtml5.__originalAction.call(this, e, dt, button, config);
+
+                        setTimeout(function () { try { btnApi.processing(false); } catch (err) { } }, 50);
                     }
-                },
+
+                }
+
 
             ],
+
+
             responsive: true,
             ajax: {
                 url: "/Inventory/getRecevieMaterialDRB",
@@ -372,10 +505,10 @@
                     orderable: false,
                     searchable: false,
                     render: function (data, type, row) {
-                       
-                            return '<button type="button" class="btn btn-success btn-InStock square-pill d-inline-flex align-items-center px-3 shadow-InStock" data-bs-toggle="tooltip" title="In Stock"><i class="bi bi-box-seam fs-5"></i></button>';
-                       
-                      
+                        return `
+            <button type="button" class="btn btn-success btn-sm btn-InStock square-pill d-inline-flex align-items-center px-2 py-1 shadow-InStock" data-bs-toggle="tooltip" title="In Stock">
+                <i class="bi bi-box-seam "></i>
+            </button>`;
                     }
                 }
             ],
@@ -408,7 +541,7 @@
             $('input.rowCheckbox', rows).prop('checked', this.checked);
         });
 
-        // Row checkbox updates SelectAll 
+        // Row checkbox updates SelectAll
         $('#ReturnGoods tbody').on('change', '.rowCheckbox', function () {
             var rows = table.rows({ search: 'applied' }).nodes();
             var total = $('input.rowCheckbox', rows).length;
@@ -433,5 +566,15 @@
                 $("#InStockModal").modal('show');
             });
         });
+
+        function getExportSrNo(rowIdx, tbl) {
+            // Get all rows nodes
+            let allRows = tbl.rows({ order: 'applied', search: 'applied' }).nodes().toArray();
+            // Filter only the checked rows
+            let checkedRows = allRows.filter(row => $(row).find('input.row-select').prop('checked'));
+            // Find the position of this row in the checkedRows array
+            let sr = checkedRows.findIndex(row => tbl.row(row).index() === rowIdx) + 1;
+            return sr; // consecutive Sr.No
+        }
     });
 </script>

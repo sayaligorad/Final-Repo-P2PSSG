@@ -1,0 +1,420 @@
+﻿<style>
+    button.dt-button.processing,
+    div.dt-button.processing {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        background: none !important;
+    }
+
+        button.dt-button.processing:after {
+            content: none !important;
+        }
+</style>
+
+
+<!-- Title -->
+<div class="text-center mb-3">
+    <h3 class="text-primary fw-bold">Approved Purchase Order</h3>
+</div>
+
+<!-- Date Range Picker -->
+<div class="mb-3 d-flex align-items-center gap-2">
+    <div class="input-group" style="max-width: 280px;">
+        <span class="input-group-text bg-primary text-white">
+            <i class="bi bi-calendar-date"></i>
+        </span>
+        <input type="text" id="Purchasedatepicker" class="form-control" placeholder="Select date range" readonly />
+    </div>
+</div>
+
+<!-- Table -->
+<div class="table-responsive">
+    <table id="tblApproved" class="table table-striped table-hover table-bordered align-middle">
+        <thead class="table-dark">
+            <tr class="text-center">
+                <th><input type="checkbox" id="selectAll" /></th>
+                <th>SR NO</th>
+                <th>PO NO</th>
+                <th>PO Date</th>
+                <th>Approved Date</th>
+                <th>Created By</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody class="text-center"></tbody>
+    </table>
+</div>
+
+
+<script>
+    $(function () {
+        let approvedTable;
+
+        toastr.options = {
+            closeButton: true, progressBar: true, newestOnTop: true,
+            positionClass: "toast-top-right", preventDuplicates: true,
+            timeOut: 3000, extendedTimeOut: 1000,
+            showDuration: 300, hideDuration: 300,
+            showMethod: "slideDown", hideMethod: "fadeOut"
+        };
+
+        function showToast(message, type = 'warning') {
+            if (type === 'success') toastr.success(message);
+            else if (type === 'error') toastr.error(message);
+            else if (type === 'info') toastr.info(message);
+            else toastr.warning(message);
+        }
+
+        function exportColumns(idx) { return idx !== 0 && idx !== 7; }
+
+        function loadApprovedPOsVNK() {
+            approvedTable = $('#tblApproved').DataTable({
+                dom: '<"d-flex justify-content-between mb-2 flex-wrap align-items-center"<"dt-buttons"B><"dt-search"f>>rt<"d-flex justify-content-between align-items-center mt-2"ip>',
+                ordering: false,
+                processing: true, serverSide: false,
+                ajax: { url: '/Purchase/GetApprovedPOsVNK', dataSrc: '' },
+                columns: [
+                    { data: null, orderable: false, className: 'text-center', render: (d, t, r) => `<input type="checkbox" class="row-select" value="${r.POCode}"/>` },
+                    { data: null, orderable: false, className: 'text-center', render: (d, t, r, meta) => meta.row + 1 },
+                    { data: 'POCode', className: 'text-center' },
+                    { data: 'AddedDateVK', className: 'text-center', render: d => d ? moment(d).format('DD/MM/YYYY') : '' },
+                    { data: 'ApprovedRejectedDateVK', className: 'text-center', render: d => d ? moment(d).format('DD/MM/YYYY') : '' },
+                    { data: 'CreatedBy', defaultContent: '', className: 'text-center' },
+                    { data: 'StatusName', className: 'text-center', render: d => `<span class="badge bg-success">${d || 'Unknown'}</span>` },
+                    { data: 'POCode', orderable: false, className: 'text-center', render: d => `<button class="btn btn-sm btn-square btn-view btn-primary" data-pocode="${d}" title="View"><i class="bi bi-eye-fill"></i></button>` }
+                ],
+
+
+                buttons: [
+                    // Print
+                    {
+                        extend: 'print',
+                        title: '',
+                        text: '<i class="bi bi-printer-fill text-dark fs-5"></i>',
+                        titleAttr: 'Print',
+                        action: function (e, dt, button, config) {
+                            if ($('#tblApproved .row-select:checked').length === 0) {
+                                showToast("Please select at least one PO to Print");
+                                return;
+                            }
+                            $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config);
+                        },
+                        exportOptions: {
+                            columns: exportColumns,
+                            rows: (idx, d, node) => $(node).find('.row-select').prop('checked')
+                        },
+                        customize: function (win) {
+                            const today = new Date();
+                            const formattedDate = today.toLocaleDateString('en-GB');
+                            $(win.document.body).prepend(`
+                <div style="text-align:center; font-size:18px; font-weight:bold; margin-bottom:5px;">Approved Purchase Orders</div>
+                <div style="text-align:center; font-size:12px; margin-bottom:10px;">Generated Date: ${formattedDate}</div>
+            `);
+                            $(win.document.body).find('thead th').css({
+                                'background-color': '#212529',
+                                'color': '#ffffff',
+                                'text-align': 'center',
+                                '-webkit-print-color-adjust': 'exact',
+                                'print-color-adjust': 'exact'
+                            });
+                            $(win.document.body).find('table').addClass('table table-bordered table-striped').css('font-size', '14px');
+                            $(win.document.body).find('table tbody tr').each(function (i) {
+                                $(this).find('td:first').text(i + 1);
+                            });
+                        }
+                    },
+
+                    // PDF
+                    {
+                        extend: 'pdfHtml5',
+                        title: 'Approved Purchase Orders',
+                        text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
+                        titleAttr: 'Export PDF',
+                        action: function (e, dt, button, config) {
+                            if ($('#tblApproved .row-select:checked').length === 0) {
+                                showToast("Select at least one PO to export PDF");
+                                return;
+                            }
+                            $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, button, config);
+                        },
+                        exportOptions: {
+                            columns: exportColumns,
+                            rows: (idx, d, node) => $(node).find('.row-select').prop('checked'),
+                            format: {
+                                body: (data, row, col) => typeof data === 'string' ? data.replace(/<\/?[^>]+(>|$)/g, "").trim() : data
+                            }
+                        },
+                        customize: function (doc) {
+                            doc.content[0].alignment = 'center';
+                            doc.content[0].fontSize = 14;
+                            doc.content.splice(1, 0, {
+                                text: 'Generated Date: ' + new Date().toLocaleDateString('en-GB'),
+                                alignment: 'center',
+                                margin: [0, 0, 0, 8],
+                                fontSize: 10
+                            });
+                            const tableNode = doc.content.find(c => c.table);
+                            if (!tableNode) return;
+                            doc.styles.tableHeader = { alignment: 'center', fillColor: '#212529', color: '#ffffff', bold: true };
+                            tableNode.table.body.forEach((row, i) => {
+                                if (i > 0) row[0] = { text: String(i), alignment: 'center' };
+                            });
+                            tableNode.layout = { paddingLeft: () => 30, paddingRight: () => 6 };
+                        }
+                    },
+
+                  
+                    // ✅ Excel Export for Approved PO Table
+                    {
+                        extend: 'excelHtml5',
+                        title: '',
+                        filename: 'Approved_POs',
+                        text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
+                        titleAttr: 'Export Excel',
+                        attr: {
+                            'data-bs-toggle': 'tooltip',
+                            'data-bs-placement': 'bottom',
+                            'title': 'Export to Excel'
+                        },
+                        action: function (e, dt, button, config) {
+                            // ✅ Require at least one PO selected
+                            if ($('#tblApproved .row-select:checked').length === 0) {
+                                showToast("Please select at least one PO to export Excel", "warning");
+                                return;
+                            }
+                            window.__excelSrCounter = 0;
+                            $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
+                        },
+                        exportOptions: {
+                            // ✅ Export only checked rows
+                            rows: (idx, d, node) => $(node).find('.row-select').prop('checked'),
+                            columns: exportColumns,
+                            format: {
+                                body: (data, row, col, node) => {
+                                    data = typeof data === 'string' ? data.replace(/<[^>]*>/g, '').trim() : data;
+                                    if (col === 1) {
+                                        if (!window.__excelSrCounter) window.__excelSrCounter = 0;
+                                        return ++window.__excelSrCounter;
+                                    }
+                                    return data;
+                                }
+                            }
+                        },
+
+                        // ✅ Custom Excel Formatting (Title + Date at Center)
+                        customize: function (xlsx) {
+                            const sheet = xlsx.xl.worksheets['sheet1.xml'];
+                            const $sheet = $(sheet);
+
+                            // Count number of columns in first row
+                            let colCount = $('row:first c', sheet).length;
+                            if (colCount === 0) colCount = 5; // fallback
+
+                            const title = 'Approved Purchase Orders';
+                            const generatedDate = 'Export Date: ' + moment().format('DD/MM/YYYY');
+
+                            // 🔹 Shift existing rows down by 2
+                            $sheet.find('sheetData row').each(function () {
+                                const r = parseInt($(this).attr('r'));
+                                $(this).attr('r', r + 2);
+                                $(this).find('c').each(function () {
+                                    const cellRef = $(this).attr('r');
+                                    const col = cellRef.replace(/[0-9]/g, '');
+                                    const rowNum = parseInt(cellRef.replace(/[A-Z]/g, '')) + 2;
+                                    $(this).attr('r', col + rowNum);
+                                });
+                            });
+
+                            // 🔹 Create Title & Date Rows
+                            const titleRow = `
+<row r="1">
+    <c t="inlineStr" r="A1" s="55"><is><t>${title}</t></is></c>
+</row>`;
+                            const dateRow = `
+<row r="2">
+    <c t="inlineStr" r="A2" s="56"><is><t>${generatedDate}</t></is></c>
+</row>`;
+
+                            $sheet.find('sheetData').prepend(titleRow + dateRow);
+
+                            // 🔹 Merge title and date cells (A1:LastCol1, A2:LastCol2)
+                            let mergeCells = $sheet.find('mergeCells');
+                            if (mergeCells.length === 0) {
+                                mergeCells = $('<mergeCells count="0"></mergeCells>');
+                                $sheet.append(mergeCells);
+                            }
+
+                            const lastCol = String.fromCharCode(64 + colCount);
+                            mergeCells.append(`<mergeCell ref="A1:${lastCol}1"/>`);
+                            mergeCells.append(`<mergeCell ref="A2:${lastCol}2"/>`);
+                            mergeCells.attr('count', mergeCells.find('mergeCell').length);
+
+                            // 🔹 Add custom styles for center alignment
+                            const styles = xlsx.xl['styles.xml'];
+                            const $styles = $(styles);
+                            const cellXfs = $styles.find('cellXfs');
+                            const count = parseInt(cellXfs.attr('count'));
+                            const newStyleIndex1 = count;      // for title
+                            const newStyleIndex2 = count + 1;  // for date
+
+                            // Add center alignment styles
+                            cellXfs.append(`
+<xf numFmtId="0" fontId="0" fillId="0" borderId="0" applyAlignment="1">
+    <alignment horizontal="center" vertical="center"/>
+</xf>`);
+                            cellXfs.append(`
+<xf numFmtId="0" fontId="0" fillId="0" borderId="0" applyAlignment="1">
+    <alignment horizontal="center" vertical="center"/>
+</xf>`);
+                            cellXfs.attr('count', count + 2);
+
+                            // Apply new style indices to our custom rows
+                            $sheet.find('c[r="A1"]').attr('s', newStyleIndex1);
+                            $sheet.find('c[r="A2"]').attr('s', newStyleIndex2);
+                        }
+                    }
+                    ,
+              
+                    // ✅ CSV Export for Approved PO Table
+                    {
+                        extend: 'csvHtml5',
+                        text: '<i class="bi bi-filetype-csv text-success fs-5"></i>',
+                        titleAttr: 'Export to CSV',
+                        attr: {
+                            'data-bs-toggle': 'tooltip',
+                            'data-bs-placement': 'bottom',
+                            'title': 'Export to CSV'
+                        },
+                        action: function (e, dt, button, config) {
+                            // ✅ Require at least one checkbox selection
+                            if ($('#tblApproved .row-select:checked').length === 0) {
+                                showToast("Please select at least one PO to export!", "warning");
+                                return;
+                            }
+
+                            // Reset serial counter
+                            window.__srnoCounter = 0;
+
+                            // Call default export action
+                            $.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, button, config);
+                            dt.processing(false); // remove spinner if any
+                        },
+                        exportOptions: {
+                            rows: function (idx, data, node) {
+                                return $(node).find('.row-select').prop('checked'); // ✅ only checked rows
+                            },
+                            columns: exportColumns, // use your defined export column list
+                            format: {
+                                body: (function () {
+                                    let counter = 0;
+                                    return function (data, row, column, node) {
+                                        // Clean HTML tags
+                                        data = typeof data === 'string' ? data.replace(/<[^>]*>/g, '').trim() : data;
+
+                                        // ✅ Serial number column
+                                        if (column === 1) {
+                                            if (!window.__srnoCounter) window.__srnoCounter = 0;
+                                            return ++window.__srnoCounter;
+                                        }
+
+                                        // ✅ Date formatting (e.g., PO Date column)
+                                        // Adjust 'column === 2' if your date column is at another index
+                                        if (column === 2) {
+                                            const m = moment(data, ["DD-MM-YYYY", "YYYY-MM-DD", "DD/MM/YYYY"], true);
+                                            if (m.isValid()) {
+                                                return m.format("DD/MM/YYYY"); // unified format
+                                            }
+                                            return data;
+                                        }
+
+                                        // ✅ Default fallback for other columns
+                                        return data;
+                                    };
+                                })()
+                            }
+                        },
+                        title: null, // disable default title row
+                        filename: function () {
+                            return 'ApprovedPO_List_' + new Date().toISOString().slice(0, 10).replace(/-/g, "");
+                        },
+                        customize: function (csv) {
+                            // Optional: add slight spacing or header alignment
+                            const spaces = '          '; // 10 spaces
+                            return spaces + '\n' + csv;
+                        }
+                    }
+
+
+
+
+
+
+
+
+                    ],
+
+
+                initComplete: function () {
+                    $('#tblApproved_filter input').addClass("form-control").attr("placeholder", "Search...").css("height", "40px");
+                }
+            });
+        }
+
+        if (!$.fn.DataTable.isDataTable('#tblApproved')) loadApprovedPOsVNK();
+
+        // Checkbox logic
+        $(document).on("change", "#selectAll", () => $(".row-select").prop("checked", $("#selectAll").prop("checked")));
+        $(document).on("change", ".row-select", () => $("#selectAll").prop("checked", $(".row-select:checked").length == $(".row-select").length));
+
+        // View PO modal
+        $(document).off('click', '#tblApproved .btn-view').on('click', '#tblApproved .btn-view', function () {
+            $("#NewModalBody").html("<div class='text-center p-3 small'>Loading...</div>");
+            const POCode = $(this).data('pocode');
+            $.get("/Purchase/ViewPurchaseOrderVNK", { POCode }, function (html) {
+                $("#NewModalBody").html(html);
+                $("#NewModal").modal('show');
+            });
+        });
+
+   
+
+
+        //  Date filter with custom ranges
+        $(document).off('focus', '#Purchasedatepicker').on('focus', '#Purchasedatepicker', function () {
+            if (!$(this).data('daterangepicker')) {
+                $(this).daterangepicker({
+                    autoUpdateInput: false,
+                    opens: "center",
+                    drops: "down",
+                    alwaysShowCalendars: false,
+                    locale: { cancelLabel: 'Clear' },
+                    ranges: {
+                        'Today': [moment(), moment()],
+                        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                        'Last 1 Month': [moment().subtract(1, 'month'), moment()],
+                        'Last 3 Months': [moment().subtract(3, 'month'), moment()],
+                        'Last 1 Year': [moment().subtract(1, 'year'), moment()],
+                    }
+                }, function (start, end) {
+                    $('#Purchasedatepicker').val(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
+
+                    // Filter logic
+                    $.fn.dataTable.ext.search.push(function (settings, data) {
+                        if (settings.nTable.id !== 'tblApproved') return true;
+                        const addedDate = moment(data[3], 'DD/MM/YYYY');
+                        return addedDate.isBetween(start, end, undefined, '[]');
+                    });
+
+                    if (approvedTable) approvedTable.draw();
+                    $.fn.dataTable.ext.search.pop();
+                });
+
+                $('#Purchasedatepicker').on('cancel.daterangepicker', function () {
+                    $(this).val('');
+                    if (approvedTable) approvedTable.draw();
+                });
+            }
+        });
+    });
+</script>

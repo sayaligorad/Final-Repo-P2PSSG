@@ -4,78 +4,114 @@
 <style>
     #taskTabsContent {
         box-shadow: none;
+        padding :0  !important;
     }
+    #RG {
+        padding-top: 0 !important;
+    }
+
+    .btnback {
+        margin-top: -120px;
+        align-content: end;
+        align-items: end;
+        text-align: end;
+        align-self: end;
+        text-align: end;
+        margin-left: 90%;
+    }
+    .modal {
+        z-index: 1050 !important;
+    }
+
+    .modal-backdrop {
+        z-index: 1040 !important;
+    }
+
+    .modal.show {
+        display: block !important;
+    }
+
 </style>
 <!-- 🔹 Wrap Whole Partial in One Card Only -->
-<div class="card shadow-lg rounded-4 border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
-        <div class="flex-grow-1 text-center position-relative">
-            <h5 class="mb-0 fw-bold text-white">GRN Task List</h5>
+
+
+
+<div class="  rounded-3 border-0">
+    <div id="RG">
+
+        <!-- GRN Info -->
+        <div class="d-flex justify-content-between align-items-center position-relative mb-3 mt-4" style="min-height: 50px;">
+            <!-- Date Picker (Left) -->
+            <div class="input-group" style="width: 280px;">
+                <span class="input-group-text bg-primary text-white">
+                    <i class="bi bi-calendar-date"></i>
+                </span>
+                <input type="text" id="grnlistdatepicker" class="form-control" placeholder="Select date range" readonly />
+            </div>
+
+            <!-- Header (Centered) -->
+            <h3 class="position-absolute start-50 translate-middle-x mb-0 fw-bolder text-center text-primary">
+                Check Quality
+            </h3>
         </div>
-        <button type="button"
-                class="btn btn-light btn-sm ms-2"
-                onclick="location.href='/Quality/IndexRG'">
-            <i class="bi bi-arrow-left"></i> Back
-        </button>
+
+        <input type="hidden" id="grnno" value="@ViewBag.GRN" name="GRNCode" class="form-control w-auto bg-light" readonly />
+
+
+        <!-- Task Grid -->
+
+        <div class="table-responsive">
+            <table id="newTaskTable" class="table table-striped table-hover table-bordered align-middle text-center mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th><input type="checkbox" id="selectAllNewTask"/></th>
+                        <th>Sr.No</th>
+                        <th>GRNCode</th>
+                        <th>Item Code</th>
+                        <th>Item Name</th>
+                        <th>Item Type</th>
+                        <th>Inspection Type</th>
+                        <th>Plan Name</th>
+                        <th>Assigned Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
     </div>
-</div>
-
-
-<div class="card-body">
-
-    <!-- GRN Info -->
-    <div class="d-flex align-items-center mb-3 mt-4">
-        <label for="grnno" class="fw-semibold me-2 mb-0">GRN No:</label>
-        <input type="text" id="grnno" value="@ViewBag.GRN" name="GRNCode" class="form-control w-auto" readonly />
-    </div>
-
-    <!-- Task Grid -->
-    <h5 class="fw-semibold mb-3">New Task</h5>
-    <div class="table-responsive">
-        <table id="newTaskTable" class="table table-striped table-hover table-bordered align-middle text-center mb-0">
-            <thead class="table-dark">
-                <tr>
-                    <th><input type="checkbox" id="selectAllNewTask" /></th>
-                    <th>Sr.No</th>
-                    <th>GRNItemCode</th>
-                    <th>Item Code</th>
-                    <th>Item Name</th>
-                    <th>Item Type</th>
-                    <th>Inspection Type</th>
-                    <th>Plan Name</th>
-                    <th>Assigned Date</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
-
 </div>
 
 
 <!-- Modal for Inspection Form -->
 <div class="modal fade" id="inspecModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content shadow-lg rounded-4 bg-white">
-            <div class="modal-header bg-primary text-white position-relative">
-                <h4 class="modal-title text-white mx-auto">Inspection Form</h4>
-                <button type="button"
-                        class="btn  position-absolute top-50 end-0 translate-middle-y btn-lg fw-bold text-white"
-                        style="width:40px; height:40px; font-size:24px; line-height:1;"
-                        data-bs-dismiss="modal"
-                        aria-label="Close">
-                    &times;
-                </button>
-            </div>
+        <div class="modal-content shadow-lg rounded-3 bg-white">
+            <div class="modal-header bg-primary text-white d-flex justify-content-center align-items-center rounded-top p-1">
+                <h3 class="modal-title fw-bold text-white mb-0 fs-5 ">Inspection Form</h3>
+                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2" data-bs-dismiss="modal"aria-label="Close"></button>
+             </div>
             <div class="modal-body" id="inspecModalBody">
                 <div class="text-center text-muted">Loading...</div>
             </div>
         </div>
     </div>
 </div>
+<style>
+    button.dt-button.processing,
+    div.dt-button.processing {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        background: none !important;
+    }
+
+        button.dt-button.processing:after {
+            content: none !important;
+        }
 
 
+
+</style>
 
 <script>
     /* this function returns toastmessage */
@@ -109,17 +145,17 @@
         //  Toast HTML with white text for all
         const toastHTML = `
 <div id="${toastId}" class="toast align-items-center bg-${type} border-0 mb-2 shadow-lg"
-                 role="alert" aria-live="assertive" aria-atomic="true"
-                 data-bs-delay="3000" data-bs-animation="true">
-                <div class="d-flex">
-                    <div class="toast-body d-flex align-items-center text-white">
-                        ${icon} ${message}
+                     role="alert" aria-live="assertive" aria-atomic="true"
+                     data-bs-delay="3000" data-bs-animation="true">
+                    <div class="d-flex">
+                        <div class="toast-body d-flex align-items-center text-white">
+                            ${icon} ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                                data-bs-dismiss="toast" aria-label="Close"></button>
                     </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto"
-                            data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-                <div class="progress" style="height: 3px; margin:0; background: rgba(255,255,255,0.3);">
-            <div class="progress-bar" role="progressbar"></div>
+                    <div class="progress" style="height: 3px; margin:0; background: rgba(255,255,255,0.3);">
+                <div class="progress-bar" role="progressbar"></div>
 </div>
 
 </div>`;
@@ -181,7 +217,7 @@
                             return meta.row + 1; // ✅ Sr.No
                         }
                     },
-                    { data: 'GrnItemCode' },
+                    { data: 'GRNCode' },
 
                     { data: 'ItemCode' },
                     { data: 'ItemName' },
@@ -190,22 +226,27 @@
                     { data: 'PlanName' },
                     {
                         data: 'strAddedDate',
-                        render: function (data, type, row) {
+                        render: function (data) {
                             if (!data) return "";
-                            // Try to parse both "YYYY-MM-DD" and "DD-MM-YYYY"
-                            let date = moment(data, ["YYYY-MM-DD", "DD-MM-YYYY", "DD/MM/YYYY"]);
+                            const date = moment(data, [
+                                "YYYY-MM-DDTHH:mm:ss", // ISO datetime
+                                "YYYY-MM-DD",          // plain date
+                                "DD/MM/YYYY hh:mm:ss A",
+                                "DD-MM-YYYY"
+                            ]);
                             return date.isValid() ? date.format("DD/MM/YYYY") : data;
                         }
+                       
                     },
                     {
                         data: 'GrnItemcode',
                         render: function (data, type, row) {
-                            return `<button class="btn btn-sm btn-primary open-inspec"
-                            onclick="openInspecForm('${row.GrnItemCode}')"
-                            data-bs-toggle="tooltip"
-                            title="Open Inspection Form">
-                      <i class="bi bi-box-arrow-up-right me-1"></i>
-                    </button>`;
+                            return `<button class="btn btn-sm btn-primary  open-inspec square-pill d-inline-flex align-items-center px-2 py-1 bi bi-box-seam fs-6"
+                                onclick="openInspecForm('${row.GrnItemCode}')"
+                                data-bs-toggle="tooltip"
+                                title="Open Inspection Form">
+                          <i class="bi bi-box-arrow-up-right me-1"></i>
+                        </button>`;
                         }
                     }
                 ],
@@ -264,41 +305,39 @@
 
                                     // Prepend centered title and generated date
                                     $(win.document.body).prepend(`
-                                            <div style="text-align:center; width:100%;">
-                                                <h2 style="margin:0; font-size:20pt; font-weight:bold;">GRN List</h2>
-                                                <div style="font-size:12pt; font-style:italic; margin-bottom:15px;">
-                                                    Generated on: ${new Date().toLocaleDateString()}
+                                                <div style="text-align:center; width:100%;">
+                                                    <h2 style="margin:0; font-size:20pt; font-weight:bold;">GRN List</h2>
+                                                    <div style="font-size:12pt; font-style:italic; margin-bottom:15px;">
+                                                        Generated on: ${new Date().toLocaleDateString()}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        `);
+                                            `);
 
                                     // Table styles (header colors and alignment remain intact)
                                     var css = `
-                                            page {
-                                                margin: 0 !important;
-                                            }
-                                            body {
-                                                margin: 0 !important;
-                                                padding: 0 !important;
-                                            }
-                                            table.dataTable thead th {
-                                                background-color: black !important;
-                                                color: white !important;
-                                                font-weight: bold !important;
-                                                text-align: center !important;
-                                                -webkit-print-color-adjust: exact !important;
-                                                print-color-adjust: exact !important;
-                                            }
-                                            table.dataTable tbody td {
-                                                text-align: center !important;
-                                            }
-                                        `;
+                                                page {
+                                                    margin: 0 !important;
+                                                }
+                                                body {
+                                                    margin: 0 !important;
+                                                    padding: 0 !important;
+                                                }
+                                                table.dataTable thead th {
+                                                    background-color: black !important;
+                                                    color: white !important;
+                                                    font-weight: bold !important;
+                                                    text-align: center !important;
+                                                    -webkit-print-color-adjust: exact !important;
+                                                    print-color-adjust: exact !important;
+                                                }
+                                                table.dataTable tbody td {
+                                                    text-align: center !important;
+                                                }
+                                            `;
                                     $(win.document.head).append('<style>' + css + '</style>');
                                 }
                             },
-
-                            //code for Pdf
-
+                            //pdf
                             {
                                 extend: 'pdfHtml5',
                                 text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
@@ -314,7 +353,7 @@
                                         return;
                                     }
                                     $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, button, config);
-                                    dt.processing(false); // ✅ force remove buffering spinner
+                                    dt.processing(false);
                                 },
                                 exportOptions: {
                                     rows: function (idx, data, node) {
@@ -339,40 +378,70 @@
                                 },
                                 title: 'GRN List',
                                 filename: function () {
-                                    return 'GRN_List_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+                                    return 'NewTask_List_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
                                 },
                                 customize: function (doc) {
+
+                                    // 🔹 Reduce font size for better fit
+                                    doc.defaultStyle.fontSize = 9;
+                                    doc.styles.tableHeader.fontSize = 10;
+
+                                    // 🔹 Center title and add generated date
                                     doc.styles.title = {
                                         fontSize: 16,
                                         bold: true,
-                                        alignment: 'center',
-                                        color: 'black',
-
+                                        alignment: 'center'
                                     };
-
                                     doc.content.splice(1, 0, {
                                         text: 'Generated on: ' + new Date().toLocaleDateString(),
-                                        fontSize: 12,
+                                        fontSize: 11,
                                         italics: true,
                                         alignment: 'center',
                                         margin: [0, 0, 0, 10]
                                     });
-                                    var tableNode = doc.content[doc.content.length - 1].table;
-                                    var headerCells = tableNode.body[0];
-                                    headerCells.forEach(function (cell) {
-                                        cell.fillColor = 'black';
-                                        cell.color = 'white';
-                                        cell.bold = true;
-                                        cell.alignment = 'center';
-                                    });
-                                    tableNode.layout = {
-                                        paddingLeft: () => 30, paddingLeft: () => 6,
 
-                                    };
-                                    var colCount = tableNode.body[0].length;
-                                    tableNode.widths = new Array(colCount).fill('*'); // distribute evenly
+                                    // 🔹 Ensure landscape layout and full width
+                                    doc.pageOrientation = 'landscape';
+                                    doc.pageSize = 'A4';
+                                    doc.pageMargins = [20, 60, 20, 30]; // [left, top, right, bottom]
+
+                                    // 🔹 Loop to style the table
+                                    for (let i = 0; i < doc.content.length; i++) {
+                                        if (doc.content[i].table) {
+                                            const table = doc.content[i].table;
+
+                                            // Header styling
+                                            table.body[0].forEach(cell => {
+                                                cell.fillColor = 'black';
+                                                cell.color = 'white';
+                                                cell.bold = true;
+                                                cell.alignment = 'center';
+                                            });
+
+                                            // Body formatting + zebra stripes
+                                            for (let r = 1; r < table.body.length; r++) {
+                                                table.body[r].forEach(cell => {
+                                                    cell.alignment = 'center';
+                                                    if (r % 2 === 0) cell.fillColor = '#f2f2f2';
+                                                });
+                                            }
+
+                                            // Add table border
+                                            doc.content[i].layout = {
+                                                hLineWidth: () => 0.5,
+                                                vLineWidth: () => 0.5,
+                                                hLineColor: () => '#000000',
+                                                vLineColor: () => '#000000'
+                                            };
+
+                                            // Even column widths
+                                            const colCount = table.body[0].length;
+                                            table.widths = new Array(colCount).fill('*');
+                                        }
+                                    }
                                 }
                             },
+
                             //code for excel
 
                             {
@@ -415,7 +484,7 @@
                                 },
                                 title: '',
                                 filename: function () {
-                                    return 'GRN_List_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+                                    return 'New_Task_List_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
                                 },
                                 customize: function (xlsx) {
                                     var sheet = xlsx.xl.worksheets['sheet1.xml'];
@@ -425,15 +494,13 @@
                                     var colCount = $('row:first c', sheet).length;
                                     if (colCount === 0) colCount = 5; // fallback
 
-                                    // Title & date text
                                     var title = 'New Task List';
                                     var generatedDate = 'Generated on: ' + moment().format('DD/MM/YYYY');
 
-                                    // 🔹 Shift all existing rows down by 2 (to make space for title + date)
+                                    // 🔹 Shift all rows down by 2
                                     $sheet.find('sheetData row').each(function () {
                                         var r = parseInt($(this).attr('r'));
                                         $(this).attr('r', r + 2);
-
                                         $(this).find('c').each(function () {
                                             var cellRef = $(this).attr('r');
                                             var col = cellRef.replace(/[0-9]/g, '');
@@ -442,31 +509,55 @@
                                         });
                                     });
 
-                                    // 🔹 Create Title row
+                                    // 🔹 Create Title & Date rows
                                     var titleRow = `
-       <row r="1">
-      <c t="inlineStr" r="A1" s="2"><is><t>${title}</t></is></c>
-        </row>`;
-
-                                    // 🔹 Create Date row
+                                                       <row r="1">
+                                                 <c t="inlineStr" r="A1" s="55"><is><t>${title}</t></is></c>
+                                                    </row>`;
                                     var dateRow = `
-         <row r="2">
-          <c t="inlineStr" r="A2" s="0"><is><t>${generatedDate}</t></is></c>
-            </row>`;
+                                            <row r="2">
+                                       <c t="inlineStr" r="A2" s="56"><is><t>${generatedDate}</t></is></c>
+                                              </row>`;
 
-                                    // Prepend title + date rows
                                     $sheet.find('sheetData').prepend(titleRow + dateRow);
 
-                                    // 🔹 Merge cells for title & date across all columns
+                                    // 🔹 Merge title and date cells
                                     var mergeCells = $sheet.find('mergeCells');
                                     if (mergeCells.length === 0) {
                                         mergeCells = $('<mergeCells count="0"></mergeCells>');
                                         $sheet.append(mergeCells);
                                     }
 
-                                    mergeCells.append(`<mergeCell ref="A1:${String.fromCharCode(64 + colCount)}1"/>`);
-                                    mergeCells.append(`<mergeCell ref="A2:${String.fromCharCode(64 + colCount)}2"/>`);
+                                    var lastCol = String.fromCharCode(64 + colCount);
+                                    mergeCells.append(`<mergeCell ref="A1:${lastCol}1"/>`);
+                                    mergeCells.append(`<mergeCell ref="A2:${lastCol}2"/>`);
                                     mergeCells.attr('count', mergeCells.find('mergeCell').length);
+
+                                    // 🔹 Add custom styles for centered alignment
+                                    var styles = xlsx.xl['styles.xml'];
+                                    var $styles = $(styles);
+
+                                    // Add cellXfs (style) for center alignment (if not already present)
+                                    var cellXfs = $styles.find('cellXfs');
+                                    var count = parseInt(cellXfs.attr('count'));
+                                    var newStyleIndex1 = count;      // for title
+                                    var newStyleIndex2 = count + 1;  // for date
+
+                                    cellXfs.append(`
+                                         <xf numFmtId="0" fontId="0" fillId="0" borderId="0" applyAlignment="1">
+                                         <alignment horizontal="center" vertical="center"/>
+                                         </xf>
+                                          `);
+                                    cellXfs.append(`
+                                      <xf numFmtId="0" fontId="0" fillId="0" borderId="0" applyAlignment="1">
+                                       <alignment horizontal="center" vertical="center"/>
+                                        </xf>
+                                         `);
+                                    cellXfs.attr('count', count + 2);
+
+                                    // Update the style index in your cells (s="55" → newStyleIndex1, s="56" → newStyleIndex2)
+                                    $sheet.find('c[r="A1"]').attr('s', newStyleIndex1);
+                                    $sheet.find('c[r="A2"]').attr('s', newStyleIndex2);
                                 }
                             },
                             //code for csv
@@ -495,7 +586,7 @@
                                     rows: function (idx, data, node) {
                                         return $(node).find('.row-select').prop('checked'); // ✅ only checked rows
                                     },
-                                    columns: ':visible',
+                                    columns: ':visible:not(:last-child)',
                                     format: {
                                         body: (function () {
                                             let counter = 0;
@@ -507,15 +598,23 @@
                                                     if (!window.__srnoCounter) window.__srnoCounter = 0;
                                                     return ++window.__srnoCounter;
                                                 }
-                                                if (column === 3) {
-                                                    // Convert to proper DD-MM-YYYY
-                                                    if (moment(data, 'DD-MM-YYYY', true).isValid()) {
-                                                        return moment(data, 'DD-MM-YYYY').format('DD-MM-YYYY');
+                                                if (column === 8) {
+                                                    if (moment(data, 'DD/MM/YYYY', true).isValid()) {
+                                                        return moment(data, 'DD/MM/YYYY').format('DD/MM/YYYY');
                                                     }
-                                                    if (moment(data).isValid()) {
-                                                        return moment(data).format('DD-MM-YYYY'); // only date
+                                                    if (moment(data, 'DD/MM/YYYY', true).isValid()) {
+                                                        return moment(data, 'DD/MM/YYYY').format('DD/MM/YYYY');
                                                     }
                                                     return data;
+                                                }
+
+                                                if (column === 8) {
+                                                    const m = moment(data, ["DD-MM-YYYY", "YYYY-MM-DD", "DD/MM/YYYY"], true);
+                                                    if (m.isValid()) {
+                                                        return m.format("DD/MM/YYYY"); // ✅ plain text
+                                                    }
+                                                    return data;
+
                                                 }
                                                 return data;
                                             };
@@ -524,15 +623,15 @@
                                 },
                                 title: null, // disable default single-line title
                                 filename: function () {
-                                    return 'GRN_List_' + new Date().toISOString().slice(0, 10); // date only
+                                    return 'NewTask_List_' + new Date().toISOString().slice(0, 10); // date only
                                 },
                                 customize: function (csv) {
-                                    const title = 'GRN List';
-                                    const generatedDate = 'Generated on: ' + moment().format('DD/MM/YYYY'); // only date
+
+
 
                                     // Estimate spaces to center (adjust if needed)
                                     const spaces = '          '; // 10 spaces for rough centering
-                                    return spaces + title + '\n' + spaces + generatedDate + '\n' + csv;
+                                    return spaces + '\n' + csv;
                                 }
                             }
                         ]
@@ -549,6 +648,14 @@
                 var checked = this.checked;
                 $('.row-select').prop('checked', checked);
             });
+            // When any individual checkbox is clicked, update the Select All checkbox
+            $('#newTaskTable').on('change', '.row-select', function () {
+                var total = $('.row-select').length;
+                var checked = $('.row-select:checked').length;
+
+                // If all rows checked → check Select All, otherwise uncheck it
+                $('#selectAllNewTask').prop('checked', total === checked);
+            });
 
 
             $('#newTaskTable').on('draw.dt', function () {
@@ -556,6 +663,7 @@
                 tooltipTriggerList.map(function (tooltipTriggerEl) {
                     return new bootstrap.Tooltip(tooltipTriggerEl);
                 });
+                initDatePicker(table);
             });
 
             // 🔹 Initialize tooltips for export buttons
@@ -578,6 +686,9 @@
     //this function used to  open modal of new task inspectionfrom is shown
 
     function openInspecForm(itemCode) {
+
+        // Remove any leftover backdrops to prevent stacking freeze
+        $('.modal-backdrop').remove();
         var inspecModal = new bootstrap.Modal(document.getElementById('inspecModal'));
         inspecModal.show();
 
@@ -640,8 +751,56 @@
 
         });
     }
+    // ✅ Date Range Picker Initialization
+    function initDatePicker(table) {
+        $('#grnlistdatepicker').daterangepicker({
+            autoUpdateInput: false,
+            alwaysShowCalendars: false,
+            opens: "center",
+            drops: "down",
+            locale: {
+                format: 'DD/MM/YYYY',
+                cancelLabel: 'Clear',
+                applyLabel: 'Apply'
+            },
+            ranges: {
+                'Today': [moment(), moment()],
+                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                'Last 1 Month': [moment().subtract(1, 'month'), moment()],
+                'Last 3 Months': [moment().subtract(3, 'month'), moment()],
+                'Last 1 Year': [moment().subtract(1, 'year'), moment()]
+            }
+        });
 
+        // ✅ When a date range is selected
+        $('#grnlistdatepicker').on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY'));
 
+            // Remove old filter before applying a new one
+            $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(f => !f.customDateFilter);
 
+            $.fn.dataTable.ext.search.push(function (settings, data) {
+
+                var dateStr = data[8];
+                if (!dateStr) return false;
+
+                var addedDate = moment(dateStr, ['DD/MM/YYYY', 'DD-MM-YYYY', 'YYYY-MM-DD']);
+                if (!addedDate.isValid()) return false;
+
+                return addedDate.isBetween(picker.startDate, picker.endDate, 'day', '[]');
+            });
+
+            $.fn.dataTable.ext.search[$.fn.dataTable.ext.search.length - 1].customDateFilter = true;
+            table.draw();
+        });
+
+        // ✅ When "Clear" is clicked
+        $('#grnlistdatepicker').on('cancel.daterangepicker', function () {
+            $(this).val('');
+            $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(f => !f.customDateFilter);
+            table.draw();
+        });
+    }
+    
 
 </script>

@@ -5,6 +5,24 @@
     button {
         display: none;
     }
+    #RG {
+        padding-top: 0 !important;
+    }
+
+    .btnback {
+        margin-top: -120px;
+        align-content: end;
+        align-items: end;
+        text-align: end;
+        align-self: end;
+        text-align: end;
+        margin-left: 90%;
+    }
+    thead th {
+        white-space: nowrap !important;
+    }
+
+
 </style>
 <input type="hidden" value="@ViewBag.GRN" name="GRNCode" id="GRNCode" />
 
@@ -12,59 +30,81 @@
 <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100;"></div>
 
 <!-- 🔹 Single Card Wrapper -->
-<div class="card shadow-lg rounded-3 border-0">
-    <div class="card-header bg-primary text-white d-flex align-items-center position-relative">
-        <!-- Centered heading -->
-        <h5 class="mb-0 fw-bold text-white position-absolute top-50 start-50 translate-middle text-center">
-            Completed Tasks
-        </h5>
+<div class="rounded-3 border-0">
+    <div  id="RG">
 
-        <!-- Back button on the right -->
-        <button type="button"
-                class="btn btn-light btn-sm ms-auto"
-                onclick="location.href='/Quality/IndexRG'">
-            <i class="bi bi-arrow-left"></i> Back
-        </button>
+        <!-- GRN Info -->
+        <div class="d-flex align-items-center mb-3 mt-4">
+            <!-- Date Picker -->
+            <div class="mt-2" id="dtp">
+
+
+                 
+                <!-- Header (Perfectly Centered) -->
+                <h3 class="position-absolute start-50 translate-middle-x mb-0 fw-bolder text-center text-primary">Check Quality</h3>
+
+
+
+                <div class="input-group" style="height: 40px; max-width: 280px;">
+                    <span class="input-group-text bg-primary text-white"><i class="bi bi-calendar-date"></i></span>
+                    <input type="text" id="grnlistdatepicker1" class="form-control"
+                           placeholder="Select date range" readonly />
+
+                </div>
+
+            </div>
+            @*<label for="grnno" class="fw-semibold me-2 mb-0">GRN No:</label>*@
+            <input type="hidden" id="grnno" value="@ViewBag.GRN" name="GRNCode" class="form-control w-auto bg-light" readonly />
+        </div>
+
+        <!-- Table -->
+        <div class="table-responsive">
+            <table id="completedTaskTable"
+                   class="table table-striped table-hover table-bordered align-middle text-center mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th><input type="checkbox" id="selectAllCompleted" /></th>
+                        <th>Sr.No</th>
+                        <th>GRNCode</th>
+                        <th>Item Code</th>
+                        <th>Item Name</th>
+                        <th>Item Type</th>
+                        <th>Qty</th>
+                        <th>Vendor Name</th>
+                        <th>Assigned Date</th>
+                        <th>Inspection Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
     </div>
+
 </div>
 
+<style>
 
-<div class="card-body">
+    .card-header {
+        background-color: white !important;
+        color: black !important;
+    }
 
-    <!-- GRN Info -->
-    <div class="d-flex align-items-center mb-3 mt-4">
-        <label for="grnno" class="fw-semibold me-2 mb-0">GRN No:</label>
-        <input type="text" id="grnno" value="@ViewBag.GRN" name="GRNCode" class="form-control w-auto" readonly />
-    </div>
+    button.dt-button.processing,
+    div.dt-button.processing {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        background: none !important;
+    }
 
-    <!-- Table -->
-    <div class="table-responsive">
-        <table id="completedTaskTable"
-               class="table table-striped table-hover table-bordered align-middle text-center mb-0">
-            <thead class="table-dark">
-                <tr>
-                    <th><input type="checkbox" id="selectAllCompleted" /></th>
-                    <th>Sr.No</th>
-                    <th>Item Code</th>
-                    <th>Item Name</th>
-                    <th>Item Type</th>
-                    <th>Qty</th>
-                    <th>Vendor Name</th>
-                    <th>Assigned Date</th>
-                    <th>Inspection Date</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
-
-</div>
-
+        button.dt-button.processing:after {
+            content: none !important;
+        }
+</style>
 
 <script>
-    // ✅ Toast function
-    // ✅ Toast function
+
+    //  Toast function
     function showToast(message, type = 'error') {
         // Map to Bootstrap contextual colors
         let icon = '';
@@ -90,7 +130,7 @@
 
         const toastId = `toast-${Date.now()}`;
 
-        // ✅ Toast HTML with white text for all
+        //  Toast HTML with white text for all
         const toastHTML = `
 <div id="${toastId}" class="toast align-items-center bg-${type} border-0 mb-2 shadow-lg"
          role="alert" aria-live="assertive" aria-atomic="true"
@@ -111,11 +151,11 @@
         const $toast = $(toastHTML);
         $('#toastContainer').prepend($toast); // newestOnTop
 
-        // ✅ Initialize bootstrap toast
+        //  Initialize bootstrap toast
         const toast = new bootstrap.Toast($toast[0], { delay: 3000 });
         toast.show();
 
-        // ✅ Animate progress bar
+        //  Animate progress bar
         $toast.find('.progress-bar')
             .css({
                 width: "100%",
@@ -129,7 +169,7 @@
 
 
 
-        // ✅ Auto-remove
+        //  Auto-remove
         $toast.on('hidden.bs.toast', function () {
             $(this).remove();
         });
@@ -172,6 +212,7 @@
                             return meta.row + 1; // ✅ Sr.No
                         }
                     },
+                    { data: 'GRNCode' },
                     { data: 'ItemCode' },
                     { data: 'ItemName' },
                     { data: 'ItemType' },
@@ -202,10 +243,10 @@
                             let statusText = (data || '').toLowerCase().trim(); // normalize to lowercase
 
                             switch (statusText) {
-                                case 'confirmed':        // ✅ lowercase
+                                case 'confirmed':        //  lowercase
                                     badgeClass = 'bg-success';
                                     break;
-                                case 'non-confirmed':    // ✅ lowercase
+                                case 'non-confirmed':    //  lowercase
                                     badgeClass = 'bg-danger';
                                     break;
                                 default:
@@ -254,7 +295,7 @@
                                                     ? data.replace(/<[^>]*>/g, '').trim()
                                                     : data;
 
-                                                // ✅ For SR.NO column (first visible after checkbox)
+                                                //  For SR.NO column (first visible after checkbox)
                                                 if (column === 1) {
                                                     counter++;
                                                     return counter;
@@ -318,7 +359,7 @@
                                         return;
                                     }
                                     $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, button, config);
-                                    dt.processing(false); // ✅ force remove buffering spinner
+                                    dt.processing(false);
                                 },
                                 exportOptions: {
                                     rows: function (idx, data, node) {
@@ -343,40 +384,89 @@
                                 },
                                 title: 'GRN List',
                                 filename: function () {
-                                    return 'GRN_List_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+                                    return 'CompletedTask_List_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
                                 },
                                 customize: function (doc) {
+                                    // 🔹 General styles
+                                    doc.defaultStyle.fontSize = 9;
+                                    doc.styles.tableHeader.fontSize = 10;
                                     doc.styles.title = {
                                         fontSize: 16,
                                         bold: true,
                                         alignment: 'center',
-                                        color: 'black',
-
+                                        color: 'black'
                                     };
 
+                                    // 🔹 Landscape layout to fit all columns
+                                    doc.pageOrientation = 'landscape';
+                                    doc.pageSize = 'A4';
+                                    doc.pageMargins = [20, 50, 20, 30];
+
+                                    // 🔹 Add generated date
                                     doc.content.splice(1, 0, {
                                         text: 'Generated on: ' + new Date().toLocaleDateString(),
-                                        fontSize: 12,
+                                        fontSize: 11,
                                         italics: true,
                                         alignment: 'center',
                                         margin: [0, 0, 0, 10]
                                     });
-                                    var tableNode = doc.content[doc.content.length - 1].table;
-                                    var headerCells = tableNode.body[0];
-                                    headerCells.forEach(function (cell) {
-                                        cell.fillColor = 'black';
-                                        cell.color = 'white';
-                                        cell.bold = true;
-                                        cell.alignment = 'center';
-                                    });
-                                    tableNode.layout = {
-                                        paddingLeft: () => 30, paddingLeft: () => 6,
 
-                                    };
-                                    var colCount = tableNode.body[0].length;
-                                    tableNode.widths = new Array(colCount).fill('*'); // distribute evenly
+                                    // 🔹 Ensure proper table formatting
+                                    for (let i = 0; i < doc.content.length; i++) {
+                                        if (doc.content[i].table) {
+                                            let table = doc.content[i].table;
+
+                                            // Header style
+                                            table.body[0].forEach(cell => {
+                                                cell.fillColor = '#000000';
+                                                cell.color = 'white';
+                                                cell.alignment = 'center';
+                                                cell.bold = true;
+                                            });
+
+                                            // Body style + zebra striping
+                                            for (let r = 1; r < table.body.length; r++) {
+                                                table.body[r].forEach(cell => {
+                                                    cell.alignment = 'center';
+                                                    if (r % 2 === 0) cell.fillColor = '#f2f2f2';
+                                                });
+                                            }
+
+                                            // Borders and padding
+                                            doc.content[i].layout = {
+                                                hLineWidth: () => 0.5,
+                                                vLineWidth: () => 0.5,
+                                                hLineColor: () => '#000000',
+                                                vLineColor: () => '#000000',
+                                                paddingLeft: () => 4,
+                                                paddingRight: () => 4,
+                                                paddingTop: () => 3,
+                                                paddingBottom: () => 3
+                                            };
+
+                                            // 🔹 Fit columns evenly + allow wrapping
+                                            const colCount = table.body[0].length;
+                                            table.widths = Array(colCount).fill('*');
+                                            doc.styles.tableBodyEven = { alignment: 'center' };
+                                            doc.styles.tableBodyOdd = { alignment: 'center' };
+                                        }
+                                    }
+
+                                    // 🔹 Auto shrink text that’s too long
+                                    doc.content.forEach(function (content) {
+                                        if (content.table) {
+                                            content.table.body.forEach(function (row) {
+                                                row.forEach(function (cell) {
+                                                    if (typeof cell.text === 'string' && cell.text.length > 30) {
+                                                        cell.fontSize = 8; // shrink long text
+                                                    }
+                                                });
+                                            });
+                                        }
+                                    });
                                 }
                             },
+
                             //export excel code
 
                             {
@@ -394,7 +484,7 @@
                                         return;
                                     }
                                     $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
-                                    dt.processing(false); // ✅ force remove buffering spinner
+                                    dt.processing(false); //  force remove buffering spinner
                                 },
                                 exportOptions: {
                                     rows: function (idx, data, node) {
@@ -419,7 +509,7 @@
                                 },
                                 title: '',
                                 filename: function () {
-                                    return 'GRN_List_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+                                    return 'Completed_Task_List_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
                                 },
                                 customize: function (xlsx) {
                                     var sheet = xlsx.xl.worksheets['sheet1.xml'];
@@ -429,15 +519,13 @@
                                     var colCount = $('row:first c', sheet).length;
                                     if (colCount === 0) colCount = 5; // fallback
 
-                                    // Title & date text
                                     var title = 'Completed Task List';
                                     var generatedDate = 'Generated on: ' + moment().format('DD/MM/YYYY');
 
-                                    // 🔹 Shift all existing rows down by 2 (to make space for title + date)
+                                    // 🔹 Shift all rows down by 2
                                     $sheet.find('sheetData row').each(function () {
                                         var r = parseInt($(this).attr('r'));
                                         $(this).attr('r', r + 2);
-
                                         $(this).find('c').each(function () {
                                             var cellRef = $(this).attr('r');
                                             var col = cellRef.replace(/[0-9]/g, '');
@@ -446,31 +534,55 @@
                                         });
                                     });
 
-                                    // 🔹 Create Title row
+                                    // 🔹 Create Title & Date rows
                                     var titleRow = `
                                    <row r="1">
-                                  <c t="inlineStr" r="A1" s="2"><is><t>${title}</t></is></c>
-                                    </row>`;
-
-                                    // 🔹 Create Date row
+                                   <c t="inlineStr" r="A1" s="55"><is><t>${title}</t></is></c>
+                                   </row>`;
                                     var dateRow = `
-                                     <row r="2">
-                                      <c t="inlineStr" r="A2" s="0"><is><t>${generatedDate}</t></is></c>
-                                        </row>`;
+                               <row r="2">
+                            <c t="inlineStr" r="A2" s="56"><is><t>${generatedDate}</t></is></c>
+                                </row>`;
 
-                                    // Prepend title + date rows
                                     $sheet.find('sheetData').prepend(titleRow + dateRow);
 
-                                    // 🔹 Merge cells for title & date across all columns
+                                    // 🔹 Merge title and date cells
                                     var mergeCells = $sheet.find('mergeCells');
                                     if (mergeCells.length === 0) {
                                         mergeCells = $('<mergeCells count="0"></mergeCells>');
                                         $sheet.append(mergeCells);
                                     }
 
-                                    mergeCells.append(`<mergeCell ref="A1:${String.fromCharCode(64 + colCount)}1"/>`);
-                                    mergeCells.append(`<mergeCell ref="A2:${String.fromCharCode(64 + colCount)}2"/>`);
+                                    var lastCol = String.fromCharCode(64 + colCount);
+                                    mergeCells.append(`<mergeCell ref="A1:${lastCol}1"/>`);
+                                    mergeCells.append(`<mergeCell ref="A2:${lastCol}2"/>`);
                                     mergeCells.attr('count', mergeCells.find('mergeCell').length);
+
+                                    // 🔹 Add custom styles for centered alignment
+                                    var styles = xlsx.xl['styles.xml'];
+                                    var $styles = $(styles);
+
+                                    // Add cellXfs (style) for center alignment (if not already present)
+                                    var cellXfs = $styles.find('cellXfs');
+                                    var count = parseInt(cellXfs.attr('count'));
+                                    var newStyleIndex1 = count;      // for title
+                                    var newStyleIndex2 = count + 1;  // for date
+
+                                    cellXfs.append(`
+                                 <xf numFmtId="0" fontId="0" fillId="0" borderId="0" applyAlignment="1">
+                                 <alignment horizontal="center" vertical="center"/>
+                                  </xf>
+                                   `);
+                                    cellXfs.append(`
+                                <xf numFmtId="0" fontId="0" fillId="0" borderId="0" applyAlignment="1">
+                                <alignment horizontal="center" vertical="center"/>
+                                </xf>
+                                `);
+                                    cellXfs.attr('count', count + 2);
+
+                                    // Update the style index in your cells (s="55" → newStyleIndex1, s="56" → newStyleIndex2)
+                                    $sheet.find('c[r="A1"]').attr('s', newStyleIndex1);
+                                    $sheet.find('c[r="A2"]').attr('s', newStyleIndex2);
                                 }
                             },
                             //export csv code
@@ -492,13 +604,13 @@
                                     window.__srnoCounter = 0; // reset counter after export
 
                                     $.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, button, config);
-                                    dt.processing(false); // ✅ force remove buffering spinner
+                                    dt.processing(false); //  force remove buffering spinner
                                 },
                                 exportOptions: {
                                     rows: function (idx, data, node) {
                                         return $(node).find('.row-select').prop('checked'); // ✅ only checked rows
                                     },
-                                    columns: ':visible',
+                                    columns: ':visible:not(:last-child)',
                                     format: {
                                         body: (function () {
                                             let counter = 0;
@@ -511,14 +623,22 @@
                                                     return ++window.__srnoCounter;
                                                 }
                                                 if (column === 3) {
-                                                    // Convert to proper DD-MM-YYYY
-                                                    if (moment(data, 'DD-MM-YYYY', true).isValid()) {
-                                                        return moment(data, 'DD-MM-YYYY').format('DD-MM-YYYY');
+                                                    if (moment(data, 'DD/MM/YYYY', true).isValid()) {
+                                                        return "'" + moment(data, 'DD/MM/YYYY').format('DD/MM/YYYY');
                                                     }
-                                                    if (moment(data).isValid()) {
-                                                        return moment(data).format('DD-MM-YYYY'); // only date
+                                                    if (moment(data, 'DD/MM/YYYY', true).isValid()) {
+                                                        return "'" + moment(data, 'DD/MM/YYYY').format('DD/MM/YYYY');
+                                                    }
+                                                    return "'" + data;
+                                                }
+
+                                                if (column === 7 || column === 8) {
+                                                    const m = moment(data, ["DD-MM-YYYY", "YYYY-MM-DD", "DD/MM/YYYY"], true);
+                                                    if (m.isValid()) {
+                                                        return m.format("DD/MM/YYYY"); // ✅ plain text
                                                     }
                                                     return data;
+
                                                 }
                                                 return data;
                                             };
@@ -527,15 +647,30 @@
                                 },
                                 title: null, // disable default single-line title
                                 filename: function () {
-                                    return 'GRN_List_' + new Date().toISOString().slice(0, 10); // date only
+                                    return 'CompletedTask_List_' + new Date().toISOString().slice(0, 10); // date only
+                                },
+                                customize: function (xlsx) {
+                                    var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                                    var $sheet = $(sheet);
+
+                                    // Force all date columns (e.g., 7, 8) to be inlineStr
+                                    $sheet.find('row c').each(function () {
+                                        var $c = $(this);
+                                        // Check for columns 7 (G) and 8 (H)
+                                        var col = $c.attr('r').replace(/[0-9]/g, '');
+                                        if (col === 'G' || col === 'H') {
+                                            $c.attr('t', 'inlineStr'); // treat as string
+                                            var v = $c.find('v').text();
+                                            $c.empty().append(`<is><t>${v}</t></is>`); // wrap value in <is><t>
+                                        }
+                                    });
                                 },
                                 customize: function (csv) {
-                                    const title = 'GRN List';
-                                    const generatedDate = 'Generated on: ' + moment().format('DD/MM/YYYY'); // only date
+
 
                                     // Estimate spaces to center (adjust if needed)
                                     const spaces = '          '; // 10 spaces for rough centering
-                                    return spaces + title + '\n' + spaces + generatedDate + '\n' + csv;
+                                    return spaces + '\n' + csv;
                                 }
                             }
                         ]
@@ -552,19 +687,97 @@
                 var checked = this.checked;
                 $('#completedTaskTable .row-select').prop('checked', checked);
             });
+            // When any individual checkbox is clicked, update the Select All checkbox
+            $('#completedTaskTable').on('change', '.row-select', function () {
+                var total = $('.row-select').length;
+                var checked = $('.row-select:checked').length;
+
+                // If all rows checked → check Select All, otherwise uncheck it
+                $('#selectAllCompleted').prop('checked', total === checked);
+            });
 
 
             // 🔹 Initialize tooltips for export buttons
-            $('#exportContainer [data-bs-toggle="tooltip"]').tooltip({
-                template: '<div class="tooltip" role="tooltip"><div class="tooltip-inner bg-dark text-white"></div></div>'
+
+            setTimeout(() => {
+                $('[data-bs-toggle="tooltip"]').tooltip({
+                    template: `
+            <div class="tooltip" role="tooltip">
+                <div class="tooltip-inner bg-dark text-white px-2 py-1 rounded"></div>
+            </div>
+        `
+                });
+            }, 500);
+
+            table.on('draw.dt buttons-action.dt', function () {
+                $('[data-bs-toggle="tooltip"]').tooltip({
+                    template: `
+            <div class="tooltip" role="tooltip">
+                <div class="tooltip-inner bg-dark text-white px-2 py-1 rounded"></div>
+            </div>
+        `
+                });
+                initDatePicker(table);
+
+
             });
 
-            table.on('buttons-action.dt', function () {
-                $('#exportContainer [data-bs-toggle="tooltip"]').tooltip({
-                    template: '<div class="tooltip" role="tooltip"><div class="tooltip-inner bg-dark text-white"></div></div>'
+        }
+        //  Date Range Picker
+        // ✅ Correct Date Range Picker Filter
+        function initDatePicker(table) {
+            $('#grnlistdatepicker1').daterangepicker({
+                autoUpdateInput: false,
+                alwaysShowCalendars: false,
+                opens: "center",
+                drops: "down",
+                locale: {
+                    format: 'DD/MM/YYYY',
+                    cancelLabel: 'Clear',
+                    applyLabel: 'Apply'
+                },
+                ranges: {
+                    'Today': [moment(), moment()],
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'Last 1 Month': [moment().subtract(1, 'month'), moment()],
+                    'Last 3 Months': [moment().subtract(3, 'month'), moment()],
+                    'Last 1 Year': [moment().subtract(1, 'year'), moment()]
+                }
+            });
+
+            // ✅ On Apply
+            $('#grnlistdatepicker1').on('apply.daterangepicker', function (ev, picker) {
+                $(this).val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY'));
+
+                // Remove existing custom filter
+                $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(f => !f.customDateFilter);
+
+                // Add new filter
+                $.fn.dataTable.ext.search.push(function (settings, data) {
+                    var dateStr = data[9]; // ✅ Assigned Date column index
+                    if (!dateStr) return false;
+
+                    var assignedDate = moment(dateStr, ['DD/MM/YYYY', 'DD-MM-YYYY', 'YYYY-MM-DD']);
+                    if (!assignedDate.isValid()) return false;
+
+                    return assignedDate.isBetween(picker.startDate, picker.endDate, 'day', '[]');
                 });
+
+                // Mark filter as custom
+                $.fn.dataTable.ext.search[$.fn.dataTable.ext.search.length - 1].customDateFilter = true;
+
+                table.draw();
+            });
+
+            // ✅ On Clear
+            $('#grnlistdatepicker1').on('cancel.daterangepicker', function () {
+                $(this).val('');
+                $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(f => !f.customDateFilter);
+                table.draw();
             });
         }
-
     });
+
+
+
 </script> 

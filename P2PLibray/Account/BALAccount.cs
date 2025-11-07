@@ -14,6 +14,7 @@ namespace P2PLibray.Account
     {
         MSSQL sql = new MSSQL();
 
+        #region Login
         /// <summary>
         /// Attempts to log in a user by validating the provided email and password
         /// against the database.
@@ -79,6 +80,22 @@ namespace P2PLibray.Account
         }
 
         /// <summary>
+        /// Executes post-login operations by calling the "AccountProcedure" stored procedure.
+        /// Passes the current date (in yyyy-MM-dd format) and the "AfterLogin" flag as parameters.
+        /// This method is asynchronous and does not return a value.
+        /// </summary>
+        public async Task AfterLogin()
+        {
+            Dictionary<string, string> param = new Dictionary<string, string>
+            {
+                {"@Flag","AfterLogin" }, {"@Date",DateTime.Now.ToString("yyyy-MM-dd")}
+            };
+            await sql.ExecuteStoredProcedure("AccountProcedure", param);
+        }
+        #endregion
+
+        #region User Profile
+        /// <summary>
         /// Retrieves complete user profile details for a given staff member,
         /// including personal information, contact details, and assigned permissions.
         /// </summary>
@@ -87,7 +104,7 @@ namespace P2PLibray.Account
         /// An <see cref="Account"/> object containing profile information such as
         /// name, department, role, contact details, addresses, and permissions.
         /// </returns>
-
+        /// 
         public async Task<Account> UserProfileDetails(string StaffCode)
         {
             Dictionary<string, string> param = new Dictionary<string, string>();
@@ -181,17 +198,18 @@ namespace P2PLibray.Account
         }
 
         /// <summary>
-        /// Retrieves the list of read-only permissions assigned to a staff member.
+        /// Retrieves the complete list of permissions assigned to a staff member,
+        /// including both permission types and their names.
         /// </summary>
         /// <param name="StaffCode">The unique staff code of the user.</param>
         /// <returns>
-        /// A list of <see cref="Permissions"/> objects containing the names of
-        /// read permissions granted to the user.
+        /// A list of <see cref="Permissions"/> objects containing both the type
+        /// of permission and its corresponding name.
         /// </returns>
-        public async Task<List<Permissions>> GetReadPermissions(string StaffCode)
+        public async Task<List<Permissions>> GetAllPermissions(string StaffCode)
         {
             Dictionary<string, string> param = new Dictionary<string, string>();
-            param.Add("@Flag", "GetReadPermissionsPCM");
+            param.Add("@Flag", "GetAllPermissionsPcm");
             param.Add("@StaffCode", StaffCode);
 
             var acc = new List<Permissions>();
@@ -202,13 +220,16 @@ namespace P2PLibray.Account
                 {
                     acc.Add(new Permissions
                     {
-                        PermissionName = dr.IsDBNull(dr.GetOrdinal("Permissions")) ? string.Empty : dr.GetString(dr.GetOrdinal("Permissions"))
+                        PermissionType = dr.IsDBNull(dr.GetOrdinal("Permissions")) ? string.Empty : dr.GetString(dr.GetOrdinal("Permissions")),
+                        PermissionName = dr.IsDBNull(dr.GetOrdinal("PermissionName")) ? string.Empty : dr.GetString(dr.GetOrdinal("PermissionName"))
                     });
                 }
             }
             return acc;
         }
+        #endregion
 
+        #region Notification
         /// <summary>
         /// Retrieves all notifications (both read and unread) for the specified staff member.
         /// </summary>
@@ -314,20 +335,21 @@ namespace P2PLibray.Account
 
             await sql.ExecuteStoredProcedure("AccountProcedure", parameters);
         }
+        #endregion
 
+        #region Calendar
         /// <summary>
-        /// Retrieves the complete list of permissions assigned to a staff member,
-        /// including both permission types and their names.
+        /// Retrieves the list of read-only permissions assigned to a staff member.
         /// </summary>
         /// <param name="StaffCode">The unique staff code of the user.</param>
         /// <returns>
-        /// A list of <see cref="Permissions"/> objects containing both the type
-        /// of permission and its corresponding name.
+        /// A list of <see cref="Permissions"/> objects containing the names of
+        /// read permissions granted to the user.
         /// </returns>
-        public async Task<List<Permissions>> GetAllPermissions(string StaffCode)
+        public async Task<List<Permissions>> GetReadPermissions(string StaffCode)
         {
             Dictionary<string, string> param = new Dictionary<string, string>();
-            param.Add("@Flag", "GetAllPermissionsPcm");
+            param.Add("@Flag", "GetReadPermissionsPCM");
             param.Add("@StaffCode", StaffCode);
 
             var acc = new List<Permissions>();
@@ -338,18 +360,18 @@ namespace P2PLibray.Account
                 {
                     acc.Add(new Permissions
                     {
-                        PermissionType = dr.IsDBNull(dr.GetOrdinal("Permissions")) ? string.Empty : dr.GetString(dr.GetOrdinal("Permissions")),
-                        PermissionName = dr.IsDBNull(dr.GetOrdinal("PermissionName")) ? string.Empty : dr.GetString(dr.GetOrdinal("PermissionName"))
+                        PermissionName = dr.IsDBNull(dr.GetOrdinal("Permissions")) ? string.Empty : dr.GetString(dr.GetOrdinal("Permissions"))
                     });
                 }
             }
             return acc;
         }
 
+        #region PR
         /// <summary>
-        /// Retrieves a list of Purchase Requisitions (PRs) for calendar display.
+        /// Gets a list of all Purchase Requisitions (PRs) for calendar display.
         /// </summary>
-        /// <returns>A list of Account objects containing PR information.</returns>
+        /// <returns>List of <see cref="Account"/> objects with PR code, added by, and added date.</returns>
         public async Task<List<Account>> PRListPCM()
         {
             List<Account> acc = new List<Account>();
@@ -363,7 +385,6 @@ namespace P2PLibray.Account
                     acc.Add(new Account
                     {
                         IdCode = dr.IsDBNull(dr.GetOrdinal("PRCode")) ? string.Empty : dr.GetString(dr.GetOrdinal("PRCode")),
-                        Status = dr.IsDBNull(dr.GetOrdinal("StatusName")) ? string.Empty : dr.GetString(dr.GetOrdinal("StatusName")),
                         AddedBy = dr.IsDBNull(dr.GetOrdinal("EmployeeName")) ? string.Empty : dr.GetString(dr.GetOrdinal("EmployeeName")),
                         AddedDate = dr.IsDBNull(dr.GetOrdinal("AddedDate")) ? DateTime.MinValue : dr.GetDateTime(dr.GetOrdinal("AddedDate"))
                     });
@@ -374,11 +395,11 @@ namespace P2PLibray.Account
         }
 
         /// <summary>
-        /// Retrieves detailed information for a specific Purchase Requisition (PR),
-        /// including items and metadata.
+        /// Gets detailed information for a specific Purchase Requisition (PR),
+        /// including metadata and associated items.
         /// </summary>
         /// <param name="code">The PR code.</param>
-        /// <returns>A CalendarEventData object with PR details and items.</returns>
+        /// <returns><see cref="CalendarEventData"/> with full PR details.</returns>
         public async Task<CalendarEventData> PRDetails(string code)
         {
             var prDetails = new CalendarEventData();
@@ -421,9 +442,50 @@ namespace P2PLibray.Account
         }
 
         /// <summary>
-        /// Retrieves a list of RFQs (Request for Quotation) to display on the calendar.
+        /// Builds calendar events for all Purchase Requisitions (PRs).
         /// </summary>
-        /// <returns>A list of Account objects containing RFQ details.</returns>
+        /// <returns>List of event objects containing PR info for calendar display.</returns>
+        public async Task<List<object>> GetPurchaseRequisitionEventsAsync()
+        {
+            var events = new List<object>();
+
+            var PRList = await PRListPCM();
+
+            foreach (var pr in PRList)
+            {
+                var prDetails = await PRDetails(pr.IdCode);
+                events.Add(new
+                {
+                    id = pr.IdCode,
+                    title = $"Purchase Requisition Is Added By {pr.AddedBy}",
+                    start = pr.AddedDate.ToString("yyyy/MM/ddTHH:mm:ss"),
+                    color = "#007bff",
+                    extendedProps = new
+                    {
+                        module = "PurchaseRequisition",
+                        PRCode = prDetails.PRCode,
+                        RequiredDate = prDetails.RequiredDate?.ToString("dd-MM-yyyy").Replace("-", "/"),
+                        StatusName = prDetails.StatusName,
+                        Description = prDetails.Description,
+                        AddedBy = prDetails.AddedBy,
+                        AddedDate = prDetails.AddedDate?.ToString("dd-MM-yyyy").Replace("-", "/"),
+                        ApprovedBy = prDetails.ApprovedBy,
+                        ApprovedDate = prDetails.ApprovedDate?.ToString("dd-MM-yyyy").Replace("-", "/"),
+                        PriorityName = prDetails.PriorityName,
+                        Items = prDetails.Items
+                    }
+                });
+            }
+
+            return events;
+        }
+        #endregion
+
+        #region RFQ
+        /// <summary>
+        /// Gets a list of all RFQs (Request for Quotation) for calendar display.
+        /// </summary>
+        /// <returns>List of <see cref="Account"/> objects with RFQ code, added by, and expected date.</returns>
         public async Task<List<Account>> RFQListPCM()
         {
             List<Account> acc = new List<Account>();
@@ -437,7 +499,6 @@ namespace P2PLibray.Account
                     acc.Add(new Account
                     {
                         IdCode = dr.IsDBNull(dr.GetOrdinal("RFQCode")) ? string.Empty : dr.GetString(dr.GetOrdinal("RFQCode")),
-                        Status = dr.IsDBNull(dr.GetOrdinal("StatusName")) ? string.Empty : dr.GetString(dr.GetOrdinal("StatusName")),
                         AddedBy = dr.IsDBNull(dr.GetOrdinal("EmployeeName")) ? string.Empty : dr.GetString(dr.GetOrdinal("EmployeeName")),
                         AddedDate = dr.IsDBNull(dr.GetOrdinal("AddedDate")) ? DateTime.MinValue : dr.GetDateTime(dr.GetOrdinal("AddedDate")),
                         EndDate = dr.IsDBNull(dr.GetOrdinal("ExpectedDate")) ? DateTime.Today : dr.GetDateTime(dr.GetOrdinal("ExpectedDate"))
@@ -448,12 +509,11 @@ namespace P2PLibray.Account
             return acc;
         }
 
-        //// <summary>
-        /// Retrieves detailed information about a specific RFQ (Request for Quotation),
-        /// including related items.
+        /// <summary>
+        /// Gets detailed information for a specific RFQ, including metadata and related items.
         /// </summary>
         /// <param name="code">The RFQ code.</param>
-        /// <returns>A CalendarEventData object with RFQ details and items.</returns>
+        /// <returns><see cref="CalendarEventData"/> containing RFQ details.</returns>
         public async Task<CalendarEventData> RFQDetails(string code)
         {
             var rfqDetails = new CalendarEventData();
@@ -495,10 +555,46 @@ namespace P2PLibray.Account
             return rfqDetails;
         }
 
+        public async Task<List<object>> GetRFQEventsAsync()
+        {
+            var events = new List<object>();
+            var RFQList = await RFQListPCM();
+
+            foreach (var rfq in RFQList)
+            {
+                var rfqDetails = await RFQDetails(rfq.IdCode);
+                events.Add(new
+                {
+                    id = rfq.IdCode,
+                    title = $"Request For Quotation Is Added By {rfq.AddedBy}",
+                    start = rfq.AddedDate.ToString("yyyy-MM-dd"),
+                    end = rfq.EndDate.ToString("yyyy-MM-dd"),
+                    color = "#17a2b8",
+                    extendedProps = new
+                    {
+                        module = "RequestForQuotation",
+                        rfqDetails.RFQCode,
+                        rfqDetails.PRCode,
+                        ExpectedDate = rfqDetails.ExpectedDate?.ToString("dd-MM-yyyy").Replace("-", "/"),
+                        rfqDetails.Description,
+                        rfqDetails.AddedBy,
+                        AddedDate = rfqDetails.AddedDate?.ToString("dd-MM-yyyy").Replace("-", "/"),
+                        rfqDetails.AccountantName,
+                        rfqDetails.AccountantEmail,
+                        rfqDetails.DeliveryAddress,
+                        rfqDetails.Items
+                    }
+                });
+            }
+            return events;
+        }
+        #endregion
+
+        #region RQ
         /// <summary>
-        /// Retrieves a list of RQs (Register Quotations) aggregated by date to display on the calendar.
+        /// Gets a list of all Register Quotation (RQ) entries for calendar display.
         /// </summary>
-        /// <returns>A list of Account objects containing RQ counts and added details.</returns>
+        /// <returns>List of <see cref="Account"/> objects with entry count, date, and creator.</returns>
         public async Task<List<Account>> RQListPCM()
         {
             List<Account> acc = new List<Account>();
@@ -522,10 +618,10 @@ namespace P2PLibray.Account
         }
 
         /// <summary>
-        /// Retrieves detailed RQ (Register Quotation) information for a given date.
+        /// Gets detailed RQ (Register Quotation) data for a specific date.
         /// </summary>
-        /// <param name="date">The date for which RQ details are retrieved.</param>
-        /// <returns>A list of CalendarEventData objects with RQ details.</returns>
+        /// <param name="date">The date for which RQ details are fetched.</param>
+        /// <returns>List of <see cref="CalendarEventData"/> objects containing RQ details.</returns>
         public async Task<List<CalendarEventData>> RQDetails(string date)
         {
             var RqDetails = new List<CalendarEventData>();
@@ -557,10 +653,51 @@ namespace P2PLibray.Account
             return RqDetails;
         }
 
+        public async Task<List<object>> GetRegisterQuotationEventsAsync()
+        {
+            var events = new List<object>();
+            var RQList = await RQListPCM();
+            foreach (var rq in RQList)
+            {
+                var rqDetails = await RQDetails(rq.AddedDate.ToString("yyyy-MM-dd"));
+
+                var items = rqDetails.Select(i => new {
+                    i.RegisterQuotationCode,
+                    i.RFQCode,
+                    i.VendorName,
+                    i.StatusName,
+                    i.AddedBy,
+                    DeliveryDate = i.DeliveryDate.HasValue ? i.DeliveryDate.Value.ToString("dd-MM-yyyy").Replace("-", "/") : "",
+                    AddedDate = i.AddedDate.HasValue ? i.AddedDate.Value.ToString("dd-MM-yyyy").Replace("-", "/") : "",
+                    i.ApprovedBy,
+                    ApprovedDate = i.ApprovedDate.HasValue ? i.ApprovedDate.Value.ToString("dd-MM-yyyy").Replace("-", "/") : "",
+                    i.ShippingCharges
+                });
+
+                events.Add(new
+                {
+                    id = $"RQ-{rq.AddedDate:yyyyMMdd}",
+                    title = $"{rq.Count} Quotation{(rq.Count != 1 ? "s" : "")} {(rq.Count != 1 ? "Are" : "Is")} Registerd By {rq.AddedBy}",
+                    start = rq.AddedDate.ToString("yyyy-MM-dd"),
+                    color = "#6f42c1",
+
+                    extendedProps = new
+                    {
+                        module = "RegisterQuotation",
+
+                        Items = items
+                    }
+                });
+            }
+            return events;
+        }
+        #endregion
+
+        #region PO
         /// <summary>
-        /// Retrieves a list of POs (Purchase Orders) to display on the calendar.
+        /// Retrieves a list of all Purchase Orders (POs) to display on the calendar.
         /// </summary>
-        /// <returns>A list of Account objects containing PO details.</returns>
+        /// <returns>List of <see cref="Account"/> objects with PO code, creator, and date.</returns>
         public async Task<List<Account>> POListPCM()
         {
             List<Account> acc = new List<Account>();
@@ -574,7 +711,6 @@ namespace P2PLibray.Account
                     acc.Add(new Account
                     {
                         IdCode = dr.IsDBNull(dr.GetOrdinal("POCode")) ? string.Empty : dr.GetString(dr.GetOrdinal("POCode")),
-                        Status = dr.IsDBNull(dr.GetOrdinal("StatusName")) ? string.Empty : dr.GetString(dr.GetOrdinal("StatusName")),
                         AddedBy = dr.IsDBNull(dr.GetOrdinal("EmployeeName")) ? string.Empty : dr.GetString(dr.GetOrdinal("EmployeeName")),
                         AddedDate = dr.IsDBNull(dr.GetOrdinal("AddedDate")) ? DateTime.MinValue : dr.GetDateTime(dr.GetOrdinal("AddedDate"))
                     });
@@ -589,7 +725,7 @@ namespace P2PLibray.Account
         /// including items and terms/conditions.
         /// </summary>
         /// <param name="code">The PO code.</param>
-        /// <returns>A CalendarEventData object with PO details, items, and terms.</returns>
+        /// <returns>A <see cref="CalendarEventData"/> object with PO details.</returns>
         public async Task<CalendarEventData> GetPODetails(string code)
         {
             var podetails = new CalendarEventData();
@@ -649,9 +785,51 @@ namespace P2PLibray.Account
         }
 
         /// <summary>
-        /// Retrieves a list of GRNs (Goods Receipt Notes) to display on the calendar.
+        /// Builds calendar events for all Purchase Orders (POs) for visualization on the calendar.
         /// </summary>
-        /// <returns>A list of Account objects containing GRN details.</returns>
+        /// <returns>List of event objects representing PO entries.</returns>
+        public async Task<List<object>> GetPurchaseOrderEventsAsync()
+        {
+            var events = new List<object>();
+            var POList = await POListPCM();
+
+            foreach (var po in POList)
+            {
+                var PODetails = await GetPODetails(po.IdCode);
+                events.Add(new
+                {
+                    id = po.IdCode,
+                    title = $"Purchase Order Is Added By {po.AddedBy}",
+                    start = po.AddedDate.ToString("yyyy-MM-ddTHH:mm:ss"),
+                    color = "#fd7e14",
+                    extendedProps = new
+                    {
+                        module = "PurchaseOrder",
+                        PODetails.POCode,
+                        PODetails.StatusName,
+                        AddedDate = PODetails.AddedDate?.ToString("dd-MM-yyyy").Replace("-", "/"),
+                        ApprovedDate = PODetails.ApprovedDate?.ToString("dd-MM-yyyy").Replace("-", "/"),
+                        PODetails.TotalAmount,
+                        PODetails.BillingAddress,
+                        PODetails.VendorName,
+                        PODetails.AddedBy,
+                        PODetails.ApprovedBy,
+                        PODetails.AccountantName,
+                        PODetails.ShippingCharges,
+                        PODetails.Items,
+                        TermConditions = PODetails.TermConditions ?? new List<string>()
+                    }
+                });
+            }
+            return events;
+        }
+        #endregion
+
+        #region GRN
+        /// <summary>
+        /// Retrieves a list of all GRNs (Goods Receipt Notes) for calendar display.
+        /// </summary>
+        /// <returns>List of <see cref="Account"/> objects containing GRN codes, creator, and dates.</returns>
         public async Task<List<Account>> GRNListPCM()
         {
             List<Account> acc = new List<Account>();
@@ -665,7 +843,6 @@ namespace P2PLibray.Account
                     acc.Add(new Account
                     {
                         IdCode = dr.IsDBNull(dr.GetOrdinal("GRNCode")) ? string.Empty : dr.GetString(dr.GetOrdinal("GRNCode")),
-                        Status = dr.IsDBNull(dr.GetOrdinal("StatusName")) ? string.Empty : dr.GetString(dr.GetOrdinal("StatusName")),
                         AddedBy = dr.IsDBNull(dr.GetOrdinal("EmployeeName")) ? string.Empty : dr.GetString(dr.GetOrdinal("EmployeeName")),
                         AddedDate = dr.IsDBNull(dr.GetOrdinal("AddedDate")) ? DateTime.MinValue : dr.GetDateTime(dr.GetOrdinal("AddedDate"))
                     });
@@ -676,11 +853,10 @@ namespace P2PLibray.Account
         }
 
         /// <summary>
-        /// Retrieves detailed information about a specific GRN (Goods Receipt Note),
-        /// including items received.
+        /// Retrieves detailed information about a specific GRN, including received items.
         /// </summary>
         /// <param name="code">The GRN code.</param>
-        /// <returns>A CalendarEventData object with GRN details and items.</returns>
+        /// <returns>A <see cref="CalendarEventData"/> object with GRN details and items.</returns>
         public async Task<CalendarEventData> GRNDetails(string code)
         {
             var grnDetails = new CalendarEventData();
@@ -702,7 +878,6 @@ namespace P2PLibray.Account
                     grnDetails.InvoiceCode = dr["InvoiceNo"].ToString();
                     grnDetails.CompanyAddress = dr["CompanyAddress"].ToString();
                     grnDetails.BillingAddress = dr["BillingAddress"].ToString();
-                    grnDetails.StatusName = dr["StatusName"].ToString();
                     grnDetails.TotalAmount = dr["TotalAmount"] != DBNull.Value ? Convert.ToDecimal(dr["TotalAmount"]) : 0;
                     grnDetails.ShippingCharges = dr["ShippingCharges"] != DBNull.Value ? Convert.ToDecimal(dr["ShippingCharges"]) : 0;
                 }
@@ -731,9 +906,64 @@ namespace P2PLibray.Account
         }
 
         /// <summary>
-        /// Retrieves a list of GRs (Goods Returns) to display on the calendar.
+        /// Builds calendar events for all GRNs for visualization on the calendar.
         /// </summary>
-        /// <returns>A list of Account objects containing Goods Return details.</returns>
+        /// <returns>List of event objects representing GRN entries.</returns>
+        public async Task<List<object>> GetGRNEventsAsync()
+        {
+            var events = new List<object>();
+            var GRNList = await GRNListPCM();
+
+            foreach (var grn in GRNList)
+            {
+                var grnDetails = await GRNDetails(grn.IdCode);
+                var items = grnDetails.Items.Select(g => new
+                {
+                    g.GRNCode,
+                    g.GRNItemCode,
+                    g.ItemCode,
+                    g.ItemName,
+                    g.Quantity,
+                    g.CostPerUnit,
+                    g.Discount,
+                    g.TaxRate,
+                    g.FinalAmount
+                });
+
+                events.Add(new
+                {
+                    id = grn.IdCode,
+                    title = $"GRN Is Added By {grn.AddedBy}",
+                    start = grn.AddedDate.ToString("yyyy-MM-ddTHH:mm:ss"),
+                    color = "#28a745",
+                    extendedProps = new
+                    {
+                        module = "GRNInfo",
+                        grnDetails.POCode,
+                        grnDetails.GRNCode,
+                        PODate = grnDetails.PODate?.ToString("dd/MM/yyyy"),
+                        GRNDate = grnDetails.GRNDate?.ToString("dd-MM-yyyy").Replace("-", "/"),
+                        InvoiceDate = grnDetails.InvoiceDate?.ToString("dd-MM-yyyy").Replace("-", "/"),
+                        grnDetails.VendorName,
+                        grnDetails.InvoiceCode,
+                        grnDetails.CompanyAddress,
+                        grnDetails.BillingAddress,
+                        grnDetails.StatusName,
+                        grnDetails.TotalAmount,
+                        grnDetails.ShippingCharges,
+                        Items = items
+                    }
+                });
+            }
+            return events;
+        }
+        #endregion
+
+        #region GR
+        /// <summary>
+        /// Retrieves a list of all Goods Returns (GRs) for calendar display.
+        /// </summary>
+        /// <returns>List of <see cref="Account"/> objects containing GR codes, creator, and dates.</returns>
         public async Task<List<Account>> GRListPCM()
         {
             List<Account> acc = new List<Account>();
@@ -747,7 +977,6 @@ namespace P2PLibray.Account
                     acc.Add(new Account
                     {
                         IdCode = dr.IsDBNull(dr.GetOrdinal("GoodReturnCode")) ? string.Empty : dr.GetString(dr.GetOrdinal("GoodReturnCode")),
-                        Status = dr.IsDBNull(dr.GetOrdinal("StatusName")) ? string.Empty : dr.GetString(dr.GetOrdinal("StatusName")),
                         AddedBy = dr.IsDBNull(dr.GetOrdinal("EmployeeName")) ? string.Empty : dr.GetString(dr.GetOrdinal("EmployeeName")),
                         AddedDate = dr.IsDBNull(dr.GetOrdinal("AddedDate")) ? DateTime.MinValue : dr.GetDateTime(dr.GetOrdinal("AddedDate"))
                     });
@@ -758,11 +987,10 @@ namespace P2PLibray.Account
         }
 
         /// <summary>
-        /// Retrieves detailed information about a specific Goods Return,
-        /// including returned items.
+        /// Retrieves detailed information for a specific Goods Return, including returned items.
         /// </summary>
         /// <param name="code">The Goods Return code.</param>
-        /// <returns>A CalendarEventData object with Goods Return details and items.</returns>
+        /// <returns>A <see cref="CalendarEventData"/> object with GR details and items.</returns>
         public async Task<CalendarEventData> GRDetails(string code)
         {
             var grDetails = new CalendarEventData();
@@ -806,9 +1034,49 @@ namespace P2PLibray.Account
         }
 
         /// <summary>
-        /// Retrieves a list of QCs (Quality Checks) aggregated by date/status for calendar display.
+        /// Builds calendar events for all Goods Returns (GRs) for visualization on the calendar.
         /// </summary>
-        /// <returns>A list of Account objects containing QC counts and related details.</returns>
+        /// <returns>List of event objects representing GR entries.</returns>
+        public async Task<List<object>> GetGoodsReturnEventsAsync()
+        {
+            var events = new List<object>();
+            var goodsReturnList = await GRListPCM();
+
+            foreach (var gr in goodsReturnList)
+            {
+                var grDetails = await GRDetails(gr.IdCode);
+                events.Add(new
+                {
+                    id = gr.IdCode,
+                    title = $"Goods Return Entry Is Added By {gr.AddedBy}",
+                    start = gr.AddedDate.ToString("yyyy-MM-ddTHH:mm:ss"),
+                    color = "#ffc107",
+                    extendedProps = new
+                    {
+                        module = "GoodsReturnInfo",
+                        grDetails.GoodsReturnCode,
+                        grDetails.GRNCode,
+                        grDetails.TransporterName,
+                        grDetails.TransportContactNo,
+                        grDetails.VehicleNo,
+                        grDetails.VehicleType,
+                        grDetails.Reason,
+                        grDetails.AddedBy,
+                        AddedDate = grDetails.AddedDate?.ToString("dd-MM-yyyy").Replace("-", "/"),
+                        grDetails.StatusName,
+                        grDetails.Items
+                    }
+                });
+            }
+            return events;
+        }
+        #endregion
+
+        #region QC
+        /// <summary>
+        /// Retrieves a list of Quality Checks (QCs) aggregated by date and status for calendar display.
+        /// </summary>
+        /// <returns>List of <see cref="Account"/> objects containing QC counts, date, status, and creator.</returns>
         public async Task<List<Account>> QCListPCM()
         {
             List<Account> acc = new List<Account>();
@@ -833,11 +1101,11 @@ namespace P2PLibray.Account
         }
 
         /// <summary>
-        /// Retrieves detailed QC (Quality Check) information for a given date and status.
+        /// Retrieves detailed QC (Quality Check) information for a specific date and status.
         /// </summary>
         /// <param name="date">The date for which QC details are retrieved.</param>
         /// <param name="status">The QC status (e.g., Passed, Failed).</param>
-        /// <returns>A list of CalendarEventData objects with QC details.</returns>
+        /// <returns>List of <see cref="CalendarEventData"/> objects containing QC details and related items.</returns>
         public async Task<List<CalendarEventData>> QCDetails(string date,string status)
         {
             var qcdetails = new List<CalendarEventData>();
@@ -883,5 +1151,408 @@ namespace P2PLibray.Account
 
             return qcdetails;
         }
+
+        /// <summary>
+        /// Builds calendar events for all Quality Checks (QCs) for visualization on the calendar.
+        /// </summary>
+        /// <returns>List of event objects representing QC entries with items.</returns>
+        public async Task<List<object>> GetQualityCheckEventsAsync()
+        {
+            var events = new List<object>();
+            var QCList = await QCListPCM();
+
+            foreach (var qc in QCList)
+            {
+                var qcDetails = await QCDetails(qc.AddedDate.ToString("yyyy-MM-dd"), qc.Status);
+                var items = qcDetails.Select(i => new
+                {
+                    i.QualityCheckCode,
+                    i.StatusName,
+                    i.GRNItemsCode,
+                    i.ItemCode,
+                    i.ItemName,
+                    i.Quantity,
+                    i.InspectionFrequency,
+                    i.SampleQualityChecked,
+                    i.SampleTestFailed,
+                    i.QCAddedBy,
+                    QCAddedDate = i.QCAddedDate?.ToString("dd-MM-yyyy").Replace("-", "/"),
+                    i.QCFailedAddedBy,
+                    QCFailedDate = i.QCFailedDate?.ToString("dd-MM-yyyy").Replace("-", "/"),
+                    i.Reason
+                });
+
+                events.Add(new
+                {
+                    id = $"QC-{qc.AddedDate:yyyyMMdd}",
+                    title = $"{qc.Count} Items Has {(qc.Status == "Confirmed" ? "Passed" : "Failed")} Quality Check",
+                    start = qc.AddedDate.ToString("yyyy-MM-dd"),
+                    color = "#dc3545",
+                    extendedProps = new
+                    {
+                        module = "QualityCheckInfo",
+                        Items = items
+                    }
+                });
+            }
+            return events;
+        }
+        #endregion
+
+        #region ISR
+        /// <summary>
+        /// Retrieves a list of Item Stock Refill (ISR) requests aggregated by date and staff for calendar display.
+        /// </summary>
+        /// <returns>List of <see cref="Account"/> objects containing ISR counts, date, and requester.</returns>
+        public async Task<List<Account>> ISRListPCM()
+        {
+            List<Account> acc = new List<Account>();
+
+            Dictionary<string, string> param = new Dictionary<string, string>();
+            param.Add("@Flag", "ShowISROnCalendar");
+            using (SqlDataReader dr = await sql.ExecuteStoredProcedureReturnDataReader("AccountProcedure", param))
+            {
+                while (await dr.ReadAsync())
+                {
+                    acc.Add(new Account
+                    {
+                        Count = dr.IsDBNull(dr.GetOrdinal("ItemCount")) ? 0 : dr.GetInt32(dr.GetOrdinal("ItemCount")),
+                        AddedDate = dr.IsDBNull(dr.GetOrdinal("AddedDate")) ? DateTime.MinValue : dr.GetDateTime(dr.GetOrdinal("AddedDate")),
+                        AddedBy = dr.IsDBNull(dr.GetOrdinal("EmployeeName")) ? string.Empty : dr.GetString(dr.GetOrdinal("EmployeeName"))
+                    });
+                }
+            }
+
+            return acc;
+        }
+
+        /// <summary>
+        /// Retrieves detailed ISR information for a specific date and staff member.
+        /// </summary>
+        /// <param name="date">The date for which ISR details are retrieved.</param>
+        /// <param name="code">The staff code associated with the ISR.</param>
+        /// <returns>List of <see cref="CalendarEventData"/> objects containing ISR items and metadata.</returns>
+        public async Task<List<CalendarEventData>> ISRDetails(string date,string code)
+        {
+            var isrDetails = new List<CalendarEventData>();
+
+            Dictionary<string,string> param = new Dictionary<string, string>()
+            {
+                { "@Flag","ISRDetailsPCM"},
+                { "@Date",date },
+                { "@StaffCode", code }
+            };
+
+            using (SqlDataReader dr = await sql.ExecuteStoredProcedureReturnDataReader("AccountProcedure", param))
+            {
+                while (await dr.ReadAsync())
+                {
+                    try
+                    {
+                        isrDetails.Add(new CalendarEventData
+                        {
+                            ItemCode = dr["ItemCode"].ToString(),
+                            ItemName = dr["ItemName"].ToString(),
+                            Quantity = dr["Quantity"] == DBNull.Value ? 0 : Convert.ToInt64(dr["Quantity"]),
+                            RequiredDate = dr["RequiredDate"] != DBNull.Value ? Convert.ToDateTime(dr["RequiredDate"]) : (DateTime?)null,
+                            StatusName = dr["Status"].ToString(),
+                            AddedBy = dr["EmployeeName"].ToString(),
+                            AddedDate = dr["AddedDate"] != DBNull.Value ? Convert.ToDateTime(dr["AddedDate"]) : (DateTime?)null,
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Error reading ISR record: " + ex.Message);
+                        throw;
+                    }
+
+                }
+            }
+
+            return isrDetails;
+        }
+
+        /// <summary>
+        /// Builds calendar events for all Item Stock Refill (ISR) requests for visualization on the calendar.
+        /// </summary>
+        /// <returns>List of event objects representing ISR entries with items.</returns>
+        public async Task<List<object>> GetItemStockRefillEventsAsync()
+        {
+            var events = new List<object>();
+
+            var ISRList = await ISRListPCM();
+
+            foreach (var isr in ISRList)
+            {
+                var isrDetails = await ISRDetails(isr.AddedDate.ToString("yyyy-MM-dd"), isr.Code);
+                var items = isrDetails.Select(i => new
+                {
+                    i.ItemCode,
+                    i.ItemName,
+                    i.Quantity,
+                    RequiredDate = i.RequiredDate?.ToString("dd-MM-yyyy").Replace("-", "/"),
+                    i.StatusName,
+                    i.AddedBy,
+                    AddedDate = i.AddedDate?.ToString("dd-MM-yyyy").Replace("-", "/")
+                });
+                events.Add(new
+                {
+                    id = $"RQ-{isr.AddedDate:yyyyMMdd}",
+                    title = $"{isr.Count} Item Stock Refill Request{(isr.Count != 1 ? "s":"")} {(isr.Count != 1 ? "Are" : "Is")} Registerd By {isr.AddedBy}",
+                    start = isr.AddedDate.ToString("yyyy-MM-dd"),
+                    color = "#6610f2",
+                    extendedProps = new
+                    {
+                        module = "ItemStockRefill",
+                        Items = items
+                    }
+                });
+            }
+
+            return events;
+        }
+        #endregion
+
+        #region JIT
+        /// <summary>
+        /// Retrieves a list of Just-In-Time (JIT) item requests aggregated by date and staff for calendar display.
+        /// </summary>
+        /// <returns>List of <see cref="Account"/> objects containing JIT counts, date, and requester.</returns>
+        public async Task<List<Account>> JITListPCM()
+        {
+            List<Account> acc = new List<Account>();
+
+            Dictionary<string, string> param = new Dictionary<string, string>();
+            param.Add("@Flag", "ShowJITOnCalendar");
+            using (SqlDataReader dr = await sql.ExecuteStoredProcedureReturnDataReader("AccountProcedure", param))
+            {
+                while (await dr.ReadAsync())
+                {
+                    acc.Add(new Account
+                    {
+                        Count = dr.IsDBNull(dr.GetOrdinal("ItemCount")) ? 0 : dr.GetInt32(dr.GetOrdinal("ItemCount")),
+                        AddedDate = dr.IsDBNull(dr.GetOrdinal("AddedDate")) ? DateTime.MinValue : dr.GetDateTime(dr.GetOrdinal("AddedDate")),
+                        AddedBy = dr.IsDBNull(dr.GetOrdinal("EmployeeName")) ? string.Empty : dr.GetString(dr.GetOrdinal("EmployeeName")),
+                        Code = dr.IsDBNull(dr.GetOrdinal("AddedBy")) ? string.Empty : dr.GetString(dr.GetOrdinal("AddedBy")),
+                    });
+                }
+            }
+
+            return acc;
+        }
+
+        /// <summary>
+        /// Retrieves detailed JIT information for a specific date and staff member.
+        /// </summary>
+        /// <param name="date">The date for which JIT details are retrieved.</param>
+        /// <param name="code">The staff code associated with the JIT request.</param>
+        /// <returns>List of <see cref="CalendarEventData"/> objects containing JIT items and metadata.</returns>
+        public async Task<List<CalendarEventData>> JITDetails(string date, string code)
+        {
+            var isrDetails = new List<CalendarEventData>();
+
+            Dictionary<string, string> param = new Dictionary<string, string>()
+            {
+                { "@Flag","JITDetailsPCM"},
+                { "@Date",date },
+                { "@StaffCode", code }
+            };
+
+            using (SqlDataReader dr = await sql.ExecuteStoredProcedureReturnDataReader("AccountProcedure", param))
+            {
+                while (await dr.ReadAsync())
+                {
+                    try
+                    {
+                        isrDetails.Add(new CalendarEventData
+                        {
+                            ItemCode = dr["ItemCode"].ToString(),
+                            ItemName = dr["ItemName"].ToString(),
+                            Quantity = dr["Quantity"] == DBNull.Value ? 0 : Convert.ToInt64(dr["Quantity"]),
+                            RequiredDate = dr["RequiredDate"] != DBNull.Value ? Convert.ToDateTime(dr["RequiredDate"]) : (DateTime?)null,
+                            StatusName = dr["Status"].ToString(),
+                            AddedBy = dr["EmployeeName"].ToString(),
+                            AddedDate = dr["AddedDate"] != DBNull.Value ? Convert.ToDateTime(dr["AddedDate"]) : (DateTime?)null,
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Error reading JIT record: " + ex.Message);
+                        throw;
+                    }
+
+                }
+            }
+
+            return isrDetails;
+        }
+
+        /// <summary>
+        /// Builds calendar events for all Just-In-Time (JIT) requests for visualization.
+        /// </summary>
+        /// <returns>List of event objects representing JIT entries with items.</returns>
+        public async Task<List<object>> GetJustInTimeEventsAsync()
+        {
+            var events = new List<object>();
+
+            var JITList = await JITListPCM();
+
+            foreach (var jit in JITList)
+            {
+                var jitDetails = await JITDetails(jit.AddedDate.ToString("yyyy-MM-dd"), jit.Code);
+                var items = jitDetails.Select(i => new
+                {
+                    i.ItemCode,
+                    i.ItemName,
+                    i.Quantity,
+                    RequiredDate = i.RequiredDate?.ToString("dd-MM-yyyy").Replace("-", "/"),
+                    i.StatusName,
+                    i.AddedBy,
+                    AddedDate = i.AddedDate?.ToString("dd-MM-yyyy").Replace("-", "/")
+                });
+                events.Add(new
+                {
+                    id = $"RQ-{jit.AddedDate:yyyyMMdd}",
+                    title = $"{jit.Count} Just In Time Request{(jit.Count != 1 ? "s" : "")} {(jit.Count != 1 ? "Are" : "Is")} Registerd By {jit.AddedBy}",
+                    start = jit.AddedDate.ToString("yyyy-MM-dd"),
+                    color = "#0d6efd",
+                    extendedProps = new
+                    {
+                        module = "JustInTime",
+                        Items = items
+                    }
+                });
+            }
+
+            return events;
+        }
+        #endregion
+
+        #region MRP
+        /// <summary>Fetches all MRP records for calendar display.</summary>
+        /// <returns>List of <see cref="Account"/> representing MRP entries.</returns>
+        public async Task<List<Account>> MRPListPCM()
+        {
+            List<Account> acc = new List<Account>();
+
+            Dictionary<string, string> param = new Dictionary<string, string>();
+            param.Add("@Flag", "ShowMRPOnCalendar");
+            using (SqlDataReader dr = await sql.ExecuteStoredProcedureReturnDataReader("AccountProcedure", param))
+            {
+                while (await dr.ReadAsync())
+                {
+                    acc.Add(new Account
+                    {
+                        IdCode = dr.IsDBNull(dr.GetOrdinal("MaterialReqPlanningCode")) ? string.Empty : dr.GetString(dr.GetOrdinal("MaterialReqPlanningCode")),
+                        AddedBy = dr.IsDBNull(dr.GetOrdinal("EmployeeName")) ? string.Empty : dr.GetString(dr.GetOrdinal("EmployeeName")),
+                        AddedDate = dr.IsDBNull(dr.GetOrdinal("AddedDate")) ? DateTime.MinValue : dr.GetDateTime(dr.GetOrdinal("AddedDate"))
+                    });
+                }
+            }
+
+            return acc;
+        }
+
+        /// <summary>Fetches detailed info for a specific MRP record, including items.</summary>
+        /// <param name="code">MRP Code.</param>
+        /// <returns><see cref="CalendarEventData"/> with header and item-level details.</returns>
+        public async Task<CalendarEventData> MRPDetails(string code)
+        {
+            var mrpDetails = new CalendarEventData();
+
+            Dictionary<string, string> param = new Dictionary<string, string>();
+            param.Add("@Flag", "MRPDetailsPCM");
+            param.Add("@Code", code);
+
+            using (SqlDataReader dr = await sql.ExecuteStoredProcedureReturnDataReader("AccountProcedure", param))
+            {
+                if (await dr.ReadAsync())
+                {
+                    try
+                    {
+                        mrpDetails.MaterialReqPlanningCode = dr["MaterialReqPlanningCode"].ToString();
+                        mrpDetails.PlanName = dr["PlanName"].ToString();
+                        mrpDetails.PlanYear = dr["Year"] != DBNull.Value ? Convert.ToInt32(dr["Year"]) : 0;
+                        mrpDetails.FromDate = dr["FromDate"] != DBNull.Value ? Convert.ToDateTime(dr["FromDate"]) : (DateTime?)null;
+                        mrpDetails.ToDate = dr["ToDate"] != DBNull.Value ? Convert.ToDateTime(dr["ToDate"]) : (DateTime?)null;
+                        mrpDetails.StatusName = dr["StatusName"].ToString();
+                        mrpDetails.AddedBy = dr["AddedBy"].ToString();
+                        mrpDetails.AddedDate = dr["AddedDate"] != DBNull.Value ? Convert.ToDateTime(dr["AddedDate"]) : (DateTime?)null;
+                        mrpDetails.ApprovedBy = dr["ApprovedBy"].ToString();
+                        mrpDetails.ApprovedDate = dr["ApprovedDate"] != DBNull.Value ? Convert.ToDateTime(dr["ApprovedDate"]) : (DateTime?)null;
+                        mrpDetails.Reason = dr["Reason"].ToString();
+
+                        if (await dr.NextResultAsync())
+                        {
+                            while (await dr.ReadAsync())
+                            {
+                                mrpDetails.Items.Add(new ItemData
+                                {
+                                    IssueItemsId = dr["IssueItemsId"] != DBNull.Value ? Convert.ToInt32(dr["IssueItemsId"]) : 0,
+                                    ItemCode = dr["ItemCode"].ToString(),
+                                    ItemName = dr["ItemName"].ToString(),
+                                    Quantity = dr["Quantity"] != DBNull.Value ? Convert.ToInt64(dr["Quantity"]) : (long?)null,
+                                });
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Error reading MRP record: " + ex.Message);
+                        throw;
+                    }
+                }
+            }
+
+            return mrpDetails;
+        }
+
+        /// <summary>Builds calendar events for all MRP entries.</summary>
+        /// <returns>List of anonymous objects representing MRP events for calendar UI.</returns>
+        public async Task<List<object>> GetMaterialReqPlanningEventsAsync()
+        {
+            var events = new List<object>();
+            var mrpList = await MRPListPCM();
+
+            foreach (var mrp in mrpList)
+            {
+                var mrpDetails = await MRPDetails(mrp.IdCode);
+                var items = mrpDetails.Items.Select(i => new
+                {
+                    i.IssueItemsId,
+                    i.ItemCode,
+                    i.ItemName,
+                    Quantity = i.Quantity ?? 0
+                });
+
+                events.Add(new
+                {
+                    id = mrp.IdCode,
+                    title = $"Material Requirenment Planning Entry Is Added By {mrp.AddedBy}",
+                    start = mrp.AddedDate.ToString("yyyy-MM-ddTHH:mm:ss"),
+                    color = "#20c997",
+                    extendedProps = new
+                    {
+                        module = "MaterialReqPlanningInfo",
+                        mrpDetails.MaterialReqPlanningCode,
+                        mrpDetails.PlanName,
+                        mrpDetails.PlanYear,
+                        FromDate = mrpDetails.FromDate?.ToString("dd-MM-yyyy").Replace("-", "/"),
+                        ToDate = mrpDetails.ToDate?.ToString("dd-MM-yyyy").Replace("-", "/"),
+                        mrpDetails.StatusName,
+                        mrpDetails.AddedBy,
+                        AddedDate = mrpDetails.AddedDate?.ToString("dd-MM-yyyy").Replace("-", "/"),
+                        mrpDetails.ApprovedBy,
+                        ApprovedDate = mrpDetails.ApprovedDate?.ToString("dd-MM-yyyy").Replace("-", "/"),
+                        mrpDetails.Reason,
+                        Items = items
+                    }
+                });
+            }
+            return events;
+        }
+        #endregion
+
+        #endregion
     }
 }

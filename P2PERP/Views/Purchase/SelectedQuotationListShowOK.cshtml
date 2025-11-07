@@ -1,5 +1,5 @@
 ﻿@{
-    ViewBag.Title = "SelectedQuotationListShowOK";
+    ViewBag.Title = "Selected Quotation List";
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Show Selected Quotation For PO Creation</title>
     <style>
+
         /* Keep readonly fields visible (not greyed) */
         input[readonly],
         textarea[readonly] {
@@ -16,14 +17,14 @@
             cursor: default;
         }
        
-        .btn-sm {
+        /*.btn-sm {
             border-radius: 6px;
             font-size: 0.8rem;
             font-weight: 500;
         }
         .table td .btn {
-            min-width: 80px; /* ensures both buttons have equal width */
-        }
+            min-width: 80px;*/ /* ensures both buttons have equal width */
+        /*}*/
         .daterangepicker-container {
             border: 1px solid #ccc;
             padding: 6px 10px;
@@ -45,22 +46,6 @@
             width: 100%; /* fit parent container */
         }
 
-        table.dataTable {
-            width: 100% !important;
-            table-layout: auto; /* auto column adjustment */
-            border-radius: 6px;
-            overflow: hidden; /* rounded corners work */
-        }
-
-            /* Header styling */
-            table.dataTable thead th {
-                white-space: nowrap; /* keep header in one line */
-                text-align: center; /* center text */
-                vertical-align: middle;
-                font-weight: 600;
-                padding: 12px 10px;
-            }
-
         /* Select All checkbox alignment */
         #tblSelectedQuotationlst thead th:first-child,
         #tblPOHistory thead th:first-child {
@@ -75,9 +60,9 @@
         #searchContainer {
             margin-top: 70px!important;
         }
-        .dt-length select label{
+/*        .dt-length select label{
             display:none;
-        }
+        }*/
         .dt-paging nav {
             float: right !important;
         }
@@ -86,6 +71,12 @@
         }
         .expbtndate {
             margin-left: -10px;
+        }
+
+        /* Common container style for both */
+        .expbtndate .input-group {
+            width: 230px !important; /* or match your preferred width */
+            min-width: 230px;
         }
     </style>
 </head>
@@ -96,32 +87,55 @@
              style="z-index: 2000;">
         </div>
         <div class="container-fluid">
-            <div class="card shadow-lg mb-4 ps-3 pe-3">
+            <div class="card shadow-lg mb-4 mt-3 ps-3 pe-3">
                 <h3 class="text-primary d-flex justify-content-center text-center mt-2">
                     Selected Quotation List
                 </h3>
 
-                <div class="d-flex justify-content-between align-items-start mb-5 flex-wrap ps-3 pe-3">
-                    <!-- Left side: Date Picker (top) + Export Buttons (bottom) -->
-                    <div class="d-flex flex-column gap-3 expbtndate">
-                        <!-- Date Range Picker -->
-                        <div class="input-group shadow-sm rounded" style="min-width: 250px; height: 53px;">
-                            <span class="input-group-text bg-primary text-white border-0">
-                                <i class="bi bi-calendar-date"></i>
-                            </span>
-                            <input type="text" id="Selectedquotationdate"
-                                   class="form-control border-0 shadow-none"
-                                   placeholder="Select date range" readonly style="height: 100%;" />
+                <!--<div class="d-flex justify-content-between align-items-start mb-5 flex-wrap ps-3 pe-3">-->
+                <!-- Left side: Date Picker (top) + Export Buttons (bottom) -->
+                <!--<div class="d-flex flex-column gap-3 expbtndate">-->
+                <!-- Date Range Picker -->
+                <!--<div class="input-group">
+        <span class="input-group-text bg-primary text-white border-0">
+            <i class="bi bi-calendar-date"></i>
+        </span>
+        <input type="text" id="Selectedquotationdate"
+               class="form-control border-0 shadow-none"
+               placeholder="Select date range" readonly style="height: 100%;" />
+    </div>-->
+                <!-- Export Buttons -->
+                <!--<div id="exportContainer" class="d-flex align-items-center gap-2"></div>
+    </div>-->
+                <!-- Right side: Search Box -->
+                <!--<div id="searchContainer"></div>
+    </div>-->
+                <div class="tab-content p-0 ps-1 pe-1" id="approval">
+
+                    <!-- ✅ Toolbar -->
+                    <div class="table-toolbar d-flex justify-content-between align-items-center flex-wrap mb-2 px-3">
+
+                        <!-- ✅ Left Section: Date Picker + Export Buttons -->
+                        <div class="row d-flex align-items-center flex-wrap gap-3">
+
+                            <!-- ✅ Date Picker Column -->
+                            <div class="col-6 p-0">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-primary text-white">
+                                        <i class="bi bi-calendar-event"></i>
+                                    </span>
+                                    <input type="text" id="Selectedquotationdate" class="form-control" placeholder="Select Date Range" readonly />
+                                </div>
+                            </div>
+
+                            <!-- ✅ Export Buttons -->
+                            <div id="exportContainer" class="d-flex align-items-center ps-0 gap-2"></div>
                         </div>
 
-                        <!-- Export Buttons -->
-                        <div id="exportContainer" class="d-flex align-items-center gap-2"></div>
+                        <!-- ✅ Right Section: Search Box -->
+                        <div id="searchContainer" class="d-flex align-items-center ps-1 mb-4"></div>
                     </div>
-
-                    <!-- Right side: Search Box -->
-                    <div id="searchContainer"></div>
                 </div>
-
                 <!-- Quotation Table -->
                 <div class="table-container mt-0">
                     <table class="table table-striped table-bordered text-center align-middle" id="tblSelectedQuotationlst">
@@ -138,7 +152,7 @@
                                 <th>Quotation Date</th>
                                 <th>Vendor Name</th>
                                 <th class="d-none">Company Name</th>
-                                <th>Total Amount</th>
+                                <th class="text-center">Total Amount</th>
                                 <th class="d-none">RFQ Code</th>
                                 <th class="d-none">Vendor Code</th>
                                 <th class="d-none">Required Date</th>
@@ -153,108 +167,72 @@
                     </table>
                 </div>
             </div>
-            @*Show Quotation Details Model*@
+            <!-- Approved Supplier Quotation Details Modal -->
             <div class="modal fade" id="largeModal" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-xl modal-dialog-scrollable">
-                    <div class="modal-content">
-                        @*Header*@
-                        <div class="modal-header bg-primary text-white">
-                            <h5 class="modal-title ms-auto text-white d-flex justify-content-center align-content-center text-center">Approved Supplier Quotation Details</h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    <div class="modal-content shadow-lg rounded-3">
+
+                        <!-- Modal Header -->
+                        <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-2">
+                            <h5 class="modal-title fw-bold text-white mb-0 fs-5">Approved Supplier Quotation Details</h5>
+                            <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        @*Body*@
+
+                        <!-- Modal Body -->
                         <div class="modal-body">
                             <form class="row g-3">
-                                @*Quotation ID & Date*@
+
+                                <!-- Quotation ID & Date -->
                                 <div class="col-md-6">
-                                    <div class="input-group input-group-merge mb-3">
-                                        <span class="input-group-text"><i class="ri-hashtag"></i></span>
-                                        <div class="form-floating form-floating-outline flex-grow-1">
-                                            <input type="text" id="quotationIdLarge" class="form-control" readonly>
-                                            <label for="quotationIdLarge">Quotation ID</label>
-                                        </div>
-                                    </div>
+                                    <label for="quotationIdLarge" class="form-label form-label-sm fw-bold text-dark">Quotation ID</label>
+                                    <input type="text" id="quotationIdLarge" class="form-control form-control-sm text-dark shadow-sm" readonly>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="input-group input-group-merge mb-3">
-                                        <span class="input-group-text"><i class="ri-calendar-line"></i></span>
-                                        <div class="form-floating form-floating-outline flex-grow-1">
-                                            <input type="text" id="quotationDateLarge" class="form-control" readonly>
-                                            <label for="quotationDateLarge">Quotation Date</label>
-                                        </div>
-                                    </div>
+                                    <label for="quotationDateLarge" class="form-label form-label-sm fw-bold text-dark">Quotation Date</label>
+                                    <input type="text" id="quotationDateLarge" class="form-control form-control-sm text-dark shadow-sm" readonly>
                                 </div>
-                                @*Vendor Name & RFQ Code*@
+
+                                <!-- Vendor Name & RFQ Code -->
                                 <div class="col-md-6">
-                                    <div class="input-group input-group-merge mb-3">
-                                        <span class="input-group-text"><i class="ri-user-3-line"></i></span>
-                                        <div class="form-floating form-floating-outline flex-grow-1">
-                                            <input type="text" id="vendorNameLarge" class="form-control" readonly>
-                                            <label for="vendorNameLarge">Vendor Name</label>
-                                        </div>
-                                    </div>
+                                    <label for="vendorNameLarge" class="form-label form-label-sm fw-bold text-dark">Vendor Name</label>
+                                    <input type="text" id="vendorNameLarge" class="form-control form-control-sm text-dark shadow-sm" readonly>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="input-group input-group-merge mb-3">
-                                        <span class="input-group-text"><i class="ri-barcode-line"></i></span>
-                                        <div class="form-floating form-floating-outline flex-grow-1">
-                                            <input type="text" id="rfqCodeLarge" class="form-control" readonly>
-                                            <label for="rfqCodeLarge">RFQ Code</label>
-                                        </div>
-                                    </div>
+                                    <label for="rfqCodeLarge" class="form-label form-label-sm fw-bold text-dark">RFQ Code</label>
+                                    <input type="text" id="rfqCodeLarge" class="form-control form-control-sm text-dark shadow-sm" readonly>
                                 </div>
-                                @*Company Name & Vendor Code*@
+
+                                <!-- Company Name & Vendor Code -->
                                 <div class="col-md-6">
-                                    <div class="input-group input-group-merge mb-3">
-                                        <span class="input-group-text"><i class="ri-building-4-line"></i></span>
-                                        <div class="form-floating form-floating-outline flex-grow-1">
-                                            <input type="text" id="companyName" class="form-control" readonly>
-                                            <label for="companyName">Company Name</label>
-                                        </div>
-                                    </div>
+                                    <label for="companyName" class="form-label form-label-sm fw-bold text-dark">Company Name</label>
+                                    <input type="text" id="companyName" class="form-control form-control-sm text-dark shadow-sm" readonly>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="input-group input-group-merge mb-3">
-                                        <span class="input-group-text"><i class="ri-code-s-slash-line"></i></span>
-                                        <div class="form-floating form-floating-outline flex-grow-1">
-                                            <input type="text" id="vendorCodeLarge" class="form-control" readonly>
-                                            <label for="vendorCodeLarge">Vendor Code</label>
-                                        </div>
-                                    </div>
+                                    <label for="vendorCodeLarge" class="form-label form-label-sm fw-bold text-dark">Vendor Code</label>
+                                    <input type="text" id="vendorCodeLarge" class="form-control form-control-sm text-dark shadow-sm" readonly>
                                 </div>
-                                @*Required Date & Delivery Date*@
+
+                                <!-- Required Date & Delivery Date -->
                                 <div class="col-md-6">
-                                    <div class="input-group input-group-merge mb-3">
-                                        <span class="input-group-text"><i class="ri-calendar-check-line"></i></span>
-                                        <div class="form-floating form-floating-outline flex-grow-1">
-                                            <input type="text" id="requireddate" class="form-control" readonly>
-                                            <label for="requireddate">Required Date</label>
-                                        </div>
-                                    </div>
+                                    <label for="requireddate" class="form-label form-label-sm fw-bold text-dark">Required Date</label>
+                                    <input type="text" id="requireddate" class="form-control form-control-sm text-dark shadow-sm" readonly>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="input-group input-group-merge mb-3">
-                                        <span class="input-group-text"><i class="ri-truck-line"></i></span>
-                                        <div class="form-floating form-floating-outline flex-grow-1">
-                                            <input type="text" id="vendordeliverydate" class="form-control" readonly>
-                                            <label for="vendordeliverydate">Vendor Delivery Date</label>
-                                        </div>
-                                    </div>
+                                    <label for="vendordeliverydate" class="form-label form-label-sm fw-bold text-dark">Vendor Delivery Date</label>
+                                    <input type="text" id="vendordeliverydate" class="form-control form-control-sm text-dark shadow-sm" readonly>
                                 </div>
-                                @*Priority*@
+
+                                <!-- Priority -->
                                 <div class="col-md-6">
-                                    <div class="input-group input-group-merge mb-3">
-                                        <span class="input-group-text"><i class="ri-star-line"></i></span>
-                                        <div class="form-floating form-floating-outline flex-grow-1">
-                                            <input type="text" id="priority" class="form-control" readonly>
-                                            <label for="priority">Priority</label>
-                                        </div>
-                                    </div>
+                                    <label for="priority" class="form-label form-label-sm fw-bold text-dark">Priority</label>
+                                    <input type="text" id="priority" class="form-control form-control-sm text-dark shadow-sm" readonly>
                                 </div>
+
                             </form>
-                            @*Quotation Items Table*@
+
+                            <!-- Quotation Items Table -->
                             <div class="table-responsive mt-4">
-                                <table class="table table-striped table-bordered text-center align-middle" id="tblQuotationItems">
+                                <table class="table table-bordered table-striped text-center align-middle" id="tblQuotationItems">
                                     <thead class="table-dark text-center align-middle">
                                         <tr>
                                             <th>SRNO</th>
@@ -264,7 +242,7 @@
                                             <th>Description</th>
                                             <th>Quantity</th>
                                             <th>UOM</th>
-                                            <th>CostPerUnit</th>
+                                            <th>Cost/Unit</th>
                                             <th>Discount</th>
                                             <th>GST</th>
                                             <th>Amount</th>
@@ -280,26 +258,30 @@
                                             <td colspan="9" class="text-end fw-bold">Transportation Charges</td>
                                             <td colspan="2" class="text-center" id="shippingLarge"></td>
                                         </tr>
-                                        <tr class="table-secondary">
-                                            <td colspan="9" class="text-end fw-bold">TotalAmount</td>
-                                            <td colspan="2" class="text-center" id="TotalAmount" name="TotalAmount"></td>
+                                        <tr>
+                                            <td colspan="9" class="text-end fw-bold">Total Amount</td>
+                                            <td colspan="2" class="text-center fw-bold" id="TotalAmount" name="TotalAmount"></td>
                                         </tr>
                                     </tfoot>
                                 </table>
                             </div>
                         </div>
-                        @*Footer*@
-                        <div class="modal-footer justify-content-end">
-                            <button type="button" class="btn btn-sm btn-success d-inline-flex align-items-center text-nowrap" onclick="OpenPOView()"> <i class="bi bi-plus-circle me-1"></i> Create PO</button>
-                            @*<button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="ri-arrow-go-back-line me-1"></i> Back</button>*@
+
+                        <!-- Modal Footer -->
+                        <div class="modal-footer py-2 d-flex justify-content-end">
+                            <button type="button" class="btn btn-success btn-sm px-3 d-flex align-items-center text-nowrap" onclick="OpenPOView()">
+                                <i class="bi bi-plus-circle me-1"></i> Create PO
+                            </button>
+                            
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
 
     @*modal end*@
-    <script>
+<script>
     $(document).ready(function () {
         var QuotationTable;
         let tblQuotationItems;
@@ -363,9 +345,16 @@
                 alignment: 'center'
             };
 
-            // Generated on date
+            // ✅ Generate date in dd/mm/yyyy format
+            var now = new Date();
+            var day = String(now.getDate()).padStart(2, '0');
+            var month = String(now.getMonth() + 1).padStart(2, '0');
+            var year = now.getFullYear();
+            var formattedDate = day + '/' + month + '/' + year;
+
+            // ✅ Insert generated date
             doc.content.splice(1, 0, {
-                text: 'Generated on: ' + new Date().toISOString().split('T')[0],
+                text: 'Generated Date: ' + formattedDate,
                 fontSize: 10,
                 italics: true,
                 alignment: 'center',
@@ -420,7 +409,7 @@
 
         // Helper function for warning toast
         function showExportToast() {
-            toastr.warning("Please select at least one row before exporting.", "Warning");
+            toastr.warning("Please select at least one row before exporting.");
         }
 
         // Initialize Quotation DataTable
@@ -473,6 +462,7 @@
                 { data: "CompanyName", title: "Company Name", "visible": false },
                 {
                     data: "TotalAmount",
+                    className: "text-center",
                     title: "Total Amount",
                     render: function (data, type, row) {
                         if (type === 'display' || type === 'filter') {
@@ -493,29 +483,36 @@
                 { data: "SubAmount", "visible": false },
                 {
                     data: "QuotationID",
+                    className: "text-center",
                     orderable: false,
                     render: function (data, type, row) {
                         return `
-                            <div class="d-flex gap-2">
-                                <button
+                        <div class="d-flex gap-2 justify-content-center">
+                
+                            <!-- Create PO Button -->
+                            <button type="button"
                                     onclick="OpenPOView('${data}')"
-                                    class="btn btn-sm btn-success d-inline-flex align-items-center text-nowrap"
+                                    class="btn btn-success square-pill d-inline-flex align-items-center px-2 py-1 shadow-InStock"
                                     title="Create PO"
                                     data-bs-toggle="tooltip"
                                     data-bs-placement="top">
-                                    <i class="bi bi-plus-circle me-1"></i>
-                                </button>
-                                <button
-                                    class="btn btn-sm btn-info btn-view"
+                                <i class="bi bi-plus-circle fs-6"></i>
+                            </button>
+
+                            <!-- View Button -->
+                            <button type="button"
+                                    class="btn btn-primary square-pill d-inline-flex align-items-center px-2 py-1 shadow-InStock btn-view"
                                     data-row='${JSON.stringify(row)}'
                                     title="View"
                                     data-bs-toggle="tooltip"
                                     data-bs-placement="top">
-                                    <i class="bi bi-eye me-1"></i>
-                                </button>
-                            </div>`;
+                                <i class="bi bi-eye fs-6"></i>
+                            </button>
+                        </div>
+                    `;
                     }
                 }
+
             ],
             drawCallback: function () {
                 // Initialize tooltips for all dynamically created elements after every table draw
@@ -584,11 +581,19 @@
                         // Center title
                         $body.find('h1').css('text-align', 'center');
 
-                        // Insert generated date
+                        // Insert generated date in dd/mm/yyyy format
                         $body.find('h1').after(
-                            '<div style="text-align:center;font-style:italic;font-size:10pt;margin-bottom:12px;">Generated on: '
-                            + new Date().toISOString().split('T')[0] + '</div>'
+                            '<div style="text-align:center;font-style:italic;font-size:10pt;margin-bottom:12px;">Generated Date: ' +
+                            (function () {
+                                const d = new Date();
+                                const day = String(d.getDate()).padStart(2, '0');
+                                const month = String(d.getMonth() + 1).padStart(2, '0');
+                                const year = d.getFullYear();
+                                return `${day}/${month}/${year}`;
+                            })() +
+                            '</div>'
                         );
+
 
                         // Add bootstrap table styles
                         $body.find('table')
@@ -627,7 +632,7 @@
                 // PDF Export button
                 {
                     extend: 'pdfHtml5',
-                    text: '<i class="bi bi-file-earmark-pdf-fill text-danger fs-5"></i>',
+                    text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
                     titleAttr: 'PDF',
                     title: 'Selected Quotation List',
                     orientation: 'landscape',
@@ -686,9 +691,9 @@
                 // Excel Export button
                 {
                     extend: 'excelHtml5',
-                    text: '<i class="bi bi-file-earmark-excel-fill text-success fs-5"></i>',
+                    text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
                     titleAttr: 'Excel',
-                    title: 'Selected Quotation List',
+                    title: '', //Selected Quotation List
                     exportOptions: {
                         columns: [1, 2, 3, 4, 5, 6],
                         rows: function (idx, data, node) {
@@ -718,6 +723,114 @@
 
                         // Fallback clear spinner after 1.5s
                         setTimeout(function () { try { btnApi.processing(false); } catch (err) { } }, 300);
+                    },
+                    customize: function (xlsx) {
+                        // ✅ Rename worksheet
+                        var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                        $('sheet', xlsx.xl['workbook.xml']).attr('name', 'Quotation List');
+
+                        // ✅ Date in dd/mm/yyyy format
+                        var now = new Date();
+                        var day = String(now.getDate()).padStart(2, '0');
+                        var month = String(now.getMonth() + 1).padStart(2, '0');
+                        var year = now.getFullYear();
+                        var formattedDate = day + '/' + month + '/' + year;
+
+                        var sheetData = $('sheetData', sheet);
+
+                        // Shift all data rows down by 2 (for title + date)
+                        sheetData.find('row').each(function () {
+                            var r = parseInt($(this).attr('r'));
+                            $(this).attr('r', r + 2);
+                            $(this).find('c').each(function () {
+                                var cellRef = $(this).attr('r');
+                                var col = cellRef.replace(/[0-9]/g, '');
+                                $(this).attr('r', col + (r + 2));
+                            });
+                        });
+
+                        // ✅ Insert Title row (now in A1, will be merged A1:G1 for centering across 7 columns)
+                        var titleRow =
+                            '<row r="1">' +
+                            '<c t="inlineStr" r="A1">' +
+                            '<is><t>Selected Quotation List</t></is>' +
+                            '</c>' +
+                            '</row>';
+
+                        // ✅ Insert Generated Date row (now in A2, will be merged A2:G2 for centering)
+                        var dateRow =
+                            '<row r="2">' +
+                            '<c t="inlineStr" r="A2">' +
+                            '<is><t>Generated Date: ' + formattedDate + '</t></is>' +
+                            '</c>' +
+                            '</row>';
+
+                        // Add rows to the top
+                        sheetData.prepend(dateRow);
+                        sheetData.prepend(titleRow);
+
+                        // ✅ Add merge cells for centering title and date across columns A:G (7 columns from export)
+                        var mergeCells = $('mergeCells', sheet);
+                        if (mergeCells.length === 0) {
+                            // If no mergeCells exist, create the element
+                            $('worksheet', sheet).append('<mergeCells count="2"/>');
+                            mergeCells = $('mergeCells', sheet);
+                        } else {
+                            // Update existing count
+                            var currentCount = parseInt(mergeCells.attr('count') || 0);
+                            mergeCells.attr('count', currentCount + 2);
+                        }
+                        // Add title merge (A1:G1)
+                        mergeCells.append('<mergeCell ref="A1:G1"/>');
+                        // Add date merge (A2:G2)
+                        mergeCells.append('<mergeCell ref="A2:G2"/>');
+
+                        // ✅ Add styles for centering + font (fonts, fills, etc.)
+                        var styles = xlsx.xl['styles.xml'];
+                        var cellXfs = $('cellXfs', styles);
+                        var fonts = $('fonts', styles);
+
+                        // Count existing fonts (default is usually 1: fontId=0)
+                        var fontCount = $('font', fonts).length;
+
+                        // Add new font for title (bold, size 14)
+                        fonts.append(
+                            '<font>' +
+                            '<sz val="14"/>' +  // Font size 14
+                            '<b/>' +             // Bold
+                            '<color rgb="000000"/>' +  // Black (default)
+                            '</font>'
+                        );
+
+                        // Add new font for date (italic, size 11)
+                        fonts.append(
+                            '<font>' +
+                            '<sz val="11"/>' +   // Font size 11 (default size)
+                            '<i/>' +             // Italic
+                            '<color rgb="000000"/>' +  // Black (default)
+                            '</font>'
+                        );
+
+                        // Count existing cellXfs
+                        var styleCount = $('xf', cellXfs).length;
+
+                        // Add new style for title (use new bold/large font, center alignment)
+                        cellXfs.append(
+                            '<xf numFmtId="0" fontId="' + fontCount + '" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1">' +
+                            '<alignment horizontal="center" vertical="center" wrapText="1"/>' +  // Center, wrap for long text
+                            '</xf>'
+                        );
+
+                        // Add new style for date (use new italic font, center alignment)
+                        cellXfs.append(
+                            '<xf numFmtId="0" fontId="' + (fontCount + 1) + '" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1">' +
+                            '<alignment horizontal="center" vertical="center" wrapText="1"/>' +  // Center, wrap for long text
+                            '</xf>'
+                        );
+
+                        // Apply new style indexes to the cells
+                        $('c[r=A1]', sheet).attr('s', styleCount);       // Title style
+                        $('c[r=A2]', sheet).attr('s', styleCount + 1);   // Date style
                     }
                 },
                 // CSV Export button
@@ -798,52 +911,50 @@
             }
         });
 
-        // Search functionality
+        // Search functionalityes
         $('#vendorSearch').on('keyup', function () {
             QuotationTable.search(this.value).draw();
         }); // This closing bracket was missing
 
-        // Initialize DatePicker
+
+        let startDate = null, endDate = null;
+
+        $.fn.dataTable.ext.search.push(function (settings, data) {
+            if (!startDate || !endDate) return true;
+            let quotationDate = moment(data[3], 'DD/MM/YYYY'); // correct index
+            return quotationDate.isBetween(startDate, endDate, undefined, '[]');
+        });
+
         $('#Selectedquotationdate').daterangepicker({
             autoUpdateInput: false,
             opens: 'center',
             drops: 'down',
             locale: {
                 cancelLabel: 'Clear',
-                format: 'DD/MM/YYYY' // set display format
+                format: 'DD/MM/YYYY'
             },
             ranges: {
                 'Today': [moment(), moment()],
-                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
                 'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                'This Month': [moment().startOf('month'), moment().endOf('month')],
-                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                'Last 1 Month': [moment().subtract(1, 'months').startOf('day'), moment()],
+                'Last 3 Months': [moment().subtract(3, 'months').startOf('day'), moment()],
+                'Last 1 Year': [moment().subtract(12, 'months').startOf('day'), moment()]
             }
         }, function (start, end) {
             startDate = start;
             endDate = end;
-            // Set value in dd/mm/yyyy format
             $('#Selectedquotationdate').val(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
-
-            // Apply client-side filter (if using column with dates in dd/mm/yyyy)
-            $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
-                var quotationDate = moment(data[2], 'DD/MM/YYYY'); // change 2 to your date column index
-                if (!startDate || !endDate) return true;
-                return quotationDate.isBetween(startDate, endDate, undefined, '[]'); // inclusive
-            });
-
             QuotationTable.draw();
-            $.fn.dataTable.ext.search.pop();
         });
 
-        // Clear date picker
         $('#Selectedquotationdate').on('cancel.daterangepicker', function () {
             startDate = null;
             endDate = null;
             $(this).val('');
             QuotationTable.draw();
         });
+
+
 
         // View quotation details
         $(document).on("click", ".btn-view", function () {
@@ -1000,8 +1111,20 @@
             return;
         }
 
+        // Create a date object for 30 minutes in the future
+        let expiryDate = new Date();
+        expiryDate.setTime(expiryDate.getTime() + (30 * 60 * 1000)); // 30 minutes * 60 seconds * 1000ms
+
+        document.cookie = "POMode=; path=/; max-age=0;";
+
+
+        console.log("cookies Data",document.cookie);
+        // Set cookie with expiry
+        document.cookie = "SelectedQuotationID=" + finalID + "; expires=" + expiryDate.toUTCString() + "; path=/;";
+
         // Redirect to controller with QuotationID
-        window.location.href = `/Purchase/CreatePOOK?quotationID=${finalID}`;
+        window.location.href = `/Purchase/CreatePOOK`;
+       // window.location.href = `/Purchase/CreatePOOK?quotationID=${finalID}`;
     }
 
     // Helper function to recalc SrNo for export across all pages
@@ -1012,8 +1135,8 @@
         let checkedRows = allRows.filter(row => $(row).find('input.row-select').prop('checked'));
         // Find the position of this row in the checkedRows array
         let sr = checkedRows.findIndex(row => tbl.row(row).index() === rowIdx) + 1;
-        return sr; // consecutive Sr.No
+        return sr; // consecutive Sr.no
     }
-    </script>
+</script>
 </body>
 </html>

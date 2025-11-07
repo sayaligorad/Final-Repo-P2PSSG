@@ -4,44 +4,44 @@
 
         <div class="row g-3">
             <div class="col-md-6">
-                <label class="form-label">GRN No</label>
-                <input type="text" class="form-control" id="grnno" name="GRNCode" value="@ViewBag.GRN" readonly />
+                <label class="form-label fw-bold text-dark">GRN No</label>
+                <input type="text" class="form-control form-control-sm text-dark shadow-sm" id="grnno" name="GRNCode" value="@ViewBag.GRN" readonly />
             </div>
             <div class="col-md-6">
-                <label class="form-label">Failed QC Code</label>
-                <input type="text" class="form-control" id="Nccode" name="NCode" value="@ViewBag.NcCode" readonly />
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label">Inspection Type</label>
-                <input type="text" class="form-control" id="insptype" name="InspectionType" value="@ViewBag.InspType" readonly />
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Plan Name</label>
-                <input type="text" class="form-control" id="planname" name="PlanName" value="@ViewBag.planname" readonly />
+                <label class="form-label fw-bold text-dark">Failed QC Code</label>
+                <input type="text" class="form-control form-control-sm text-dark shadow-sm" id="Nccode" name="NCode" value="@ViewBag.NcCode" readonly />
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">Item Name</label>
-                <input type="text" class="form-control" id="itemname" name="ItemName" value="@ViewBag.itemname" readonly />
+                <label class="form-label fw-bold text-dark">Inspection Type</label>
+                <input type="text" class="form-control form-control-sm text-dark shadow-sm" id="insptype" name="InspectionType" value="@ViewBag.InspType" readonly />
             </div>
             <div class="col-md-6">
-                <label class="form-label">Sample Qty Checked</label>
-                <input type="text" class="form-control" id="sqc" name="SampleQualityCheck" value="@ViewBag.sqc" readonly />
+                <label class="form-label fw-bold text-dark">Plan Name</label>
+                <input type="text" class="form-control form-control-sm text-dark shadow-sm" id="planname" name="PlanName" value="@ViewBag.planname" readonly />
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">Inspection Frequency</label>
-                <input type="text" class="form-control" id="Inf" name="InspectionFrequency" value="@ViewBag.Inf" readonly />
+                <label class="form-label fw-bold text-dark">Item Name</label>
+                <input type="text" class="form-control form-control-sm text-dark shadow-sm" id="itemname" name="ItemName" value="@ViewBag.itemname" readonly />
             </div>
             <div class="col-md-6">
-                <label class="form-label">Item Tested Failed</label>
-                <input type="text" class="form-control" id="itf" name="ItFailed" placeholder="Enter failed qty" />
+                <label class="form-label fw-bold text-dark">Sample Qty Checked</label>
+                <input type="text" class="form-control form-control-sm text-dark shadow-sm" id="sqc" name="SampleQualityCheck" value="@ViewBag.sqc" readonly />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold text-dark">Inspection Frequency</label>
+                <input type="text" class="form-control form-control-sm text-dark shadow-sm" id="Inf" name="InspectionFrequency" value="@ViewBag.Inf" readonly />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-bold text-dark">Item Tested Failed <span class="text-danger">*</span></label>
+                <input type="text" class="form-control form-control-sm text-dark shadow-sm" id="itf" name="ItFailed" placeholder="Enter failed qty" />
             </div>
 
             <div class="col-12">
-                <label class="form-label">Reason Of Rejection</label>
-                <textarea class="form-control" id="ROr" name="ReasonOfRejection" rows="2" placeholder="Enter reason"></textarea>
+                <label class="form-label fw-bold text-dark">Reason Of Rejection <span class="text-danger">*</span></label>
+                <textarea class="form-control form-control-sm text-dark shadow-sm" id="ROr" name="ReasonOfRejection" rows="2" placeholder="Enter reason"></textarea>
             </div>
         </div>
 
@@ -50,9 +50,8 @@
         <input type="hidden" value="@ViewBag.QCCode" id="QCCode" />
     </div>
 
-    <div class="card-footer text-end">
-        <button type="button" class="btn btn-primary me-2" onclick="finalnc()">Initiate NC</button>
-       
+    <div class="card-footer text-end mt-3">
+        <button type="button" class="btn btn-primary me-2 px-2 py-1 btn-sm" onclick="finalnc()">Initiate NC</button>
     </div>
 
 </div>
@@ -61,17 +60,37 @@
 
 <script>
 
-    //Validations for max number according to quantity and allow only number
-
+    //  Validations for max number according to quantity and allow only numbers
     $('#itf').on('input', function () {
-        this.value = this.value.replace(/[^0-9]/g, ''); // only digits
+        // Allow only digits
+        this.value = this.value.replace(/[^0-9]/g, '');
 
-        const maxVal = parseInt($('#sqc').val(), 10) || 9999;
-        if (parseInt(this.value, 10) > maxVal) {
-            Swal.fire("⚠️ Limit Exceeded", "Item Tested Failed cannot be greater than " + maxVal, "warning");
-            this.value = maxVal;
+        const maxVal = parseInt($('#sqc').val(), 10) || 0;
+        const currentVal = parseInt(this.value, 10) || 0;
+
+        // Remove old error message
+        $('#itfError').remove();
+        $(this).removeClass('is-invalid');
+
+        //  Show error only if current value > maxVal
+        if (currentVal > maxVal) {
+            this.value = maxVal; // Reset value to max
+
+            $(this).addClass('is-invalid').after(`
+            <small id="itfError" class="text-danger fw-semibold">
+                 Value cannot be greater than ${maxVal}
+            </small>
+        `);
+        }
+        //  If value is valid (≤ max), remove error message immediately
+        else {
+            $('#itfError').remove();
+            $(this).removeClass('is-invalid');
         }
     });
+
+
+
 
 
     //validation for onlu text can be add no and symbols doesnt allow
@@ -81,24 +100,92 @@
     });
 
 
-
+    //Nc buton code for update status and some fields
     function finalnc() {
-        const GRNICode = $('#GRICode').val(),
+
+
+        //  Clear "Item Tested Failed" error immediately when user types valid number
+        $('#itf').on('input', function () {
+            const val = parseInt($(this).val(), 10);
+            const sqc = parseInt($('#sqc').val(), 10) || 0;
+
+            if (val > 0 && val <= sqc) {
+                $(this).removeClass('is-invalid');
+                $(this).next('.error-text').remove();
+            }
+        });
+
+        //  Clear "Reason of Rejection" error immediately when user types valid text
+        $('#ROr').on('input', function () {
+            const text = $(this).val().trim();
+
+            if (text.length >= 10 && /^[a-zA-Z\s]+$/.test(text)) {
+                $(this).removeClass('is-invalid');
+                $(this).next('.error-text').remove();
+            }
+        });
+
+
+
+        // Remove old error messages
+        $('.error-text').remove();
+        $('.is-invalid').removeClass('is-invalid');
+
+        let GRNICode = $('#GRICode').val(),
             SQC = $('#sqc').val(),
             STF = $('#itf').val();
+        let ROR = $('#ROr').val().trim();
+        let hasError = false;
 
+        //  Validate Item Tested Failed
         if (!STF) {
-            Swal.fire("⚠️ Required", "Please enter Item Tested Failed.", "warning");
-            return;
+            $('#itf').addClass('is-invalid').after(`
+                <small class="text-danger fw-semibold error-text">
+                    Please enter Item Tested Failed.
+                </small>
+            `);
+            hasError = true;
+        } else if (isNaN(STF) || parseInt(STF, 10) <= 0) {
+            $('#itf').addClass('is-invalid').after(`
+                <small class="text-danger fw-semibold error-text">
+                     Item Tested Failed must be greater than 0.
+                </small>
+            `);
+            hasError = true;
+        } else if (parseInt(STF, 10) > SQC) {
+            $('#itf').addClass('is-invalid').after(`
+                <small class="text-danger fw-semibold error-text">
+                    Item Tested Failed cannot exceed Sample Qty Checked (${SQC}).
+                </small>
+            `);
+            hasError = true;
         }
-        if (isNaN(STF) || STF <= 0) {
-            Swal.fire("⚠️ Invalid", "Item Tested Failed must be a positive number.", "warning");
-            return;
+
+        // 🔹 Validate Reason of Rejection
+        if (!ROR) {
+            $('#ROr').addClass('is-invalid').after(`
+                <small class="text-danger fw-semibold error-text">
+                     Please enter Reason of Rejection.
+                </small>
+            `);
+            hasError = true;
+        } else if (ROR.length < 10) {
+            $('#ROr').addClass('is-invalid').after(`
+                <small class="text-danger fw-semibold error-text">
+                     Reason must be at least 10 characters long.
+                </small>
+            `);
+            hasError = true;
+        } else if (!/^[a-zA-Z\s]+$/.test(ROR)) {
+            $('#ROr').addClass('is-invalid').after(`
+                <small class="text-danger fw-semibold error-text">
+                     Only alphabets and spaces are allowed.
+                </small>
+            `);
+            hasError = true;
         }
-        if (parseInt(STF, 10) > parseInt(SQC, 10)) {
-            Swal.fire("⚠️ Invalid", "Item Tested Failed cannot exceed Sample Qty Checked.", "warning");
-            return;
-        }
+
+        if (hasError) return; // Stop if validation failed
 
 
         INF = $('#Inf').val(),
@@ -116,13 +203,30 @@
                 setTimeout(() => {
                     bootstrap.Modal.getInstance(document.getElementById('ncModal'))?.hide();
                     window.parent.closeModal?.();
-                    window.parent.openTask?.(GRNCode,"completed");
-                
+                    window.parent.openTask?.(GRNCode, "completed");
+
+
+
+                    const grnCode = $("#GRN").val();
+                    if (grnCode) {
+                        window.parent.$("#grnGridSection").hide();
+                        window.parent.$("#taskSection").show();
+                        // ✅ Directly load Completed tab with GRNCode
+                        new bootstrap.Tab($('#completed-task-tab')).show();
+
+                        // Refresh the completed task grid
+                        window.parent.$('#completedTaskContent').load(`/Quality/CompletedTaskListRG?id=${GRNCode}`);
+
+                        // Reinitialize completed tasks if available
+                        window.parent.initCompleted?.();
+
+                    }
+
                 }, 1600);
             })
             .fail(() => Swal.fire({ icon: 'error', title: 'Failed', text: 'Something went wrong. Please try again!', showConfirmButton: false, timer: 2000 }));
     }
-    // 🧱 Ensure multiple modals stack properly
+    //  Ensure multiple modals stack properly
     $(document).on('show.bs.modal', '.modal', function () {
         const zIndex = 1050 + 10 * $('.modal:visible').length;
         $(this).css('z-index', zIndex);
@@ -134,7 +238,7 @@
         }, 0);
     });
 
-    // ♻️ Keep body scroll behavior correct when closing nested modals
+    //  Keep body scroll behavior correct when closing nested modals
     $(document).on('hidden.bs.modal', '.modal', function () {
         if ($('.modal.show').length) {
             $('body').addClass('modal-open');

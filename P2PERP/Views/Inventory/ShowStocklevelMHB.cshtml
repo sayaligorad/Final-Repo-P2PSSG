@@ -14,7 +14,7 @@
 
         <!-- 📋 DataTable -->
         <div class="table-responsive shadow-lg rounded container-fluid">
-            <h2 class="text-center text-primary fw-bold mb-4"> Stock Analysis & Raise Order  For Item Stock Refill   </h2>
+            <h3 class="text-center text-primary fw-bold mb-1"> Stock Analysis & Raise Order  For Item Stock Refill   </h3>
             <table id="myTable" class="table table-hover table-striped align-middle table-bordered">
                 <thead class="table-dark">
                     <tr>
@@ -24,7 +24,7 @@
                         <th>Item Code</th>
                         <th>Reorder Qty</th>
                         <th>Min Qty</th>
-                        <th>Max Qty</th>
+                        @*<th>Max Qty</th>*@
                         <th>Current Items</th>
                         <th>Status</th>
                         <th>Action</th>
@@ -37,14 +37,14 @@
 </div>
 <!-- 📦 Raise Order Modal -->
 <div class="modal fade" id="raiseOrderModal" tabindex="-1" aria-labelledby="raiseOrderLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content shadow-lg rounded-3">
             <!-- 🟢 Modal Header -->
-            <div class="modal-header bg-primary">
-                <h5 class="modal-title text-white w-100 text-center m-0" id="raiseOrderLabel">
+            <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-1">
+                <h5 class="modal-title fw-bold text-white mb-0 fs-5" id="raiseOrderLabel">
                     Raise Order
                 </h5>
-                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
             <!-- 🟢 Modal Body -->
@@ -143,7 +143,11 @@
     .modal {
         z-index: 1055 !important;
     }
+    
 
+        button.dt-button.processing:after {
+            content: none !important;
+        }
 
     .btnAction:disabled {
         opacity: 0.6;
@@ -153,6 +157,13 @@
     #myTable th, #myTable td {
         vertical-align: middle !important;
         text-align: center;
+    }
+
+    button.dt-button.processing,
+    div.dt-button.processing {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        background: none !important;
     }
 </style>
 <script>
@@ -180,7 +191,7 @@
             tbody.empty();
 
             if (!data || data.length === 0) {
-                tbody.append(`<tr><td colspan="9" class="text-center">No records found</td></tr>`);
+                tbody.append(`<tr><td colspan="8" class="text-center">No records found</td></tr>`);
                 return;
             }
 
@@ -200,11 +211,11 @@
                         <td>${item.ItemCode}</td>
                         <td>${item.ReorderQuantity}</td>
                         <td>${item.minQuantity}</td>
-                        <td>${item.MaxQuantity}</td>
+                     
                         <td>${item.CurrentItems}</td>
                         <td><span class="status-badge ${statusClass}">${item.StockStatus}</span></td>
                         <td>
-                           <button class="btnAction d-flex align-items-center justify-content-center gap-2"
+                           <button class="btnAction d-flex align-items-center justify-content-center gap-2 "
                                     data-id="${item.ItemCode}"
                                     ${item.StockStatus === "Order Raised" ? "disabled" : ""}
                                       ${item.StockStatus === "Available" ? "disabled" : ""}
@@ -214,7 +225,7 @@
                         : item.StockStatus === 'Available'
                             ? 'Stock already available'
                             : 'Raise order'}">
-                                <i class="bi bi-cart-plus"></i>
+                                <i class="bi bi-cart-plus "></i>
                             </button>
 
                         </td>
@@ -245,32 +256,32 @@
                             $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config);
                         },
                         exportOptions: {
-                            columns: [1, 2, 3, 4, 5, 6, 7, 8],
+                            columns: [1, 2, 3, 4, 5, 6, 7],
                             rows: function (idx, data, node) {
                                 return $(node).find('.row-select').prop('checked');
                             }
                         },
+                    
                         customize: function (win) {
-                            $(win.document.body).prepend(
-                                `<div style="text-align:center; font-size:12px; margin-bottom:10px;">
-                        Generated on: ${new Date().toLocaleString()}
-                    </div>`
-                            );
-                            $(win.document.body).find('table')
-                                .addClass('table table-bordered table-striped')
-                                .css('font-size', '14px');
-                            $(win.document.body).find('thead')
-                                .css('background-color', '#0d6efd')
-                                .css('color', 'white');
-                            $(win.document.body).find('table tbody tr').each(function (i) {
-                                $(this).find('td:first').text(i + 1);
-                            });
+                            $(win.document.body).find('h1').remove();
+                            const today = new Date().toLocaleDateString('en-GB');
+                            $(win.document.body).prepend(`
+                                  <div style="text-align:center; margin-bottom:10px;">
+                                      <h2 style="margin:0;">Stock Analysis & Raise Order For Item Stock Refill</h2>
+                                      <div style="font-size:12px;">Generated Date: ${today}</div>
+                                  </div>
+                              `);
+                            const $table = $(win.document.body).find('table');
+                            $table.addClass('table table-bordered table-striped').css({ 'font-size': '14px', 'width': '100%', 'border-collapse': 'collapse', 'margin-top': '20px' });
+                            $table.find('thead th').css({ 'background-color': '#00000', 'color': '#fff', 'text-align': 'center' });
+                            $table.find('tbody td').css('text-align', 'center');
+                            $table.find('tbody tr').each(function (i) { $(this).find('td:first').text(i + 1); });
                         }
                     },
                     // ✅ PDF
                     {
                         extend: 'pdfHtml5',
-                        title: 'Stock Level',
+                        title: 'Stock Analysis & Raise Order For Item Stock Refill',
                         text: '<i class="bi bi-file-earmark-pdf text-danger fs-5" data-bs-toggle="tooltip" title="Export to PDF"></i>',
                         titleAttr: 'Export PDF',
                         action: function (e, dt, button, config) {
@@ -281,7 +292,7 @@
                             $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, button, config);
                         },
                         exportOptions: {
-                            columns: [1, 2, 3, 4, 5, 6, 7, 8],
+                            columns: [1, 2, 3, 4, 5, 6, 7],
                             rows: function (idx, data, node) {
                                 return $(node).find('.row-select').prop('checked');
                             },
@@ -295,37 +306,24 @@
                         },
                         customize: function (doc) {
                             try {
-                                doc.content[0].alignment = 'center';
-                                doc.content[0].fontSize = 14;
+                                doc.content[0].alignment = 'center'; doc.content[0].fontSize = 14;
                                 var exportDate = new Date().toLocaleDateString('en-GB');
-                                doc.content.splice(1, 0, {
-                                    text: 'Export Date: ' + exportDate,
-                                    alignment: 'center',
-                                    margin: [0, 0, 0, 8],
-                                    fontSize: 10
-                                });
+                                doc.content.splice(1, 0, { text: 'Generated Date: ' + exportDate, alignment: 'center', margin: [0, 0, 0, 8], fontSize: 10 });
                                 var tableNode = doc.content.find(c => c.table);
                                 if (!tableNode) return;
                                 doc.styles = doc.styles || {};
-                                doc.styles.tableHeader = { alignment: 'center', fillColor: '#212529', color: '#ffffff', bold: true };
+                                doc.styles.tableHeader = { alignment: 'center', fillColor: '#212529', color: '#fff', bold: true };
                                 doc.styles.tableBodyEven = { alignment: 'center' };
                                 doc.styles.tableBodyOdd = { alignment: 'center' };
-                                tableNode.layout = {
-                                    hLineWidth: () => .5, vLineWidth: () => .5,
-                                    hLineColor: () => '#dddddd', vLineColor: () => '#dddddd',
-                                    paddingLeft: () => 30, paddingRight: () => 6,
-                                    paddingTop: () => 4, paddingBottom: () => 4
-                                };
-                                tableNode.table.body.forEach((row, i) => {
-                                    if (i > 0) row[0] = { text: String(i), alignment: 'center' };
-                                });
-                            } catch (err) { console.error('PDF customize error:', err); }
+                                tableNode.layout = { hLineWidth: () => 0.5, vLineWidth: () => 0.5, hLineColor: () => '#ddd', vLineColor: () => '#ddd', paddingLeft: () => 20, paddingRight: () => 10, paddingTop: () => 4, paddingBottom: () => 4 };
+                                tableNode.table.body.forEach((row, i) => { if (i > 0) row[0] = { text: String(i), alignment: 'center' }; });
+                            } catch (err) { console.error(err); }
                         }
                     },
                     // ✅ Excel
                     {
                         extend: 'excelHtml5',
-                        title: 'Stock Level',
+                        title: 'Stock Analysis & Raise Order For Item Stock Refill',
                         text: '<i class="bi bi-file-earmark-excel text-success fs-5" data-bs-toggle="tooltip" title="Export to Excel"></i>',
                         titleAttr: 'Export Excel',
                         action: function (e, dt, button, config) {
@@ -337,7 +335,7 @@
                             $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
                         },
                         exportOptions: {
-                            columns: [1, 2, 3, 4, 5, 6, 7, 8],
+                            columns: [1, 2, 3, 4, 5, 6, 7],
                             rows: function (idx, data, node) {
                                 return $(node).find('.row-select').prop('checked');
                             },
@@ -352,12 +350,61 @@
                                     return data;
                                 }
                             }
+
+                        },
+                        customize: function (xlsx) {
+                            const sheet = xlsx.xl.worksheets['sheet1.xml'];
+                            const now = new Date();
+                            const formattedDate = now.toLocaleDateString('en-GB'); // DD/MM/YYYY
+
+                            const newRowNumber = 2;
+
+                            // Create "Generated Date" row
+                            const dateRow = `
+<row r="${newRowNumber}">
+    <c t="inlineStr" r="A${newRowNumber}">
+        <is><t>Generated Date: ${formattedDate}</t></is>
+    </c>
+</row>`;
+
+                            // Shift existing rows down by +1
+                            $('row', sheet).each(function () {
+                                const r = parseInt($(this).attr('r'));
+                                if (r >= newRowNumber) $(this).attr('r', r + 1);
+                            });
+                            $('c', sheet).each(function () {
+                                const cellRef = $(this).attr('r');
+                                const col = cellRef.replace(/[0-9]/g, '');
+                                const row = parseInt(cellRef.replace(/[A-Z]/g, ''));
+                                if (row >= newRowNumber) $(this).attr('r', col + (row + 1));
+                            });
+
+                            // Add the new date row right after the title
+                            $('row[r="1"]', sheet).after(dateRow);
+
+                            // ✅ Merge cells from A to last column
+                            const totalCols = $('row c', sheet).last().attr('r').replace(/[0-9]/g, '');
+                            let mergeCells = $('mergeCells', sheet);
+                            if (mergeCells.length === 0) {
+                                $('worksheet', sheet).prepend(`<mergeCells count="1"><mergeCell ref="A${newRowNumber}:${totalCols}${newRowNumber}"/></mergeCells>`);
+                            } else {
+                                const count = parseInt(mergeCells.attr('count')) + 1;
+                                mergeCells.attr('count', count);
+                                mergeCells.append(`<mergeCell ref="A${newRowNumber}:${totalCols}${newRowNumber}"/>`);
+                            }
+
+                            // ✅ Center align the merged cell
+                            const styles = xlsx.xl['styles.xml'];
+                            const styleIndex = $('cellXfs xf', styles).length;
+                            $('cellXfs', styles).append('<xf xfId="0" applyAlignment="1"><alignment horizontal="center"/></xf>');
+                            $(`c[r="A${newRowNumber}"]`, sheet).attr('s', styleIndex);
                         }
+                    
                     },
                     // ✅ CSV
                     {
                         extend: 'csvHtml5',
-                        title: 'Stock_Level',
+                        title: 'Stock Analysis & Raise Order For Item Stock Refill',
                         text: '<i class="bi bi-filetype-csv text-primary fs-5" data-bs-toggle="tooltip" title="Export to CSV"></i>',
                         titleAttr: 'Export CSV',
                         action: function (e, dt, button, config) {
@@ -368,15 +415,23 @@
                             $.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, button, config);
                         },
                         exportOptions: {
-                            columns: [1, 2, 3, 4, 5, 6, 7, 8],
+                            columns: [1, 2, 3, 4, 5, 6, 7],
                             rows: function (idx, data, node) {
                                 return $(node).find('.row-select').prop('checked');
                             },
                             format: {
                                 body: function (data, rowIdx, colIdx) {
-                                    if (colIdx === 1) return rowIdx + 1;
-                                    if (typeof data === 'string') return data.replace(/<\/?[^>]+(>|$)/g, "").trim();
-                                    return data;
+                                    // Remove HTML tags and trim
+                                    if (typeof data === 'string') data = data.replace(/<[^>]*>/g, '').trim();
+
+                                    // Serial number column
+                                    if (colIdx === 0 || colIdx === 1) {
+                                        // Initialize counter once
+                                        if (typeof this.srnoCounter === 'undefined') this.srnoCounter = 0;
+                                        return ++this.srnoCounter;
+                                    }
+
+                                    return data; // fallback
                                 }
                             }
                         }
@@ -384,7 +439,7 @@
                 ],
                 columnDefs: [
                     { targets: 1, render: function (data, type, row, meta) { return meta.row + 1; } },
-                    { orderable: false, targets: [0, 9] }
+                    { orderable: false, targets: [0, 8] }
                 ]
 
 

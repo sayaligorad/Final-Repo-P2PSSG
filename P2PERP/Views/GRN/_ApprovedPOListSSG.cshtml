@@ -1,21 +1,22 @@
 ﻿@{
     Layout = "";
 }
-
+<style>
+    #approvedPoTable thead th {
+        padding: 0.3rem 0.4rem !important;
+    }
+</style>
 
 <!-- Approved PO List Card -->
-<div class="table-responsive card shadow p-3 bg-white rounded">
-    <h4 class="text-primary text-center fw-bolder">Approved PO List</h4>
+<div >
 
     <div class="d-flex justify-content-between align-items-center mb-5 flex-wrap pe-3">
         <!-- Date Range Picker -->
-        <div class="d-flex align-items-center gap-3">
-            <div class="input-group" style="height: 40px; max-width: 280px;">
-                <span class="input-group-text bg-primary text-white">
-                    <i class="bi bi-calendar-date"></i>
-                </span>
-                <input type="text" id="Purchasedatepicker" class="form-control" placeholder="Select date range" readonly />
-            </div>
+        <div class="input-group" style="max-width: 320px;">
+            <span class="input-group-text bg-primary text-white">
+                <i class="bi bi-calendar-date"></i>
+            </span>
+            <input type="text" id="Purchasedatepicker" class="form-control" placeholder="Select date range" readonly />
         </div>
 
         <!-- Export buttons -->
@@ -39,20 +40,33 @@
     </table>
 </div>
 
+
 <!-- Create GRN Modal -->
 <div class="modal fade" id="createGrnModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header bg-primary py-2 px-3" style="min-height:50px;">
-                <h5 class="modal-title m-0 flex-grow-1 text-center fs-5 text-white">Create GRN</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        <div class="modal-content shadow-lg rounded-3">
+            <div class="card-header bg-primary text-white d-flex justify-content-center align-items-center rounded-top p-1">
+                <h3 class="modal-title fw-bold text-white mb-0 fs-5">Create GRN</h3>
+                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
             </div>
-
             <div class="modal-body" id="grnModalBody"></div>
+
         </div>
     </div>
 </div>
 
+<style>
+    button.dt-button.processing,
+    div.dt-button.processing {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        background: none !important;
+    }
+
+        button.dt-button.processing:after {
+            content: none !important;
+        }
+</style>
 <script>
 toastr.options = {
     closeButton: true,
@@ -63,7 +77,7 @@ toastr.options = {
     timeOut: "3000"
 };
 
-function showExportWarning(msg="Please select at least one row before exporting.") { toastr.warning(msg,"Warning"); }
+function showExportWarning(msg="Please select at least one row before exporting.") { toastr.warning(msg); }
 function showExportSuccess(msg="Export completed.") { toastr.success(msg,"Success"); }
 
 $(document).ready(function () {
@@ -131,7 +145,7 @@ $(document).ready(function () {
                 data: 'POCode',
                 className: 'text-center',
                 render: data => `
-        <button class="btn btn-success btn-sm createGRNBtn"
+        <button class="btn btn-success square-pill d-inline-flex align-items-center px-2 py-1 btn-sm createGRNBtn"
                 data-bs-toggle="tooltip"
                 data-bs-placement="top"
                 title="Create GRN for: ${data}">
@@ -146,7 +160,7 @@ $(document).ready(function () {
             // --- PRINT ---
             {
                 extend: 'print',
-                text: '<i class="bi bi-printer-fill fs-5"></i>',
+                text: '<i class="bi bi-printer-fill text-dark fs-5"></i>',
                 title: '',
                 exportOptions: {
                     columns: [2, 3, 4, 5, 6],
@@ -161,7 +175,7 @@ $(document).ready(function () {
                     );
                     const headerRow = body.find('table thead tr');
                     headerRow.each(function () {
-                        $(this).prepend('<th>S.No.</th>');
+                        $(this).prepend('<th>Sr.No.</th>');
                     });
                     let exportSerialCounter = 0;
                     body.find('table tbody tr').each(function () {
@@ -200,8 +214,6 @@ $(document).ready(function () {
                 }
             },
 
-
-
             // PDF
             {
                 extend: 'pdfHtml5',
@@ -214,25 +226,29 @@ $(document).ready(function () {
                 },
                 customize: function (doc) {
                     exportSerialCounter = 0;
-
                     doc.content.unshift(
                         { text: 'Approved PO List', style: 'title', alignment: 'center', margin: [0, 0, 0, 5], fontSize: 16, bold: true },
                         { text: 'Generated Date: ' + moment().format("DD/MM/YYYY"), style: 'subTitle', alignment: 'center', margin: [0, 0, 0, 10], fontSize: 12 }
                     );
-
-                    doc.content[2].table.body[0].unshift({ text: 'S.No.', bold: true, fillColor: '#000', color: '#fff', alignment: 'center' });
+                    doc.content[2].table.body[0].unshift({ text: 'Sr.No.', bold: true, fillColor: '#000', color: '#fff', alignment: 'center' });
                     doc.content[2].table.body.forEach(function (row, idx) {
                         if (idx === 0) return;
                         row.unshift({ text: (++exportSerialCounter).toString(), alignment: 'center' });
                     });
-
                     doc.content[2].table.body[0].forEach(function (headerCell) {
                         headerCell.fillColor = '#000';
                         headerCell.color = '#fff';
                         headerCell.alignment = 'center';
                         headerCell.bold = true;
                     });
-
+                    doc.content[2].table.body.forEach(function (row, idx) {
+                        if (idx === 0) return;
+                        row.forEach(function (cell) {
+                            if (cell.text) cell.alignment = 'center';
+                        });
+                    });
+                    doc.content[2].table.alignment = 'center';
+                    doc.content[2].table.widths = Array(doc.content[2].table.body[0].length).fill('*');
                     doc.content[2].layout = {
                         hLineWidth: function (i, node) { return 1; },
                         vLineWidth: function (i, node) { return 1; },
@@ -243,8 +259,7 @@ $(document).ready(function () {
                         paddingTop: function (i, node) { return 4; },
                         paddingBottom: function (i, node) { return 4; }
                     };
-
-                    doc.content[2].table.alignment = 'center';
+                    doc.pageMargins = [40, 40, 40, 40];
                 },
                 action: function (e, dt, btn, config) {
                     if (selectedPOs.size === 0) { showExportWarning(); return; }
@@ -252,17 +267,19 @@ $(document).ready(function () {
                 }
             },
 
-            //excel
+            // Excel
             {
                 extend: 'excelHtml5',
                 text: '<i class="bi bi-file-earmark-excel fs-5 text-success"></i>',
-                filename: `Approved_PO_List_${moment().format("DD-MM-YYYY")}`,
+                title: '',
+                filename: `Approved_PO_List_${moment().format("DD/MM/YYYY")}`,
+                titleAttr: 'Export Excel',
                 exportOptions: {
-                    columns: [0, 2, 3, 4,5],
+                    columns: [0, 2, 3, 4, 5,6],
                     rows: (idx, data, node) => selectedPOs.has(data.POCode),
                     format: {
                         header: function (data, colIdx) {
-                            if (colIdx === 0) return 'S.No.';
+                            if (colIdx === 0) return 'Sr.No.';
                             return data;
                         },
                         body: function (data, row, colIdx) {
@@ -274,19 +291,27 @@ $(document).ready(function () {
                     }
                 },
                 customize: function (xlsx) {
-                    var sheet = xlsx.xl.worksheets['sheet1.xml'];
-                    var now = moment().format("DD-MM-YYYY HH:mm:ss");
-                    var headingRow = `<row r="1">
-            <c t="inlineStr" s="2"><is><t>Approved PO List</t></is></c>
-            <c t="inlineStr" s="2"><is><t>Generated Date: ${now}</t></is></c>
-        </row>`;
-                    sheet.childNodes[0].childNodes[1].innerHTML = headingRow + sheet.childNodes[0].childNodes[1].innerHTML;
-                    $('row c', sheet).each(function () {
-                        var r = parseInt($(this).parent().attr('r'));
-                        if (r === 2) {
-                            $(this).attr('s', '2');
-                        }
+                    const sheet = xlsx.xl.worksheets['sheet1.xml'];
+                    const dateStr = moment().format("DD/MM/YYYY");
+                    $(sheet).find('row').each(function () {
+                        const r = parseInt($(this).attr('r'));
+                        $(this).attr('r', r + 2);
+                        $(this).find('c').each(function () {
+                            const cellRef = $(this).attr('r');
+                            const col = cellRef.replace(/\d+/g, '');
+                            const row = parseInt(cellRef.replace(/\D/g, '')) + 2;
+                            $(this).attr('r', col + row);
+                        });
                     });
+
+                    const titleRow = `<row r="1">
+                    <c t="inlineStr" r="C1" s="2"><is><t>Approved PO List</t></is></c>
+                </row>`;
+                                    const dateRow = `<row r="2">
+                    <c t="inlineStr" r="C2" s="2"><is><t>Generated Date: ${dateStr}</t></is></c>
+                </row>`;
+
+                    sheet.childNodes[0].childNodes[1].innerHTML = titleRow + dateRow + sheet.childNodes[0].childNodes[1].innerHTML;
                 },
                 action: function (e, dt, btn, config) {
                     if (selectedPOs.size === 0) {
@@ -298,7 +323,8 @@ $(document).ready(function () {
                 }
             },
 
-            // CSV EXPORT
+
+            // --- CSV EXPORT ---
             {
                 extend: 'csvHtml5',
                 text: '<i class="bi bi-filetype-csv text-success fs-5"></i>',
@@ -306,25 +332,41 @@ $(document).ready(function () {
                 filename: `Approved_PO_List_${moment().format("DD-MM-YYYY")}`,
                 bom: true,
                 exportOptions: {
-                    columns: [0, 2, 3, 4,5],
+                    columns: [0, 2, 3, 4, 5],
                     rows: (idx, data, node) => selectedPOs.has(data.POCode),
                     format: {
                         header: function (data, colIdx) {
-                            if (colIdx === 0) return 'S.No.';
+                            if (colIdx === 0) return 'Sr.No.';
                             return data;
                         },
                         body: function (data, row, colIdx) {
                             let plain = $('<div>').html(data).text().trim();
+
                             plain = plain.replace(/â‚¹|&amp;#8377;/g, '₹');
                             if (colIdx === 0) return ++exportSerialCounter;
+
+                            if (colIdx === 4) {
+                                const dt = moment(plain, ["YYYY-MM-DD", "DD-MM-YYYY", "MM/DD/YYYY"]);
+                                if (dt.isValid()) return dt.format("DD/MM/YYYY");
+                            }
+
                             return plain;
                         }
-                    }
-                },
-                customize: function (csv) {
-                    var now = moment().format("DD/MM/YYYY HH:mm:ss");
-                    var heading = `Approved PO List - Generated Date: ${now}`;
-                    return heading + "\n\n" + csv;
+                    },
+                    customize: function (xlsx) {
+                        var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                        var $sheet = $(sheet);
+
+                        $sheet.find('row c').each(function () {
+                            var $c = $(this);
+                            var col = $c.attr('r').replace(/[0-9]/g, '');
+                            if (col === 'G' || col === 'H') {
+                                $c.attr('t', 'inlineStr');
+                                var v = $c.find('v').text();
+                                $c.empty().append(`<is><t>${v}</t></is>`);
+                            }
+                        });
+                    },
                 },
                 action: function (e, dt, btn, config) {
                     if (selectedPOs.size === 0) {
@@ -364,12 +406,11 @@ $(document).ready(function () {
         drops: "down",
         locale: { format: "DD-MM-YYYY", cancelLabel: "Clear" },
         ranges: {
-            "Today":[moment(),moment()],
-            "Yesterday":[moment().subtract(1,"days"),moment().subtract(1,"days")],
-            "Last 7 Days":[moment().subtract(6,"days"),moment()],
-            "Last 30 Days":[moment().subtract(29,"days"),moment()],
-            "This Month":[moment().startOf("month"),moment().endOf("month")],
-            "Last Month":[moment().subtract(1,"month").startOf("month"),moment().subtract(1,"month").endOf("month")]
+            'Today': [moment(), moment()],
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+            'Last 1 Month': [moment().subtract(1, 'month'), moment()],
+            'Last 3 Months': [moment().subtract(3, 'month'), moment()],
+            'Last 1 Year': [moment().subtract(1, 'year'), moment()]
         }
     },function(start,end){
         fromDatePO=start.startOf('day');
@@ -385,21 +426,26 @@ $(document).ready(function () {
         table.draw();
     });
 
-    // Row checkbox, select all
-    $(document).on('change','.rowCheckboxApprovedPO', function(){
-        const poCode=$(this).val();
-        $(this).is(':checked')?selectedPOs.add(poCode):selectedPOs.delete(poCode);
-        $('#selectAllApprovedPO').prop('checked',
-            table.rows({page:'current'}).nodes().to$().find('.rowCheckboxApprovedPO').length ===
-            table.rows({page:'current'}).nodes().to$().find('.rowCheckboxApprovedPO:checked').length
-        );
+    //  Row checkbox, select all
+    $(document).on('change', '.rowCheckboxApprovedPO', function () {
+        const poCode = $(this).val();
+        $(this).is(':checked') ? selectedPOs.add(poCode) : selectedPOs.delete(poCode);
+
+        const allVisibleChecked = table.rows({ page: 'current' }).nodes().to$().find('.rowCheckboxApprovedPO').length ===
+            table.rows({ page: 'current' }).nodes().to$().find('.rowCheckboxApprovedPO:checked').length;
+        $('#selectAllApprovedPO').prop('checked', allVisibleChecked);
     });
 
-    $(document).on('change','#selectAllApprovedPO', function(){
-        const checked=$(this).is(':checked');
-        table.rows().every(function(){ checked?selectedPOs.add(this.data().POCode):selectedPOs.delete(this.data().POCode); });
-        $('#approvedPoTable').find('.rowCheckboxApprovedPO').prop('checked', checked);
+    $(document).on('change', '#selectAllApprovedPO', function () {
+        const checked = $(this).is(':checked');
+
+        table.rows({ page: 'current' }).nodes().to$().find('.rowCheckboxApprovedPO').prop('checked', checked);
+        table.rows({ page: 'current' }).data().each(d => {
+            if (checked) selectedPOs.add(d.POCode);
+            else selectedPOs.delete(d.POCode);
+        });
     });
+
 
     //  Create GRN modal
     $(document).on("click",".createGRNBtn", function(){
@@ -426,6 +472,11 @@ $(document).ready(function () {
 
     $('#qcItemsTable').on('draw.dt', function () {
         initDescriptionTooltips();
+    });
+    $('#createGrnModal').on('shown.bs.modal', function () {
+        const tooltipEls = document.querySelectorAll('.tooltip');
+        tooltipEls.forEach(el => el.remove());
+        $('[data-bs-toggle="tooltip"]').tooltip('dispose');
     });
 
 </script>

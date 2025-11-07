@@ -1,4 +1,8 @@
-﻿@model IEnumerable<P2PLibray.Purchase.Purchase>
+﻿@{
+    ViewBag.Title = "PO Reports";
+}
+
+@model IEnumerable<P2PLibray.Purchase.Purchase>
 
 
 <div id="pagecontent" class="main-content">
@@ -45,7 +49,7 @@
                     <thead class="table-dark">
                         <tr>
                             <th><input type="checkbox" id="selectAll" /></th>
-                            <th>Sr.</th>
+                            <th>Sr.No</th>
                             <th>PO Code</th>
                             <th>Vendor Name</th>
                             <th>Company Name</th>
@@ -70,16 +74,17 @@
                                 <td>@(po.ApprovedRejectedDateAT.HasValue? po.ApprovedRejectedDateAT.Value.ToString("dd'/'MM'/'yyyy", System.Globalization.CultureInfo.InvariantCulture): "")</td>
                                 <td>
                                     <span class="@(po.StatusName == "Approved" ? "badge bg-success" :
-                                           po.StatusName == "Rejected" ? "badge bg-danger" : "badge bg-secondary")">
+                                                   po.StatusName == "Open" ? "badge bg-info" :
+                                           po.StatusName == "Close" ? "badge bg-danger" : "badge bg-secondary")">
                                         @po.StatusName
                                     </span>
                                 </td>
 
                                 <td>
                                     <button id="btnview" type="button"
-                                            class="btn btn-sm btn-primary view-items"
+                                            class="btn btn-sm btn-primary view-items rounded-2"
                                             data-pocode="@po.POCode">
-                                        <i class="bi bi-eye"></i>
+                                        <i class="bi bi-eye fs-6"></i>
                                     </button>
 
                                 </td>
@@ -95,17 +100,27 @@
 
 
 @*Modal View*@
-<div class="modal fade" data-bs-backdrop="true" id="poItemsModal" tabindex="-1" aria-hidden="true">
+@*<div class="modal fade" data-bs-backdrop="true" id="poItemsModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
                 <div class="w-100 text-center">
-                    <h5 class="modal-title text-white bg-gradient-primary mb-0">Purchase Order Items</h5>
+                    <h5 class="modal-title text-white bg-gradient-primary mb-3 fs-5 p-1 fw-bold">Purchase Order Items</h5>
                 </div>
 
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close btn-close-white mb-2" data-bs-dismiss="modal"></button>
+            </div>*@
+<div class="modal fade" id="poItemsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content shadow-lg rounded-3">
+            <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-1">
+                <!-- Modal title -->
+                <h5 class="modal-title fw-bold text-white mb-0 fs-5">Purchase Order Items</h5>
+                <!-- Close button -->
+                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+
                 <table id="poItemsTable" class="table table-striped table-bordered w-100">
                     <thead class="table-dark">
                         <tr>
@@ -156,6 +171,59 @@
 
 
 <script>
+
+
+    // Clear processing state for all DataTable buttons
+    window.__dt_clearAllProcessing = function () {
+        try {
+            // Try to clear via DataTables API
+            var tables = $.fn.dataTable.tables();
+            for (var i = 0; i < tables.length; i++) {
+                try {
+                    var api = $(tables[i]).DataTable();
+                    if (!api || !api.buttons) continue;
+                    var btnCount = (api.buttons().nodes && api.buttons().nodes().length) || 0;
+                    for (var j = 0; j < btnCount; j++) {
+                        try { api.button(j).processing(false); } catch (e) { }
+                    }
+                } catch (e) { }
+            }
+        } catch (e) { }
+
+        // Fallback DOM cleanup
+        try {
+            $('.dt-button').removeClass('dt-button-processing');
+            $('.dt-button').prop('disabled', false);
+        } catch (e) { }
+    };
+
+    // Listen for print-done message from print window
+    window.addEventListener('message', function (ev) {
+        if (ev && ev.data === 'dt_print_done') {
+            window.__dt_clearAllProcessing();
+        }
+    });
+
+    // Store original button actions if not already stored
+    if (!$.fn.dataTable.ext.buttons.pdfHtml5.__originalAction) {
+        $.fn.dataTable.ext.buttons.pdfHtml5.__originalAction =
+            $.fn.dataTable.ext.buttons.pdfHtml5.action;
+    }
+    if (!$.fn.dataTable.ext.buttons.print.__originalAction) {
+        $.fn.dataTable.ext.buttons.print.__originalAction =
+            $.fn.dataTable.ext.buttons.print.action;
+    }
+    if (!$.fn.dataTable.ext.buttons.excelHtml5.__originalAction) {
+        $.fn.dataTable.ext.buttons.excelHtml5.__originalAction =
+            $.fn.dataTable.ext.buttons.excelHtml5.action;
+    }
+    if (!$.fn.dataTable.ext.buttons.csvHtml5.__originalAction) {
+        $.fn.dataTable.ext.buttons.csvHtml5.__originalAction =
+            $.fn.dataTable.ext.buttons.csvHtml5.action;
+    }
+
+
+
     var table, poChart;
     var startDate = null, endDate = null;
 
@@ -212,6 +280,7 @@
                     extend: 'print',
                     title: 'RFQ List',
                     text: '<i class="bi bi-printer-fill text-dark fs-5"></i>',
+
                     exportOptions: {
                         rows: function (idx, data, node) {
                             return $(node).find('input.rowCheckbox').prop('checked');
@@ -233,13 +302,46 @@
                             }
                         }
                     },
+                    //action: function (e, dt, button, config) {
+                    //    if ($('.rowCheckbox:checked').length === 0) {
+                    //        showExportToast();
+                    //        return;
+                    //    }
+                    //    $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config);
+                    //},
                     action: function (e, dt, button, config) {
-                        if ($('.rowCheckbox:checked').length === 0) {
+                        var selected = dt.rows().nodes().to$().find('input.row-select:checked').length;
+                        var btnApi = dt.button(button);
+
+                        // Support both checkbox classes
+                        var selectedCount = selected || $('.rowCheckbox:checked').length;
+
+                        // --- No selection ---
+                        if (selectedCount === 0) {
                             showExportToast();
+                            try { btnApi.processing(false); } catch (err) { }
                             return;
                         }
-                        $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config);
+
+                        // --- Show spinner ---
+                        try { btnApi.processing(true); } catch (err) { }
+
+                        // --- Call original Print action ---
+                        try {
+                            $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config);
+                        } catch (err) {
+                            console.error('Print export error:', err);
+                            // Ensure spinner stops on error
+                            setTimeout(function () { try { btnApi.processing(false); } catch (e) { } }, 300);
+                            throw err;
+                        }
+
+                        // --- Fallback: stop spinner after 2s ---
+                        setTimeout(function () {
+                            try { btnApi.processing(false); } catch (err) { }
+                        }, 2000);
                     },
+
                     customize: function (win) {
                         // Center the title
                         $(win.document.body).find('h1').css({
@@ -249,7 +351,7 @@
 
                         // Add export date below the title
                         var exportDate = new Date().toLocaleDateString('en-GB');
-                        $(win.document.body).find('h1').after('<div style="text-align:center; margin-bottom:10px;">Export Date: ' + exportDate + '</div>');
+                        $(win.document.body).find('h1').after('<div style="text-align:center; margin-bottom:10px;">Generated Date: ' + exportDate + '</div>');
 
                         // Style table header black
                         $(win.document.body).find('table thead').css({
@@ -270,6 +372,7 @@
                     extend: 'pdfHtml5',
                     title: 'Purchase Order List',
                     text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
+
                     orientation: 'landscape',
                     pageSize: 'A4',
                     exportOptions: {
@@ -288,12 +391,50 @@
                         }
                     },
                     action: function (e, dt, button, config) {
-                        if ($('.rowCheckbox:checked').length === 0) {
+                        var selected = dt.rows().nodes().to$().find('input.row-select:checked').length;
+                        var btnApi = dt.button(button);
+
+                        // Support both checkbox classes
+                        var selectedCount = selected || $('.rowCheckbox:checked').length;
+
+                        // --- No selection ---
+                        if (selectedCount === 0) {
                             showExportToast();
+                            try { btnApi.processing(false); } catch (err) { }
                             return;
                         }
+
+                        // --- Show spinner ---
+                        try { btnApi.processing(true); } catch (err) { }
+
+                        // --- Patch pdfMake download to stop spinner (only once) ---
+                        if (window.pdfMake && pdfMake.createPdf && !pdfMake._patchedForDT) {
+                            (function () {
+                                var origCreate = pdfMake.createPdf;
+                                pdfMake.createPdf = function (docDefinition) {
+                                    var pdfDoc = origCreate.call(pdfMake, docDefinition);
+                                    var origDownload = pdfDoc.download;
+                                    pdfDoc.download = function (filename, cb) {
+                                        origDownload.call(pdfDoc, filename, function () {
+                                            try { btnApi.processing(false); } catch (err) { }
+                                            if (typeof cb === 'function') cb();
+                                        });
+                                    };
+                                    return pdfDoc;
+                                };
+                                pdfMake._patchedForDT = true; // patch only once
+                            })();
+                        }
+
+                        // --- Call original PDF action ---
                         $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, button, config);
+
+                        // --- Fallback: stop spinner after 1.5s if something fails ---
+                        setTimeout(function () {
+                            try { btnApi.processing(false); } catch (err) { }
+                        }, 1500);
                     },
+
                     customize: function (doc) {
                         // Center the title
                         doc.content[0].alignment = 'center';
@@ -302,7 +443,7 @@
                         // Add export date below title
                         var exportDate = new Date().toLocaleDateString('en-GB');
                         doc.content.splice(1, 0, {
-                            text: 'Export Date: ' + exportDate,
+                            text: 'Generated Date: ' + exportDate,
                             alignment: 'center',
                             margin: [0, 0, 0, 8],
                             fontSize: 10
@@ -335,31 +476,199 @@
 
 
                 // Excel
+                // Excel - Working Version
                 {
                     extend: 'excelHtml5',
-                    title: 'Purchase Order List',
                     text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
+
+                    titleAttr: 'Excel',
+                    title: '',
                     exportOptions: {
+                        columns: [2, 3, 4, 5, 6, 7, 8], // Exclude serial number column since we'll add it manually
                         rows: function (idx, data, node) {
                             return $(node).find('input.rowCheckbox').prop('checked');
                         },
-                        columns: [1, 2, 3, 4, 5, 6, 7, 8], // exclude Action column
                         format: {
-                            body: function (data, row, column, node) {
-                                // Serial number column
-                                if (column === 0) return row + 1;
-                                // Remove HTML tags from other cells
-                                if (typeof data === 'string') return data.replace(/<\/?[^>]+(>|$)/g, "").trim();
+                            body: function (data, rowIdx, colIdx, node) {
+                                // Remove HTML tags from all cells
+                                if (typeof data === 'string') return data.replace(/<[^>]*>/g, '').trim();
                                 return data;
                             }
                         }
                     },
                     action: function (e, dt, button, config) {
-                        if ($('.rowCheckbox:checked').length === 0) {
+                        var selected = dt.rows().nodes().to$().find('input.row-select:checked').length;
+                        var btnApi = dt.button(button);
+
+                        // Support both checkbox classes
+                        var selectedCount = selected || $('.rowCheckbox:checked').length;
+
+                        // --- No selection ---
+                        if (selectedCount === 0) {
                             showExportToast();
+                            try { btnApi.processing(false); } catch (err) { }
                             return;
                         }
-                        $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
+
+                        // --- Show spinner ---
+                        try { btnApi.processing(true); } catch (err) { }
+
+                        // Call original excelHtml5 action
+                        $.fn.dataTable.ext.buttons.excelHtml5.__originalAction.call(this, e, dt, button, config);
+
+                        // Fallback clear spinner after short delay
+                        setTimeout(function () { try { btnApi.processing(false); } catch (err) { } }, 300);
+                    },
+                    customize: function (xlsx) {
+                        // ✅ Rename worksheet
+                        var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                        $('sheet', xlsx.xl['workbook.xml']).attr('name', 'Purchase_Order_List');
+
+                        // ✅ Date in dd/mm/yyyy format
+                        var now = new Date();
+                        var day = String(now.getDate()).padStart(2, '0');
+                        var month = String(now.getMonth() + 1).padStart(2, '0');
+                        var year = now.getFullYear();
+                        var formattedDate = day + '/' + month + '/' + year;
+
+                        var sheetData = $('sheetData', sheet);
+
+                        // Shift all data rows down by 2 (for title + date)
+                        sheetData.find('row').each(function () {
+                            var r = parseInt($(this).attr('r'));
+                            $(this).attr('r', r + 2);
+                            $(this).find('c').each(function () {
+                                var cellRef = $(this).attr('r');
+                                var col = cellRef.replace(/[0-9]/g, '');
+                                $(this).attr('r', col + (r + 2));
+                            });
+                        });
+
+                        // ✅ Insert Title row (now in A1)
+                        var titleRow =
+                            '<row r="1">' +
+                            '<c t="inlineStr" r="A1">' +
+                            '<is><t>Purchase Order List</t></is>' +
+                            '</c>' +
+                            '</row>';
+
+                        // ✅ Insert Generated Date row (now in A2)
+                        var dateRow =
+                            '<row r="2">' +
+                            '<c t="inlineStr" r="A2">' +
+                            '<is><t>Generated Date: ' + formattedDate + '</t></is>' +
+                            '</c>' +
+                            '</row>';
+
+                        // Add rows to the top
+                        sheetData.prepend(dateRow);
+                        sheetData.prepend(titleRow);
+
+                        // ✅ Add merge cells for centering title and date across all columns
+                        var totalCols = 8; // Sr.No + your 7 columns [2, 3, 4, 5, 6, 7, 8]
+                        var endCol = String.fromCharCode(64 + totalCols); // A=65, H=72 for 8 columns
+
+                        var mergeCells = $('mergeCells', sheet);
+                        if (mergeCells.length === 0) {
+                            $('worksheet', sheet).append('<mergeCells count="2"/>');
+                            mergeCells = $('mergeCells', sheet);
+                        } else {
+                            var currentCount = parseInt(mergeCells.attr('count') || 0);
+                            mergeCells.attr('count', currentCount + 2);
+                        }
+                        // Add title merge (A1:H1)
+                        mergeCells.append('<mergeCell ref="A1:' + endCol + '1"/>');
+                        // Add date merge (A2:H2)
+                        mergeCells.append('<mergeCell ref="A2:' + endCol + '2"/>');
+
+                        // ✅ Add Sr.No header and serial numbers to data rows
+                        var dataRows = $(sheet).find('row').slice(2); // Skip title and date rows
+
+                        // Add Sr.No header to the first data row (which is now row 3)
+                        var headerRow = $(dataRows[0]);
+                        var headerCells = headerRow.find('c');
+
+                        // Create Sr.No header cell
+                        var srNoHeader = '<c t="inlineStr" r="A3"><is><t>Sr.No</t></is></c>';
+
+                        // Shift existing headers to the right
+                        headerCells.each(function () {
+                            var cellRef = $(this).attr('r');
+                            var col = cellRef.replace(/\d+/g, '');
+                            var newCol = String.fromCharCode(65 + (col.charCodeAt(0) - 64)); // B, C, D, etc.
+                            $(this).attr('r', newCol + '3');
+                        });
+
+                        // Add Sr.No header at the beginning
+                        headerRow.prepend(srNoHeader);
+
+                        // Add serial numbers to data rows (starting from row 4)
+                        dataRows.slice(1).each(function (index) {
+                            var row = $(this);
+                            var rowNum = parseInt(row.attr('r'));
+                            var cells = row.find('c');
+
+                            // Create serial number cell
+                            var srNoCell = '<c t="inlineStr" r="A' + rowNum + '"><is><t>' + (index + 1) + '</t></is></c>';
+
+                            // Shift existing cells to the right
+                            cells.each(function () {
+                                var cellRef = $(this).attr('r');
+                                var col = cellRef.replace(/\d+/g, '');
+                                var newCol = String.fromCharCode(65 + (col.charCodeAt(0) - 64)); // B, C, D, etc.
+                                $(this).attr('r', newCol + rowNum);
+                            });
+
+                            // Add serial number at the beginning
+                            row.prepend(srNoCell);
+                        });
+
+                        // ✅ Add styles for centering + font
+                        var styles = xlsx.xl['styles.xml'];
+                        var cellXfs = $('cellXfs', styles);
+                        var fonts = $('fonts', styles);
+
+                        // Count existing fonts
+                        var fontCount = $('font', fonts).length;
+
+                        // Add new font for title (bold, size 14)
+                        fonts.append(
+                            '<font>' +
+                            '<sz val="14"/>' +  // Font size 14
+                            '<b/>' +             // Bold
+                            '<color rgb="000000"/>' +  // Black
+                            '</font>'
+                        );
+
+                        // Add new font for date (italic, size 11)
+                        fonts.append(
+                            '<font>' +
+                            '<sz val="11"/>' +   // Font size 11
+                            '<i/>' +             // Italic
+                            '<color rgb="000000"/>' +  // Black
+                            '</font>'
+                        );
+
+                        // Count existing cellXfs
+                        var styleCount = $('xf', cellXfs).length;
+
+                        // Add new style for title (use new bold/large font, center alignment)
+                        cellXfs.append(
+                            '<xf numFmtId="0" fontId="' + fontCount + '" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1">' +
+                            '<alignment horizontal="center" vertical="center" wrapText="1"/>' +
+                            '</xf>'
+                        );
+
+                        // Add new style for date (use new italic font, center alignment)
+                        cellXfs.append(
+                            '<xf numFmtId="0" fontId="' + (fontCount + 1) + '" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1">' +
+                            '<alignment horizontal="center" vertical="center" wrapText="1"/>' +
+                            '</xf>'
+                        );
+
+                        // Apply new style indexes to the cells
+                        $('c[r=A1]', sheet).attr('s', styleCount);       // Title style
+                        $('c[r=A2]', sheet).attr('s', styleCount + 1);   // Date style
                     }
                 },
 
@@ -368,15 +677,16 @@
                     extend: 'csvHtml5',
                     title: 'Purchase Order List',
                     text: '<i class="bi bi-filetype-csv text-success fs-5"></i>',
+
                     exportOptions: {
                         rows: function (idx, data, node) {
                             return $(node).find('input.rowCheckbox').prop('checked');
                         },
-                        columns: [1, 2, 3, 4, 5, 6, 7, 8], // exclude Action column
+                        columns: [2, 3, 4, 5, 6, 7, 8], // Include serial number column (1) and exclude checkbox (0) & action (9)
                         format: {
-                            body: function (data, row, column, node) {
-                                // Serial number column
-                                if (column === 0) return row + 1;
+                            body: function (data, rowIdx, colIdx, node) {
+                                // Serial number column (first column in export)
+                                if (colIdx === 0) return rowIdx + 1;
                                 // Remove HTML tags from other cells
                                 if (typeof data === 'string') return data.replace(/<\/?[^>]+(>|$)/g, "").trim();
                                 return data;
@@ -384,11 +694,54 @@
                         }
                     },
                     action: function (e, dt, button, config) {
-                        if ($('.rowCheckbox:checked').length === 0) {
+                        var selectedCount = dt.rows().nodes().to$().find('input.row-select:checked').length
+                            || $('.rowCheckbox:checked').length;
+
+                        if (selectedCount === 0) {
                             showExportToast();
                             return;
                         }
-                        $.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, button, config);
+
+                        var btnApi = dt.button(button);
+                        try { btnApi.processing(true); } catch (err) { }
+
+                        // Call original CSV export
+                        try {
+                            $.fn.dataTable.ext.buttons.csvHtml5.__originalAction
+                                ? $.fn.dataTable.ext.buttons.csvHtml5.__originalAction.call(this, e, dt, button, config)
+                                : $.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, button, config);
+                        } catch (err) {
+                            console.error('CSV export error:', err);
+                        }
+
+                        // Stop spinner shortly after
+                        setTimeout(function () {
+                            try { btnApi.processing(false); } catch (err) { }
+                        }, 300);
+                    },
+                    customize: function (csv) {
+                        var lines = csv.split('\n');
+                        if (!lines || lines.length === 0) return csv;
+
+                        var newLines = [];
+
+                        // Process header row - add "Sr.No" as first column
+                        if (lines[0]) {
+                            var headers = lines[0].split(',');
+                            headers.unshift('"Sr.No"');
+                            newLines.push(headers.join(','));
+                        }
+
+                        // Process data rows - add serial numbers
+                        for (var i = 1; i < lines.length; i++) {
+                            if (lines[i].trim()) {
+                                var row = lines[i].split(',');
+                                row.unshift('"' + i + '"'); // Add serial number starting from 1
+                                newLines.push(row.join(','));
+                            }
+                        }
+
+                        return newLines.join('\n');
                     }
                 },
 
@@ -444,7 +797,7 @@
             autoUpdateInput: false,
             locale: {
                 cancelLabel: 'Clear',
-                format: 'DD-MM-YYYY',
+                format: 'DD/MM/YYYY',
                 applyLabel: 'Apply'
             },
             ranges: {
@@ -457,7 +810,7 @@
         }, function (start, end) {
             startDate = start.toDate();
             endDate = end.toDate();
-            $('#dateRange').val(start.format('DD-MM-YYYY') + ' - ' + end.format('DD-MM-YYYY'));
+            $('#dateRange').val(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
             table.draw();
         });
         $('#dateRange').on('cancel.daterangepicker', function () {
@@ -567,13 +920,89 @@
 
 
 
-
-
-
-
-
-
         // View Modal Button
+        //    $('#poTable').on('click', '.view-items', function () {
+        //        var poCode = $(this).data('pocode');
+
+        //        $.ajax({
+        //            url: '/Purchase/GetPOItems',
+        //            type: 'GET',
+        //            data: { poCode: poCode },
+        //            success: function (response) {
+        //                if (response.success) {
+        //                    // 🔹 Destroy & clean up existing DataTable
+        //                    if ($.fn.DataTable.isDataTable('#poItemsTable')) {
+        //                        $('#poItemsTable').DataTable().clear().destroy();
+        //                        $('#poItemsTable').find('thead tr th').removeClass('sorting sorting_asc sorting_desc');
+        //                    }
+
+        //                    // 🔹 Clear old rows
+        //                    $('#poItemsTable tbody').empty();
+        //                    let totalAmount = 0;
+
+        //                    // 🔹 Append rows
+        //                    $.each(response.data, function (i, item) {
+        //                        totalAmount += parseFloat(item.FinalAmount || 0);
+
+        //                        $('#poItemsTable tbody').append(
+        //                            `<tr>
+        //    <td>${i + 1}</td> <!-- 🆕 Serial number -->
+        //    <td>${item.ItemName}</td>
+        //    <td>${item.UnitQuantity}</td>
+        //    <td>₹${item.CostPerUnit}</td>
+        //    <td>${item.Discount}</td>
+        //    <td>${item.TaxRate}</td>
+        //    <td>₹${item.FinalAmount}</td>
+        //</tr>`
+        //                        );
+
+        //                    });
+
+
+
+        //                    //// 🔹 Initialise DataTable again
+        //                    $('#poItemsTable').DataTable({
+        //                        scrollX: true,
+        //                        paging: false,
+        //                        searching: false,
+        //                        ordering: false,
+        //                        lengthChange: false,
+        //                        info: false,
+        //                        destroy: true,
+        //                        columnDefs: [
+        //                            { className: 'text-center', targets: '_all' }
+        //                        ],
+        //                        footerCallback: function (row, data, start, end, display) {
+        //                            let api = this.api();
+
+        //                            // Sum final amount column (last column index = 6)
+        //                            let total = api
+        //                                .column(6, { page: 'current' })
+        //                                .data()
+        //                                .reduce((a, b) => {
+        //                                    let val = parseFloat(String(b).replace(/[^\d.-]/g, '')) || 0;
+        //                                    return a + val;
+        //                                }, 0);
+
+        //                            // Update footer cell
+        //                            $(api.column(6).footer()).html('₹' + total.toFixed(2));
+        //                        }
+        //                    });
+
+        //                    // 🔹 Show modal
+        //                    new bootstrap.Modal(document.getElementById('poItemsModal')).show();
+        //                } else {
+        //                    alert('No items found for this PO.');
+        //                }
+        //            },
+        //            error: function () {
+        //                alert('Error fetching PO items.');
+        //            }
+        //        });
+
+        //    });
+
+        // View PO Items Modal
         $('#poTable').on('click', '.view-items', function () {
             var poCode = $(this).data('pocode');
 
@@ -583,10 +1012,11 @@
                 data: { poCode: poCode },
                 success: function (response) {
                     if (response.success) {
-                        // 🔹 Destroy & clean up existing DataTable
+
+                        // 🔹 Destroy existing DataTable if initialized
                         if ($.fn.DataTable.isDataTable('#poItemsTable')) {
                             $('#poItemsTable').DataTable().clear().destroy();
-                            $('#poItemsTable').find('thead tr th').removeClass('sorting sorting_asc sorting_desc');
+                            $('#poItemsTable thead tr th').removeClass('sorting sorting_asc sorting_desc');
                         }
 
                         // 🔹 Clear old rows
@@ -597,58 +1027,40 @@
                         $.each(response.data, function (i, item) {
                             totalAmount += parseFloat(item.FinalAmount || 0);
 
-                            $('#poItemsTable tbody').append(
-                                `<tr>
-        <td>${i + 1}</td> <!-- 🆕 Serial number -->
-        <td>${item.ItemName}</td>
-        <td>${item.UnitQuantity}</td>
-        <td>₹${item.CostPerUnit}</td>
-        <td>${item.Discount}</td>
-        <td>${item.TaxRate}</td>
-        <td>₹${item.FinalAmount}</td>
-    </tr>`
-                            );
-
+                            $('#poItemsTable tbody').append(`
+                        <tr>
+                            <td>${i + 1}</td> <!-- Serial number -->
+                            <td>${item.ItemName}</td>
+                            <td>${item.UnitQuantity}</td>
+                            <td>₹${item.CostPerUnit}</td>
+                            <td>${item.Discount}</td>
+                            <td>${item.TaxRate}</td>
+                            <td>₹${item.FinalAmount}</td>
+                        </tr>
+                    `);
                         });
 
-
-
-                        //// 🔹 Initialise DataTable again
+                        // 🔹 Initialize DataTable
                         $('#poItemsTable').DataTable({
                             scrollX: true,
-                            paging: false,
-                            searching: false,
-                            ordering: false,
+                            paging: false,         // optional: you can enable if many rows
+                            searching: true,       // ✅ adds search box
+                            ordering: false,        // optional: enable sorting
                             lengthChange: false,
                             info: false,
                             destroy: true,
                             columnDefs: [
                                 { className: 'text-center', targets: '_all' }
                             ],
-                            //footerCallback: function (row, data, start, end, display) {
-                            //    let api = this.api();
-
-                            //    // Sum final amount column (last column index = 5)
-                            //    let total = api
-                            //        .column(5, { page: 'current' })
-                            //        .data()
-                            //        .reduce((a, b) => {
-                            //            let val = parseFloat(String(b).replace(/[^\d.-]/g, '')) || 0;
-                            //            return a + val;
-                            //        }, 0);
-
-                            //    // Update footer cell
-                            //    $(api.column(5).footer()).html('₹' + total.toFixed(2));
-                            //}
                             footerCallback: function (row, data, start, end, display) {
-                                let api = this.api();
+                                var api = this.api();
 
-                                // Sum final amount column (last column index = 6)
-                                let total = api
+                                // Sum final amount column (index 6)
+                                var total = api
                                     .column(6, { page: 'current' })
                                     .data()
                                     .reduce((a, b) => {
-                                        let val = parseFloat(String(b).replace(/[^\d.-]/g, '')) || 0;
+                                        var val = parseFloat(String(b).replace(/[^\d.-]/g, '')) || 0;
                                         return a + val;
                                     }, 0);
 
@@ -659,15 +1071,15 @@
 
                         // 🔹 Show modal
                         new bootstrap.Modal(document.getElementById('poItemsModal')).show();
+
                     } else {
-                        alert('No items found for this PO.');
+                        toastr.warning('No items found for this PO.');
                     }
                 },
                 error: function () {
-                    alert('Error fetching PO items.');
+                    toastr.error('Error fetching PO items.');
                 }
             });
-
         });
 
 

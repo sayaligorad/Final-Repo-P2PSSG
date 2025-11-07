@@ -25,13 +25,12 @@
     <table id="Non-confirmItemTable" class="table table-striped table-bordered wrap" style="width:100%">
         <thead class="table-dark">
             <tr>
-                <th><input type="checkbox" id="selectAllNonConfirm" /></th>
+                <th><input type="checkbox" id="selectAllNonConfirm" class="small-checkbox" /></th>
                 <th>Sr No</th>
                 <th>GRN Code</th>
                 <th>Vendor Name</th>
                 <th>Add Date</th>
-                <th>Quality Check Date</th>
-                <th class="dt-center">Action</th>
+                <th class="dt-center ">Action</th>
             </tr>
         </thead>
     </table>
@@ -39,14 +38,18 @@
 
 <!-- Bootstrap Modal for Viewing Details -->
 <div class="modal fade" id="viewDetailsModal" tabindex="-1" aria-labelledby="viewDetailsModalLabel" aria-hidden="true" data-bs-backdrop="True">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <!-- Added modal-dialog-centered class -->
         <div class="modal-content">
 
             <!--  Modal Header with Centered Title -->
-            <div class="modal-header bg-primary text-white justify-content-center">
-                <h5 class="modal-title text-white fw-bold" id="viewDetailsModalLabel">Non-Confirm Items</h5>
-                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header bg-primary text-white justify-content-center p-1">
+                <h5 class="modal-title text-white  text-center w-100 fs-5" id="viewDetailsModalLabel">
+                    Non-Confirm Items
+                </h5>
+                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-1 mt-2 mb-2" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+
 
             <!-- GRN Code in Box -->
             <div class="px-4 py-3">
@@ -57,16 +60,23 @@
             </div>
 
             <div class="modal-body">
+                <!-- Export Buttons for Modal Table -->
+                <div class="mb-3 d-flex justify-content-between align-items-center">
+                    <div id="modalTableButtonsNonConfirm" class="btn-group"></div>
+                    <!-- Search box removed from here -->
+                </div>
+
                 <!-- Dynamic Item Details Table -->
                 <table class="table table-bordered" id="itemDetailsTableNonConfirm">
                     <thead class="table-dark">
                         <tr>
-                            <th><input type="checkbox" id="selectAllItemDetails" /></th>
+                            <th><input type="checkbox" id="selectAllItemDetails" class="small-checkbox" /></th>
                             <th>Sr No</th>
                             <th>Item Code</th>
                             <th>Item Name</th>
                             <th>Failure Reason</th>
                             <th>Failed QC Code</th>
+                            <th>Quality Cheack Date</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -83,6 +93,15 @@
 
 <style>
 
+
+
+    #Non-confirmItemTable thead th {
+        padding: 0.3rem 0.4rem !important;
+    }
+
+    #itemDetailsTableNonConfirm thead th {
+        padding: 0.10rem 0.11rem !important;
+    }
     h4 {
         font-weight: 600;
         margin-bottom: 0;
@@ -99,13 +118,13 @@
         vertical-align: middle;
     }
 
-
     #itemDetailsTableNonConfirm th,
     #itemDetailsTableNonConfirm td {
         vertical-align: middle;
         text-align: center;
     }
-    /*  Table heading aur cell content center mein */
+
+    /* Table heading aur cell content center mein */
     #Non-confirmItemTable th,
     #Non-confirmItemTable td,
     #itemDetailsTableNonConfirm th,
@@ -113,6 +132,42 @@
         text-align: center;
         vertical-align: middle !important;
     }
+
+    /* ✅ SMALLER CHECKBOX STYLING FOR ALL CHECKBOXES */
+    .small-checkbox {
+        width: 14px !important;
+        height: 14px !important;
+        transform: scale(0.85);
+        margin: 0 auto;
+        display: block;
+    }
+
+    /* Ensure proper alignment for checkbox columns */
+    #Non-confirmItemTable th:first-child,
+    #Non-confirmItemTable td:first-child,
+    #itemDetailsTableNonConfirm th:first-child,
+    #itemDetailsTableNonConfirm td:first-child {
+        width: 30px !important;
+        text-align: center !important;
+    }
+
+    /* Modal positioning */
+    .modal-dialog-centered {
+        display: flex;
+        align-items: center;
+        min-height: calc(100% - 1rem);
+    }
+
+    button.dt-button.processing,
+    div.dt-button.processing {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        background: none !important;
+    }
+
+        button.dt-button.processing:after {
+            content: none !important;
+        }
 </style>
 
 <script>
@@ -126,47 +181,80 @@
             "timeOut": "3000"
         };
 
-        //  Main Date Range Picker for Table Filter
+        // ✅ FIXED: Date Range Picker with proper event handling
         $('#Tabledate').daterangepicker({
             autoUpdateInput: false,
-            opens: "center",
-            drops: "down",
-            locale: { cancelLabel: 'Clear' },
+            alwaysShowCalendars: false,
+            locale: {
+                cancelLabel: 'Clear',
+                format: 'DD/MM/YYYY',
+                applyLabel: 'Apply',
+                customRangeLabel: 'Custom Range'
+            },
             ranges: {
                 'Today': [moment(), moment()],
-                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
                 'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                'This Month': [moment().startOf('month'), moment().endOf('month')],
-                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                'Last 1 Month': [moment().subtract(1, 'months').startOf('day'), moment()],
+                'Last 3 Months': [moment().subtract(3, 'months').startOf('day'), moment()],
+                'Last 1 Year': [moment().subtract(12, 'months').startOf('day'), moment()]
             }
+        }, function (start, end) {
+            // Set the date range in the input field
+            $('#Tabledate').val(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
+
+            // Store the dates in data attributes for filtering
+            $('#Tabledate').data('start', start);
+            $('#Tabledate').data('end', end);
+
+            console.log('Date range selected:', start.format('DD/MM/YYYY'), 'to', end.format('DD/MM/YYYY'));
+
+            // Trigger table redraw
+            $('#Non-confirmItemTable').DataTable().draw();
         });
 
-        //  Custom Search Filter for AddDate (column index 4)
+        // Handle cancel event
+        $('#Tabledate').on('cancel.daterangepicker', function () {
+            $(this).val('Select Date Range');
+            $(this).removeData('start').removeData('end');
+            console.log('Date filter cleared');
+            $('#Non-confirmItemTable').DataTable().draw();
+        });
+
+        // Set initial placeholder value
+        $('#Tabledate').val('Select Date Range');
+
+        // ✅ FIXED: Simple Date Filter - Only check AddDate column (index 4)
         $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
             if (settings.nTable.id !== 'Non-confirmItemTable') return true;
+
             const start = $('#Tabledate').data('start');
             const end = $('#Tabledate').data('end');
-            const addDateStr = data[4];
-            if (!addDateStr) return false;
-            const addDate = moment(addDateStr, 'YYYY-MM-DD');
-            if (!start || !end) return true;
-            return addDate.isSameOrAfter(start) && addDate.isSameOrBefore(end);
-        });
 
-        // On Date Apply
-        $('#Tabledate').on('apply.daterangepicker', function (ev, picker) {
-            $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
-            $(this).data('start', picker.startDate);
-            $(this).data('end', picker.endDate);
-            $('#Non-confirmItemTable').DataTable().draw();
-        });
+            // If no date range selected, show all rows
+            if (!start || !end) {
+                return true;
+            }
 
-        // On Cancel
-        $('#Tabledate').on('cancel.daterangepicker', function (ev, picker) {
-            $(this).val('');
-            $(this).removeData('start').removeData('end');
-            $('#Non-confirmItemTable').DataTable().draw();
+            // Get only AddDate column (index 4)
+            const addDateStr = data[4]; // Add Date column
+
+            console.log('Checking date:', addDateStr, 'for range:', start.format('DD/MM/YYYY'), 'to', end.format('DD/MM/YYYY'));
+
+            // Check Add Date - Use strict DD/MM/YYYY format
+            if (addDateStr && addDateStr.trim() !== '') {
+                const addDate = moment(addDateStr, 'DD/MM/YYYY', true);
+                if (addDate.isValid()) {
+                    const isInRange = addDate.isSameOrAfter(start) && addDate.isSameOrBefore(end);
+                    console.log('Date is valid, in range:', isInRange);
+                    return isInRange;
+                } else {
+                    console.log('Invalid date format:', addDateStr);
+                }
+            } else {
+                console.log('Empty or invalid date string');
+            }
+
+            return false;
         });
 
         // 🔹 Main DataTable Initialization
@@ -191,7 +279,7 @@
                     searchable: false,
                     className: 'dt-center',
                     render: function (data, type, row) {
-                        return `<input type="checkbox" class="row-select" value="${row.GRNCode}" />`;
+                        return `<input type="checkbox" class="row-select small-checkbox" value="${row.GRNCode}" />`;
                     }
                 },
                 {
@@ -203,31 +291,39 @@
                         return meta.row + 1;
                     }
                 },
-                { data: "GRNCode", orderable: false },
-                { data: "VenderName", orderable: false },
-                { data: "AddDate", orderable: false },
-                { data: "QualityCheckDate", orderable: false },
+                { data: "GRNCode", orderable: false, className: "dt-center" },
+                { data: "VenderName", orderable: false, className: "dt-center" },
+                {
+                    data: "AddDate",
+                    orderable: false,
+                    className: "dt-center",
+                    render: function (data, type, row) {
+                        // Ensure date is properly formatted
+                        return data || '';
+                    }
+                },
                 {
                     data: null,
                     className: "dt-center",
+                    orderable: false,
                     render: function (data, type, row) {
                         return `<button class="btn btn-sm btn-primary view-details-btn"
                 data-grn="${row.GRNCode}"
                 data-bs-toggle="tooltip"
                 data-bs-placement="top"
                 title="View Details">
-            <i class="bi bi-eye"></i>
+            <i class="btn-sm bi-eye-fill"></i>
         </button>`;
                     }
                 }
             ],
             buttons: [
-                // PRINT
+
                 // PRINT - Main Table
                 {
                     extend: 'print',
                     text: '<i class="bi bi-printer-fill text-dark fs-5"></i>',
-                    title: '',
+                    title: '', // ✅ Empty title to remove default table title
                     exportOptions: {
                         rows: function (idx, data, node) {
                             return $(node).find('.row-select').prop('checked');
@@ -235,15 +331,16 @@
                         columns: ':not(:first-child):not(:last-child)',
                         format: {
                             body: function (data, row, column, node) {
-                                // Handle serial number for selected rows
-                                if (column === 0) { // Sr No column
+                                // ✅ Sequential serial numbers for selected rows
+                                if (column === 1) {
                                     const $node = $(node);
-                                    if ($node.find('.row-select').prop('checked')) {
-                                        // Return sequential number for selected rows
-                                        const selectedRows = $('input.row-select:checked');
-                                        const currentIndex = selectedRows.index($node.closest('tr').find('.row-select'));
+                                    if ($node.closest('tr').find('.row-select').prop('checked')) {
+                                        const selectedRows = $('#Non-confirmItemTable tbody input.row-select:checked');
+                                        const currentRow = $node.closest('tr');
+                                        const currentIndex = selectedRows.index(currentRow.find('.row-select'));
                                         return currentIndex + 1;
                                     }
+                                    return ''; // Empty for non-selected
                                 }
                                 return data;
                             }
@@ -258,64 +355,56 @@
                         $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config);
                     },
                     customize: function (win) {
-                        // Get the body reference
                         var $body = $(win.document.body);
 
-                        // Add print-specific CSS styles
                         $body.append(`
             <style>
                 thead th {
                     background-color: black !important;
                     color: white !important;
                     text-align: center !important;
-                    vertical-align: middle !important;
-                    -webkit-print-color-adjust: exact !important;
-                    print-color-adjust: exact !important;
-                    font-weight: bold !important;
-                    padding: 8px !important;
                 }
                 table {
                     border-collapse: collapse !important;
                     width: 100% !important;
-                    margin: 0 auto !important;
                 }
                 td, th {
                     border: 1px solid #000 !important;
                     padding: 6px !important;
                     text-align: center !important;
-                    vertical-align: middle !important;
                 }
-                tbody td {
-                    text-align: center !important;
-                    vertical-align: middle !important;
-                }
-                h3, p {
+                .centered-content {
                     text-align: center !important;
                 }
             </style>
         `);
 
-                        // Add title and metadata
+                        //  FIXED: Single header with title and date
                         $body.prepend(`
-            <h3>Non-Confirm Item List</h3>
-            <p>Generated on: ${moment().format("YYYY-MM-DD")}</p>
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h2>Non-Confirm Item List</h2>
+                <p>Generated on: ${moment().format("DD/MM/YYYY")}</p>
+            </div>
         `);
 
-                        // Set body styling
-                        $body.css({
-                            'font-size': '12pt',
-                            'font-family': 'Arial, sans-serif'
+                        //  Center align all content in print
+                        $body.find('table').addClass('centered-content');
+                        $body.find('td, th').css('text-align', 'center');
+
+                        //  Fix serial numbers in print - sequential for selected rows only
+                        const $table = $body.find('table');
+                        let serialNo = 1;
+                        $table.find('tbody tr').each(function () {
+                            const $row = $(this);
+                            $row.find('td:first').text(serialNo++);
                         });
 
-                        // Fix serial numbers in print
-                        const $table = $body.find('table');
-                        $table.find('tbody tr').each(function (index) {
-                            $(this).find('td:first').text(index + 1);
-                        });
+                        //  REMOVE DUPLICATE TITLE THAT APPEARS ABOVE TABLE
+                        $body.find('h1').remove();
                     }
                 },
 
-                // PDF - Main Table (Updated with Center Alignment)
+                // PDF - Main Table
                 {
                     extend: 'pdfHtml5',
                     text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
@@ -327,14 +416,16 @@
                         columns: ':not(:first-child):not(:last-child)',
                         format: {
                             body: function (data, row, column, node) {
-                                // Handle serial number for selected rows
-                                if (column === 0) { // Sr No column
+                                // ✅ Sequential serial numbers for selected rows
+                                if (column === 1) {
                                     const $node = $(node);
-                                    if ($node.find('.row-select').prop('checked')) {
-                                        const selectedRows = $('input.row-select:checked');
-                                        const currentIndex = selectedRows.index($node.closest('tr').find('.row-select'));
+                                    if ($node.closest('tr').find('.row-select').prop('checked')) {
+                                        const selectedRows = $('#Non-confirmItemTable tbody input.row-select:checked');
+                                        const currentRow = $node.closest('tr');
+                                        const currentIndex = selectedRows.index(currentRow.find('.row-select'));
                                         return currentIndex + 1;
                                     }
+                                    return '';
                                 }
                                 return data;
                             }
@@ -349,33 +440,20 @@
                         $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, button, config);
                     },
                     customize: function (doc) {
-                        // Set page margins
                         doc.pageMargins = [40, 60, 40, 40];
 
-                        // Title styling - centered
-                        doc.styles.title = {
-                            fontSize: 16,
-                            bold: true,
-                            alignment: 'center',
-                            margin: [0, 0, 0, 10]
-                        };
-
-                        // Add generation date - centered
-                        doc.content.splice(1, 0, {
-                            text: `Generated on: ${moment().format("YYYY-MM-DD")}`,
+                        //  FIXED: Single title with generated date
+                        doc.content[0] = {
+                            text: 'Non-Confirm Item List\nGenerated Date: ' + moment().format("DD/MM/YYYY"),
                             alignment: 'center',
                             margin: [0, 0, 0, 10],
-                            fontSize: 10,
-                            italics: true
-                        });
+                            fontSize: 14,
+                            bold: true
+                        };
 
-                        // Find and style the table
                         const table = doc.content.find(n => n.table);
                         if (table) {
-                            // Set all columns to equal width
                             table.table.widths = Array(table.table.body[0].length).fill('*');
-
-                            // Table layout settings
                             table.layout = {
                                 hLineWidth: () => 0.5,
                                 vLineWidth: () => 0.5,
@@ -395,35 +473,33 @@
                                 cell.bold = true;
                             });
 
-                            // Style all data rows - CENTER ALIGNMENT
+                            // ✅ Center align all cells and fix serial numbers
+                            let serialNo = 1;
                             table.table.body.forEach((row, rowIndex) => {
-                                if (rowIndex > 0) { // Skip header row
-                                    // Fix serial numbers in PDF
-                                    row[0].text = rowIndex;
-
-                                    // Center align all cells in data rows
-                                    row.forEach(cell => {
-                                        cell.alignment = 'center';
-                                    });
+                                if (rowIndex > 0) {
+                                    row[0].text = serialNo++;
                                 }
+                                row.forEach(cell => {
+                                    cell.alignment = 'center';
+                                });
                             });
 
-                            // Ensure table is centered on page
                             table.alignment = 'center';
                         }
 
-                        // Set default styles for all text to be centered
+                        // Set default alignment for all content
                         doc.defaultStyle = {
                             alignment: 'center'
                         };
                     }
                 },
 
-                // EXCEL
+                //  EXCEL - Main Table
                 {
                     extend: 'excelHtml5',
                     text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
                     title: 'Non-Confirm Item List',
+                    messageTop: `Generated Date: ${moment().format("DD/MM/YYYY")}`,
                     exportOptions: {
                         rows: function (idx, data, node) {
                             return $(node).find('.row-select').prop('checked');
@@ -431,18 +507,49 @@
                         columns: ':not(:first-child):not(:last-child)',
                         format: {
                             body: function (data, row, column, node) {
-                                // Handle serial number for selected rows
-                                if (column === 0) { // Sr No column
+                                if (column === 1) {
                                     const $node = $(node);
-                                    if ($node.find('.row-select').prop('checked')) {
-                                        const selectedRows = $('input.row-select:checked');
-                                        const currentIndex = selectedRows.index($node.closest('tr').find('.row-select'));
+                                    if ($node.closest('tr').find('.row-select').prop('checked')) {
+                                        const selectedRows = $('#Non-confirmItemTable tbody input.row-select:checked');
+                                        const currentRow = $node.closest('tr');
+                                        const currentIndex = selectedRows.index(currentRow.find('.row-select'));
                                         return currentIndex + 1;
                                     }
+                                    return '';
                                 }
                                 return data;
                             }
                         }
+                    },
+                    customize: function (xlsx) {
+                        let sheet = xlsx.xl.worksheets['sheet1.xml'];
+
+                        // Insert "Sr. No" column at start and make it bold
+                        let serial = 1;
+                        $('row', sheet).each(function () {
+                            let rowIndex = parseInt($(this).attr('r'));
+
+                            if (rowIndex === 1) {
+                                // Title row - center align and bold
+                                $(this).find('c').attr('s', '51');
+                            } else if (rowIndex === 2) {
+                                // Generated date row - center align and bold
+                                $(this).find('c').attr('s', '51');
+                            } else if (rowIndex === 3) {
+                                // Header row: Add Sr. No column
+                                $(this).find('c:first').before(`<c t="inlineStr" s="2"><is><t>Sr. No</t></is></c>`);
+                                // Make all header cells bold and centered
+                                $(this).find('c').attr('s', '2');
+                            } else if (rowIndex > 3) {
+                                // Data rows: Add serial numbers
+                                $(this).find('c:first').before(`<c t="inlineStr"><is><t>${serial}</t></is></c>`);
+                                serial++;
+                            }
+                        });
+
+                        // Center align title and date rows
+                        $('row[r="1"] c', sheet).attr('s', '51');
+                        $('row[r="2"] c', sheet).attr('s', '51');
                     },
                     action: function (e, dt, button, config) {
                         const selected = $('input.row-select:checked').length;
@@ -454,11 +561,12 @@
                     }
                 },
 
-                // CSV
+                // CSV - Main Table
                 {
                     extend: 'csvHtml5',
                     text: '<i class="bi bi-filetype-csv text-success fs-5"></i>',
                     title: 'Non-Confirm Item List',
+                    message: 'Generated Date: ' + moment().format("DD/MM/YYYY"),
                     exportOptions: {
                         rows: function (idx, data, node) {
                             return $(node).find('.row-select').prop('checked');
@@ -466,14 +574,16 @@
                         columns: ':not(:first-child):not(:last-child)',
                         format: {
                             body: function (data, row, column, node) {
-                                // Handle serial number for selected rows
-                                if (column === 0) { // Sr No column
+                                // ✅ Sequential serial numbers for selected rows
+                                if (column === 1) {
                                     const $node = $(node);
-                                    if ($node.find('.row-select').prop('checked')) {
-                                        const selectedRows = $('input.row-select:checked');
-                                        const currentIndex = selectedRows.index($node.closest('tr').find('.row-select'));
+                                    if ($node.closest('tr').find('.row-select').prop('checked')) {
+                                        const selectedRows = $('#Non-confirmItemTable tbody input.row-select:checked');
+                                        const currentRow = $node.closest('tr');
+                                        const currentIndex = selectedRows.index(currentRow.find('.row-select'));
                                         return currentIndex + 1;
                                     }
+                                    return '';
                                 }
                                 return data;
                             }
@@ -516,8 +626,8 @@
             const grnCode = $(this).data('grn');
             $('#modalGRNCodeNonConfirm').text(grnCode);
             const tbody = $('#itemDetailsTableNonConfirm tbody');
-            const tableId = '#itemDetailsTableNonConfirm';
-            tbody.empty().append('<tr><td colspan="6" class="text-center">Loading...</td></tr>');
+            tbody.empty().append('<tr><td colspan="7" class="text-center">Loading...</td></tr>');
+            $('#noDataMessageNonConfirm').hide();
 
             $.ajax({
                 url: '@Url.Action("FailedItemsDetailsPR", "Quality")',
@@ -526,42 +636,43 @@
                 success: function (response) {
                     tbody.empty();
 
+                    if ($.fn.DataTable.isDataTable('#itemDetailsTableNonConfirm')) {
+                        $('#itemDetailsTableNonConfirm').DataTable().clear().destroy();
+                    }
+                    $('#modalTableButtonsNonConfirm').empty();
+                    $('#selectAllItemDetails').prop('checked', false);
+
                     if (response.success && response.data.length > 0) {
-
-                        if ($.fn.DataTable.isDataTable(tableId)) {
-                            $(tableId).DataTable().clear().destroy();
-                        }
-
-                        response.data.forEach((item, index) => {
+                        response.data.forEach((item, i) => {
                             tbody.append(`
                                 <tr>
-                                    <td class="dt-center"><input type="checkbox" class="item-row-select" value="${item.ItemCode}" /></td>
-                                    <td>${index + 1}</td>
-                                    <td>${item.ItemCode}</td>
-                                    <td>${item.ItemName}</td>
-                                    <td>${item.Reason}</td>
-                                    <td>${item.FailedQCCode}</td>
+                                    <td class="dt-center"><input type="checkbox" class="item-row-select small-checkbox" value="${item.ItemCode}" /></td>
+                                    <td class="dt-center">${i + 1}</td>
+                                    <td class="dt-center">${item.ItemCode}</td>
+                                    <td class="dt-center">${item.ItemName}</td>
+                                    <td class="dt-center">${item.Reason}</td>
+                                    <td class="dt-center">${item.FailedQCCode}</td>
+                                    <td class="dt-center">${item.AddedDate}</td>
                                 </tr>
                             `);
                         });
 
-                        $(tableId).DataTable({
+                        const modalTable = $('#itemDetailsTableNonConfirm').DataTable({
                             paging: true,
-                            searching: false,
+                            searching: true,
                             ordering: false,
                             lengthChange: false,
                             pageLength: 5,
                             responsive: true,
-                            destroy: true,
-                            dom: "<'row mb-2'<'col-sm-12 d-flex justify-content-start'B>>" +
-                                "tr" +
-                                "<'row mt-2'<'col-md-6'i><'col-md-6 text-end'p>>",
+                            dom: '<"d-flex justify-content-end align-items-center mb-2"<"button-group">f>rt<"d-flex justify-content-between align-items-center mt-2"ip>',
+                            language: {
+                                search: "Search:"
+                            },
                             buttons: [
-                                // PRINT
-                                // PRINT - Modal Table
+                                // ✅ PRINT - Modal Table
                                 {
                                     extend: 'print',
-                                    text: '<i class="bi bi-printer-fill text-dark fs-5"></i>',
+                                    text: '<i class="bi bi-printer-fill text-dark fs-6"></i>',
                                     title: '',
                                     exportOptions: {
                                         rows: function (idx, data, node) {
@@ -570,13 +681,16 @@
                                         columns: ':not(:first-child)',
                                         format: {
                                             body: function (data, row, column, node) {
-                                                if (column === 0) { // Sr No column
+                                                // ✅ Sequential serial numbers for selected modal items
+                                                if (column === 1) {
                                                     const $node = $(node);
-                                                    if ($node.find('.item-row-select').prop('checked')) {
+                                                    if ($node.closest('tr').find('.item-row-select').prop('checked')) {
                                                         const selectedRows = $('.item-row-select:checked');
-                                                        const currentIndex = selectedRows.index($node.closest('tr').find('.item-row-select'));
+                                                        const currentRow = $node.closest('tr');
+                                                        const currentIndex = selectedRows.index(currentRow.find('.item-row-select'));
                                                         return currentIndex + 1;
                                                     }
+                                                    return '';
                                                 }
                                                 return data;
                                             }
@@ -585,73 +699,62 @@
                                     action: function (e, dt, button, config) {
                                         const selected = $('.item-row-select:checked').length;
                                         if (selected === 0) {
-                                            toastr.warning('Please select at least one row before exporting.');
+                                            toastr.warning('Please select at least one item to export.');
                                             return;
                                         }
                                         $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config);
                                     },
                                     customize: function (win) {
-                                        // Get the body reference
                                         var $body = $(win.document.body);
 
-                                        // Add print-specific CSS styles
                                         $body.append(`
-            <style>
-                thead th {
-                    background-color: black !important;
-                    color: white !important;
-                    text-align: center !important;
-                    vertical-align: middle !important;
-                    -webkit-print-color-adjust: exact !important;
-                    print-color-adjust: exact !important;
-                    font-weight: bold !important;
-                    padding: 8px !important;
-                }
-                table {
-                    border-collapse: collapse !important;
-                    width: 100% !important;
-                    margin: 0 auto !important;
-                }
-                td, th {
-                    border: 1px solid #000 !important;
-                    padding: 6px !important;
-                    text-align: center !important;
-                    vertical-align: middle !important;
-                }
-                tbody td {
-                    text-align: center !important;
-                    vertical-align: middle !important;
-                }
-                h3, p {
-                    text-align: center !important;
-                }
-            </style>
-        `);
+                    <style>
+                        thead th {
+                            background-color: black !important;
+                            color: white !important;
+                            text-align: center !important;
+                        }
+                        table {
+                            border-collapse: collapse !important;
+                            width: 100% !important;
+                        }
+                        td, th {
+                            border: 1px solid #000 !important;
+                            padding: 6px !important;
+                            text-align: center !important;
+                        }
+                        .centered-content {
+                            text-align: center !important;
+                        }
+                    </style>
+                `);
 
-                                        // Add title and metadata
+                                        // FIXED: Single header for modal
                                         $body.prepend(`
-            <h3>Failed Items Details</h3>
-            <p>GRN Code: <strong>${$('#modalGRNCodeNonConfirm').text()}</strong></p>
-            <p>Generated on: ${moment().format("YYYY-MM-DD")}</p>
-        `);
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <h2>Failed Items Details - ${$('#modalGRNCodeNonConfirm').text()}</h2>
+                        <p>Generated Date: ${moment().format("DD/MM/YYYY")}</p>
+                    </div>
+                `);
 
-                                        // Set body styling
-                                        $body.css({
-                                            'font-size': '12pt',
-                                            'font-family': 'Arial, sans-serif'
-                                        });
+                                        //  Center align all content in print
+                                        $body.find('table').addClass('centered-content');
+                                        $body.find('td, th').css('text-align', 'center');
 
-                                        // Fix serial numbers in modal print
+                                        //  Fix serial numbers in modal print
                                         const $table = $body.find('table');
-                                        $table.find('tbody tr').each(function (index) {
-                                            $(this).find('td:first').text(index + 1);
+                                        let serialNo = 1;
+                                        $table.find('tbody tr').each(function () {
+                                            const $row = $(this);
+                                            $row.find('td:first').text(serialNo++);
                                         });
                                     }
                                 },
-                                // PDF - Modal Table (Updated with Center Alignment)
+
+                                //  PDF - Modal Table
                                 {
                                     extend: 'pdfHtml5',
-                                    text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
+                                    text: '<i class="bi bi-file-earmark-pdf text-danger fs-6"></i>',
                                     title: 'Failed Items Details',
                                     exportOptions: {
                                         rows: function (idx, data, node) {
@@ -660,13 +763,15 @@
                                         columns: ':not(:first-child)',
                                         format: {
                                             body: function (data, row, column, node) {
-                                                if (column === 0) { // Sr No column
-                                                    const $node = $(node);
-                                                    if ($node.find('.item-row-select').prop('checked')) {
+                                                //  Sequential serial numbers for selected modal items
+                                                if (column === 1) {                                                     const $node = $(node);
+                                                    if ($node.closest('tr').find('.item-row-select').prop('checked')) {
                                                         const selectedRows = $('.item-row-select:checked');
-                                                        const currentIndex = selectedRows.index($node.closest('tr').find('.item-row-select'));
+                                                        const currentRow = $node.closest('tr');
+                                                        const currentIndex = selectedRows.index(currentRow.find('.item-row-select'));
                                                         return currentIndex + 1;
                                                     }
+                                                    return '';
                                                 }
                                                 return data;
                                             }
@@ -675,7 +780,7 @@
                                     action: function (e, dt, button, config) {
                                         const selected = $('.item-row-select:checked').length;
                                         if (selected === 0) {
-                                            toastr.warning('Please select at least one row before exporting.');
+                                            toastr.warning('Please select at least one item to export.');
                                             return;
                                         }
                                         $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, button, config);
@@ -683,31 +788,14 @@
                                     customize: function (doc) {
                                         doc.pageMargins = [40, 80, 40, 40];
 
-                                        // Title styling - centered
-                                        doc.styles.title = {
-                                            fontSize: 16,
-                                            bold: true,
+                                        //  FIXED: Single title for modal PDF
+                                        doc.content[0] = {
+                                            text: `Failed Items Details - ${$('#modalGRNCodeNonConfirm').text()}\nGenerated Date: ${moment().format("DD/MM/YYYY")}`,
                                             alignment: 'center',
-                                            margin: [0, 0, 0, 10]
+                                            margin: [0, 0, 0, 10],
+                                            fontSize: 14,
+                                            bold: true
                                         };
-
-                                        // Add GRN Code and generation date - centered
-                                        doc.content.splice(1, 0,
-                                            {
-                                                text: `GRN Code: ${$('#modalGRNCodeNonConfirm').text()}`,
-                                                alignment: 'center',
-                                                margin: [0, 0, 0, 5],
-                                                fontSize: 12,
-                                                bold: true
-                                            },
-                                            {
-                                                text: `Generated on: ${moment().format("YYYY-MM-DD")}`,
-                                                alignment: 'center',
-                                                margin: [0, 0, 0, 10],
-                                                fontSize: 10,
-                                                italics: true
-                                            }
-                                        );
 
                                         const table = doc.content.find(n => n.table);
                                         if (table) {
@@ -731,35 +819,33 @@
                                                 cell.bold = true;
                                             });
 
-                                            // Style all data rows - CENTER ALIGNMENT
+                                            //  Center align all cells and fix serial numbers
+                                            let serialNo = 1;
                                             table.table.body.forEach((row, rowIndex) => {
                                                 if (rowIndex > 0) {
-                                                    // Fix serial numbers
-                                                    row[0].text = rowIndex;
-
-                                                    // Center align all cells in data rows
-                                                    row.forEach(cell => {
-                                                        cell.alignment = 'center';
-                                                    });
+                                                    row[0].text = serialNo++;
                                                 }
+                                                row.forEach(cell => {
+                                                    cell.alignment = 'center';
+                                                });
                                             });
 
-                                            // Ensure table is centered on page
                                             table.alignment = 'center';
                                         }
 
-                                        // Set default styles for all text to be centered
+                                        // Set default alignment for all content
                                         doc.defaultStyle = {
                                             alignment: 'center'
                                         };
                                     }
                                 },
 
-                                // EXCEL
+                                //  EXCEL
                                 {
                                     extend: 'excelHtml5',
-                                    text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
-                                    title: 'Failed Items Details',
+                                    text: '<i class="bi bi-file-earmark-excel text-success fs-6"></i>',
+                                    title: 'Failed Items Details - ' + $('#modalGRNCodeNonConfirm').text(),
+                                    messageTop: `Generated Date: ${moment().format("DD/MM/YYYY")}`,
                                     exportOptions: {
                                         rows: function (idx, data, node) {
                                             return $(node).find('.item-row-select').prop('checked');
@@ -767,22 +853,54 @@
                                         columns: ':not(:first-child)',
                                         format: {
                                             body: function (data, row, column, node) {
-                                                if (column === 0) { // Sr No column
+                                                if (column === 1) {
                                                     const $node = $(node);
-                                                    if ($node.find('.item-row-select').prop('checked')) {
+                                                    if ($node.closest('tr').find('.item-row-select').prop('checked')) {
                                                         const selectedRows = $('.item-row-select:checked');
-                                                        const currentIndex = selectedRows.index($node.closest('tr').find('.item-row-select'));
+                                                        const currentRow = $node.closest('tr');
+                                                        const currentIndex = selectedRows.index(currentRow.find('.item-row-select'));
                                                         return currentIndex + 1;
                                                     }
+                                                    return '';
                                                 }
                                                 return data;
                                             }
                                         }
                                     },
+                                    customize: function (xlsx) {
+                                        let sheet = xlsx.xl.worksheets['sheet1.xml'];
+
+                                        // Insert "Sr. No" column at start and make it bold
+                                        let serial = 1;
+                                        $('row', sheet).each(function () {
+                                            let rowIndex = parseInt($(this).attr('r'));
+
+                                            if (rowIndex === 1) {
+                                                // Title row - center align and bold
+                                                $(this).find('c').attr('s', '51');
+                                            } else if (rowIndex === 2) {
+                                                // Generated date row - center align and bold
+                                                $(this).find('c').attr('s', '51');
+                                            } else if (rowIndex === 3) {
+                                                // Header row: Add Sr. No column
+                                                $(this).find('c:first').before(`<c t="inlineStr" s="2"><is><t>Sr. No</t></is></c>`);
+                                                // Make all header cells bold and centered
+                                                $(this).find('c').attr('s', '2');
+                                            } else if (rowIndex > 3) {
+                                                // Data rows: Add serial numbers
+                                                $(this).find('c:first').before(`<c t="inlineStr"><is><t>${serial}</t></is></c>`);
+                                                serial++;
+                                            }
+                                        });
+
+                                        // Center align title and date rows
+                                        $('row[r="1"] c', sheet).attr('s', '51');
+                                        $('row[r="2"] c', sheet).attr('s', '51');
+                                    },
                                     action: function (e, dt, button, config) {
                                         const selected = $('.item-row-select:checked').length;
                                         if (selected === 0) {
-                                            toastr.warning('Please select at least one row before exporting.');
+                                            toastr.warning('Please select at least one item to export.');
                                             return;
                                         }
                                         $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
@@ -792,8 +910,9 @@
                                 // CSV
                                 {
                                     extend: 'csvHtml5',
-                                    text: '<i class="bi bi-filetype-csv text-success fs-5"></i>',
-                                    title: 'Failed Items Details',
+                                    text: '<i class="bi bi-filetype-csv text-success fs-6"></i>',
+                                    title: 'Failed Items Details - ' + $('#modalGRNCodeNonConfirm').text(),
+                                    message: 'Generated Date: ' + moment().format("DD/MM/YYYY"),
                                     exportOptions: {
                                         rows: function (idx, data, node) {
                                             return $(node).find('.item-row-select').prop('checked');
@@ -801,13 +920,16 @@
                                         columns: ':not(:first-child)',
                                         format: {
                                             body: function (data, row, column, node) {
-                                                if (column === 0) { // Sr No column
+                                                // ✅ Sequential serial numbers for selected modal items
+                                                if (column === 1) {
                                                     const $node = $(node);
-                                                    if ($node.find('.item-row-select').prop('checked')) {
+                                                    if ($node.closest('tr').find('.item-row-select').prop('checked')) {
                                                         const selectedRows = $('.item-row-select:checked');
-                                                        const currentIndex = selectedRows.index($node.closest('tr').find('.item-row-select'));
+                                                        const currentRow = $node.closest('tr');
+                                                        const currentIndex = selectedRows.index(currentRow.find('.item-row-select'));
                                                         return currentIndex + 1;
                                                     }
+                                                    return '';
                                                 }
                                                 return data;
                                             }
@@ -816,35 +938,69 @@
                                     action: function (e, dt, button, config) {
                                         const selected = $('.item-row-select:checked').length;
                                         if (selected === 0) {
-                                            toastr.warning('Please select at least one row before exporting.');
+                                            toastr.warning('Please select at least one item to export.');
                                             return;
                                         }
                                         $.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, button, config);
                                     }
                                 }
-                            ]
+                            ],
+                            initComplete: function () {
+                                // Buttons aur search box ko align karne ke liye
+                                $('.dataTables_filter').addClass('ms-3');
+                            }
                         });
+                        modalTable.buttons().container().appendTo('#modalTableButtonsNonConfirm');
 
-                        // Checkbox logic for details table
-                        $('#selectAllItemDetails').prop('checked', false).off('click').on('click', function () {
+                        // Modal checkbox logic
+                        $('#selectAllItemDetails').on('click', function () {
                             $('.item-row-select').prop('checked', this.checked);
                         });
 
-                        $('#itemDetailsTableNonConfirm tbody').off('change', '.item-row-select').on('change', function () {
-                            const allChecked = $('.item-row-select').length === $('.item-row-select:checked').length;
-                            $('#selectAllItemDetails').prop('checked', allChecked);
+                        $('#itemDetailsTableNonConfirm tbody').on('change', '.item-row-select', function () {
+                            const total = $('.item-row-select').length;
+                            const selected = $('.item-row-select:checked').length;
+                            $('#selectAllItemDetails').prop('checked', total === selected);
                         });
 
                     } else {
-                        tbody.html('<tr><td colspan="6" class="text-center text-muted">No item details found for this GRN Code.</td></tr>');
+                        $('#noDataMessageNonConfirm').show();
                     }
                 },
                 error: function (xhr) {
-                    tbody.empty().append('<tr><td colspan="6" class="text-danger text-center">Failed to load item details.</td></tr>');
+                    tbody.empty().append('<tr><td colspan="7" class="text-danger text-center">Failed to load item details.</td></tr>');
                 }
             });
 
             new bootstrap.Modal(document.getElementById('viewDetailsModal')).show();
+        });
+
+        // ✅ FIXED: Debug function to check date formats and filtering
+        table.on('draw', function () {
+            console.log('Table redrawn with date filter');
+            const start = $('#Tabledate').data('start');
+            const end = $('#Tabledate').data('end');
+            const visibleRows = table.rows({ filter: 'applied' }).count();
+            const totalRows = table.rows().count();
+
+            console.log('Total rows:', totalRows, 'Visible rows:', visibleRows);
+
+            if (start && end) {
+                console.log('Active date filter:', {
+                    start: start.format('DD/MM/YYYY'),
+                    end: end.format('DD/MM/YYYY')
+                });
+            } else {
+                console.log('No active date filter - showing all rows');
+            }
+        });
+
+        // ✅ FIXED: Add debug info for data received
+        table.on('xhr.dt', function (e, settings, json, xhr) {
+            console.log('Data received from server:', json);
+            if (json && json.data && json.data.length > 0) {
+                console.log('Sample row data:', json.data[0]);
+            }
         });
 
     });

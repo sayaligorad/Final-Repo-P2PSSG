@@ -8,7 +8,7 @@
 
     <!-- 📋 Table -->
     <div class="table-responsive shadow-lg rounded container-fluid">
-        <h2 class="text-center text-primary fw-bold mb-4"> ISR & JIT Stock  </h2>
+        <h3 class="text-center text-primary fw-bold "> ISR & JIT Stock  </h3>
         <!-- Date Range Picker -->
         <div class="mb-3">
             <div class="input-group" style="max-width: 280px;">
@@ -68,6 +68,16 @@
         text-align: center;
         vertical-align: middle;
     }
+    button.dt-button.processing,
+    div.dt-button.processing {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        background: none !important;
+    }
+
+        button.dt-button.processing:after {
+            content: none !important;
+        }
 </style>
 
 <script>
@@ -108,8 +118,8 @@
                         <td>${item.ItemName}</td>
                         <td>${item.ItemCode}</td>
                         <td>${item.ISRQuantity}</td>
-                        <td data-bs-toggle="tooltip" title="${item.Description}">
-                ${item.Description.length > 20 ? item.Description.substring(0, 20) + "..." : item.Description}
+                        <td data-bs-toggle="tooltip" title="${item.Description || ''}">
+                ${item.Description || ''}
                  </td>
                         <td>${item.RequiredDates}</td>
                         <td>${item.UOMName}</td>
@@ -143,25 +153,25 @@
                         },
                         exportOptions: {
                             columns: [1, 2, 3, 4, 5, 6, 7, 8],
+
                             rows: function (idx, data, node) {
                                 return $(node).find('.row-select').prop('checked');
                             }
                         },
                         customize: function (win) {
-                            $(win.document.body).prepend(
-                                `<div style="text-align:center; font-size:12px; margin-bottom:10px;">
-                        Generated on: ${new Date().toLocaleString()}
-                    </div>`
-                            );
-                            $(win.document.body).find('table')
-                                .addClass('table table-bordered table-striped')
-                                .css('font-size', '14px');
-                            $(win.document.body).find('thead')
-                                .css('background-color', '#0d6efd')
-                                .css('color', 'white');
-                            $(win.document.body).find('table tbody tr').each(function (i) {
-                                $(this).find('td:first').text(i + 1);
-                            });
+                            $(win.document.body).find('h1').remove();
+                            const today = new Date().toLocaleDateString('en-GB');
+                            $(win.document.body).prepend(`
+         <div style="text-align:center; margin-bottom:10px;">
+             <h2 style="margin:0;">Stocl Level</h2>
+             <div style="font-size:12px;">Generated Date: ${today}</div>
+         </div>
+     `);
+                            const $table = $(win.document.body).find('table');
+                            $table.addClass('table table-bordered table-striped').css({ 'font-size': '14px', 'width': '100%', 'border-collapse': 'collapse', 'margin-top': '20px' });
+                            $table.find('thead th').css({ 'background-color': '#000', 'color': '#fff', 'text-align': 'center' });
+                            $table.find('tbody td').css('text-align', 'center');
+                            $table.find('tbody tr').each(function (i) { $(this).find('td:first').text(i + 1); });
                         }
                     },
                     // ✅ PDF
@@ -199,7 +209,7 @@
                                 // Add export date below title
                                 var exportDate = new Date().toLocaleDateString('en-GB');
                                 doc.content.splice(1, 0, {
-                                    text: 'Export Date: ' + exportDate,
+                                    text: 'Generated Date: ' + exportDate,
                                     alignment: 'center',
                                     margin: [0, 0, 0, 8],
                                     fontSize: 10
@@ -259,35 +269,98 @@
                                     return data;
                                 }
                             }
-                        }
-                    },
-                    // ✅ CSV
-                    {
-                        extend: 'csvHtml5',
-                        title: 'Stock_Level',
-                        text: '<i class="bi bi-filetype-csv text-primary fs-5" data-bs-toggle="tooltip" title="Export to CSV"></i>',
-                        titleAttr: 'Export CSV',
-                        action: function (e, dt, button, config) {
-                            if ($('.row-select:checked').length === 0) {
-                                showExportToast("Please select at least one row to export CSV");
-                                return;
-                            }
-                            $.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, button, config);
                         },
-                        exportOptions: {
-                            columns: [1, 2, 3, 4, 5, 6, 7, 8],
-                            rows: function (idx, data, node) {
-                                return $(node).find('.row-select').prop('checked');
-                            },
-                            format: {
-                                body: function (data, rowIdx, colIdx) {
-                                    if (colIdx === 1) return rowIdx + 1;
-                                    if (typeof data === 'string') return data.replace(/<\/?[^>]+(>|$)/g, "").trim();
-                                    return data;
-                                }
+                        customize: function (xlsx) {
+                            const sheet = xlsx.xl.worksheets['sheet1.xml'];
+                            const now = new Date();
+                            const formattedDate = now.toLocaleDateString('en-GB'); // DD/MM/YYYY
+
+                            const newRowNumber = 2;
+
+                            // Create "Generated Date" row
+                            const dateRow = `
+<row r="${newRowNumber}">
+    <c t="inlineStr" r="A${newRowNumber}">
+        <is><t>Generated Date: ${formattedDate}</t></is>
+    </c>
+</row>`;
+
+                            // Shift existing rows down by +1
+                            $('row', sheet).each(function () {
+                                const r = parseInt($(this).attr('r'));
+                                if (r >= newRowNumber) $(this).attr('r', r + 1);
+                            });
+                            $('c', sheet).each(function () {
+                                const cellRef = $(this).attr('r');
+                                const col = cellRef.replace(/[0-9]/g, '');
+                                const row = parseInt(cellRef.replace(/[A-Z]/g, ''));
+                                if (row >= newRowNumber) $(this).attr('r', col + (row + 1));
+                            });
+
+                            // Add the new date row right after the title
+                            $('row[r="1"]', sheet).after(dateRow);
+
+                            // ✅ Merge cells from A to last column
+                            const totalCols = $('row c', sheet).last().attr('r').replace(/[0-9]/g, '');
+                            let mergeCells = $('mergeCells', sheet);
+                            if (mergeCells.length === 0) {
+                                $('worksheet', sheet).prepend(`<mergeCells count="1"><mergeCell ref="A${newRowNumber}:${totalCols}${newRowNumber}"/></mergeCells>`);
+                            } else {
+                                const count = parseInt(mergeCells.attr('count')) + 1;
+                                mergeCells.attr('count', count);
+                                mergeCells.append(`<mergeCell ref="A${newRowNumber}:${totalCols}${newRowNumber}"/>`);
                             }
+
+                            // ✅ Center align the merged cell
+                            const styles = xlsx.xl['styles.xml'];
+                            const styleIndex = $('cellXfs xf', styles).length;
+                            $('cellXfs', styles).append('<xf xfId="0" applyAlignment="1"><alignment horizontal="center"/></xf>');
+                            $(`c[r="A${newRowNumber}"]`, sheet).attr('s', styleIndex);
                         }
-                    }
+                   
+                    },
+                   {
+    extend: 'csvHtml5',
+    title: 'Stock_Level',
+    text: '<i class="bi bi-filetype-csv text-primary fs-5" data-bs-toggle="tooltip" title="Export to CSV"></i>',
+    titleAttr: 'Export CSV',
+
+    // 🧭 Custom Action — checks if any row is selected
+    action: function (e, dt, button, config) {
+        if ($('.row-select:checked').length === 0) {
+            showExportToast("Please select at least one row to export CSV");
+            return;
+        }
+        // Run default CSV export action
+        $.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, button, config);
+    },
+
+    exportOptions: {
+        columns: [1, 2, 3, 4, 5, 6, 7, 8], // ✅ columns to export
+        rows: function (idx, data, node) {
+            // ✅ export only selected rows
+            return $(node).find('.row-select').prop('checked');
+        },
+
+        // ✅ Proper serial numbering + HTML cleanup
+        format: {
+            body: function (data, rowIdx, colIdx) {
+                // Remove HTML tags and trim
+                if (typeof data === 'string') data = data.replace(/<[^>]*>/g, '').trim();
+
+                // Serial number column
+                if (colIdx === 0 || colIdx === 1) {
+                    // Initialize counter once
+                    if (typeof this.srnoCounter === 'undefined') this.srnoCounter = 0;
+                    return ++this.srnoCounter;
+                }
+
+                return data; // fallback
+            }
+        }
+    }
+}
+
                 ],
                 columnDefs: [
                     { targets: 1, render: function (data, type, row, meta) { return meta.row + 1; } },
@@ -354,11 +427,10 @@
                 locale: { cancelLabel: 'Clear' },
                 ranges: {
                     'Today': [moment(), moment()],
-                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
                     'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                    'This Month': [moment().startOf('month'), moment().endOf('month')],
-                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                    'Last 1 Month': [moment().subtract(1, 'months').startOf('day'), moment()],
+                    'Last 3 Months': [moment().subtract(3, 'months').startOf('day'), moment()],
+                    'Last 1 Year': [moment().subtract(12, 'months').startOf('day'), moment()]
                 }
             }, function (start, end) {
                 $('#ISRdatepicker').val(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));

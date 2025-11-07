@@ -8,7 +8,9 @@
             <th>PO Code</th>
             <th>Item Code</th>
             <th>Item Name</th>
-            <th>Quantity</th>
+            <th>Ordered Quantity</th>
+            <th>Recieved Quantity</th>
+            <th>Pending Quantity</th>
             <th>Expected Date</th>
             <th>Ordered By</th>
         </tr>
@@ -27,7 +29,9 @@
                     <td>@item.POCode</td>
                     <td>@item.ItemCode</td>
                     <td>@item.ItemName</td>
-                    <td>@item.Quantity</td>
+                    <td>@item.OrderQuantity</td>
+                    <td>@item.RecievedQuantity</td>
+                    <td>@item.PendingQuantity</td>
 
                     <td>@(item.ExpectedDate.HasValue? item.ExpectedDate.Value.ToString("dd'/'MM'/'yyyy", System.Globalization.CultureInfo.InvariantCulture): "")</td>
                     <td>@item.OrderedBy</td>

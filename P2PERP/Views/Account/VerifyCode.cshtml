@@ -9,40 +9,33 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>VerifyCode</title>
+    <title>Verify Code</title>
 
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="~/Content/images/favicon/favicon.ico" />
 
     <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="~/Content/font-family-inter.css" rel="stylesheet" />
-    <link rel="stylesheet" href="~/Content/iconify-icons.css" />
+    <link rel="stylesheet" href="~/Content/assets/vendor/fonts/iconify-icons.css" />
 
     <!-- Core CSS -->
-    <link rel="stylesheet" href="~/Content/node-waves.css" />
-    <link rel="stylesheet" href="~/Content/pickr-themes.css" />
-    <link rel="stylesheet" href="~/Content/core.css" />
-    <link rel="stylesheet" href="~/Content/demo.css" />
+    <link rel="stylesheet" href="~/Content/assets/vendor/libs/node-waves/node-waves.css" />
+    <link rel="stylesheet" href="~/Content/assets/vendor/libs/pickr/pickr-themes.css" />
+    <link rel="stylesheet" href="~/Content/assets/vendor/css/core.css" />
+    <link rel="stylesheet" href="~/Content/assets/css/demo.css" />
     <link rel="stylesheet" href="~/Content/toastr.min.css" />
 
     <!-- Vendor CSS -->
-    <link rel="stylesheet" href="~/Content/perfect-scrollbar.css" />
+    <link rel="stylesheet" href="~/Content/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
     <link rel="stylesheet" href="~/Content/form-validation.css" />
 
     <!-- Page Specific CSS (Auth Page) -->
     <link rel="stylesheet" href="~/Content/page-auth.css" />
 
-    <!-- Helpers (must be loaded before config/theme js) -->
-    <script src="~/Scripts/helpers.js"></script>
-    <script src="~/Scripts/template-customizer.js"></script>
-
     <!-- jQuery -->
-    <script src="~/Scripts/jquery-3.7.1.min.js"></script>
+    <script src="~/Scripts/jquery-3.7.1.js"></script>
     <script src="~/Scripts/toastr.min.js"></script>
 </head>
-<body style="background-color: #58a8c8;">
+<body style="background: linear-gradient(to bottom, #58a8c8, #4eb8d8);">
     <div class="container body-content">
         <!-- Authentication Wrapper -->
         <div class="authentication-wrapper authentication-cover">
@@ -96,13 +89,13 @@
                 </div>
                 <!-- /Left Section -->
                 <!-- Right Section: Verify Email Form -->
-                <div class="d-flex col-12 col-lg-5 col-xl-4 align-items-center authentication-bg position-relative py-sm-5 px-12 py-4 my-8">
+                <div class="d-flex col-12 col-lg-5 col-xl-4 align-items-center authentication-bg position-relative py-sm-5 px-12 py-4">
                     <div class="w-px-400 mx-auto pt-12 pt-lg-0">
 
                         <!-- Heading -->
                         <h4 class="mb-8 text-primary fw-semibold">Verify your email ✉️</h4>
                         <p class="text-start mb-0 text-warning fs-5 text-capitalize">
-                            Account activation link sent to your email address: <span class="h6">@Session["ForgetPasswordEmail"]</span>
+                            Account activation link sent to your email address: <span class="h6 text-lowercase">@Session["ForgetPasswordEmail"]</span>
                         </p>
 
                         <!-- Verification Code Form -->
@@ -127,8 +120,7 @@
 
                         <!-- Resend option -->
                         <p class="text-center">
-                            Didn't get the mail?
-                            <a href="javascript:void(0);"> Resend </a>
+                            Remaining Time : <span id="Timer"></span>
                         </p>
                     </div>
                 </div>
@@ -140,16 +132,14 @@
 
     <!-- JS Libraries -->
     <script src="~/Scripts/sweetalert2@11.js"></script>
-    <script src="~/Scripts/config.js"></script>
-    <script src="~/Scripts/popper.js"></script>
-    <script src="~/Scripts/bootstrap.js"></script>
-    <script src="~/Scripts/node-waves.js"></script>
+    <script src="~/Content/assets/vendor/libs/popper/popper.js"></script>
+    <script src="~/Content/assets/vendor/js/bootstrap.js"></script>
+    <script src="~/Content/assets/vendor/libs/node-waves/node-waves.js"></script>
     <script src="~/Scripts/autocomplete-js.js"></script>
-    <script src="~/Scripts/pickr.js"></script>
-    <script src="~/Scripts/perfect-scrollbar.js"></script>
-    <script src="~/Scripts/hammer.js"></script>
-    <script src="~/Scripts/i18n.js"></script>
-    <script src="~/Scripts/menu.js"></script>
+    <script src="~/Content/assets/vendor/libs/pickr/pickr.js"></script>
+    <script src="~/Content/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+    <script src="~/Content/assets/vendor/libs/hammer/hammer.js"></script>
+    <script src="~/Content/assets/vendor/js/menu.js"></script>
 
     <!-- Form Validation -->
     <script src="~/Scripts/popular.js"></script>
@@ -157,8 +147,51 @@
     <script src="~/Scripts/auto-focus.js"></script>
 
     <!-- Main JS -->
-    <script src="~/Scripts/main.js"></script>
     <script src="~/Scripts/pages-auth.js"></script>
     <script src="~/Scripts/Login.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Total countdown time in seconds (10 minutes)
+            const TOTAL_TIME = 10 * 60;
+
+            // Check if a timer already exists in sessionStorage
+            let remainingSeconds = sessionStorage.getItem('verificationTimer');
+            if (remainingSeconds === null) {
+                remainingSeconds = TOTAL_TIME;
+                sessionStorage.setItem('verificationTimer', remainingSeconds);
+            } else {
+                remainingSeconds = parseInt(remainingSeconds);
+            }
+
+            // Function to update the timer display
+            function updateTimer() {
+                let minutes = Math.floor(remainingSeconds / 60);
+                let seconds = remainingSeconds % 60;
+
+                $('#Timer').text(`${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
+
+                if (remainingSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    sessionStorage.removeItem('verificationTimer');
+                    window.location.href = '@Url.Action("Logout", "Account")';
+                }
+
+                remainingSeconds--;
+                sessionStorage.setItem('verificationTimer', remainingSeconds);
+            }
+
+            // Start the timer
+            updateTimer();
+            const timerInterval = setInterval(updateTimer, 1000);
+
+            // Stop timer and clear sessionStorage if form is submitted
+            $('#formAuthentication').on('submit', function () {
+                clearInterval(timerInterval);
+                sessionStorage.removeItem('verificationTimer');
+            });
+        });
+    </script>
+
 </body>
 </html>

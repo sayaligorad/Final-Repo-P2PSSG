@@ -6,106 +6,93 @@
 }
 
 
-<div class="container-fluid bg-white " style="min-height:auto">
-    <h2 class="mb-4 text-center text-primary"> Material Requirement Planning</h2>
+<!--<div class="container-fluid bg-white " style="min-height:auto">
+    <h3 class=" text-center text-primary"> Material Requirement Planning</h3>
 
 
     <form id="stockForm">
-        <div class="row g-3 ">
-
-            <!-- Item Dropdown -->
-            <div class="col-md-6">
-                <label for="itemName" class="form-label">Item Name</label>
-                <select id="itemName" class="form-select">
-                    <option value="">-- Select Item --</option>
-                </select>
-            </div>
-
-            <!-- Plan Name -->
-            <div class="col-md-6">
-                <label for="planName" class="form-label">Plan Name *</label>
-                <input type="text" id="planName" class="form-control" required />
-            </div>
-
-            <!-- Year (auto) -->
-            <div class="col-md-2">
-                <label for="year" class="form-label">Year</label>
-                <input type="text" id="year" class="form-control" readonly />
-            </div>
-
-            <!-- Item Code -->
-            <div class="col-md-5">
-                <label for="itemCode" class="form-label">Item Code</label>
-                <input type="text" id="itemCode" class="form-control" readonly />
-            </div>
-
-            <!-- UOM -->
-            <div class="col-md-5">
-                <label for="uom" class="form-label">UOM</label>
-                <input type="text" id="uom" class="form-control" readonly />
-            </div>
-
-            <!-- Quantity (no required here) -->
-            <div class="col-md-6">
-                <label for="quantity" class="form-label">Quantity</label>
-                <input type="number" id="quantity" class="form-control" />
-            </div>
-
-            <!-- Description -->
-            <div class="col-md-6">
-                <label for="description" class="form-label">Description</label>
-                <textarea id="description" class="form-control" readonly></textarea>
-            </div>
-
-            <!-- Add Button -->
-            <div class="col-md-12 text-end">
-                <button type="button" id="btnAdd" class="btn btn-primary mt-2">➕ Add Item</button>
-            </div>
+        <div class="row g-3 ">-->
+<!-- Item Dropdown -->
+<!--<div class="col-md-6">
+    <label for="itemName" class="form-label">Item Name <span class="required-star">*</span></label>
+    <select id="itemName" class="form-select">
+        <option value="">-- Select Item --</option>
+    </select>
+</div>-->
+<!-- Plan Name -->
+<!--<div class="col-md-6">
+    <label for="planName" class="form-label">Plan Name <span class="required-star">*</span></label>
+    <input type="text" id="planName" class="form-control" required />
+</div>-->
+<!-- Year (auto) -->
+<!--<div class="col-md-2">
+    <label for="year" class="form-label">Year</label>
+    <input type="text" id="year" class="form-control bg-light" readonly />
+</div>-->
+<!-- Item Code -->
+<!--<div class="col-md-5">
+    <label for="itemCode" class="form-label">Item Code</label>
+    <input type="text" id="itemCode" class="form-control bg-light" readonly />
+</div>-->
+<!-- UOM -->
+<!--<div class="col-md-5">
+    <label for="uom" class="form-label">UOM</label>
+    <input type="text" id="uom" class="form-control bg-light" readonly />
+</div>-->
+<!-- Quantity (no required here) -->
+<!--<div class="col-md-6">
+    <label for="quantity" class="form-label">Quantity <span class="required-star">*</span> </label>
+    <input type="number" id="quantity" class="form-control" />
+</div>-->
+<!-- Description -->
+<!--<div class="col-md-6">
+    <label for="description" class="form-label">Description</label>
+    <textarea id="description" class="form-control bg-light " readonly></textarea>
+</div>-->
+<!-- Add Button -->
+<!--<div class="col-md-12 text-end">
+    <button type="button" id="btnAdd" class="btn btn-success mt-2"><i class="bi bi-plus-circle me-2"></i> Add Item</button>
+</div>
 
 
-            <hr />
-
-            <!-- Table to Display Added Items -->
-            <!-- ✅ Items Table with DataTable support -->
-            <div class="table-responsive mt-4">
-                <table id="itemsTable" class="table table-striped table-bordered align-middle">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Item Name</th>
-                            <th>Item Code</th>
-                            <th>Quantity</th>
-                            <th>UOM</th>
-                            <th>Description</th>
-                            <th>Request Type</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-
-            <!-- Dates -->
-            <div class="row mt-3">
-                <div class="col-md-3">
-                    <label>From Date</label>
-                    <input type="date" id="fromDate" class="form-control " required />
-                </div>
-                <div class="col-md-3">
-                    <label>To Date</label>
-                    <input type="date" id="toDate" class="form-control " required />
-                </div>
-            </div>
-
-
-            <!-- Submit Button -->
-            <div class="text-center mt-4">
-                <button type="submit" class="btn btn-success">📤 Send for Approval</button>
-            </div>
-            <br><br>
-            <br />
-
-            <!-- Warning Alert -->
-            <div id="warning" class="alert alert-warning mt-3 d-none">
+<hr />-->
+<!-- Table to Display Added Items -->
+<!-- ✅ Items Table with DataTable support -->
+<!--<div class="table-responsive mt-4">
+    <table id="itemsTable" class="table table-striped table-bordered align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>Item Name</th>
+                <th>Item Code</th>
+                <th>Quantity</th>
+                <th>UOM</th>
+                <th>Description</th>
+                <th>Request Type</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>-->
+<!-- Dates -->
+<!--<div class="row mt-3">
+    <div class="col-md-3">
+        <label>From Date <span class="required-star">*</span></label>
+        <input type="date" id="fromDate" class="form-control " required />
+    </div>
+    <div class="col-md-3">
+        <label>To Date <span class="required-star">*</span></label>
+        <input type="date" id="toDate" class="form-control " required />
+    </div>
+</div>-->
+<!-- Submit Button -->
+<!--<div class="text-center mt-4">
+    <button type="submit" class="btn btn-success"> Send for Approval</button>
+</div>
+<br><br>
+<br />-->
+<!-- Warning Alert -->
+<!--<div id="warning" class="alert alert-warning mt-3 d-none">
                 ⚠️ Warning! Kindly enter a Plan Name and at least one item.
             </div>
         </div>
@@ -136,34 +123,39 @@
         text-align: center !important;
         vertical-align: middle !important;
     }
+    .required-star {
+        color: red;
+        font-size: 1em;
+        font-weight: bold;
+        vertical-align: middle;
+        position: relative;
+        top: -4px;
+    }
 </style>
 
-
 <script>
-    let itemList = [];
+    let allItems = [];   // All items fetched from backend
+    let itemList = [];   // Items added to grid
     let table;
 
     $(document).ready(function () {
-        // Set year and today's date
         const today = new Date().toISOString().split("T")[0];
         $('#year').val(new Date().getFullYear());
         $('#fromDate').attr("min", today);
         $('#toDate').attr("min", today);
 
-        // From Date changes To Date min
+        // From Date -> To Date sync
         $('#fromDate').on('change', function () {
             $('#toDate').attr("min", $(this).val());
         });
 
-
-        // Load Item Dropdown
+        // 🟢 Load all items once
         $.get('/Inventory/GetItemListMHB', function (items) {
-            $.each(items, function (i, item) {
-                $('#itemName').append(`<option value="${item.ItemId}">${item.ItemName}</option>`);
-            });
+            allItems = items;
+            updateItemDropdown();
         });
 
-        // Fetch Item Details
+        // 🟡 On dropdown change, load details
         $('#itemName').on('change', function () {
             const itemId = $(this).val();
             if (!itemId) return;
@@ -175,19 +167,17 @@
             });
         });
 
+        // 🟢 Initialize DataTable
         table = $('#itemsTable').DataTable({
             paging: true,
             searching: true,
             ordering: false,
             info: false,
             lengthChange: false,
-
-            language: {
-                emptyTable: "No items added yet."
-            }
+            language: { emptyTable: "No items added yet." }
         });
 
-        // ➕ Add Item
+        // ➕ Add Item to Grid
         $('#btnAdd').click(function () {
             const itemId = $('#itemName').val();
             const itemName = $('#itemName option:selected').text();
@@ -198,6 +188,12 @@
 
             if (!itemId || !qty || qty <= 0) {
                 Swal.fire('Invalid Entry', 'Please select a valid item and quantity.', 'warning');
+                return;
+            }
+
+            // Prevent duplicate entries (double safety)
+            if (itemList.some(x => x.ItemId == itemId)) {
+                Swal.fire('Duplicate', 'This item is already added.', 'warning');
                 return;
             }
 
@@ -213,18 +209,30 @@
             };
 
             itemList.push(item);
+
+            // Refresh grid and dropdownGGG
             renderTable();
+            updateItemDropdown();
             clearFields();
         });
 
-        // 🗑️ Delete Item
-        $('#itemsTable tbody').on('click', '.btn-delete', function () {
-            const index = $(this).data('index');
-            itemList.splice(index, 1);
+        // 🗑️ Remove item from grid
+        $('#itemsTable tbody').on('click', '.btn-remove', function () {
+            const row = $(this).closest('tr');
+            const itemCode = row.find('td:eq(1)').text();
+
+            // Remove the item from grid list
+            const removedItem = itemList.find(x => x.ItemCode === itemCode);
+            itemList = itemList.filter(x => x.ItemCode !== itemCode);
+
+            // Refresh table
             renderTable();
+
+            // Add removed item back into dropdown
+            updateItemDropdown();
         });
 
-        // ✅ Submit Form with SweetAlert
+        // ✅ Form Submit
         $('#stockForm').on('submit', function (e) {
             e.preventDefault();
 
@@ -247,7 +255,6 @@
                 return;
             }
 
-            // 🔔 Confirm submission
             Swal.fire({
                 title: 'Send Plan for Approval?',
                 text: "This action will submit the MRP plan.",
@@ -262,7 +269,6 @@
                         title: 'Submitting...',
                         text: 'Please wait...',
                         allowOutsideClick: false,
-
                         didOpen: () => Swal.showLoading()
                     });
 
@@ -286,18 +292,18 @@
                                     title: '✅ Success',
                                     text: 'Plan submitted successfully!',
                                     showConfirmButton: false,
-                                    timer: 1000   // closes after 2s
+                                    timer: 1000
                                 });
 
                                 setTimeout(() => {
                                     itemList = [];
                                     renderTable();
+                                    updateItemDropdown();
                                     $('#stockForm')[0].reset();
                                     $('#year').val(new Date().getFullYear());
                                     $('#fromDate').attr("min", today);
                                     $('#toDate').attr("min", today);
                                 }, 1000);
-
                             } else {
                                 Swal.fire('❌ Error', 'Failed to submit plan.', 'error');
                             }
@@ -311,38 +317,409 @@
         });
     });
 
+    // 🟢 Dropdown Refresh Logic
+    function updateItemDropdown() {
+        const ddl = $("#itemName").empty().append('<option value="">-- Select Item --</option>');
+        allItems.forEach(i => {
+            // Exclude items already in the grid
+            if (!itemList.some(g => g.ItemCode === i.ItemCode)) {
+                ddl.append(`<option value="${i.ItemId}">${i.ItemName}</option>`);
+            }
+        });
+    }
+
+    // 🟢 DataTable Render
     function renderTable() {
         table.clear();
-        itemList.forEach((item, i) => {
+        itemList.forEach((item) => {
             table.row.add([
                 item.ItemName,
                 item.ItemCode,
                 item.Quantity,
                 item.UOM,
-                `<span data-bs-toggle="tooltip" title="${item.Description}">
-                ${item.Description}
-             </span>`,
+                `<span data-bs-toggle="tooltip" title="${item.Description}">${item.Description}</span>`,
                 item.RequestType,
-
-                ` <button class="btn btn-outline-danger btn-sm  btn-delete " data-bs-toggle="tooltip" title="Remove">
-             <i class="bi bi-trash-fill"></i>
-
-            </button>`
-
-
-
+                `<button class="btn btn-sm btn-square btn-remove bg-danger" data-bs-toggle="tooltip" title="Remove">
+                    <i class="bi bi-trash text-white"></i>
+                 </button>`
             ]);
         });
         table.draw();
 
+        // Enable Bootstrap tooltips
         const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
     }
 
+    // 🧹 Clear Fields
+    function clearFields() {
+        $('#itemName').val('');
+        $('#itemCode').val('');
+        $('#uom').val('');
+        $('#quantity').val('');
+        $('#description').val('');
+    }
+</script>-->
 
-    // Clear Input Fields
+
+
+
+@{
+    ViewBag.Title = "NewplanMHB";
+}
+
+<div class="container-fluid bg-white" style="min-height:auto">
+    <h3 class="text-center text-primary">Material Requirement Planning</h3>
+
+    <form id="stockForm" novalidate>
+        <div class="row g-3">
+
+            <!-- Item Dropdown -->
+            <div class="col-md-6">
+                <label for="itemName" class="form-label form-label-sm fw-bold text-dark">Item Name <span class="required-star">*</span></label>
+                <select id="itemName" class="form-select form-select-sm item-select shadow-sm">
+                    <option value="">-- Select Item --</option>
+                </select>
+                <small id="itemError" class="text-danger d-none"></small>
+            </div>
+
+            <!-- Plan Name -->
+            <div class="col-md-6">
+                <label for="planName" class="form-label form-label-sm fw-bold text-dark">Plan Name <span class="required-star">*</span></label>
+                <input type="text" id="planName" class="form-control form-control-sm  text-dark shadow-sm" />
+                <small id="planError" class="text-danger d-none"></small>
+            </div>
+
+            <!-- Year -->
+            <div class="col-md-2">
+                <label for="year" class="form-label form-label-sm fw-bold text-dark">Year</label>
+                <input type="text" id="year" class="form-control bg-light form-control-sm  text-dark shadow-sm" readonly />
+            </div>
+
+            <!-- Item Code -->
+            <div class="col-md-5">
+                <label for="itemCode" class="form-label form-label-sm fw-bold text-dark">Item Code</label>
+                <input type="text" id="itemCode" class="form-control bg-light form-control-sm  text-dark shadow-sm" readonly />
+            </div>
+
+            <!-- UOM -->
+            <div class="col-md-5">
+                <label for="uom" class="form-label form-label-sm fw-bold text-dark">UOM</label>
+                <input type="text" id="uom" class="form-control bg-light form-control-sm  text-dark shadow-sm" readonly />
+            </div>
+
+            <!-- Quantity -->
+            <div class="col-md-6">
+                <label for="quantity" class="form-label form-label-sm fw-bold text-dark">Quantity <span class="required-star">*</span></label>
+                <input type="number" id="quantity" class="form-control form-control-sm  text-dark shadow-sm" />
+                <small id="qtyError" class="text-danger d-none"></small>
+            </div>
+
+            <!-- Description -->
+            <div class="col-md-6">
+                <label for="description" class="form-label form-label-sm fw-bold text-dark">Description</label>
+                <textarea id="description" class="form-control bg-light form-control-sm  text-dark shadow-sm" readonly></textarea>
+            </div>
+
+            <!-- Add Button -->
+            <div class="col-md-12 text-end">
+                <button type="button" id="btnAdd" class="btn btn-success mt-2 btn-sm ">
+                    <i class="bi bi-plus-circle me-2"></i> Add Item
+                </button>
+            </div>
+
+            <hr />
+
+            <!-- Table -->
+            <div class="table-responsive mt-2">
+                <table id="itemsTable" class="table table-striped table-bordered text-center align-middle">
+                    <thead class="table-dark text-center">
+                        <tr>
+                            <th>Item Name</th>
+                            <th>Item Code</th>
+                            <th>Quantity</th>
+                            <th>UOM</th>
+                            <th>Description</th>
+                            <th>Request Type</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <!-- Dates -->
+            <div class="row ">
+                <div class="col-md-3">
+                    <label class="form-label form-label-sm fw-bold text-dark">From Date <span class="required-star">*</span></label>
+                    <input type="date" id="fromDate" class="form-control form-control-sm  text-dark shadow-sm" />
+                    <small id="fromDateError" class="text-danger d-none"></small>
+                </div>
+                <div class="col-md-3 mb-2">
+                    <label class="form-label form-label-sm fw-bold text-dark">To Date <span class="required-star">*</span></label>
+                    <input type="date" id="toDate" class="form-control form-control-sm  text-dark shadow-sm" />
+                    <small id="toDateError" class="text-danger d-none"></small>
+                </div>
+            </div>
+
+            <div class="text-center mb-4">
+                <button type="submit" class="btn btn-success btn-sm ">Send for Approval</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<style>
+    label {
+        font-weight: 600;
+    }
+
+    .form-control[readonly] {
+        background-color: #f8f9fa;
+    }
+
+    .container-fluid {
+        max-width: 1400px !important;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .required-star {
+        color: red;
+        font-size: 1em;
+        font-weight: bold;
+        vertical-align: middle;
+        position: relative;
+        top: -4px;
+    }
+
+    .error-border {
+        border: 2px solid #dc3545 !important;
+        box-shadow: 0 0 6px rgba(220, 53, 69, 0.25);
+    }
+
+    /* Center table content */
+    #itemsTable th, #itemsTable td {
+        text-align: center;
+        vertical-align: middle;
+    }
+   textarea {
+        height: 40px;
+    }
+</style>
+
+<script>
+    let allItems = [];
+    let itemList = [];
+    let table;
+
+    $(document).ready(function () {
+        const today = new Date().toISOString().split("T")[0];
+        $('#year').val(new Date().getFullYear());
+        $('#fromDate').attr("min", today);
+        $('#toDate').attr("min", today);
+
+        $('#fromDate').on('change', function () {
+            $('#toDate').attr("min", $(this).val());
+        });
+
+        $.get('/Inventory/GetItemListMHB', function (items) {
+            allItems = items;
+            updateItemDropdown();
+        });
+
+        $('#itemName').on('change', function () {
+            const itemId = $(this).val();
+            if (!itemId) return;
+            $.get('/Inventory/GetItemDetailsMHB', { itemId: itemId }, function (item) {
+                $('#itemCode').val(item.ItemCode);
+                $('#uom').val(item.UOMName);
+                $('#description').val(item.Description);
+            });
+        });
+
+        // Initialize DataTable
+        table = $('#itemsTable').DataTable({
+            paging: true, searching: true, ordering: false, info: false, lengthChange: false,
+            language: { emptyTable: "No items added yet." }
+        });
+
+        // Live validation removal
+        $('#itemName, #planName, #quantity, #fromDate, #toDate').on('input change', function () {
+            const id = $(this).attr('id');
+            const errElem = $('#' + id + 'Error');
+            clearError($(this), errElem);
+        });
+
+        // Add item button
+        $('#btnAdd').click(function () {
+            clearError($('#itemName'), $('#itemError'));
+            clearError($('#quantity'), $('#qtyError'));
+
+            const itemId = $('#itemName').val();
+            const itemName = $('#itemName option:selected').text();
+            const itemCode = $('#itemCode').val();
+            const uom = $('#uom').val();
+            const qty = $('#quantity').val();
+            const desc = $('#description').val();
+
+            if (!itemId) {
+                showError($('#itemName'), $('#itemError'), 'Please select an item.');
+                return;
+            }
+            if (!qty || qty <= 0) {
+                showError($('#quantity'), $('#qtyError'), 'Please enter a valid quantity.');
+                return;
+            }
+
+            if (itemList.some(x => x.ItemId == itemId)) {
+                Swal.fire('Duplicate', 'This item is already added.', 'warning');
+                return;
+            }
+
+            const item = {
+                ItemId: itemId,
+                ItemName: itemName,
+                ItemCode: itemCode,
+                Quantity: qty,
+                QuantityMRP: qty,
+                UOM: uom,
+                Description: desc,
+                RequestType: "MRP"
+            };
+
+            itemList.push(item);
+            renderTable();
+            updateItemDropdown();
+            clearFields();
+        });
+
+        // Remove item
+        $('#itemsTable tbody').on('click', '.btn-remove', function () {
+            const row = $(this).closest('tr');
+            const itemCode = row.find('td:eq(1)').text();
+            itemList = itemList.filter(x => x.ItemCode !== itemCode);
+            renderTable();
+            updateItemDropdown();
+        });
+
+        // Form submit
+        $('#stockForm').on('submit', function (e) {
+            e.preventDefault();
+            let valid = true;
+
+            const planName = $('#planName').val().trim();
+            const fromDate = $('#fromDate').val();
+            const toDate = $('#toDate').val();
+
+            clearError($('#planName'), $('#planError'));
+            clearError($('#fromDate'), $('#fromDateError'));
+            clearError($('#toDate'), $('#toDateError'));
+
+            if (!planName) {
+                showError($('#planName'), $('#planError'), 'Please enter Plan Name.');
+                valid = false;
+            }
+            if (!fromDate) {
+                showError($('#fromDate'), $('#fromDateError'), 'Please select From Date.');
+                valid = false;
+            }
+            if (!toDate) {
+                showError($('#toDate'), $('#toDateError'), 'Please select To Date.');
+                valid = false;
+            }
+            if (fromDate && toDate && toDate < fromDate) {
+                showError($('#toDate'), $('#toDateError'), 'To Date must be after From Date.');
+                valid = false;
+            }
+
+            if (itemList.length === 0) {
+                Swal.fire("⚠️ Warning", "Please add at least one item.", "warning");
+                valid = false;
+            }
+
+            if (!valid) return;
+
+            Swal.fire({
+                title: 'Send Plan for Approval?',
+                text: "This action will submit the MRP plan.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#198754',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, Submit'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({ title: 'Submitting...', text: 'Please wait...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+                    const payload = {
+                        PlanName: planName,
+                        Year: $('#year').val(),
+                        FromDate: fromDate,
+                        ToDate: toDate,
+                        Items: itemList
+                    };
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '/Inventory/SubmitPlanForApprovalMHB',
+                        contentType: 'application/json',
+                        data: JSON.stringify(payload),
+                        success: function (res) {
+                            if (res.success) {
+                                Swal.fire({ icon: 'success', title: '✅ Success', text: 'Plan submitted successfully!', showConfirmButton: false, timer: 1000 });
+                                setTimeout(() => {
+                                    itemList = [];
+                                    renderTable();
+                                    updateItemDropdown();
+                                    $('#stockForm')[0].reset();
+                                    $('#year').val(new Date().getFullYear());
+                                    $('#fromDate').attr("min", today);
+                                    $('#toDate').attr("min", today);
+                                }, 1000);
+                            } else Swal.fire('❌ Error', 'Failed to submit plan.', 'error');
+                        },
+                        error: function () { Swal.fire('❌ Server Error', 'Something went wrong.', 'error'); }
+                    });
+                }
+            });
+        });
+    });
+
+    // Utility functions
+    function showError($input, $errElem, message) {
+        $input.addClass('error-border');
+        $errElem.text(message).removeClass('d-none');
+    }
+    function clearError($input, $errElem) {
+        $input.removeClass('error-border');
+        $errElem.text('').addClass('d-none');
+    }
+
+    function updateItemDropdown() {
+        const ddl = $("#itemName").empty().append('<option value="">-- Select Item --</option>');
+        allItems.forEach(i => {
+            if (!itemList.some(g => g.ItemCode === i.ItemCode)) {
+                ddl.append(`<option value="${i.ItemId}">${i.ItemName}</option>`);
+            }
+        });
+    }
+
+    function renderTable() {
+        table.clear();
+        itemList.forEach((item) => {
+            table.row.add([
+                item.ItemName, item.ItemCode, item.Quantity, item.UOM,
+                `<span data-bs-toggle="tooltip" title="${item.Description}">${item.Description}</span>`,
+                item.RequestType,
+                `<button class="btn btn-sm btn-square btn-remove bg-danger" title="Remove" style="width: 32px; height: 32px;"><i class="bi bi-trash text-white"></i></button>`
+            ]);
+        });
+        table.draw();
+    }
+
     function clearFields() {
         $('#itemName').val('');
         $('#itemCode').val('');
@@ -351,6 +728,5 @@
         $('#description').val('');
     }
 </script>
-
 
 

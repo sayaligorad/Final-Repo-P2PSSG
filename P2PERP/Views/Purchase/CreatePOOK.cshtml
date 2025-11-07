@@ -1,369 +1,519 @@
-﻿@model P2PLibray.Purchase.Purchase
-
-@{
-    ViewBag.Title = "CreatePOOK";
+﻿@{
+    ViewBag.Title = "Create Purchase Order";
 }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Order Form</title>
+    <style>
+             /* ==========================
+        Global Styles
+        ========================== */
+             body {
+                 background-color: #f4f5f7;
+                 font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+                 color: #333;
+             }
 
-@*<h2>CreatePOOK</h2>*@
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Purchase Order Form</title>
-        <style>
-            body {
-                background-color: #f4f5f7;
-                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-                color: #333;
-            }
+             .po-form {
+                 background: #fff;
+                 padding: 30px;
+                 border-radius: 16px;
+                 box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+                 margin: 30px auto;
+                 max-width: 1150px;
+             }
 
-            .po-form {
-                background: #fff;
-                padding: 30px;
-                border-radius: 16px;
-                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-                margin: 30px auto;
-                max-width: 1150px;
-            }
+             .section-title {
+                 font-size: 1.1rem;
+                 font-weight: 600;
+                 color: #000;
+                 margin-bottom: 12px;
+                 border-left: 4px solid #000;
+                 padding-left: 10px;
+             }
 
-            .section-title {
-                font-size: 1.1rem;
+                 /* Invalid fields: red border */
+                 .form-control.is-invalid,
+                 .form-select.is-invalid {
+                     border-color: #dc3545 !important;
+                     box-shadow: none !important;
+                     background-image: none !important;
+                 }
+             /* Validation feedback */
+             .invalid-feedback {
+                 display: none;
+                 width: 100%;
+                 margin-top: 0.25rem;
+                 font-size: 0.875em;
+                 color: #dc3545;
+             }
+             /*        Revome Green Color*/
+
+             .was-validated .form-control:invalid ~ .invalid-feedback,
+             .was-validated .form-select:invalid ~ .invalid-feedback {
+                 display: block;
+             }
+
+             .was-validated .form-select:valid, .form-select.is-valid {
+                 border: 1px solid;
+                 border-color: #ddd !important;
+                 box-shadow: none !important;
+                 outline: none !important;
+             }
+
+             .was-validated .form-control:valid, .form-control.is-valid {
+                 border: 1px solid;
+                 border-color: #ddd !important;
+                 box-shadow: none !important;
+                 outline: none !important;
+             }
+
+             .was-validated .form-check-input:valid:checked,
+             .form-check-input.is-valid:checked {
+                 background-color: #0d6efd !important; /* sky blue */
+                 border-color: #0d6efd !important;
+             }
+
+             .was-validated .form-control:invalid, .form-control.is-invalid {
+                 border: 1px solid #ddd;
+             }
+             /* ==========================
+        Tables
+        ========================== */
+
+        table-responsive {
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        table th {
+            white-space: nowrap; /* Prevents text wrapping */
+            text-overflow: ellipsis; /* Adds "..." if text is too long */
+            overflow: hidden; /* Hides overflow text */
+        }
+
+             .totals {
+                 text-align: right;
+                 font-weight: 600;
+             }
+
+             .totals-row td {
+                 border-top: 2px solid #000;
+             }
+
+             /* ==========================
+        Tooltip (Dark)
+        ========================== */
+             .tooltip-dark .tooltip-inner {
+                 background-color: #000;
+                 color: #fff;
+             }
+
+        .tooltip-dark .tooltip-arrow::before {
+            /*                 border-top-color: #000 !important;*/
+            display: none;
+        }
+
+             /* ==========================
+        Terms & Conditions (Checkbox)
+        ========================== */
+             #termsList .form-check-label {
+                 color: #000 !important;
+                 font-weight: 500;
+             }
+
+             /* Invalid checkbox state */
+             #termsList input[type="checkbox"]:not(:checked):invalid + .form-check-label {
+                 color: #000 !important;
+                 border-color: #dc3545 !important;
+             }
+
+             /* ✅ Checked checkbox color: light-sky blue */
+             #termsList input[type="checkbox"] {
+                 accent-color: #0d6efd !important; /* sky blue */
+                 border: 1.5px solid #0d6efd !important;
+             }
+
+             /* List styling */
+             .terms-list {
+                 padding-left: 20px;
+                 margin-top: 5px;
+             }
+
+                 .terms-list li {
+                     margin-bottom: 6px;
+                     font-size: 0.92rem;
+                 }
+        /* Add spacing between buttons */
+        .swal2-custom-actions {
+            gap: 12px; /* adjust gap as needed */
+        }
+
+            /* Optional: small visual consistency */
+            .swal2-custom-actions .btn {
                 font-weight: 600;
-                color: #000;
-                margin-bottom: 12px;
-                border-left: 4px solid #000;
-                padding-left: 10px;
+                border-radius: 6px;
+                min-width: 120px;
             }
 
-            .input-wrapper {
-                background: #fafafa;
-                border: 1px solid #ddd;
-                border-radius: 10px;
-                padding: 10px 12px;
-                transition: all 0.3s ease;
-                display: flex;
-                align-items: center;
-            }
+        .hidden-force {
+            display: none !important;
+        }
 
-                .input-wrapper:hover {
-                    border-color: #000;
-                    box-shadow: 0 0 8px rgba(0, 0, 0, 0.12);
-                }
+    </style>
+</head>
+<body>
+    <!-- Toast container -->
+    <div id="toastContainer"
+         class="toast-container position-fixed top-0 end-0 p-3"
+         style="z-index: 2000;">
+    </div>
 
-                .input-wrapper i {
-                    color: #000;
-                    font-size: 1.1rem;
-                    margin-right: 8px;
-                }
+    <div class="container">
+        <form class="po-form needs-validation pt-0" novalidate>
+            <h3 class="text-center text-primary mb-4 pt-0 mt-0">Purchase Order</h3>
+            <!-- Hidden fields -->
+            <input type="hidden" id="TotalAmount" name="TotalAmount" />
 
-                .input-wrapper input,
-                .input-wrapper textarea {
-                    border: none;
-                    outline: none;
-                    background: transparent;
-                    width: 100%;
-                    font-size: 0.95rem;
-                }
-
-            textarea {
-                resize: none;
-                min-height: 70px;
-            }
-
-            .terms-list {
-                padding-left: 20px;
-                margin-top: 5px;
-            }
-
-                .terms-list li {
-                    margin-bottom: 6px;
-                    font-size: 0.92rem;
-                }
-
-            .table thead {
-                background: #000;
-                color: #fff;
-            }
-
-            .table tbody tr td {
-                font-size: 0.9rem;
-            }
-
-            .totals {
-                text-align: right;
-                font-weight: 600;
-            }
-
-            .totals-row td {
-                border-top: 2px solid #000;
-            }
-
-            .btn-create {
-                background: #000;
-                color: #fff;
-                border-radius: 10px;
-                padding: 8px 20px;
-                font-weight: 500;
-            }
-
-                .btn-create:hover {
-                    background: #333;
-                }
-
-            .btn-cancel {
-                background: #dc3545;
-                color: #fff;
-                border-radius: 10px;
-                padding: 8px 20px;
-                font-weight: 500;
-            }
-
-                .btn-cancel:hover {
-                    background: #a71d2a;
-                }
-
-
-            #tblItems tbody td,
-            #tblItems thead th,
-            #tblItems tfoot td {
-                padding: 0.3rem 0.5rem; /* smaller padding */
-                font-size: 0.85rem; 
-                vertical-align: middle; /* vertical alignment */
-            }
-
-            #tblItems tbody tr {
-                line-height: 1.2; /* compact row height */
-            }
-
-            .table-sm th,
-            .table-sm td {
-                padding: 0.25rem 0.5rem; /* Bootstrap small table adjustment */
-            }
-
-            .tooltip-dark .tooltip-inner {
-                background-color: #000;
-                color: #fff;
-            }
-
-            .tooltip-dark .tooltip-arrow::before {
-                border-top-color: #000 !important;
-            }
-
-
-        </style>
-    </head>
-    <body>
-        <!-- Toast container somewhere fixed, e.g. top right -->
-        <div id="toastContainer"
-             class="toast-container position-fixed top-0 end-0 p-3"
-             style="z-index: 2000;">
-        </div>
-
-        <div class="container">
-            <form class="po-form">
-                <h2 class="text-center text-primary">Purchase Order</h2>
-
-                <!-- General Details -->
-                <h5 class="section-title">General Details</h5>
-                <input type="hidden" id="TotalAmount" name="TotalAmount" />
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <div class="input-wrapper">
-                            <i class="bi bi-hash"></i>
-                            <input type="text" class="form-control border-0" id="QuotationNo" name="RegisterQuotationCode" placeholder="Quotation Number" readonly>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="input-wrapper">
-                            <i class="bi bi-calendar-date"></i>
-                            <input type="text" class="form-control border-0" name="QuotationDate" id="QuotationDate" readonly>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="input-wrapper">
-                            <i class="bi bi-person-check"></i>
-                            <input type="text" class="form-control border-0" name="ApprovedRejectedBy" id="ApprovedBy" placeholder="Approved By" readonly>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="input-wrapper">
-                            <i class="bi bi-calendar-check"></i>
-                            <input type="text" class="form-control border-0" name="ApprovedRejectedDate" id="ApprovedDate" placeholder="Approved Date" readonly>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="input-wrapper position-relative">
-                            <i class="bi bi-envelope position-absolute" style="top: 50%; left: 12px; transform: translateY(-50%);"></i>
-                            <select class="form-select ps-5 border-0" name="Usercode" id="ddlAccountant" required>
-                                <option value="">Select Accountant Email</option>
-                                <!-- Options will be dynamically populated via AJAX -->
-                            </select>
-                        </div>
-                    </div>
-
+            <!-- General Details -->
+            <h5 class="section-title text-dark">General Details</h5>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="QuotationNo" class="form-label form-label-sm fw-bold text-dark">Quotation Number</label>
+                    <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light" id="QuotationNo" name="RegisterQuotationCode" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label for="QuotationDate" class="form-label form-label-sm fw-bold text-dark">Quotation Date</label>
+                    <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light" name="QuotationDate" id="QuotationDate" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label for="ApprovedBy" class="form-label form-label-sm fw-bold text-dark">Approved By</label>
+                    <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light" name="ApprovedRejectedBy" id="ApprovedBy" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label for="ApprovedDate" class="form-label form-label-sm fw-bold text-dark">Approved Date</label>
+                    <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light" name="ApprovedRejectedDate" id="ApprovedDate" readonly>
+                </div>
+                <div class="mb-3 col-md-4">
+                    <label for="ddlAccountant" class="form-label form-label-sm fw-bold text-dark">
+                        Accountant Email <span class="text-danger">*</span>
+                    </label>
+                    <select id="ddlAccountant" name="Usercode" class="form-select form-select-sm shadow-sm" required>
+                        <option value="">Select Accountant Email</option>
+                        @*<option value="a@example.com">a@example.com</option>*@
+                    </select>
+                    <div class="invalid-feedback">Please select an accountant email.</div>
                 </div>
 
-                <!-- Vendor Details -->
-                <h5 class="section-title mt-4">Vendor Details</h5>
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <div class="input-wrapper">
-                            <i class="bi bi-person"></i>
-                            <input type="text" class="form-control border-0" id="VendorName" name="VendorName" placeholder="Vendor Name" readonly>
-                        </div>
+
+            </div>
+
+            <!-- Vendor Details -->
+            <h5 class="section-title mt-4">Vendor Details</h5>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="VendorName" class="form-label form-label-sm fw-bold text-dark">Vendor Name</label>
+                    <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light" id="VendorName" name="VendorName" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label for="CompanyName" class="form-label form-label-sm fw-bold text-dark">Company Name</label>
+                    <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light" id="CompanyName" name="CompanyName" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label for="CompanyAddress" class="form-label form-label-sm fw-bold text-dark">Company Address</label>
+                    <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light" id="CompanyAddress" name="CompanyAddress" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label for="VendorContactNumber" class="form-label form-label-sm fw-bold text-dark">Vendor Contact Number</label>
+                    <input type="tel" class="form-control form-control-sm text-dark shadow-sm bg-light" id="VendorContactNumber" name="MobileNo" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label for="VendorEmail" class="form-label form-label-sm fw-bold text-dark">Vendor Email</label>
+                    <input type="email" class="form-control form-control-sm text-dark shadow-sm bg-light" id="VendorEmail" name="Email" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label for="VendorAccountNumber" class="form-label form-label-sm fw-bold text-dark">Vendor Account Number</label>
+                    <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light" id="VendorAccountNumber" name="AccountNumber" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label for="IFSCcode" class="form-label form-label-sm fw-bold text-dark">IFSC Code</label>
+                    <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light" id="IFSCcode" name="IFSCcode" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label for="SwiftCode" class="form-label form-label-sm fw-bold text-dark">Swift Code</label>
+                    <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light" id="SwiftCode" name="SwiftCode" readonly>
+                </div>
+            </div>
+
+            <!-- Company Details -->
+            <h5 class="section-title mt-4">Company Details</h5>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="BillingAddress" class="form-label form-label-sm fw-bold text-dark">
+                        Billing Address <span class="text-danger">*</span>
+                    </label>
+                    <textarea class="form-control form-control-sm text-dark shadow-sm bg-light"
+                              id="BillingAddress"
+                              name="BillingAddress"
+                              placeholder="Enter billing address"
+                              minlength="10"
+                              required readonly></textarea>
+                    <div class="invalid-feedback">
+                        Billing address must be at least 10 characters long.
                     </div>
-                    <div class="col-md-4">
-                        <div class="input-wrapper">
-                            <i class="bi bi-buildings"></i>
-                            <input type="text" class="form-control border-0" id="CompanyName" name="CompanyName" placeholder="Company Name" readonly>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="input-wrapper">
-                            <i class="bi bi-geo-alt"></i>
-                            <input type="text" class="form-control border-0" id="CompanyAddress" name="CompanyAddress" placeholder="Company Address" readonly>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="input-wrapper">
-                            <i class="bi bi-telephone"></i>
-                            <input type="tel" class="form-control border-0" id="VendorContactNumber" name="MobileNo" placeholder="Vendor Contact Number" readonly>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="input-wrapper">
-                            <i class="bi bi-envelope-at"></i>
-                            <input type="email" class="form-control border-0" id="VendorEmail" name="Email" placeholder="Vendor Email" readonly>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="input-wrapper">
-                            <i class="bi bi-bank"></i>
-                            <input type="text" class="form-control border-0" id="VendorAccountNumber" name="AccountNumber" placeholder="Vendor Account Number" readonly>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="input-wrapper">
-                            <i class="bi bi-upc-scan"></i>
-                            <input type="text" class="form-control border-0" id="IFSCcode" name="IFSCcode" placeholder="IFSC Code" readonly>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="input-wrapper">
-                            <i class="bi bi-cash-stack"></i>
-                            <input type="text" class="form-control border-0" id="SwiftCode" name="SwiftCode" placeholder="Swift Code" readonly>
-                        </div>
-                    </div>
-                   
                 </div>
 
-                <!-- Company Details -->
-                <h5 class="section-title mt-4">Company Details</h5>
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <div class="input-wrapper">
-                            <i class="bi bi-house-door"></i>
-                            <textarea class="form-control border-0" id="BillingAddress" name="BillingAddress" placeholder="Billing Address"></textarea>
-                        </div>
+                <div class="col-md-6">
+                    <label for="DeliveryAddress" class="form-label form-label-sm fw-bold text-dark">Delivery Address</label>
+                    <textarea class="form-control form-control-sm text-dark shadow-sm bg-light" id="DeliveryAddress" name="DeliveryAddress" readonly></textarea>
+                </div>
+            </div>
+
+            <!-- Terms & Conditions -->
+            <h5 class="section-title mt-4">Terms & Conditions</h5>
+            <div id="termsList" class="mb-3">
+                <!-- Terms will be populated dynamically -->
+            </div>
+            <div class="invalid-feedback" id="termsFeedback" style="display: none;">
+                Please select at least one term and condition.
+            </div>
+
+            <!-- Item Details -->
+            <h5 class="section-title mt-4">Item Details</h5>
+            <!-- Items Table -->
+            <div class="table-responsive mt-4">
+                <button type="button" class="btn btn-sm btn-primary d-flex align-items-center justify-content-end me-3 ms-auto" id="btnRestoreItem">
+                    <i class="bi bi-arrow-counterclockwise me-2"></i>Restore Items
+                </button>
+
+                <table class="table table-bordered table-striped text-center" id="tblItems">
+                    <thead class="table-dark text-center">
+                        <tr>
+                            <th>SRNo</th>
+                            <th>Item Code</th>
+                            <th class="d-none">RegisterQuotationItemCode</th>
+                            <th>Item Name</th>
+                            <th class="d-none">ItemCode</th>
+                            <th class="text-center">Description</th>
+                            <th>Quantity</th>
+                            <th>UOM</th>
+                            <th>Unit Rate</th>
+                            <th>Discount</th>
+                            <th>GST</th>
+                            <th>Amount</th>
+                            <th class="hideaction">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dynamically populated rows -->
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="11" class="text-end fw-bold">Sub Total</td>
+                            <td colspan="2" class="text-center" id="subTotal"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="11" class="text-end fw-bold">Transportation Charges</td>
+                            <td colspan="2" class="text-center" id="transportationCharges"></td>
+                        </tr>
+                        <tr class="table-secondary">
+                            <td colspan="11" class="text-end fw-bold">Grand Total</td>
+                            <td colspan="2" class="text-center" id="grandTotal" name="TotalAmount"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="text-end mt-4">
+                <button type="submit" class="btn btn-sm btn-success">
+                    <i class="bi bi-check2-circle me-2"></i>Create PO
+                </button>
+                <button type="button" class="btn btn-sm btn-danger" onclick="window.location.href='SelectedQuotationListShowOK'">
+                    <i class="bi bi-x-circle me-2"></i>Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+    <!-- Restore Modal -->
+    <div class="modal fade" id="restoreModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+            <div class="modal-content shadow-lg rounded-3">
+                <!-- Header -->
+                <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-2">
+                    <h5 class="modal-title fw-bold text-white mb-0 fs-5">
+                        Restore Removed Item
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2"
+                            data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <!-- Body -->
+                <div class="modal-body px-4">
+                    <div class="mb-3">
+                        <label for="ddlRemovedItems" class="form-label form-label-sm fw-bold text-dark">
+                            Select Removed Item<span class="text-danger">*</span>
+                        </label>
+                        <select id="ddlRemovedItems" class="form-select form-select-sm shadow-sm">
+                            <option value="">Select Item</option>
+                        </select>
                     </div>
-                    <div class="col-md-6">
-                        <div class="input-wrapper">
-                            <i class="bi bi-truck"></i>
-                            <textarea class="form-control border-0" id="DeliveryAddress" name="DeliveryAddress" placeholder="Delivery Address" readonly></textarea>
+
+
+                    <div id="restoreDetails" style="display:none;">
+                        <div class="mb-3">
+                            <label class="form-label form-label-sm fw-bold text-dark">Quantity</label>
+                            <input type="number" id="restoreQty" class="form-control form-control-sm text-dark shadow-sm" min="1">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label form-label-sm fw-bold text-dark">Description</label>
+                            <input type="text" id="restoreDesc" class="form-control form-control-sm text-dark shadow-sm">
                         </div>
                     </div>
                 </div>
 
-                <!-- Terms & Conditions -->
-                <h5 class="section-title mt-4">Terms & Conditions</h5>
-                <ul id="termsList">
-                
-                </ul>
-
-                <!-- Item Details -->
-                <h5 class="section-title mt-4">Item Details</h5>
-                <!-- Items Table -->
-                <div class="table-responsive mt-4">
-                    <table class="table table-bordered table-striped text-center" id="tblItems">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>SRNo</th>
-                                <th>Item Code</th>
-                                <th class="d-none">RegisterQuotationItemCode</th>
-                                <th>Item Name</th>
-                                <th>Description</th>
-                                <th>Quantity</th>
-                                <th>UOM</th>
-                                <th>Unit Rate</th>
-                                <th>Discount</th>
-                                <th>GST</th>
-                                <th>Amount</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Dynamically populated rows -->
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <td colspan="10" class="text-end fw-bold">Sub Total</td>
-                                <td colspan="2" class="text-center" id="subTotal"></td>
-                            </tr>
-                            <tr>
-                                <td colspan="10" class="text-end fw-bold">Transportation Charges</td>
-                                <td colspan="2" class="text-center" id="transportationCharges"></td>
-                            </tr>
-                            <tr class="table-secondary">
-                                <td colspan="10" class="text-end fw-bold">Grand Total</td>
-                                <td colspan="2" class="text-center" id="grandTotal" name="TotalAmount"></td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-
-
-                <!-- Action Buttons -->
-                <div class="text-end mt-4">
-                    <button type="button" class="btn btn-success" onclick="CretePO(event)">
-                        <i class="bi bi-check2-circle me-2"></i>Create PO
+                <!-- Footer -->
+                <div class="modal-footer bg-light rounded-bottom p-2 d-flex justify-content-end">
+                    <button type="button" id="btnAddBack" class="btn btn-sm btn-success px-4">
+                        <i class="bi bi-arrow-clockwise me-1"></i> Add Back
                     </button>
-                    <button type="reset" class="btn btn-cancel" onclick="window.location.href='SelectedQuotationListShowOK'">
-                        <i class="bi bi-x-circle me-2"></i>Cancel
-                    </button>
-
                 </div>
-            </form>
+            </div>
         </div>
-        @*toster script*@
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    </div>
 
-        <script>
-            // ====================================================
-            // ✅ Define SweetAlert mixin FIRST (global reusable alert)
-            // ====================================================
-            const swalWithBootstrapButtons = Swal.mixin({
-                customClass: {
-                    confirmButton: "btn btn-success",
-                    cancelButton: "btn btn-danger"
-                },
-                buttonsStyling: false
+
+    <script>
+        let removedItems = [];
+        // ====================================================
+        // ✅ Define SweetAlert mixin
+        // ====================================================
+        const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: "btn btn-success",
+                cancelButton: "btn btn-danger"
+            },
+            buttonsStyling: false
+        });
+
+        // ====================================================
+        // ✅ Global Variables
+        // ====================================================
+        var table;
+
+        // ✅ Cookie Helper Functions
+        function getCookie(name) {
+            const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+            return match ? match[2] : null;
+        }
+
+        function setCookie(name, value, minutes) {
+            const expiry = new Date(Date.now() + minutes * 60 * 1000).toUTCString();
+            document.cookie = `${name}=${value}; expires=${expiry}; path=/`;
+        }
+
+        // ====================================================
+        // ✅ Form Validation
+        // ====================================================
+        (function () {
+            'use strict'
+
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            const forms = document.querySelectorAll('.needs-validation')
+
+            // Loop over them and prevent submission
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    // Check terms and conditions
+                    const termsChecked = document.querySelectorAll('#termsList input[type=checkbox]:checked').length > 0;
+                    const termsFeedback = document.getElementById('termsFeedback');
+
+                    // ✅ Accountant Email validation
+                    const ddlAccountant = document.getElementById('ddlAccountant');
+                    if (ddlAccountant) {
+                        if (ddlAccountant.value.trim() === "") {
+                            ddlAccountant.setCustomValidity('Please select an accountant email.');
+                        } else {
+                            ddlAccountant.setCustomValidity(''); // clear error if selected
+                        }
+                    }
+
+                    // ✅ Billing address validation
+                    const billingAddress = document.getElementById('BillingAddress');
+                    if (billingAddress.value.trim().length < 10) {
+                        billingAddress.setCustomValidity('Billing address must be at least 10 characters.');
+                    } else {
+                        billingAddress.setCustomValidity('');
+                    }
+
+                    if (!termsChecked) {
+                        termsFeedback.style.display = 'block';
+                        event.preventDefault();
+                        event.stopPropagation();
+                    } else {
+                        termsFeedback.style.display = 'none';
+                    }
+
+                    if (!form.checkValidity() || !termsChecked) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    } else {
+                        // If form is valid, proceed with PO creation
+                        event.preventDefault();
+                        CretePO(event);
+                    }
+
+                    form.classList.add('was-validated');
+                }, false);
             });
+        })()
 
-            // ====================================================
-            // ✅ Global Variables
-            // ====================================================
-            var table;
 
-            // ====================================================
-            // ✅ Document Ready - Fetch PO Details and Initialize Page
-            // ====================================================
-            $(document).ready(function () {
+        // ====================================================
+        // ✅ Document Ready - Fetch PO Details and Initialize Page
+        // ====================================================
+        $(document).ready(function () {
+            const mode = getCookie("POMode");
 
-                $.ajax({
-                    url: '/Purchase/GetCreatePoDetailsOK',
-                    type: 'GET',
-                    success: function (response) {
+            const $restoreBtn = $("#btnRestoreItem");
+            if ($restoreBtn.length === 0) {
+                console.warn("Button not found!");
+                return;
+            }
+
+            if (mode === "JIT") {
+                $("#btnRestoreItem").addClass("hidden-force");
+                ////$("#hideaction").addClass("hidden-force");
+                //table.column(10).visible(false);
+                //console.log("✅ Hidden btnRestoreItem for JIT mode");
+                //console.log("Columns count:", table.columns().count());
+
+            } else {
+                $restoreBtn.show();
+                console.log("ℹ️ Shown btnRestoreItem for normal mode");
+            }
+            if (mode === "JIT") {
+
+                // $("#btnRestoreItem").hide(); // hide
+                $("#btnRestoreItem").css("display", "none !important");
+                // CallJITPOMethod();
+                console.log("Call JIT PO");
+                const itemCodes = JSON.parse(localStorage.getItem("SelectedJITItems") || "[]");
+                console.log("ITEM DETAILS", itemCodes[0].ItemCode, itemCodes[0].StockReqirementId);
+                const firstItem = itemCodes[0]; // just take one for now
+                 $.ajax({
+                    url: '@Url.Action("FetchJITItemPODetailsOk", "Purchase")',
+                    type: "POST",
+                     // data: JSON.stringify({ items: itemCodes }),
+                     data: JSON.stringify({
+                         itemCode: firstItem.ItemCode,
+                         stockRequirementId: firstItem.StockReqirementId
+                     }),
+                    contentType: "application/json; charset=utf-8",
+                     success: function (response) {
+                        console.log(response);
                         let header = response.QuotationHeader[0];
                         let staff = response.AccountantStaff;
                         let terms = response.TermsConditions;
@@ -377,27 +527,39 @@
                         // 📝 Populate Header Details
                         // ------------------------------
                         $("#QuotationNo").val(header.QuotationID);
-                        $("#QuotationDate").val(header.QuotationDateString);
+                      //  $("#QuotationDate").val(header.QuotationDateString);
                         $("#ApprovedBy").val(header.ApprovedBy);
-                        $("#ApprovedDate").val(header.OriginalApprovedDate);
+                       // $("#ApprovedDate").val(header.OriginalApprovedDate);
                         $("#VendorName").val(header.VendorName);
                         $("#CompanyName").val(header.CompanyName);
                         $("#CompanyAddress").val(header.CompanyAddress);
                         $("#VendorContactNumber").val(header.MobileNo);
+                        $("#BillingAddress").val(header.BillingAddress);
                         $("#VendorEmail").val(header.Email);
                         $("#VendorAccountNumber").val(header.AccountNumber);
                         $("#IFSCcode").val(header.IFSCCode);
                         $("#SwiftCode").val(header.SwiftCode);
                         $("#DeliveryAddress").val(header.DeliveryAddress);
-                        $("#TotalAmount").val(header.TotalAmount);
-                        $("#transportationCharges").text(header.ShippingCharges);
-                        $("#grandTotal").text(header.TotalAmount);
-                        $("#subTotal").text('₹' + (header.SubAmount).toFixed(2));
+                        $("#transportationCharges").text('₹' +header.ShippingCharges);
+
+
+                         if (header.QuotationDateString) {
+                             console.log(header.QuotationDateString);
+                             $("#QuotationDate").val(moment(header.QuotationDateString, "YYYY-MM-DD").format("DD/MM/YYYY"));
+                         }
+
+                         //// Convert QuotationDateString to dd/mm/yyyy
+                         if (header.OriginalApprovedDate) {
+                             $("#ApprovedDate").val(moment(header.OriginalApprovedDate, "YYYY-MM-DD").format("DD/MM/YYYY"));
+                         }
+                         //if (row.VendorDeliveryDateString) {
+                         //    $("#vendordeliverydate").val(moment(row.VendorDeliveryDateString, ["YYYY-MM-DD", "YYYY-MM-DDTHH:mm:ss"]).format("DD/MM/YYYY"));
+                         //}
 
                         // ------------------------------
                         // 👨‍💼 Accountant Dropdown
                         // ------------------------------
-                        $("#ddlAccountant").empty().append('<option>Select Accountant Email</option>');
+                        $("#ddlAccountant").empty().append('<option value="">Select Accountant Email</option>');
                         $.each(staff, function (i, row) {
                             $("#ddlAccountant").append(`<option value="${row.StaffCode}">${row.AccountEmail}</option>`);
                         });
@@ -422,263 +584,504 @@
                             destroy: true,
                             data: items,
                             columns: [
-                                { data: "SRNO" },
-                                { data: "ItemCode" },
-                                { data: "RegisterQuotationItemCode", visible: false },
-                                { data: "ItemName" },
+                                { data: "SRNO", className: "text-center"},
+                                { data: "ItemCode", className: "text-center"},
+                                { data: "RegisterQuotationItemCode", className: "text-center",visible: false },
+                                { data: "ItemName", className: "text-center"},
+                                { data: "ItemCode", className: "text-center", visible: false},
                                 {
                                     data: "Description",
+                                    className: "text-center",
                                     render: function (data) {
                                         let safe = (data === null || data === undefined) ? '' : String(data);
                                         return `<span data-bs-toggle="tooltip" title="${safe}">${safe}</span>`;
                                     }
                                 },
-                                { data: "Quantity" },
-                                { data: "UOM" },
+                                { data: "Quantity", className: "text-center"},
+                                { data: "UOM", className: "text-center" },
                                 { data: "CostPerUnit", render: data => '₹' + parseFloat(data).toFixed(2) },
-                                { data: "Discount" },
-                                { data: "GST" },
-                                { data: "Amount", render: data => '₹' + parseFloat(data).toFixed(2) },
-                                { data: null, orderable: false, searchable: false, render: () => '<a href="#" class="remove-link">Remove</a>' }
+                                {
+                                    data: "Discount",
+                                    className: "text-center",
+                                    render: function (data) {
+                                        if (data == null || data === "") return "0%";
+                                        return data + "%";
+                                    }
+                                },
+                                { data: "GST",className: "text-center"},
+                                { data: "Amount",className: "text-center", render: data => '₹' + parseFloat(data).toFixed(2) },
+                                {
+                                    data: null,
+                                    orderable: false,
+                                    searchable: false,
+                                    className: "text-center",
+                                    render: () => `
+                                    <a href="#" class="remove-link btn btn-danger btn-sm d-inline-flex align-items-center justify-content-center p-1 rounded-circle" title="Delete">
+                                        <i class="bi bi-trash-fill text-white"></i>
+                                    </a>
+                                `
+                                }
+                            ],
+                            columnDefs: [
+                                { className: "text-center", targets: "_all" }  // 👈 Centers all columns
                             ],
                             paging: true,
-                            searching: true,
-                            ordering: true,
+                            searching: false,
+                            ordering: false,
                             lengthChange: false,
-                            pageLength: 5,
+                            pageLength: 10,
                             drawCallback: function () {
                                 // Re-number rows
                                 this.api().rows({ order: 'applied', search: 'applied' }).nodes().each(function (row, i) {
                                     $(row).find('td:eq(0)').text(i + 1);
                                 });
+                                // Recalculate totals
+                                updateTableCalculations();
 
                                 // Initialize tooltips
                                 initializeTooltips();
 
-                                // Recalculate totals
-                                updateTableCalculations();
                             }
                         });
-
+                         if (mode === "JIT") {
+                             table.column(-1).visible(false).draw(false);
+                             console.log("✅ Hidden last column for JIT mode");
+                         }
+                        // Recalculate totals
+                        updateTableCalculations();
                         // Remove link handler
                         $('#tblItems tbody').on('click', '.remove-link', function (e) {
                             e.preventDefault();
                             let row = table.row($(this).closest('tr'));
+                            let rowData = row.data();
                             if (row) {
+                                removedItems.push(rowData); // store removed item
                                 row.remove().draw();
+                                console.log("Removed item stored:", removedItems);
                             }
                         });
                     },
                     error: function (err) {
-                        console.log(err);
+                        console.error(err);
+                        alert("Failed to create JIT PO.");
+                    }
+                 });
+
+            } else {
+                //$("#btnRestoreItem").toggle();
+                $.ajax({
+                url: '/Purchase/GetCreatePoDetailsOK',
+                type: 'GET',
+                success: function (response) {
+                    let header = response.QuotationHeader[0];
+                    let staff = response.AccountantStaff;
+                    let terms = response.TermsConditions;
+                    let items = response.Items;
+
+                    console.log("terms", terms);
+                    console.log("items", items);
+                    console.log("HEADER", header);
+
+                    // ------------------------------
+                    // 📝 Populate Header Details
+                    // ------------------------------
+                    $("#QuotationNo").val(header.QuotationID);
+                    // $("#QuotationDate").val(header.QuotationDateString);
+                    if (header.QuotationDateString) {
+                        console.log(header.QuotationDateString);
+                        $("#QuotationDate").val(moment(header.QuotationDateString, "YYYY-MM-DD").format("DD/MM/YYYY"));
+                    }
+                    $("#ApprovedBy").val(header.ApprovedBy);
+                    // $("#ApprovedDate").val(header.OriginalApprovedDate);
+                    if (header.OriginalApprovedDate) {
+                        $("#ApprovedDate").val(moment(header.OriginalApprovedDate, "YYYY-MM-DD").format("DD/MM/YYYY"));
+                    }
+                    $("#VendorName").val(header.VendorName);
+                    $("#CompanyName").val(header.CompanyName);
+                    $("#CompanyAddress").val(header.CompanyAddress);
+                    $("#VendorContactNumber").val(header.MobileNo);
+                    $("#VendorEmail").val(header.Email);
+                    $("#VendorAccountNumber").val(header.AccountNumber);
+                    $("#IFSCcode").val(header.IFSCCode);
+                    $("#SwiftCode").val(header.SwiftCode);
+                    $("#DeliveryAddress").val(header.DeliveryAddress);
+                    $("#TotalAmount").val(header.TotalAmount);
+                    $("#BillingAddress").val(header.BillingAddress);
+                    $("#transportationCharges").text('₹' +header.ShippingCharges);
+                    $("#grandTotal").text('₹' +header.TotalAmount);
+                    $("#subTotal").text('₹' + (header.SubAmount).toFixed(2));
+
+
+
+                    // ------------------------------
+                    // 👨‍💼 Accountant Dropdown
+                    // ------------------------------
+                    $("#ddlAccountant").empty().append('<option value="">Select Accountant Email</option>');
+                    $.each(staff, function (i, row) {
+                        $("#ddlAccountant").append(`<option value="${row.StaffCode}">${row.AccountEmail}</option>`);
+                    });
+
+                    // ------------------------------
+                    // 📜 Terms & Conditions
+                    // ------------------------------
+                    $("#termsList").empty();
+                    $.each(terms, function (i, row) {
+                        $("#termsList").append(`
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="${row.TermConditionId}" id="term${row.TermConditionId}">
+                                <label class="form-check-label" for="term${row.TermConditionId}">${row.TermConditionName}</label>
+                            </div>
+                        `);
+                    });
+
+                    // ------------------------------
+                    // 📦 Items Table Initialization
+                    // ------------------------------
+                    table = $('#tblItems').DataTable({
+                        destroy: true,
+                        data: items,
+                        columns: [
+                            { data: "SRNO" },
+                            { data: "ItemCode" },
+                            { data: "RegisterQuotationItemCode", visible: false },
+                            { data: "ItemName" },
+                            {data:"ItemCode", visible: false},
+                            {
+                                data: "Description",
+                                render: function (data) {
+                                    let safe = (data === null || data === undefined) ? '' : String(data);
+                                    return `<span data-bs-toggle="tooltip" title="${safe}">${safe}</span>`;
+                                }
+                            },
+                            { data: "Quantity" },
+                            { data: "UOM" },
+                            { data: "CostPerUnit", render: data => '₹' + parseFloat(data).toFixed(2) },
+                            { data: "Discount" },
+                            { data: "GST" },
+                            { data: "Amount", render: data => '₹' + parseFloat(data).toFixed(2) },
+                            {
+                                data: null,
+                                orderable: false,
+                                searchable: false,
+                                className: "text-center",
+                                render: () => `
+                                    <a href="#" class="remove-link btn btn-danger btn-sm d-inline-flex align-items-center justify-content-center p-1 rounded-circle" title="Delete">
+                                        <i class="bi bi-trash-fill text-white"></i>
+                                    </a>
+                                `
+                            }
+
+                        ],
+                        columnDefs: [
+                            { className: "text-center", targets: "_all" }  // 👈 Centers all columns
+                        ],
+                        paging: true,
+                      //  searching: true,
+                        ordering: false,
+                        lengthChange: false,
+                        pageLength: 10,
+                        drawCallback: function () {
+                            // Re-number rows
+                            this.api().rows({ order: 'applied', search: 'applied' }).nodes().each(function (row, i) {
+                                $(row).find('td:eq(0)').text(i + 1);
+                            });
+
+                            // Initialize tooltips
+                            initializeTooltips();
+
+                            // Recalculate totals
+                            updateTableCalculations();
+                        }
+                    });
+
+                    // Remove link handler
+                    $('#tblItems tbody').on('click', '.remove-link', function (e) {
+                        e.preventDefault();
+                        let row = table.row($(this).closest('tr'));
+                        let rowData = row.data();
+                        if (row) {
+                            removedItems.push(rowData); // store removed item
+                            row.remove().draw();
+                            console.log("Removed item stored:", removedItems);
+                        }
+                    });
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+            });
+            }
+
+        });
+        $("#btnRestoreItem").click(function () {
+            if (removedItems.length === 0) {
+                showWarningToast("No removed items to restore!");
+                return;
+            }
+
+            // clear and repopulate dropdown
+            $("#ddlRemovedItems").empty().append('<option value="">Select Item</option>');
+            $.each(removedItems, function (i, item) {
+                $("#ddlRemovedItems").append(`<option value="${i}">${item.ItemName} (${item.ItemCode})</option>`);
+            });
+
+            // reset fields
+            $("#restoreDetails").hide();
+            $("#restoreQty").val('');
+            $("#restoreDesc").val('');
+
+            // show modal
+            $("#restoreModal").modal('show');
+        });
+
+        $("#ddlRemovedItems").change(function () {
+            let index = $(this).val();
+            if (index === "") {
+                $("#restoreDetails").hide();
+                return;
+            }
+
+            let item = removedItems[index];
+            $("#restoreDetails").show();
+            $("#restoreQty").val(item.Quantity).prop("readonly", true);
+            $("#restoreDesc").val(item.Description).prop("readonly", true);
+
+        });
+
+
+        $("#btnAddBack").click(function () {
+            let index = $("#ddlRemovedItems").val();
+            if (index === "") {
+                showWarningToast("Please select an item to restore!");
+                return;
+            }
+
+            let item = removedItems[index];
+            item.Quantity = $("#restoreQty").val();
+            item.Description = $("#restoreDesc").val();
+
+            // Add back to DataTable
+            table.row.add(item).draw();
+
+            // Remove from removedItems array
+            removedItems.splice(index, 1);
+
+            $("#restoreModal").modal('hide');
+            updateTableCalculations();
+            showSuccessToast("Item restored successfully!");
+        });
+
+
+        // ====================================================
+        // ✅ Toast Notification Helper
+        // ====================================================
+        toastr.options = {
+            closeButton: true,
+            progressBar: true,
+            newestOnTop: true,
+            positionClass: "toast-top-right",
+            preventDuplicates: true,
+            timeOut: 3000,
+            extendedTimeOut: 1000,
+            showDuration: 300,
+            hideDuration: 300,
+            showMethod: "slideDown",
+            hideMethod: "fadeOut"
+        };
+        // ⚠️ Warning Toast
+        function showWarningToast(message) {
+            toastr.warning(message, "Warning");
+        }
+
+        // ✅ Success Toast
+        function showSuccessToast(message) {
+            toastr.success(message, "Success");
+        }
+
+        // ====================================================
+        // ✅ Tooltip Initializer
+        // ====================================================
+        function initializeTooltips() {
+            $('[data-bs-toggle="tooltip"]').each(function () {
+                const existing = bootstrap.Tooltip.getInstance(this);
+                if (existing) existing.dispose();
+            });
+
+            $('[data-bs-toggle="tooltip"]').each(function () {
+                new bootstrap.Tooltip(this, {
+                    placement: 'top',
+                    customClass: 'tooltip-dark',
+                    popperConfig: {
+                        modifiers: [
+                            { name: 'flip', options: { fallbackPlacements: [] } }
+                        ]
                     }
                 });
             });
+        }
 
-            // ====================================================
-            // ✅ Toast Notification Helper
-            // ====================================================
-            function showToast(message, type = 'danger') {
-                const toastHTML = `
-                    <div class="toast align-items-center text-white bg-${type} border-0 mb-2" role="alert">
-                        <div class="d-flex">
-                            <div class="toast-body">${message}</div>
-                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-                        </div>
-                    </div>`;
-                const $toast = $(toastHTML);
-                $('#toastContainer').append($toast);
-                new bootstrap.Toast($toast[0], { delay: 3000 }).show();
-                $toast.on('hidden.bs.toast', function () { $(this).remove(); });
+        // ====================================================
+        // ✅ Recalculate Subtotal & Grand Total
+        // ====================================================
+        function updateTableCalculations() {
+            if (!table) return;
+            let subamount = 0;
+
+            table.rows({ search: 'applied' }).every(function () {
+                let rowData = this.data();
+                let amount = parseFloat(rowData.Amount) || 0;
+                subamount += amount;
+            });
+
+            $("#subTotal").text('₹' + subamount.toFixed(2));
+            let transportation = parseFloat($("#transportationCharges").text().replace(/[^0-9.-]+/g, '')) || 0;
+            let grandTotal = subamount + transportation;
+
+            $("#grandTotal").text('₹' + grandTotal.toFixed(2));
+            $("#TotalAmount").val(grandTotal.toFixed(2));
+
+            console.log("Grand Total Recalculated:", grandTotal);
+            console.log("Subamount:", subamount);
+        }
+
+        function CretePO(e) {
+            e.preventDefault();
+
+            // ✅ Get total rows in DataTable
+            let rowCount = table.rows({ search: 'applied' }).count();
+
+            // ✅ Check if rows are 0
+            if (rowCount === 0) {
+                toastr.error("No items available to create a Purchase Order!", "Error");
+                return; // Stop further execution
             }
 
-            // ====================================================
-            // ✅ Tooltip Initializer
-            // ====================================================
-            function initializeTooltips() {
-                $('[data-bs-toggle="tooltip"]').each(function () {
-                    const existing = bootstrap.Tooltip.getInstance(this);
-                    if (existing) existing.dispose();
-                });
+            // Remove old hidden fields
+            $(".po-form input[name='ItemsJson']").remove();
+            $(".po-form input[name='Terms']").remove();
 
-                $('[data-bs-toggle="tooltip"]').each(function () {
-                    new bootstrap.Tooltip(this, {
-                        placement: 'top',
-                        customClass: 'tooltip-dark',
-                        popperConfig: {
-                            modifiers: [
-                                { name: 'flip', options: { fallbackPlacements: [] } }
-                            ]
-                        }
-                    });
-                });
-            }
+            // Collect items
+            let poItems = [];
+            table.rows({ search: 'applied' }).every(function () {
+                let rowData = this.data();
+                poItems.push({ RQItemCode: rowData.RegisterQuotationItemCode });
+            });
+            console.log("PO Items:", poItems);
+            // Add hidden field for items
+            $(".po-form").append(
+                `<input type="hidden" name="POItems" value='${JSON.stringify(poItems)}'/>`
+            );
 
-            // ====================================================
-            // ✅ Recalculate Subtotal & Grand Total
-            // ====================================================
-            function updateTableCalculations() {
-                if (!table) return;
-                let subamount = 0;
+            let Itemslst = [];
+            table.rows({ search: 'applied' }).every(function () {
+                let rowData = this.data();
+                Itemslst.push({ ItemCode: rowData.ItemCode });
+            });
+            console.log("Itemslst:", Itemslst);
 
-                table.rows({ search: 'applied' }).every(function () {
-                    let rowData = this.data();
-                    let amount = parseFloat(rowData.Amount) || 0;
-                    subamount += amount;
-                });
+            // Add hidden field for items
+            $(".po-form").append(
+                `<input type="hidden" name="Itemslst" value='${JSON.stringify(Itemslst)}'/>`
+            );
 
-                $("#subTotal").text('₹' + subamount.toFixed(2));
-                let transportation = parseFloat($("#transportationCharges").text().replace(/[^0-9.-]+/g, '')) || 0;
-                let grandTotal = subamount + transportation;
+            // Collect terms
+            let checkedTermIds = [];
+            $('#termsList input[type=checkbox]:checked').each(function () {
+                checkedTermIds.push($(this).val());
+            });
+            let idsString = checkedTermIds.join(",");
+            $(".po-form").append(
+                `<input type="hidden" name="TermConditionIds" value="${idsString}" />`
+            );
 
-                $("#grandTotal").text('₹' + grandTotal.toFixed(2));
-                $("#TotalAmount").val(grandTotal.toFixed(2));
+            console.log("Selected TermCondition IDs:", idsString);
 
-                console.log("Grand Total Recalculated:", grandTotal);
-                console.log("Subamount:", subamount);
-            }
+            // Calculate grand total
+            let grandTotalNumber = parseFloat($("#grandTotal").text().replace(/[^0-9.-]+/g, ''));
+            $("#TotalAmount").val(grandTotalNumber.toFixed(2));
 
-            function CretePO(e) {
-                e.preventDefault();
+            // Serialize form
+            let formData = $(".po-form").serialize();
+            console.log("Serialized Form Data:", formData);
 
-                // Remove old hidden fields
-                $(".po-form input[name='ItemsJson']").remove();
-                $(".po-form input[name='Terms']").remove();
+            // Build model (for debug)
+            let model = {
+                RegisterQuotationCode: $("#QuotationNo").val(),
+                UserCode: $("#ddlAccountant").val(),
+                TotalAmount: $("#grandTotal").val(),
+                TermsConditionId: idsString,
+                BillingAddress: $("#BillingAddress").val(),
+                POItems: poItems,
+                Itemcodes: Itemslst
+            };
+            console.log("Model", model);
 
-                // Collect items
-                let poItems = [];
-                table.rows({ search: 'applied' }).every(function () {
-                    let rowData = this.data();
-                    poItems.push({ RQItemCode: rowData.RegisterQuotationItemCode });
-                });
-                console.log("PO Items:", poItems);
-
-                // Add hidden field for items
-                $(".po-form").append(
-                    `<input type="hidden" name="POItems" value='${JSON.stringify(poItems)}'/>`
-                );
-
-                // Collect terms
-                let checkedTermIds = [];
-                $('#termsList input[type=checkbox]:checked').each(function () {
-                    checkedTermIds.push($(this).val());
-                });
-                let idsString = checkedTermIds.join(",");
-                $(".po-form").append(
-                    `<input type="hidden" name="TermConditionIds" value="${idsString}" />`
-                );
-
-                console.log("Selected TermCondition IDs:", idsString);
-
-                // Calculate grand total
-                let grandTotalNumber = parseFloat($("#grandTotal").text().replace(/[^0-9.-]+/g, ''));
-                $("#TotalAmount").val(grandTotalNumber.toFixed(2));
-
-                // Serialize form
-                let formData = $(".po-form").serialize();
-                console.log("Serialized Form Data:", formData);
-
-                // Build model (for debug)
-                let model = {
-                    RegisterQuotationCode: $("#QuotationNo").val(),
-                    UserCode: $("#ddlAccountant").val(),
-                    TotalAmount: $("#grandTotal").val(),
-                    TermsConditionId: idsString,
-                    BillingAddress: $("#BillingAddress").val(),
-                    POItems: poItems
-                };
-                console.log("Model", model);
-                //$("#QuotationNo").val(header.QuotationID);
-
-                //-----------------------------------------------
-                // ✅ VALIDATION SECTION
-                //-----------------------------------------------
-                let accountant = $("#ddlAccountant").val();
-                let billingAddress = $("#BillingAddress").val().trim();
-                let termChecked = checkedTermIds.length > 0;
-
-                if (!accountant) {
-                    swalWithBootstrapButtons.fire({
-                        title: "Missing Information",
-                        text: "Please select an Accountant Email before proceeding.",
-                        icon: "warning"
-                    });
-                    return; // Stop further execution
-                }
-
-                if (!billingAddress) {
-                    swalWithBootstrapButtons.fire({
-                        title: "Missing Information",
-                        text: "Please enter a Billing Address before proceeding.",
-                        icon: "warning"
-                    });
-                    return;
-                }
-
-                if (!termChecked) {
-                    swalWithBootstrapButtons.fire({
-                        title: "Missing Information",
-                        text: "Please select at least one Term & Condition.",
-                        icon: "warning"
-                    });
-                    return;
-                }
-
-                //-----------------------------------------------
-                // ✅ Confirmation Alert (runs only if validation passes)
-                //-----------------------------------------------
-                swalWithBootstrapButtons.fire({
-                    title: "Are you sure?",
-                    text: "Do you really want to create this Purchase Order?",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonText: "Yes, create it!",
-                    cancelButtonText: "No, cancel!",
-                    reverseButtons: false // Yes first, Cancel second
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: '/Purchase/SavePOOK',
-                            type: 'POST',
-                            data: formData,
-                            success: function (res) {
-                                if (res.success) {
-                                    swalWithBootstrapButtons.fire({
-                                        title: "Created!",
-                                        text: res.message,
-                                        icon: "success",
-                                        showConfirmButton: false,
-                                        timer: 1500
-                                    }).then(() => {
+            //-----------------------------------------------
+            // ✅ Confirmation Alert
+            //-----------------------------------------------
+            swalWithBootstrapButtons.fire({
+                title: "Are you sure?",
+                text: "Do you really want to create this Purchase Order?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes, create it!",
+                cancelButtonText: "No, cancel!",
+                reverseButtons: false, // Yes first, Cancel second
+                customClass: {
+                    confirmButton: 'btn btn-success px-4', // green button
+                    cancelButton: 'btn btn-danger px-4',   // red button
+                    actions: 'swal2-custom-actions'        // for spacing between buttons
+                },
+                buttonsStyling: false // disable SweetAlert2 default button styling
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/Purchase/SavePOOK',
+                        type: 'POST',
+                        data: formData,
+                        success: function (res) {
+                            if (res.success) {
+                                swalWithBootstrapButtons.fire({
+                                    title: "Created!",
+                                    text: res.message,
+                                    icon: "success",
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                }).then(() => {
+                                    if (res.sessionValue === "OK") {
+                                        setTimeout(function () {
+                                            window.location.href = "/Purchase/JustInTimeItemListOK";
+                                        }, 800);
+                                    } else {
                                         setTimeout(function () {
                                             window.location.href = "/Purchase/SelectedQuotationListShowOK";
                                         }, 800);
-                                    });
-                                } else {
-                                    swalWithBootstrapButtons.fire({
-                                        title: "Error",
-                                        text: res.message,
-                                        icon: "error"
-                                    });
-                                }
-                            },
-                            error: function (err) {
-                                console.error(err);
+                                    }
+                                });
+                            } else {
                                 swalWithBootstrapButtons.fire({
                                     title: "Error",
-                                    text: "An unexpected error occurred while saving PO.",
+                                    text: res.message,
                                     icon: "error"
                                 });
                             }
-                        });
-                    }
-                });
-            }
+                        },
+                        error: function (err) {
+                            console.error(err);
+                            swalWithBootstrapButtons.fire({
+                                title: "Error",
+                                text: "An unexpected error occurred while saving PO.",
+                                icon: "error"
+                            });
+                        }
+                    });
+                }
+            });
+        }
 
-
-            // ====================================================
-            // ✅ End of Script
-            // ====================================================
-        </script>
-    </body>
+        // ====================================================
+        // ✅ End of Scripted
+        // ====================================================
+    </script>
+</body>
 </html>

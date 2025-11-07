@@ -6,52 +6,156 @@
 
 
 <style>
-    .stat-card {
+
+
+
+    button.dt-button.processing,
+    div.dt-button.processing {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        background: none !important;
+    }
+
+        button.dt-button.processing:after {
+            content: none !important;
+        }
+
+   
+    body {
+        background-color: #f6f7fb;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    /* --- Dashboard Container --- */
+    .dashboard-container {
         display: flex;
-        flex-direction: column;
-        align-items: center;
         justify-content: center;
-        width: 250px;
-        height: 120px;
+        align-items: stretch;
+        gap: 20px;
+        flex-wrap: nowrap;
+        margin: 40px auto;
+        max-width: 1100px;
+    }
+
+    /* --- Card Base --- */
+    .stat-card {
+        flex: 1 1 250px;
+        background: #fff;
         border-radius: 12px;
-        font-weight: bold;
-        text-align: center;
-        transition: transform 0.2s, box-shadow 0.2s;
-        cursor: pointer;
-        margin: auto;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        padding: 20px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        transition: all 0.25s ease;
+        position: relative;
+        text-align: left;
     }
 
         .stat-card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+            transform: translateY(-4px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.08);
         }
 
-        .stat-card .count {
-            font-size: 32px;
-            margin-bottom: 6px;
-            color: #000;
+        /* Accent bottom border */
+        .stat-card::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            border-radius: 0 0 12px 12px;
+            background: transparent;
+            transition: background 0.3s;
         }
 
-        .stat-card .label {
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-
-    .pending {
-        background-color: #ffb700;
-        color: white;
+    /* --- Icon container --- */
+    .stat-icon {
+        font-size: 26px;
+        padding: 12px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
-    .confirm {
-        background-color: #007bff;
-        color: white;
+    /* --- Info container --- */
+    .stat-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
     }
 
-    .nonconfirm {
-        background-color: #ff0000;
-        color: white;
+    .count {
+        font-size: 28px;
+        font-weight: 600;
+        color: #2d2d2d;
+        margin-bottom: 4px;
+    }
+
+    .label {
+        font-size: 15px;
+        color: #555;
+        font-weight: 500;
+        margin-bottom: 3px;
+    }
+
+    /* --- Color Themes --- */
+    .pending-card .stat-icon {
+        background-color: rgba(255, 193, 7, 0.15);
+        color: #f5a623;
+    }
+
+    .pending-card::after {
+        background: #f5a623;
+    }
+
+    .confirm-card .stat-icon {
+        background-color: rgba(46, 204, 113, 0.15);
+        color: #27ae60;
+    }
+
+    .confirm-card::after {
+        background: #27ae60;
+    }
+
+    .nonconfirm-card .stat-icon {
+        background-color: rgba(231, 76, 60, 0.15);
+        color: #e74c3c;
+    }
+
+    .nonconfirm-card::after {
+        background: #e74c3c;
+    }
+
+    .totalqc-card .stat-icon {
+        background-color: rgba(52, 152, 219, 0.15);
+        color: #3498db;
+    }
+
+    .totalqc-card::after {
+        background: #3498db;
+    }
+
+
+    /* ---- Chart Container ---- */
+    .chart-container {
+        background: #fff;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        margin-top: 20px;
+    }
+
+    /* Chart title & alignment */
+    .chart-title {
+        font-weight: bold;
+        font-size: 16px;
+        color: #333;
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
     }
 
     .dt-toolbar {
@@ -158,12 +262,12 @@
         z-index: 2000;
     }
 
-    /* Define your purple header background */
+
     .bg-purple {
         background-color: #6f42c1 !important;
     }
 
-    /* Ensure header always displays properly */
+
     .modal-header {
         display: flex !important;
         align-items: center;
@@ -172,61 +276,73 @@
         z-index: 1056;
     }
 
-    /* Fix if header hidden due to overflow */
+
     .modal-content {
         overflow: visible !important;
         position: relative;
         z-index: 1055;
     }
 
-    /* Ensure white text stays visible */
-    .modal-title {
-        color: #fff !important;
-    }
+
+
+
 </style>
-<div class="container bg-white shadow-lg rounded-4 p-5 my-4" style="max-width: 95%;">
 
-    <div class="row g-4 justify-content-center">
-        <div class="col-md-3 d-flex justify-content-center">
-            <div class="stat-card pending">
-                <div class="mb-2"><i class="bi bi-hourglass-split fs-3"></i></div>
-                <div class="count" id="pending">0</div>
-                <div class="label">Pending Count</div>
-            </div>
-        </div>
-        <div class="col-md-3 d-flex justify-content-center">
-            <div class="stat-card confirm">
-                <div class="mb-2"><i class="bi bi-check-circle fs-3"></i></div>
-                <div class="count" id="confirm">0</div>
-                <div class="label">Confirm Items Count</div>
-            </div>
-        </div>
-        <div class="col-md-3 d-flex justify-content-center">
-            <div class="stat-card nonconfirm">
-                <div class="mb-2"><i class="bi bi-x-circle fs-3"></i></div>
-                <div class="count" id="nonconfirm">0</div>
-                <div class="label">NonConfirm Items Count</div>
-            </div>
-        </div>
-        </div>
-        <!-- Date Button (fixed position) -->
-        <button id="calendarTrigger"
-                class="btn btn-primary rounded-circle shadow-lg position-fixed"
-                style="top: 70px; right: 20px; width: 60px; height: 60px; z-index: 1050;">
-            <i class="bi bi-calendar-date fs-4"></i>
-        </button>
-
-        <!-- Hidden input used for daterangepicker -->
-        <input type="text" id="reportrange" class="form-control position-fixed"
-               style="top: 70px; right: 20px; width: 1px; height: 1px; opacity: 0; z-index: -1;" />
-
-        <!-- Only one toast container -->
-        <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 2000;"></div>
-
-        <div class="chartparent">
-            <div class="chart-container" id="doughnutChart"></div>
+<!-- ✅ Dashboard Section -->
+<div class="dashboard-container">
+    <div class="stat-card pending-card">
+        <div class="stat-icon"><i class="bi bi-hourglass-split"></i></div>
+        <div class="stat-info">
+            <div class="count" id="pending"></div>
+            <div class="label">Pending Count</div>
         </div>
     </div>
+
+    <div class="stat-card confirm-card">
+        <div class="stat-icon"><i class="bi bi-check-circle"></i></div>
+        <div class="stat-info">
+            <div class="count" id="confirm"></div>
+            <div class="label">Confirm Items Count</div>
+        </div>
+    </div>
+
+    <div class="stat-card nonconfirm-card">
+        <div class="stat-icon"><i class="bi bi-x-circle"></i></div>
+        <div class="stat-info">
+            <div class="count" id="nonconfirm"></div>
+            <div class="label">NonConfirm Items Count</div>
+        </div>
+    </div>
+
+    <div class="stat-card totalqc-card">
+        <div class="stat-icon"><i class="bi bi-bar-chart-line"></i></div>
+        <div class="stat-info">
+            <div class="count" id="totalqc">0</div>
+            <div class="label">Total QC</div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Date Button (fixed position) -->
+<button id="calendarTrigger"
+        class="btn btn-primary rounded-circle shadow-lg position-fixed"
+        style="top: 70px; right: 20px; width: 60px; height: 60px; z-index: 1050;">
+    <i class="bi bi-calendar-date fs-4"></i>
+</button>
+
+<!-- Hidden input used for daterangepicker -->
+<input type="text" id="reportrange" class="form-control position-fixed"
+       style="top: 70px; right: 20px; width: 1px; height: 1px; opacity: 0; z-index: -1;" />
+
+<!-- Only one toast container -->
+<div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 2000;"></div>
+
+<div class="chartparent">
+    <div class="chart-container" id="doughnutChart"></div>
+</div>
+
 
 
 <!-- Confirm Modal -->
@@ -236,14 +352,13 @@
 
             <!-- Modal Header -->
             <div class="modal-header bg-purple justify-content-center">
-                <h5 class="modal-title w-100 text-center text-white">Confirm List</h5>
+                <h5 class="modal-title w-100 text-center text-white  mb-3">Confirm List</h5>
                 <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
             </div>
 
             <!-- Modal Body -->
             <div class="modal-body Confirm-list-body" style="max-height: 500px; overflow-y: auto;">
-                <!-- Date Filter Container -->
-                <div id="confirmDateFilterContainer" class="mb-3"></div>
+
                 <!-- Table -->
                 <div class="table-responsive">
                     <table class="table table-striped table-hover table-bordered" id="confirmTable">
@@ -253,6 +368,7 @@
                                 <th class="text-center">Sr.No</th>
                                 <th class="text-center">QualityCheckCode</th>
                                 <th class="text-center">ItemName</th>
+                                <th class="text-center">Quantity</th>
                                 <th class="text-center">Added By</th>
                                 <th class="text-center">Added Date</th>
                             </tr>
@@ -266,7 +382,44 @@
     </div>
 </div>
 
+<!-- Pending Modal -->
+<div class="modal" id="PendingModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" style="max-width: 1200px; width: 95%; min-height: 600px;">
+        <div class="modal-content" style="min-height: 600px;">
 
+
+            <!-- Modal Header -->
+            <div class="modal-header bg-purple justify-content-center">
+                <h5 class="modal-title w-100 text-center text-white  mb-3">
+                    Pending List
+                </h5>
+                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body Pending-list-body" style="max-height: 500px; overflow-y: auto;">
+                <!-- Table -->
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover table-bordered" id="PendingTable">
+                        <thead class="table-dark">
+                            <tr>
+                                <th class="text-center"><input type="checkbox" id="selectAllPending" /></th>
+                                <th class="text-center">Sr.No</th>
+                                <th class="text-center">QualityCheckCode</th>
+                                <th class="text-center">ItemName</th>
+                                <th class="text-center">Quantity</th>
+                                <th class="text-center">Added By</th>
+                                <th class="text-center">Added Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="PendingListTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
 
 <!-- NonConfirm Modal -->
 <div class="modal fade" id="NonconfirmModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="true">
@@ -275,14 +428,13 @@
 
             <!-- Modal Header -->
             <div class="modal-header bg-purple justify-content-center">
-                <h5 class="modal-title w-100 text-center text-white">Non-Confirm List</h5>
+                <h5 class="modal-title w-100 text-center text-white ">Non-Confirm List</h5>
                 <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
             </div>
 
             <!-- Modal Body -->
             <div class="modal-body Nonconfirm-list-body" style="max-height: 500px; overflow-y: auto;">
-                <!-- Date Filter Container -->
-                <div id="NonconfirmDateFilterContainer" class="mb-3"></div>
+
                 <!-- Table -->
                 <div class="table-responsive">
                     <table class="table table-striped table-hover table-bordered" id="NonconfirmTable">
@@ -292,6 +444,7 @@
                                 <th class="text-center">Sr.No</th>
                                 <th class="text-center">QualityCheckCode</th>
                                 <th class="text-center">ItemName</th>
+                                <th class="text-center">Quantity</th>
                                 <th class="text-center">Added By</th>
                                 <th class="text-center">Added Date</th>
                             </tr>
@@ -307,7 +460,11 @@
 
 
 <script>
+
+    let startDateGlobal = null;
+    let endDateGlobal = null;
     $(document).ready(function () {
+        $.fn.dataTable.ext.errMode = 'none';
         loadDashboardData(); // initial load
         initDateRangePicker();
 
@@ -346,17 +503,17 @@
         // ✅ Toast HTML with white text for all
         const toastHTML = `
 <div id="${toastId}" class="toast align-items-center bg-${type} border-0 mb-2 shadow-lg"
-                         role="alert" aria-live="assertive" aria-atomic="true"
-                         data-bs-delay="3000" data-bs-animation="true">
-                        <div class="d-flex">
-                            <div class="toast-body d-flex align-items-center text-white">
-                                ${icon} ${message}
-                            </div>
-                            <button type="button" class="btn-close btn-close-white me-2 m-auto"
-                                    data-bs-dismiss="toast" aria-label="Close"></button>
-                        </div>
-                        <div class="progress" style="height: 3px; margin:0; background: rgba(255,255,255,0.3);">
-                    <div class="progress-bar" role="progressbar"></div>
+                                 role="alert" aria-live="assertive" aria-atomic="true"
+                                 data-bs-delay="3000" data-bs-animation="true">
+                                <div class="d-flex">
+                                    <div class="toast-body d-flex align-items-center text-white">
+                                        ${icon} ${message}
+                                    </div>
+                                    <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                                            data-bs-dismiss="toast" aria-label="Close"></button>
+                                </div>
+                                <div class="progress" style="height: 3px; margin:0; background: rgba(255,255,255,0.3);">
+                            <div class="progress-bar" role="progressbar"></div>
 </div>
 
 </div>`;
@@ -402,78 +559,435 @@
                 if (data) {
                     $('#confirm').text(data.ConfirmCount);
                     $('#nonconfirm').text(data.NonConfirmCount);
-                    $('#pending').text(data.PendingCount || 0); // pending count
-                    renderDoughnutChart(data.ConfirmCount, data.NonConfirmCount);
+                    $('#pending').text(data.PendingCount);
+
+                    // ✅ Calculate and show Total QC Count
+                    const totalQC = (data.ConfirmCount || 0) + (data.NonConfirmCount || 0) + (data.PendingCount || 0);
+                    $('#totalqc').text(totalQC);
+
+                    renderDoughnutChart(data.ConfirmCount, data.NonConfirmCount, data.PendingCount);
                 }
             }
         });
     }
 
-    // === Pie Chart ===
-    function renderDoughnutChart(c, n) {
+   
+    // === Bar Chart ===
+    function renderDoughnutChart(c, n, p) {
         Highcharts.chart('doughnutChart', {
-            chart: { type: 'pie' }, // Pie chart type
+            chart: {
+                type: 'bar',
+                backgroundColor: 'transparent',
+                height: 300
+            },
             title: {
-                text: 'Pending / Confirm / NonConfirm',
-                text: '<span class=" fw-bolder" style="font-size: 22px;">Pending / Confirm / NonConfirm </span>'
+                text: 'Confirm, NonConfirm, Pending Items Count',
+                style: {
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                    color: '#333'
+                }
+            },
+            xAxis: {
+                categories: ['Confirm', 'Non Confirm', 'Pending'],
+                title: { text: null },
+                labels: {
+                    style: {
+                        fontSize: '13px',
+                        fontWeight: 'bold',
+                        color: '#333'
+                    }
+                }
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Count',
+                    align: 'high'
+                },
+                labels: {
+                    overflow: 'justify',
+                    style: { color: '#555' }
+                },
+                gridLineColor: '#eee'
+            },
+            tooltip: {
+                valueSuffix: ' items'
             },
             plotOptions: {
-                pie: {
-                    // Removed innerSize to make it full pie
-                    cursor: 'pointer',
+                bar: {
                     dataLabels: {
                         enabled: true,
-                        format: '{point.name}: {point.y}'
+                        style: {
+                            fontWeight: 'bold',
+                            color: 'black'
+                        }
                     },
+                    cursor: 'pointer',
                     point: {
                         events: {
                             click: function () {
-                                if (this.name === 'Confirm') loadConfirmList();
-                                else if (this.name === 'Non Confirm') loadNonConfirmList();
+                                if (this.category === 'Confirm')
+                                    loadConfirmList(startDateGlobal, endDateGlobal);
+                                else if (this.category === 'Non Confirm')
+                                    loadNonConfirmList(startDateGlobal, endDateGlobal);
+                                else if (this.category === 'Pending')
+                                    loadPendingList(startDateGlobal, endDateGlobal);
                             }
                         }
                     }
                 }
             },
+            legend: { enabled: false },
+            credits: { enabled: false },
             series: [{
+                name: 'Count',
+                colorByPoint: true,
                 data: [
-                    { name: 'Confirm', y: c, color: '#007bff' },
-                    { name: 'Non Confirm', y: n, color: '#ff0000' }
+                    { name: 'Confirm', y: c, color: 'green' },
+                    { name: 'Non Confirm', y: n, color: 'red' },
+                    { name: 'Pending', y: p, color: 'orange' }
                 ]
             }]
         });
     }
 
-    // Attach Date Filter
-    function attachDateFilter(container, tableId, table, colIndex) {
-        $(container).html(`<div class="input-group" style="max-width:280px;">
-     <span class="input-group-text bg-primary text-white"><i class="bi bi-calendar-date"></i></span>
-     <input type="text" class="form-control dateFilterInput" placeholder="Select date range" readonly />
- </div>`);
-        $(container + ' .dateFilterInput').daterangepicker({ autoUpdateInput: false, locale: { cancelLabel: 'Clear' } }, function (start, end) {
-            $(container + ' .dateFilterInput').val(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
-            $.fn.dataTable.ext.search.push((s, data) => { if (s.nTable.id !== tableId.substring(1)) return true; return moment(data[colIndex], 'DD/MM/YYYY').isBetween(start, end, undefined, '[]'); });
-            table.draw();
-            $.fn.dataTable.ext.search.pop();
+
+
+    function loadPendingList(startDate = null, endDate) {
+        if ($.fn.DataTable.isDataTable('#confirmTable')) $('#confirmTable').DataTable().destroy();
+        if ($.fn.DataTable.isDataTable('#NonconfirmTable')) $('#NonconfirmTable').DataTable().destroy();
+        if ($.fn.DataTable.isDataTable('#PendingTable')) $('#PendingTable').DataTable().destroy();
+
+
+        let requestData = {};
+        startDate = startDateGlobal;
+        endDate = endDateGlobal;
+        if (startDate && endDate) {
+            requestData = { startDate: startDate, endDate: endDate };
+        }
+
+        $.get('/Quality/GetPendingListNAM', requestData, d => {
+            var r = '';
+            console.log(d);
+            if (d && d.length) {
+                $.each(d, (i, x) => {
+                    r += `<tr>
+                            <td class="text-center"><input type="checkbox" class="Pending-row-select" value="${x.QualityCheckCode}" /></td>
+                            <td class="text-center">${i + 1}</td>
+                            <td class="text-center">${x.QualityCheckCode}</td>
+                            <td class="text-center">${x.ItemName}</td>
+                            <td class="text-center">${x.Quantity}</td>
+                            <td class="text-center">${x.AddedBy}</td>
+                            <td>${moment(x.AddedDate).format('DD/MM/YYYY')}</td>
+                        </tr>`;
+                });
+            } else {
+                r = '<tr><td colspan="7" class="text-center">No Records</td></tr>';
+            }
+
+            $('#PendingListTable').html(r);
+
+            if ($.fn.DataTable.isDataTable('#PendingTable')) $('#PendingTable').DataTable().destroy();
+
+            let t = $('#PendingTable').DataTable({
+
+
+
+                dom: '<"dt-toolbar"<"dt-left"B><"dt-search"f>>rt<"bottom d-flex justify-content-between align-items-center"ip>>',
+                ordering: false,
+
+                buttons: [
+                    {
+                        extend: 'print',
+                        title: '',
+                        text: '<i class="bi bi-printer-fill text-dark fs-5"></i>',
+                        titleAttr: 'Print Selected',
+                        action: function (e, dt, button, config) {
+                            if ($('#PendingTable .Pending-row-select:checked').length === 0) {
+                                showToast("Please select at least one row to print!", "warning");
+                                return;
+                            }
+                            $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config);
+                        },
+                        exportOptions: {
+                            // ✅ include Added Date column (remove :not(:last-child))
+                            columns: ':visible:not(:first-child)',
+                            rows: (idx, d, node) => $(node).find('.Pending-row-select').prop('checked'),
+                            format: {
+                                body: (data, row, col, node) => {
+                                    data = typeof data === 'string' ? data.replace(/<[^>]*>/g, '').trim() : data;
+                                    if (col === 1) return ++window.__srnoCounter || (window.__srnoCounter = 1);
+                                    return data;
+                                }
+                            }
+                        },
+                        customize: function (win) {
+                            const today = new Date();
+                            const formattedDate = today.toLocaleDateString('en-GB');
+
+                            // === Header Section ===
+                            $(win.document.body).prepend(`
+                <div style="text-align:center; font-size:18px; font-weight:bold; margin-bottom:5px;">
+                    Pending Quality List
+                </div>
+                <div style="text-align:center; font-size:12px; margin-bottom:10px;">
+                    Genrated Date: ${formattedDate}
+                </div>
+            `);
+
+                            // === Table Styling ===
+                            $(win.document.body).find('thead th').css({
+                                'background-color': '#212529',
+                                'color': '#ffffff',
+                                'text-align': 'center',
+                                '-webkit-print-color-adjust': 'exact',
+                                'print-color-adjust': 'exact'
+                            });
+
+                            $(win.document.body).find('table')
+                                .addClass('table table-bordered table-striped')
+                                .css('font-size', '14px');
+
+                            // === Sr.No Auto Numbering ===
+                            $(win.document.body).find('table tbody tr').each(function (i) {
+                                $(this).find('td:first').text(i + 1);
+                            });
+                        }
+                    }
+                    ,
+
+
+                    {
+                        extend: 'pdfHtml5',
+                        title: 'Pending List',
+                        text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
+                        titleAttr: 'Export PDF',
+                        action: function (e, dt, button, config) {
+                            if ($('#PendingTable .Pending-row-select:checked').length === 0) {
+                                showToast("Please select at least one record to export PDF", "warning");
+                                return;
+                            }
+                            $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, button, config);
+                        },
+                        exportOptions: {
+                            // ✅ Include Added Date column (remove :not(:last-child))
+                            columns: ':visible:not(:first-child)',
+                            rows: (idx, d, node) => $(node).find('.Pending-row-select').prop('checked'),
+                            format: {
+                                body: (data, row, col) => typeof data === 'string'
+                                    ? data.replace(/<\/?[^>]+(>|$)/g, "").trim()
+                                    : data
+                            }
+                        },
+                        filename: function () {
+                            return 'Pending_List_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+                        },
+                        customize: function (doc) {
+                            // === Title and alignment ===
+                            doc.content[0].alignment = 'center';
+                            doc.content[0].fontSize = 14;
+                            doc.content[0].text = 'Pending Quality List';
+
+                            // === Add generated date below title ===
+                            doc.content.splice(1, 0, {
+                                text: 'Generated Date: ' + new Date().toLocaleDateString('en-GB'),
+                                alignment: 'center',
+                                margin: [0, 0, 0, 8],
+                                fontSize: 10
+                            });
+
+                            // === Get table reference ===
+                            const tableNode = doc.content.find(c => c.table);
+                            if (!tableNode) return;
+
+                            // === Table header styling ===
+                            doc.styles.tableHeader = {
+                                alignment: 'center',
+                                fillColor: '#212529',
+                                color: '#ffffff',
+                                bold: true
+                            };
+
+                            // === Add serial number (Sr. No.) ===
+                            tableNode.table.body.forEach((row, i) => {
+                                if (i > 0) row[0] = { text: String(i), alignment: 'center' };
+                            });
+
+                            // === Add padding like your Purchase PDF ===
+                            tableNode.layout = {
+                                paddingLeft: () => 30,
+                                paddingRight: () => 6
+                            };
+                        }
+                    }
+                    ,
+
+
+                    {
+                        extend: 'excelHtml5',
+                        title: '',
+                        filename: 'Pending_List',
+                        text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
+                        titleAttr: 'Export Excel',
+                        action: function (e, dt, button, config) {
+                            if ($('#PendingTable .Pending-row-select:checked').length === 0) {
+                                showToast("Please select at least one record to export Excel", "warning");
+                                return;
+                            }
+                            window.__excelSrCounter = 0;
+                            $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
+                        },
+                        exportOptions: {
+                            // ✅ Include Added Date column (remove :not(:last-child))
+                            columns: ':visible:not(:first-child)',
+                            rows: (idx, d, node) => $(node).find('.Pending-row-select').prop('checked'),
+                            format: {
+                                body: (data, row, col, node) =>
+                                    col === 1
+                                        ? ++window.__excelSrCounter // Sr.No auto increment
+                                        : (typeof data === 'string'
+                                            ? data.replace(/<\/?[^>]+(>|$)/g, "").trim()
+                                            : data)
+                            }
+                        },
+                        customize: function (xlsx) {
+                            const sheet = xlsx.xl.worksheets['sheet1.xml'];
+                            const today = new Date();
+                            const dateStr = today.toLocaleDateString('en-GB');
+
+                            // Shift all existing rows down by 2 to make space for title + date
+                            $(sheet).find('row').each(function () {
+                                let r = parseInt($(this).attr('r'));
+                                $(this).attr('r', r + 2);
+                                $(this).find('c').each(function () {
+                                    const cellRef = $(this).attr('r');
+                                    const col = cellRef.replace(/\d+/g, '');
+                                    const row = parseInt(cellRef.replace(/\D/g, '')) + 2;
+                                    $(this).attr('r', col + row);
+                                });
+                            });
+
+                            // Add Title & Date Row at top (center aligned)
+                            const titleRow = `
+<row r="1">
+        <c t="inlineStr" r="A1" s="51"><is><t>Pending Quality List</t></is></c>
+</row>`;
+                            const dateRow = `
+<row r="2">
+        <c t="inlineStr" r="A2" s="51"><is><t>Genrated Date: ${dateStr}</t></is></c>
+</row>`;
+
+                            // ✅ Merge cells (extended range to include Added Date column if more columns)
+                            const mergeCells = `
+<mergeCells count="2">
+        <mergeCell ref="A1:G1"/>
+        <mergeCell ref="A2:G2"/>
+</mergeCells>`;
+
+                            // Prepend new rows to sheet
+                            sheet.childNodes[0].childNodes[1].innerHTML =
+                                titleRow + dateRow + sheet.childNodes[0].childNodes[1].innerHTML;
+
+                            // Add merged cell info for centering
+                            if ($(sheet).find('mergeCells').length === 0) {
+                                $(sheet).append(mergeCells);
+                            } else {
+                                $(sheet).find('mergeCells').append('<mergeCell ref="A1:G1"/><mergeCell ref="A2:G2"/>');
+                            }
+                        }
+                    },
+
+
+
+                    {
+                        extend: 'csvHtml5',
+                        text: '<i class="bi bi-filetype-csv text-success fs-5"></i>',
+                        titleAttr: 'Export CSV',
+                        action: function (e, dt, button, config) {
+                            if ($('#PendingTable .Pending-row-select:checked').length === 0) {
+                                showToast("Please select at least one row to export CSV", "warning");
+                                return;
+                            }
+                            window.__srnoCounter = 0;
+                            $.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, button, config);
+                        },
+                        exportOptions: {
+                            // ✅ Include Added Date column (remove :not(:last-child))
+                            columns: ':visible:not(:first-child)',
+                            rows: (idx, d, node) => $(node).find('.Pending-row-select').prop('checked'),
+                            format: {
+                                body: (data, row, col, node) => {
+                                    data = typeof data === 'string' ? data.replace(/<[^>]*>/g, '').trim() : data;
+                                    if (col === 1) return ++window.__srnoCounter; // Auto Sr.No
+                                    return data;
+                                }
+                            }
+                        },
+                        filename: () => 'Pending_List_' + new Date().toISOString().slice(0, 10).replace(/-/g, ""),
+                        customize: function (csv) {
+                            // Return CSV without extra heading or date rows (as per your logic)
+                            return csv;
+                        }
+                    }
+                ],
+
+
+            });
+
+            $("#PendingModal").modal("show");
         });
-        $(container + ' .dateFilterInput').on('cancel.daterangepicker', function () { $(this).val(''); table.draw(); });
+
+        $('#selectAllPending').on('click', function () {
+            var checked = this.checked;
+            $('#PendingTable .Pending-row-select').prop('checked', checked);
+        });
+        // Uncheck "Select All" if any single checkbox is unchecked
+        $('#PendingTable').on('change', '.Pending-row-select', function () {
+            // If any unchecked → uncheck header checkbox
+            if (!this.checked) {
+                $('#selectAllPending').prop('checked', false);
+            } else {
+                // If all checked → check header checkbox automatically
+                const allChecked = $('.Pending-row-select:checked').length === $('.Pending-row-select').length;
+                $('#selectAllPending').prop('checked', allChecked);
+            }
+        });
+
     }
 
-    function loadNonConfirmList() {
-        $.get('/Quality/GetNonConfirmedListNAM',
+
+    function loadNonConfirmList(startDate = null, endDate) {
+
+        if ($.fn.DataTable.isDataTable('#NonconfirmTable')) $('#NonconfirmTable').DataTable().destroy();
+        if ($.fn.DataTable.isDataTable('#confirmTable')) $('#confirmTable').DataTable().destroy();
+        if ($.fn.DataTable.isDataTable('#PendingTable')) $('#PendingTable').DataTable().destroy();
+
+
+
+        let requestData = {};
+        startDate = startDateGlobal;
+        endDate = endDateGlobal;
+        if (startDate && endDate) {
+            requestData = { startDate: startDate, endDate: endDate };
+        }
+
+
+        $.get('/Quality/GetNonConfirmedListNAM', requestData,
 
             d => {
                 var r = '';
                 if (d && d.length) {
                     $.each(d, (i, x) => {
                         r += `<tr>
-      <td class="text-center"><input type="checkbox" class="Nonconfirm-row-select" value="${x.QualityCheckCode}" /></td>
-      <td class="text-center">${i + 1}</td>
-      <td class="text-center">${x.QualityCheckCode}</td>
-      <td class="text-center">${x.ItemName}</td>
-      <td class="text-center">${x.AddedBy}</td>
-                                <td>${moment(x.AddedDate).format('DD/MM/YYYY')}</td>
-    </tr>`;
+              <td class="text-center"><input type="checkbox" class="Nonconfirm-row-select" value="${x.QualityCheckCode}" /></td>
+              <td class="text-center">${i + 1}</td>
+              <td class="text-center">${x.QualityCheckCode}</td>
+              <td class="text-center">${x.ItemName}</td>
+              <td class="text-center">${x.Quantity}</td>
+              <td class="text-center">${x.AddedBy}</td>
+                                        <td>${moment(x.AddedDate).format('DD/MM/YYYY')}</td>
+            </tr>`;
                     });
                 }
                 else r = '<tr><td colspan="6" class="text-center">No Records</td></tr>';
@@ -482,6 +996,7 @@
                 let t = $('#NonconfirmTable').DataTable({
                     dom: '<"dt-toolbar"<"dt-left"B><"dt-search"f>>rt<"bottom d-flex justify-content-between align-items-center"ip>>',
                     ordering: false,
+
                     buttons: [
                         // Print button
                         {
@@ -497,10 +1012,11 @@
                                 dt.processing(false); // ✅ force remove buffering spinner
                             },
                             exportOptions: {
+                                // ✅ include Added Date column (remove :not(:last-child))
+                                columns: ':visible:not(:first-child)',
                                 rows: function (idx, data, node) {
                                     return $(node).find('.Nonconfirm-row-select').prop('checked');
                                 },
-                                columns: ':visible:not(:first-child):not(:last-child)',
                                 format: {
                                     body: (function () {
                                         let counter = 0;
@@ -508,7 +1024,7 @@
                                             data = typeof data === 'string'
                                                 ? data.replace(/<[^>]*>/g, '').trim()
                                                 : data;
-                                            if (column === 1) {
+                                            if (column === 1) { // Auto number first visible column
                                                 counter++;
                                                 return counter;
                                             }
@@ -517,102 +1033,105 @@
                                     })()
                                 }
                             },
-                            title: 'Non-confirmlist ',
+                            title: '',
                             customize: function (win) {
-                                // 🔹 Change title style
-                                $(win.document.body).find('h1')
-                                    .css('text-align', 'center')
-                                    .css('font-size', '16pt')
-                                    .css('font-weight', 'bold')
-                                    .css('color', 'black');
+                                const today = new Date();
+                                const formattedDate = today.toLocaleDateString('en-GB');
 
-                                // 🔹 Add generated date below title
-                                $(win.document.body).prepend(
-                                    `<div style="text-align:center; font-size:12pt; font-style:italic; margin-bottom:10px;">
-                                                         Generated on: ${new Date().toLocaleString()}
-                                                      </div>`
-                                );
+                                // 🔹 Add main title and date
+                                $(win.document.body).prepend(`
+        <div style="text-align:center; font-size:18px; font-weight:bold; margin-bottom:5px;">Non-confirm List</div>
+        <div style="text-align:center; font-size:12px; margin-bottom:10px;">Genrated Date: ${formattedDate}</div>
+`);
 
                                 // 🔹 Style table headers
-                                $(win.document.body).find('table thead th')
-                                    .css('background-color', 'black')
-                                    .css('color', 'white')
-                                    .css('font-weight', 'bold')
-                                    .css('text-align', 'center');
+                                $(win.document.body).find('table thead th').css({
+                                    'background-color': '#212529',
+                                    'color': '#ffffff',
+                                    'text-align': 'center',
+                                    '-webkit-print-color-adjust': 'exact',
+                                    'print-color-adjust': 'exact'
+                                });
+
+                                // 🔹 Add table classes and font size
+                                $(win.document.body).find('table')
+                                    .addClass('table table-bordered table-striped')
+                                    .css('font-size', '14px');
+
+                                // 🔹 Auto number rows
+                                $(win.document.body).find('table tbody tr').each(function (i) {
+                                    $(this).find('td:first').text(i + 1);
+                                });
                             }
                         },
-                        // PDF export button
+
+
                         {
                             extend: 'pdfHtml5',
                             text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
-                            titleAttr: 'Export to PDF',
+                            titleAttr: 'Export PDF',
                             action: function (e, dt, button, config) {
                                 if ($('#NonconfirmTable .Nonconfirm-row-select:checked').length === 0) {
                                     showToast("Please select at least one row to export!", "warning");
                                     return;
                                 }
                                 $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, button, config);
-                                dt.processing(false); // ✅ force remove buffering spinner
+                                dt.processing(false); // ✅ remove spinner
                             },
                             exportOptions: {
-                                rows: function (idx, data, node) {
-                                    return $(node).find('.Nonconfirm-row-select').prop('checked');
-                                },
-                                columns: ':visible:not(:first-child):not(:last-child)',
+                                // ✅ include Added Date column (removed :not(:last-child))
+                                columns: ':visible:not(:first-child)',
+                                rows: (idx, d, node) => $(node).find('.Nonconfirm-row-select').prop('checked'),
                                 format: {
-                                    body: (function () {
-                                        let counter = 0;
-                                        return function (data, row, column, node) {
-                                            data = typeof data === 'string'
-                                                ? data.replace(/<[^>]*>/g, '').trim()
-                                                : data;
-                                            if (column === 1) {
-                                                counter++;
-                                                return counter;
-                                            }
-                                            return data;
-                                        };
-                                    })()
+                                    body: (data, row, col) =>
+                                        typeof data === 'string' ? data.replace(/<\/?[^>]+(>|$)/g, "").trim() : data
                                 }
                             },
-                            title: 'Non-confirmlist',
+                            title: 'Non-confirm List',
                             filename: function () {
-                                return 'GRN_List_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+                                return 'NonConfirm_List_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
                             },
                             customize: function (doc) {
-                                doc.styles.title = {
-                                    fontSize: 16,
-                                    bold: true,
-                                    alignment: 'center',
-                                    color: 'black',
+                                // === Title styling ===
+                                doc.content[0].alignment = 'center';
+                                doc.content[0].fontSize = 14;
+                                doc.content[0].text = 'Non-confirm List';
 
-                                };
-
+                                // === Add generated date below title ===
                                 doc.content.splice(1, 0, {
-                                    text: 'Generated on: ' + new Date().toLocaleDateString(),
-                                    fontSize: 12,
-                                    italics: true,
+                                    text: 'Generated Date: ' + new Date().toLocaleDateString('en-GB'),
                                     alignment: 'center',
-                                    margin: [0, 0, 0, 10]
+                                    margin: [0, 0, 0, 8],
+                                    fontSize: 10
                                 });
-                                var tableNode = doc.content[doc.content.length - 1].table;
-                                var headerCells = tableNode.body[0];
-                                headerCells.forEach(function (cell) {
-                                    cell.fillColor = 'black';
-                                    cell.color = 'white';
-                                    cell.bold = true;
-                                    cell.alignment = 'center';
-                                });
-                                tableNode.layout = {
-                                    paddingLeft: () => 30, paddingLeft: () => 6,
 
+                                // === Get table reference ===
+                                const tableNode = doc.content.find(c => c.table);
+                                if (!tableNode) return;
+
+                                // === Table header styling ===
+                                doc.styles.tableHeader = {
+                                    alignment: 'center',
+                                    fillColor: '#212529',
+                                    color: '#ffffff',
+                                    bold: true
                                 };
-                                var colCount = tableNode.body[0].length;
-                                tableNode.widths = new Array(colCount).fill('*'); // distribute evenly
+
+                                // === Add serial number (Sr. No.) ===
+                                tableNode.table.body.forEach((row, i) => {
+                                    if (i > 0) row[0] = { text: String(i), alignment: 'center' };
+                                });
+
+                                // === Table layout and padding ===
+                                tableNode.layout = {
+                                    paddingLeft: () => 30,
+                                    paddingRight: () => 6
+                                };
                             }
                         },
 
-                        // Excel export button
+
+
                         {
                             extend: 'excelHtml5',
                             text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
@@ -622,40 +1141,76 @@
                                     showToast("Please select at least one row to export!", "warning");
                                     return;
                                 }
+                                window.__excelSrCounter = 0; // reset Sr. No counter
                                 $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
-                                dt.processing(false); // ✅ force remove buffering spinner
+                                dt.processing(false); // ✅ remove spinner
                             },
                             exportOptions: {
+                                // ✅ include Added Date column (remove :not(:last-child))
+                                columns: ':visible:not(:first-child)',
                                 rows: function (idx, data, node) {
                                     return $(node).find('.Nonconfirm-row-select').prop('checked');
                                 },
-                                columns: ':visible',
                                 format: {
-                                    body: (function () {
-                                        let counter = 0;
-                                        return function (data, row, column, node) {
-                                            data = typeof data === 'string'
-                                                ? data.replace(/<[^>]*>/g, '').trim()
-                                                : data;
-                                            if (column === 1) {
-                                                counter++;
-                                                return counter;
-                                            }
-                                            return data;
-                                        };
-                                    })()
+                                    body: (data, row, col, node) =>
+                                        col === 1
+                                            ? ++window.__excelSrCounter
+                                            : (typeof data === 'string' ? data.replace(/<\/?[^>]+(>|$)/g, "").trim() : data)
                                 }
                             },
-                            title: 'Nonconfirmlist',
+                            title: '',
                             filename: function () {
-                                return 'non-confirm_List_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+                                return 'NonConfirm_List_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
                             },
                             customize: function (xlsx) {
-                                var sheet = xlsx.xl.worksheets['sheet1.xml'];
-                                $('row:first c', sheet).attr('s', '2'); // ✅ bold header
+                                const sheet = xlsx.xl.worksheets['sheet1.xml'];
+                                const today = new Date();
+                                const dateStr = today.toLocaleDateString('en-GB');
+
+                                // 🔹 Shift existing rows down to add title + date
+                                $(sheet).find('row').each(function () {
+                                    let r = parseInt($(this).attr('r'));
+                                    $(this).attr('r', r + 2);
+                                    $(this).find('c').each(function () {
+                                        const cellRef = $(this).attr('r');
+                                        const col = cellRef.replace(/\d+/g, '');
+                                        const row = parseInt(cellRef.replace(/\D/g, '')) + 2;
+                                        $(this).attr('r', col + row);
+                                    });
+                                });
+
+                                // 🔹 Add Title & Date Row at top (center aligned)
+                                const titleRow = `
+<row r="1">
+        <c t="inlineStr" r="A1" s="51"><is><t>Non-confirm List</t></is></c>
+</row>`;
+                                const dateRow = `
+<row r="2">
+        <c t="inlineStr" r="A2" s="51"><is><t>Generated Date: ${dateStr}</t></is></c>
+</row>`;
+
+                                // 🔹 Merge cells to center title and date (A1:E1 and A2:E2)
+                                const mergeCells = `
+<mergeCells count="2">
+        <mergeCell ref="A1:E1"/>
+        <mergeCell ref="A2:E2"/>
+</mergeCells>`;
+
+                                // 🔹 Prepend new rows to sheet
+                                sheet.childNodes[0].childNodes[1].innerHTML =
+                                    titleRow + dateRow + sheet.childNodes[0].childNodes[1].innerHTML;
+
+                                // 🔹 Add merged cell info for centering
+                                if ($(sheet).find('mergeCells').length === 0) {
+                                    $(sheet).append(mergeCells);
+                                } else {
+                                    $(sheet).find('mergeCells').append('<mergeCell ref="A1:E1"/><mergeCell ref="A2:E2"/>');
+                                }
                             }
                         },
-                        // CSV export button
+
+
+
                         {
                             extend: 'csvHtml5',
                             text: '<i class="bi bi-filetype-csv text-success fs-5"></i>',
@@ -665,8 +1220,9 @@
                                     showToast("Please select at least one row to export!", "warning");
                                     return;
                                 }
+                                window.__srnoCounter = 0; // reset Sr. No counter
                                 $.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, button, config);
-                                dt.processing(false); // ✅ force remove buffering spinner
+                                dt.processing(false); // remove spinner
                             },
                             exportOptions: {
                                 rows: function (idx, data, node) {
@@ -677,64 +1233,84 @@
                                     body: (function () {
                                         let counter = 0;
                                         return function (data, row, column, node) {
-                                            data = typeof data === 'string'
-                                                ? data.replace(/<[^>]*>/g, '').trim()
-                                                : data;
-                                            if (column === 1) {
-                                                counter++;
-                                                return counter;
-                                            }
-                                            if (column === 3) {
-                                                // Convert to proper DD-MM-YYYY
-                                                if (moment(data, 'DD-MM-YYYY', true).isValid()) {
-                                                    return moment(data, 'DD-MM-YYYY').format('DD-MM-YYYY');
-                                                }
-                                                // fallback if data is ISO or DB format
-                                                if (moment(data).isValid()) {
-                                                    return moment(data).format('DD-MM-YYYY');
-                                                }
-                                                return data; // leave unchanged if not a date
-                                            }
+                                            data = typeof data === 'string' ? data.replace(/<[^>]*>/g, '').trim() : data;
+                                            if (column === 1) return ++window.__srnoCounter; // Sr. No
                                             return data;
                                         };
                                     })()
                                 }
                             },
-                            title: 'NonConfirm-List',
+                            title: '',
                             filename: function () {
-                                return 'nonconfirm_List_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+                                return 'NonConfirm_List_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+                            },
+                            customize: function (csv) {
+                                // Return CSV without any heading or export date
+                                return csv;
                             }
                         }
                     ],
+
                 });
 
-                attachDateFilter('#NonconfirmDateFilterContainer', '#NonconfirmTable', t, 5);
+
                 $("#NonconfirmModal").modal("show");
             });
         $('#selectAllNonConfirm').on('click', function () {
             var checked = this.checked;
             $('#NonconfirmTable .Nonconfirm-row-select').prop('checked', checked);
         });
+        // Select / Deselect all rows
+        $('#selectAllNonConfirm').on('click', function () {
+            var checked = this.checked;
+            $('#NonconfirmTable .Nonconfirm-row-select').prop('checked', checked);
+        });
+
+        // If any row checkbox is unchecked, uncheck the header checkbox
+        $('#NonconfirmTable').on('change', '.Nonconfirm-row-select', function () {
+            if (!this.checked) {
+                $('#selectAllNonConfirm').prop('checked', false);
+            } else {
+                // If all checkboxes are checked, check the header checkbox
+                var allChecked = $('#NonconfirmTable .Nonconfirm-row-select').length ===
+                    $('#NonconfirmTable .Nonconfirm-row-select:checked').length;
+                $('#selectAllNonConfirm').prop('checked', allChecked);
+            }
+        });
+
     }
 
 
 
     // Load Confirm List
-    function loadConfirmList() {
-        $.get('/Quality/GetConfirmedListNAM',
+    function loadConfirmList(startDate = null, endDate) {
+        if ($.fn.DataTable.isDataTable('#confirmTable')) $('#confirmTable').DataTable().destroy();
+        if ($.fn.DataTable.isDataTable('#NonconfirmTable')) $('#NonconfirmTable').DataTable().destroy();
+        if ($.fn.DataTable.isDataTable('#PendingTable')) $('#PendingTable').DataTable().destroy();
+
+
+
+        let requestData = {};
+        startDate = startDateGlobal;
+        endDate = endDateGlobal;
+        if (startDate && endDate) {
+            requestData = { startDate: startDate, endDate: endDate };
+        }
+        $.get('/Quality/GetConfirmedListNAM', requestData,
 
             d => {
                 var r = '';
                 if (d && d.length) {
                     $.each(d, (i, x) => {
                         r += `<tr>
-         <td class="text-center"><input type="checkbox" class="confirm-row-select" value="${x.QualityCheckCode}" /></td>
-         <td class="text-center">${i + 1}</td>
-         <td class="text-center">${x.QualityCheckCode}</td>
-         <td class="text-center">${x.ItemName}</td>
-         <td class="text-center">${x.AddedBy}</td>
-                                <td>${moment(x.AddedDate).format('DD/MM/YYYY')}</td>
-       </tr>`;
+                 <td class="text-center"><input type="checkbox" class="confirm-row-select" value="${x.QualityCheckCode}" /></td>
+                 <td class="text-center">${i + 1}</td>
+                 <td class="text-center">${x.QualityCheckCode}</td>
+                 <td class="text-center">${x.ItemName}</td>
+                 <td class="text-center">${x.Quantity}</td>
+                 <td class="text-center">${x.AddedBy}</td>
+                                        <td>${moment(x.AddedDate).format('DD/MM/YYYY')}</td>
+               </tr>`;
                     });
                 }
                 else r = '<tr><td colspan="6" class="text-center">No Records</td></tr>';
@@ -745,8 +1321,11 @@
                     ordering: false,
                     buttons: [
                         // Print button
+                        // Print
+                        // ✅ PRINT BUTTON (includes Added Date)
                         {
                             extend: 'print',
+                            title: '',
                             text: '<i class="bi bi-printer-fill text-dark fs-5"></i>',
                             titleAttr: 'Print Selected',
                             action: function (e, dt, button, config) {
@@ -755,168 +1334,191 @@
                                     return;
                                 }
                                 $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config);
-                                dt.processing(false); // ✅ force remove buffering spinner
+                                dt.processing(false);
                             },
                             exportOptions: {
-                                rows: function (idx, data, node) {
-                                    return $(node).find('.confirm-row-select').prop('checked');
-                                },
-                                columns: ':visible:not(:first-child):not(:last-child)',
+                                // ✅ Include Added Date column (removed :not(:last-child))
+                                columns: ':visible:not(:first-child)',
+                                rows: (idx, data, node) => $(node).find('.confirm-row-select').prop('checked'),
                                 format: {
                                     body: (function () {
                                         let counter = 0;
                                         return function (data, row, column, node) {
-                                            data = typeof data === 'string'
-                                                ? data.replace(/<[^>]*>/g, '').trim()
-                                                : data;
-                                            if (column === 1) {
-                                                counter++;
-                                                return counter;
-                                            }
+                                            data = typeof data === 'string' ? data.replace(/<[^>]*>/g, '').trim() : data;
+                                            if (column === 1) return ++counter; // Sr.No auto
                                             return data;
                                         };
                                     })()
                                 }
                             },
-                            title: 'Confirm-list',
                             customize: function (win) {
-                                // 🔹 Change title style
-                                $(win.document.body).find('h1')
-                                    .css('text-align', 'center')
-                                    .css('font-size', '16pt')
-                                    .css('font-weight', 'bold')
-                                    .css('color', 'black');
+                                const today = new Date();
+                                const formattedDate = today.toLocaleDateString('en-GB');
+                                $(win.document.body).prepend(`
+                <div style="text-align:center; font-size:18px; font-weight:bold; margin-bottom:5px;">Confirm List</div>
+                <div style="text-align:center; font-size:12px; margin-bottom:10px;">Generated Date: ${formattedDate}</div>
+            `);
+                                $(win.document.body).find('thead th').css({
+                                    'background-color': '#212529',
+                                    'color': '#ffffff',
+                                    'text-align': 'center',
+                                    '-webkit-print-color-adjust': 'exact',
+                                    'print-color-adjust': 'exact'
+                                });
+                                $(win.document.body).find('table').addClass('table table-bordered table-striped').css('font-size', '14px');
+                                $(win.document.body).find('table tbody tr').each(function (i) {
+                                    $(this).find('td:first').text(i + 1);
+                                });
 
-                                // 🔹 Add generated date below title
-                                $(win.document.body).prepend(
-                                    `<div style="text-align:center; font-size:12pt; font-style:italic; margin-bottom:10px;">
-                                                            Generated on: ${new Date().toLocaleString()}
-                                                         </div>`
-                                );
-
-                                // 🔹 Style table headers
-                                $(win.document.body).find('table thead th')
-                                    .css('background-color', 'black')
-                                    .css('color', 'white')
-                                    .css('font-weight', 'bold')
-                                    .css('text-align', 'center');
+                                // ✅ Center align Added Date column
+                                $(win.document.body).find('table tbody tr td:last-child').css('text-align', 'center');
                             }
                         },
-                        // PDF export button
+
+                        // ✅ PDF BUTTON (includes Added Date)
                         {
                             extend: 'pdfHtml5',
+                            title: 'Confirm List',
                             text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
-                            titleAttr: 'Export to PDF',
+                            titleAttr: 'Export PDF',
                             action: function (e, dt, button, config) {
                                 if ($('#confirmTable .confirm-row-select:checked').length === 0) {
                                     showToast("Please select at least one row to export!", "warning");
                                     return;
                                 }
                                 $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, button, config);
-                                dt.processing(false); // ✅ force remove buffering spinner
+                                dt.processing(false);
                             },
                             exportOptions: {
-                                rows: function (idx, data, node) {
-                                    return $(node).find('.confirm-row-select').prop('checked');
-                                },
-                                columns: ':visible:not(:first-child):not(:last-child)',
+                                // ✅ Include Added Date column
+                                columns: ':visible:not(:first-child)',
+                                rows: (idx, data, node) => $(node).find('.confirm-row-select').prop('checked'),
                                 format: {
                                     body: (function () {
                                         let counter = 0;
                                         return function (data, row, column, node) {
-                                            data = typeof data === 'string'
-                                                ? data.replace(/<[^>]*>/g, '').trim()
-                                                : data;
-                                            if (column === 1) {
-                                                counter++;
-                                                return counter;
-                                            }
+                                            data = typeof data === 'string' ? data.replace(/<[^>]*>/g, '').trim() : data;
+                                            if (column === 1) return ++counter;
                                             return data;
                                         };
                                     })()
                                 }
                             },
-                            title: 'Confirm List',
-                            filename: function () {
-                                return 'confirm_List_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
-                            },
                             customize: function (doc) {
-                                doc.styles.title = {
-                                    fontSize: 16,
-                                    bold: true,
-                                    alignment: 'center',
-                                    color: 'black',
+                                // === Title and styling ===
+                                doc.content[0].alignment = 'center';
+                                doc.content[0].fontSize = 14;
 
-                                };
-
+                                // === Add Generated Date below title ===
                                 doc.content.splice(1, 0, {
-                                    text: 'Generated on: ' + new Date().toLocaleDateString(),
-                                    fontSize: 12,
-                                    italics: true,
+                                    text: 'Generated Date: ' + new Date().toLocaleDateString('en-GB'),
                                     alignment: 'center',
-                                    margin: [0, 0, 0, 10]
+                                    margin: [0, 0, 0, 8],
+                                    fontSize: 10
                                 });
-                                var tableNode = doc.content[doc.content.length - 1].table;
-                                var headerCells = tableNode.body[0];
-                                headerCells.forEach(function (cell) {
-                                    cell.fillColor = 'black';
-                                    cell.color = 'white';
-                                    cell.bold = true;
-                                    cell.alignment = 'center';
-                                });
-                                tableNode.layout = {
-                                    paddingLeft: () => 30, paddingLeft: () => 6,
 
+                                const tableNode = doc.content.find(c => c.table);
+                                if (!tableNode) return;
+
+                                // === Table header styling ===
+                                doc.styles.tableHeader = {
+                                    alignment: 'center',
+                                    fillColor: '#212529',
+                                    color: '#ffffff',
+                                    bold: true
                                 };
-                                var colCount = tableNode.body[0].length;
-                                tableNode.widths = new Array(colCount).fill('*'); // distribute evenly
+
+                                // === Sr.No auto numbering ===
+                                tableNode.table.body.forEach((row, i) => {
+                                    if (i > 0) row[0] = { text: String(i), alignment: 'center' };
+                                });
+
+                                // === Add padding ===
+                                tableNode.layout = {
+                                    paddingLeft: () => 30,
+                                    paddingRight: () => 6
+                                };
+                            },
+                            filename: function () {
+                                return 'Confirm_List_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
                             }
                         },
 
-                        // Excel export button
+
+                        // Excel
                         {
                             extend: 'excelHtml5',
+                            title: '',
+                            filename: 'Confirm_List',
                             text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
-                            titleAttr: 'Export to Excel',
+                            titleAttr: 'Export Excel',
                             action: function (e, dt, button, config) {
                                 if ($('#confirmTable .confirm-row-select:checked').length === 0) {
                                     showToast("Please select at least one row to export!", "warning");
                                     return;
                                 }
+                                window.__excelSrCounter = 0;
                                 $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
-                                dt.processing(false); // ✅ force remove buffering spinner
+                                dt.processing(false);
                             },
                             exportOptions: {
-                                rows: function (idx, data, node) {
-                                    return $(node).find('.confirm-row-select:checked').prop('checked');
-                                },
                                 columns: ':visible',
+                                rows: (idx, d, node) => $(node).find('.confirm-row-select').prop('checked'),
                                 format: {
-                                    body: (function () {
-                                        let counter = 0;
-                                        return function (data, row, column, node) {
-                                            data = typeof data === 'string'
-                                                ? data.replace(/<[^>]*>/g, '').trim()
-                                                : data;
-                                            if (column === 1) {
-                                                counter++;
-                                                return counter;
-                                            }
-                                            return data;
-                                        };
-                                    })()
+                                    body: (data, row, col, node) =>
+                                        col === 1 ? ++window.__excelSrCounter : (typeof data === 'string' ? data.replace(/<\/?[^>]+(>|$)/g, "").trim() : data)
                                 }
                             },
-                            title: 'Confirm-list',
-                            filename: function () {
-                                return 'confirm_List_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
-                            },
                             customize: function (xlsx) {
-                                var sheet = xlsx.xl.worksheets['sheet1.xml'];
-                                $('row:first c', sheet).attr('s', '2'); // ✅ bold header
+                                const sheet = xlsx.xl.worksheets['sheet1.xml'];
+                                const today = new Date();
+                                const dateStr = today.toLocaleDateString('en-GB');
+
+                                // Shift all rows down to make space for title and date
+                                $(sheet).find('row').each(function () {
+                                    let r = parseInt($(this).attr('r'));
+                                    $(this).attr('r', r + 2);
+                                    $(this).find('c').each(function () {
+                                        const cellRef = $(this).attr('r');
+                                        const col = cellRef.replace(/\d+/g, '');
+                                        const row = parseInt(cellRef.replace(/\D/g, '')) + 2;
+                                        $(this).attr('r', col + row);
+                                    });
+                                });
+
+                                // Add Title & Date Row at top (center aligned)
+                                const titleRow = `
+<row r="1">
+        <c t="inlineStr" r="A1" s="51"><is><t>Confirm List</t></is></c>
+</row>`;
+                                const dateRow = `
+<row r="2">
+        <c t="inlineStr" r="A2" s="51"><is><t>Generated on: ${dateStr}</t></is></c>
+</row>`;
+
+                                // Merge cells to center title and date (A1:E1 and A2:E2)
+                                const mergeCells = `
+<mergeCells count="2">
+        <mergeCell ref="A1:E1"/>
+        <mergeCell ref="A2:E2"/>
+</mergeCells>`;
+
+                                // Prepend new rows to sheet
+                                sheet.childNodes[0].childNodes[1].innerHTML =
+                                    titleRow + dateRow + sheet.childNodes[0].childNodes[1].innerHTML;
+
+                                // Add merged cell info for centering
+                                if ($(sheet).find('mergeCells').length === 0) {
+                                    $(sheet).append(mergeCells);
+                                } else {
+                                    $(sheet).find('mergeCells').append('<mergeCell ref="A1:E1"/><mergeCell ref="A2:E2"/>');
+                                }
                             }
                         },
-                        // CSV export button
+
+
+
+                        // CSV
                         {
                             extend: 'csvHtml5',
                             text: '<i class="bi bi-filetype-csv text-success fs-5"></i>',
@@ -926,49 +1528,33 @@
                                     showToast("Please select at least one row to export!", "warning");
                                     return;
                                 }
+                                window.__srnoCounter = 0;
                                 $.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, button, config);
-                                dt.processing(false); // ✅ force remove buffering spinner
+                                dt.processing(false);
                             },
                             exportOptions: {
-                                rows: function (idx, data, node) {
-                                    return $(node).find('.confirm-row-select:checked').prop('checked');
-                                },
                                 columns: ':visible',
+                                rows: (idx, d, node) => $(node).find('.confirm-row-select').prop('checked'),
                                 format: {
-                                    body: (function () {
-                                        let counter = 0;
-                                        return function (data, row, column, node) {
-                                            data = typeof data === 'string'
-                                                ? data.replace(/<[^>]*>/g, '').trim()
-                                                : data;
-                                            if (column === 1) {
-                                                counter++;
-                                                return counter;
-                                            }
-                                            if (column === 3) {
-                                                // Convert to proper DD-MM-YYYY
-                                                if (moment(data, 'DD-MM-YYYY', true).isValid()) {
-                                                    return moment(data, 'DD-MM-YYYY').format('DD-MM-YYYY');
-                                                }
-                                                // fallback if data is ISO or DB format
-                                                if (moment(data).isValid()) {
-                                                    return moment(data).format('DD-MM-YYYY');
-                                                }
-                                                return data; // leave unchanged if not a date
-                                            }
-                                            return data;
-                                        };
-                                    })()
+                                    body: (data, row, col, node) => {
+                                        data = typeof data === 'string' ? data.replace(/<[^>]*>/g, '').trim() : data;
+                                        if (col === 1) return ++window.__srnoCounter;
+                                        return data;
+                                    }
                                 }
                             },
-                            title: 'Confirm List',
                             filename: function () {
-                                return 'confirm_List_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+                                return 'Confirm_List_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+                            },
+                            customize: function (csv) {
+                                // Simply return CSV without any heading or generated date
+                                return csv;
                             }
                         }
                     ],
+
                 });
-                attachDateFilter('#confirmDateFilterContainer', '#confirmTable', t, 5);
+
                 $("#confirmModal").modal("show");
 
             });
@@ -976,6 +1562,24 @@
             var checked = this.checked;
             $('#confirmTable .confirm-row-select').prop('checked', checked);
         });
+        // Select / Deselect all rows
+        $('#selectAllConfirm').on('click', function () {
+            var checked = this.checked;
+            $('#confirmTable .confirm-row-select').prop('checked', checked);
+        });
+
+        // If any row checkbox is unchecked, uncheck the header checkbox
+        $('#confirmTable').on('change', '.confirm-row-select', function () {
+            if (!this.checked) {
+                $('#selectAllConfirm').prop('checked', false);
+            } else {
+                // If all checkboxes are checked, check the header checkbox
+                var allChecked = $('#confirmTable .confirm-row-select').length ===
+                    $('#confirmTable .confirm-row-select:checked').length;
+                $('#selectAllConfirm').prop('checked', allChecked);
+            }
+        });
+
     }
 
 
@@ -985,17 +1589,23 @@
         var end = moment();
         function cb(start, end) {
             $('#reportrange').val(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+            startDateGlobal = start.format("YYYY-MM-DD");
+            endDateGlobal = end.format("YYYY-MM-DD");
             loadDashboardData(start.format("YYYY-MM-DD"), end.format("YYYY-MM-DD"));
+
+
+
+
+
         }
         $('#reportrange').daterangepicker({
             startDate: start, endDate: end, autoUpdateInput: false,
             ranges: {
                 'Today': [moment(), moment()],
-                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
                 'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                'This Month': [moment().startOf('month'), moment().endOf('month')],
-                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                'Last 1 Month': [moment().subtract(1, 'month'), moment()],
+                'Last 3 Months': [moment().subtract(3, 'month'), moment()],
+                'Last 1 Year': [moment().subtract(1, 'year'), moment()]
             },
             locale: { cancelLabel: 'Clear' }
         }, cb);
@@ -1003,7 +1613,10 @@
         $('#reportrange').on('cancel.daterangepicker', function () {
             $(this).val('');
             loadDashboardData();
+            startDateGlobal = null;
+            endDateGlobal = null;
+
         });
     }
-    
+
 </script>

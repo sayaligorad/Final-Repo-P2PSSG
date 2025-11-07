@@ -1,0 +1,115 @@
+﻿@{
+    ViewBag.Title = "Send Email with Attachment";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0 rounded-4">
+                <!-- Modal Header -->
+                <div class="modal-header bg-primary text-white d-flex justify-content-center position-relative p-0">
+
+                    <!-- Title Centered -->
+                    <h5 class="modal-title m-0 flex-grow-1 text-center text-white py-3">
+                        Send Mail
+                    </h5>
+
+
+                </div>
+
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" id="mailForm">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">To Email</label>
+                            <input type="text" name="toEmail" class="form-control" id="toEmail" placeholder="example@gmail.com" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Subject</label>
+                            <input type="text" name="subject" class="form-control" id="Subject" placeholder="Enter subject" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Message</label>
+                            <textarea name="messageBody" class="form-control" rows="4" id="messageBody" placeholder="Write your message here..."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Attachment</label>
+                            <input type="file" name="attachment" id="mailAttachment" class="form-control" />
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="bi bi-send-fill"></i> Send Email
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    @*document.addEventListener("DOMContentLoaded", function () {
+        // Only show SweetAlert after mail is actually sent
+        var status = "@ViewBag.Status";
+
+        if (status && status.trim() !== "") {
+            if (status.includes("✅") || status.toLowerCase().includes("success")) {
+                Swal.fire({
+                    title: "Email Sent!",
+                    text: status.replace("✅", ""),
+                    icon: "success",
+                    confirmButtonColor: "#198754"
+                });
+            } else {
+                Swal.fire({
+                    title: "Error!",
+                    text: status.replace("❌", ""),
+                    icon: "error",
+                    confirmButtonColor: "#dc3545"
+                });
+            }
+        }
+    });*@
+
+    $(document).ready(function () {
+        $('#mailForm').on('submit', function (e) {
+            e.preventDefault();
+
+            var toEmail = $('#toEmail').val().split(',').map(e => e.trim());
+            var Subject = $('#Subject').val();
+            var messageBody = $('#messageBody').val();
+            var mailAttachment = $('#mailAttachment')[0].files[0];
+
+            var formData = new FormData();
+            var emailObj = {
+                ToEmails: toEmail,
+                Subject: Subject,
+                Body: messageBody,
+                IsBodyHtml: true,
+                CcEmails: [],
+                BccEmails: [],
+                AttachmentPaths: []
+            };
+
+            formData.append("email", JSON.stringify(emailObj));
+
+            if (mailAttachment) {
+                formData.append("mailAttachment", mailAttachment);
+            }
+
+            sendEmailAjax(formData, {
+                title: "Sending Email...",
+                html: "<b>Please wait.</b>",
+                willClose: () => {
+                    $('#mailForm')[0].reset();
+                }
+            });
+        });
+    });
+
+</script>
+

@@ -1,17 +1,12 @@
 ﻿<div class="d-flex justify-content-between align-items-center mb-3">
-
     <div class="flex-grow-1 text-center">
-        <h4 class="mb-0 text-primary">Rack List</h4>
+        <h4 class="mb-0 h3 text-primary">Rack List</h4>
     </div>
-
     <button class="btn btn-success" id="btnAddrack">
         <i class="bi bi-plus-circle"></i> Add Rack
     </button>
-
 </div>
 
-
-<!-- Table without fixed height container -->
 <div class="table-responsive">
     <table id="rackTable" class="table table-bordered table-hover align-middle w-100">
         <thead class="table-dark text-center">
@@ -33,84 +28,139 @@
     </table>
 </div>
 
-<!-- Add/Edit Rack Modal -->
-<div class="modal fade" id="rackModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+
+<!-- Add Rack Modal -->
+<div class="modal fade" id="addRackModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
-            <div class="modal-header bg-primary text-white position-relative">
-                <h5 class="modal-title text-white w-100 text-center" id="rackModalTitle">Add Rack</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            <div class="modal-header bg-primary text-white position-relative py-2">
+                <h5 class="modal-title h5 text-white text-center mb-1 w-100" id="addRackModalTitle" style="line-height: 1.2;">
+                    Add Rack
+                </h5>
+                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+
             <div class="modal-body">
-                <form id="rackForm" class="row g-3">
-                    <input type="hidden" id="RackId" name="RackId" />
+                <form id="addRackForm" class="row g-3">
 
                     <!-- Rack Code -->
-                    <div class="col-md-6">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-barcode-line"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <input type="text" class="form-control" id="RackCode" name="RackCode" required readonly>
-                                <label for="RackCode">Rack Code</label>
-                            </div>
-                        </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="addRackCode" class="form-label">Rack Code</label>
+                        <input type="text" class="form-control bg-gray" id="addRackCode" name="RackCode" required readonly>
                     </div>
 
                     <!-- Rack Name -->
-                    <div class="col-md-6">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-archive-drawer-line"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <input type="text" class="form-control" id="RackName" name="RackName" required>
-                                <label for="RackName">Rack Name</label>
-                            </div>
-                        </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="addRackName" class="form-label">Rack Name <span class="text-red">*</span></label>
+                        <input type="text" class="form-control" id="addRackName" name="RackName">
+                        <span id="addRackNameError" class="text-danger"></span>
                     </div>
 
                     <!-- Warehouse -->
-                    <div class="col-md-6">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-building-4-line"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <select class="form-select" id="WarehouseId" name="WarehouseId" required>
-                                    <option value="">-- Select Warehouse --</option>
-                                </select>
-                                <label for="WarehouseId">Warehouse</label>
-                            </div>
-                        </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="addWarehouseId" class="form-label">Warehouse <span class="text-red">*</span></label>
+                        <select class="form-select" id="addWarehouseId" name="WarehouseId">
+                            <option value="">-- Select Warehouse --</option>
+                        </select>
+                        <span id="addRackWhNameError" class="text-danger"></span>
                     </div>
 
                     <!-- Section -->
-                    <div class="col-md-6">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-layout-masonry-line"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <select class="form-select" id="SectionId" name="SectionCode" required>
-                                    <option value="">-- Select Section --</option>
-                                </select>
-                                <label for="SectionId">Section</label>
-                            </div>
-                        </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="addSectionId" class="form-label">Section <span class="text-red">*</span></label>
+                        <select class="form-select" id="addSectionId" name="SectionCode">
+                            <option value="">-- Select Section --</option>
+                        </select>
+                        <span id="addRackSectinError" class="text-danger"></span>
                     </div>
 
                     <!-- Description -->
-                    <div class="col-12">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-file-text-line"></i></span>
+                    <div class="col-12 mb-3">
+                        <label for="addDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="addDescription" name="Description" rows="3"></textarea>
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="submit" form="addRackForm" class="btn btn-success px-4" id="addRackModalSubmitBtn">
+                    Save
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Edit Rack Modal -->
+<div class="modal fade" id="editRackModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white position-relative py-2">
+                <h5 class="modal-title h5 text-white text-center mb-1 w-100" id="updateRackModalTitle" style="line-height: 1.2;">
+                    Update Rack
+                </h5>
+                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editRackForm" class="row g-3">
+                    <input type="hidden" id="editRackId" name="RackId" />
+                    <!--  Rack Code  -->
+                    <div class="col-md-6">
+                        <label for="editRackCode">Rack Code</label>
+
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" class="form-control bg-gray" id="editRackCode" name="RackCode" required readonly>
+                        </div>
+
+                    </div>
+                    <!-- Rack Name -->
+                    <div class="col-md-6">
+                        <label for="editRackName">Rack Name <span class="text-red">*</span></label>
+
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" class="form-control" id="editRackName" name="RackName" required>
+                        </div>
+
+                        <small class="text-danger" id="editRackNameError"></small>
+                    </div>
+                    <!--  warehouse name  -->
+                    <div class="col-md-6">
+                        <label for="editWarehouseName">Warehouse</label>
+
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" class="form-control bg-gray" id="editWarehouseName" readonly>
+                            <input type="hidden" id="editWarehouseId" name="WarehouseId">
+                        </div>
+
+                    </div>
+                    <!-- Section name  -->
+                    <div class="col-md-6">
+                        <label for="editSectionName">Section</label>
+                        
                             <div class="form-floating form-floating-outline">
-                                <textarea class="form-control" id="Description" name="Description" rows="3"></textarea>
-                                <label for="Description">Description</label>
+                                <input type="text" class="form-control bg-gray" id="editSectionName" readonly>
+                                <input type="hidden" id="editSectionId" name="SectionCode">
+                                
                             </div>
                         </div>
+                    <!-- Description -->
+                    <div class="col-12">
+                        <label for="editDescription">Description</label>
+
+                        <div class="form-floating form-floating-outline">
+                            <textarea class="form-control" id="editDescription" name="Description" rows="3"></textarea>
+                        </div>
+
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-danger bg-danger text-white px-4" data-bs-dismiss="modal">
-                    <i class="bi bi-x-circle me-2"></i>Close
-                </button>
-                <button type="submit" form="rackForm" class="btn btn-success px-4" id="rackModalSubmitBtn">
-                    <i class="bi bi-check-circle me-2 text-white"></i>Save
+                <button type="submit" form="editRackForm" class="btn btn-success px-4" id="editRackModalSubmitBtn">
+                    <i class="bi bi-check-circle me-2 text-white"></i>Update
                 </button>
             </div>
         </div>
@@ -119,88 +169,64 @@
 
 <!-- View Rack Modal -->
 <div class="modal fade" id="viewRackModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
-            <div class="modal-header bg-primary text-white position-relative">
-                <h5 class="modal-title text-white w-100 text-center">Rack Details</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            <div class="modal-header bg-primary text-white position-relative py-2">
+                <h5 class="modal-title h5 text-white text-center mb-1 w-100" id="rackDetailsModalTitle" style="line-height: 1.2;">
+                    Rack Details
+                </h5>
+                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+
             <div class="modal-body">
                 <form class="row g-3">
-                    <!-- Rack Code -->
                     <div class="col-md-6">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-barcode-line"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <input type="text" class="form-control" id="viewRackCode" readonly>
-                                <label for="viewRackCode">Rack Code</label>
-                            </div>
+                        <label for="viewRackCode">Rack Code</label>
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" class="form-control" id="viewRackCode" readonly>
                         </div>
                     </div>
 
-                    <!-- Rack Name -->
                     <div class="col-md-6">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-archive-drawer-line"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <input type="text" class="form-control" id="viewRackName" readonly>
-                                <label for="viewRackName">Rack Name</label>
-                            </div>
+                        <label for="viewRackName">Rack Name</label>
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" class="form-control" id="viewRackName" readonly>
                         </div>
                     </div>
 
-                    <!-- Warehouse -->
                     <div class="col-md-6">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-building-4-line"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <input type="text" class="form-control" id="viewWarehouseName" readonly>
-                                <label for="viewWarehouseName">Warehouse</label>
-                            </div>
+                        <label for="viewWarehouseName">Warehouse</label>
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" class="form-control" id="viewWarehouseName" readonly>
                         </div>
                     </div>
 
-                    <!-- Section -->
                     <div class="col-md-6">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-layout-masonry-line"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <input type="text" class="form-control" id="viewSectionName" readonly>
-                                <label for="viewSectionName">Section</label>
-                            </div>
+                        <label for="viewSectionName">Section</label>
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" class="form-control" id="viewSectionName" readonly>
                         </div>
                     </div>
 
-                    <!-- Description -->
                     <div class="col-12">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-file-text-line"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <textarea class="form-control" id="viewDescription" rows="2" readonly></textarea>
-                                <label for="viewDescription">Description</label>
-                            </div>
+                        <label for="viewDescription">Description</label>
+                        <div class="form-floating form-floating-outline">
+                            <textarea class="form-control" id="viewDescription" rows="2" readonly></textarea>
                         </div>
                     </div>
 
-                    <!-- Added Date -->
                     <div class="col-md-6">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-calendar-line"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <input type="text" class="form-control" id="viewAddedDate" readonly>
-                                <label for="viewAddedDate">Added Date</label>
-                            </div>
+                        <label for="viewAddedDate">Added Date</label>
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" class="form-control" id="viewAddedDate" readonly>
                         </div>
                     </div>
 
-                    <!-- Added By -->
                     <div class="col-md-6">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-user-3-line"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <input type="text" class="form-control" id="viewAddedBy" readonly>
-                                <label for="viewAddedBy">Added By</label>
-                            </div>
+                        <label for="viewAddedBy">Added By</label>
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" class="form-control" id="viewAddedBy" readonly>
                         </div>
                     </div>
                 </form>
@@ -209,104 +235,227 @@
     </div>
 </div>
 
-<script>
-    toastr.options = {
-        closeButton: true,
-        progressBar: true,
-        newestOnTop: true,
-        positionClass: "toast-top-right",
-        preventDuplicates: true,
-        timeOut: 3000
-    };
 
-    $(document).ready(function () {
-        // Track selected racks
-        let selectedRackIds = new Set();
 
-        // Initialize tooltips
-        function initTooltips() {
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl, {
-                    trigger: 'hover'
-                });
-            });
+<style>
+    button.dt-button.processing,
+    div.dt-button.processing {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        background: none !important;
+    }
+
+        button.dt-button.processing:after {
+            content: none !important;
         }
 
-        // Initialize DataTable WITHOUT scrolling
-        var table = $('#rackTable').DataTable({
-            dom: '<"d-flex justify-content-between align-items-center mt-1 mb-2"Bf>rt<"d-flex justify-content-between mt-2"<"datatable-info"i><"datatable-pagination"p>>',
-            paging: true,
-            pageLength: 25,
-            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
-            "ajax": {
-                "url": "/Inventory/GetRacksSK",
-                "type": "GET",
-                "dataSrc": "data"
+    .text-red {
+        color: red;
+    }
+</style>
+
+<script>
+    $(document).ready(function () {
+        // ================= CONFIGURATION & CONSTANTS =================
+        const CONFIG = {
+            urls: {
+                getRacks: '/Inventory/GetRacksSK',
+                getNextCode: '/Inventory/GetNextRackCodeSK',
+                saveRack: '/Inventory/SaveRackSK',
+                deleteRack: '/Inventory/DeleteRackSK/',
+                getRackById: '/Inventory/GetRackByIdSKK/',
+                getWarehouses: '/Inventory/GetWarehousesListSK',
+                getSections: '/Inventory/GetSectionsSKK'
             },
-            "columns": [
+            selectors: {
+                table: '#rackTable',
+                addForm: '#addRackForm',
+                editForm: '#editRackForm',
+                addModal: '#addRackModal',
+                editModal: '#editRackModal',
+                viewModal: '#viewRackModal'
+            }
+        };
+
+        // ================= GLOBAL VARIABLES =================
+        let selectedRackIds = new Set();
+        let isRackInitialized = false;
+        let table;
+
+        // ================= UTILITY FUNCTIONS =================
+        const utils = {
+            // Tooltip initialization
+            initTooltips: function () {
+                const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                tooltipTriggerList.map(function (tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl, { trigger: 'hover' });
+                });
+            },
+
+            // Date formatting
+            formatDate: function (dateString) {
+                if (!dateString) return "";
+                let date;
+                const match = /\/Date\((\d+)\)\//.exec(dateString);
+                if (match) {
+                    date = new Date(parseInt(match[1]));
+                } else {
+                    date = new Date(dateString);
+                }
+                return !isNaN(date.getTime()) ?
+                    date.toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" }) : "";
+            },
+
+            // Validation helpers
+            showFieldError: function (inputId, errorId, message) {
+                $(`#${inputId}`).addClass("is-invalid");
+                $(`#${errorId}`).text(message).removeClass("d-none");
+            },
+
+            clearFieldError: function (inputId, errorId) {
+                $(`#${inputId}`).removeClass("is-invalid");
+                $(`#${errorId}`).text("").addClass("d-none");
+            },
+
+            clearAllErrors: function (formSelector) {
+                $(`${formSelector} .form-control, ${formSelector} .form-select`).removeClass("is-invalid");
+                $(`${formSelector} .text-danger`).text("").addClass("d-none");
+            },
+
+            // SweetAlert wrapper
+            showAlert: function (title, text, icon, timer = 2000) {
+                return Swal.fire({ title, text, icon, timer, showConfirmButton: false });
+            },
+
+            // Error handler
+            handleError: function (message) {
+                Swal.fire({ title: "Error", text: message, icon: "error", timer: 2500 });
+            }
+        };
+
+        // ================= VALIDATION FUNCTIONS =================
+        const validators = {
+            rackForm: function (formSelector) {
+                let isValid = true;
+                const $form = $(formSelector);
+
+                const fields = {
+                    addRackName: {
+                        value: $form.find("#addRackName").val().trim(),
+                        errorId: 'addRackNameError',
+                        message: 'Rack Name is required.'
+                    },
+                    addWarehouseId: {
+                        value: $form.find("#addWarehouseId").val(),
+                        errorId: 'addRackWhNameError',
+                        message: 'Please select a Warehouse.'
+                    },
+                    addSectionId: {
+                        value: $form.find("#addSectionId").val(),
+                        errorId: 'addRackSectinError',
+                        message: 'Please select a Section.'
+                    }
+                };
+
+                Object.keys(fields).forEach(field => {
+                    const config = fields[field];
+                    if (!config.value) {
+                        utils.showFieldError(field, config.errorId, config.message);
+                        isValid = false;
+                    }
+                });
+
+                return isValid;
+            },
+
+            editRackForm: function () {
+                const nameValue = $('#editRackName').val().trim();
+                if (!nameValue) {
+                    $('#editRackName').addClass('is-invalid');
+                    $('#editRackNameError').text('Rack Name is required').removeClass('d-none');
+                    return false;
+                }
+                return true;
+            }
+        };
+
+        // ================= DATA TABLE INITIALIZATION =================
+        function initializeDataTable() {
+            table = $(CONFIG.selectors.table).DataTable({
+                dom: '<"d-flex justify-content-between align-items-center mt-1 mb-2"Bf>rt<"d-flex justify-content-between mt-2"<"datatable-info"i><"datatable-pagination"p>>',
+                paging: true,
+                pageLength: 10,
+                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                ajax: {
+                    url: CONFIG.urls.getRacks,
+                    type: "GET",
+                    dataSrc: "data"
+                },
+                columns: getTableColumns(),
+                columnDefs: [
+                    { orderable: false, targets: "_all" },
+                    { className: "text-center", targets: "_all" }
+                ],
+                buttons: getTableButtons(),
+                drawCallback: function (settings) {
+                    setTimeout(utils.initTooltips, 100);
+                },
+                initComplete: function (settings, json) {
+                    setTimeout(utils.initTooltips, 100);
+                }
+            });
+
+            addDateRangePicker();
+        }
+
+        function getTableColumns() {
+            return [
                 {
-                    "data": "RackId",
-                    "render": function (data, type, row) {
+                    data: "RackId",
+                    render: function (data) {
                         return `<input type="checkbox" class="rack-checkbox" value="${data}">`;
                     },
-                    "orderable": false,
-                    "searchable": false
+                    orderable: false,
+                    searchable: false
                 },
                 {
-                    "data": null,
-                    "render": function (data, type, row, meta) {
-                        if (type === 'display' || type === 'export') {
-                            return meta.row + 1;
-                        }
-                        return data;
+                    data: null,
+                    render: function (data, type, row, meta) {
+                        return (type === 'display' || type === 'export') ? meta.row + 1 : data;
                     }
                 },
-                { "data": "RackId", visible: false },
-                { "data": "RackCode" },
-                { "data": "RackName" },
-                { "data": "SectionName" },
-                { "data": "WarehouseName" },
+                { data: "RackId", visible: false },
+                { data: "RackCode" },
+                { data: "RackName" },
+                { data: "SectionName" },
+                { data: "WarehouseName" },
                 {
-                    "data": "AddedDate",
-                    "render": function (data) {
-                        if (!data) return "";
-                        var match = /\/Date\((\d+)\)\//.exec(data);
-                        if (match) {
-                            var d = new Date(parseInt(match[1]));
-                            return d.toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" });
-                        }
-                        var d2 = new Date(data);
-                        return !isNaN(d2.getTime()) ?
-                            d2.toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" })
-                            : "";
+                    data: "AddedDate",
+                    render: function (data) {
+                        return utils.formatDate(data);
                     }
                 },
-                { "data": "AddedBy" },
+                { data: "AddedBy" },
                 {
-                    "data": "Description",
-                    "render": function (data, type, row) {
+                    data: "Description",
+                    render: function (data, type) {
                         if (!data) return "";
-
                         if (type === "display") {
-                            if (data.length > 30) {
-                                return `<span class="description-tooltip" data-bs-toggle="tooltip" data-bs-placement="top" title="${data.replace(/"/g, '&quot;')}">${data.substr(0, 30)}...</span>`;
-                            } else {
-                                return `<span class="description-tooltip" data-bs-toggle="tooltip" data-bs-placement="top" title="${data.replace(/"/g, '&quot;')}">${data}</span>`;
-                            }
+                            const truncated = data.length > 30 ? data.substr(0, 30) + "..." : data;
+                            return `<span class="description-tooltip" data-bs-toggle="tooltip" data-bs-placement="top" title="${data.replace(/"/g, '&quot;')}">${truncated}</span>`;
                         }
                         return data;
                     }
                 },
                 {
-                    "data": "RackId",
-                    "render": function (data, type, row) {
+                    data: "RackId",
+                    render: function (data) {
                         return `
                         <div class="d-flex justify-content-center gap-1">
                             <button class="btn btn-sm btn-primary view-rack" data-id="${data}" data-bs-toggle="tooltip" title="View Rack">
-                                <i class="bi bi-eye"></i>
+                                <i class="bi bi-eye-fill"></i>
                             </button>
-                            <button class="btn btn-sm btn-warning edit-rack" data-id="${data}" data-bs-toggle="tooltip" title="Edit Rack">
+                            <button class="btn btn-sm btn-secondary edit-rack" data-id="${data}" data-bs-toggle="tooltip" title="Edit Rack">
                                 <i class="bi bi-pencil-square"></i>
                             </button>
                             <button class="btn btn-sm btn-danger delete-rack" data-id="${data}" data-bs-toggle="tooltip" title="Delete Rack">
@@ -315,443 +464,494 @@
                         </div>
                         `;
                     },
-                    "orderable": false,
-                    "searchable": false
+                    orderable: false,
+                    searchable: false
                 }
-            ],
-            columnDefs: [
-                { orderable: false, targets: "_all" }
-            ],
-            buttons: [
-                {
-                    extend: 'print',
-                    text: '<i class="bi bi-printer-fill text-dark fs-5" data-bs-toggle="tooltip" title="Print"></i>',
-                    title: '',
-                    exportOptions: {
-                        columns: ':visible:not(:first-child):not(:last-child)',
-                        rows: function (idx, data, node) {
-                            return selectedRackIds.has(data.RackId.toString());
-                        }
-                    },
-                    action: function (e, dt, button, config) {
-                        if (selectedRackIds.size === 0) {
-                            toastr.warning("Please select at least one rack before printing.", "No Selection");
-                            return;
-                        }
-                        $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config);
-                    },
-                    customize: function (win) {
-                        // Reset serial number for selected rows only
-                        let serialNumber = 1;
+            ];
+        }
 
-                        // Update serial numbers in the printed table
-                        $(win.document.body).find('table tbody tr').each(function () {
-                            $(this).find('td:eq(0)').text(serialNumber++);
-                        });
-
-                        $(win.document.body).prepend(
-                            '<h2 style="text-align: center; margin-bottom: 10px;">Rack List</h2>' +
-                            '<p style="text-align: center; margin-bottom: 20px; color: #666;">Generated on: ' + new Date().toLocaleDateString("en-GB") + '</p>' +
-                            '<hr style="margin-bottom: 20px;">'
-                        );
-
-                        $(win.document.body).find('table')
-                            .css('border', '1px solid black')
-                            .css('border-collapse', 'collapse')
-                            .css('width', '100%')
-                            .find('th, td')
-                            .css('border', '1px solid black')
-                            .css('padding', '8px')
-                            .css('text-align', 'center');
-
-                        $(win.document.body).find('th')
-                            .css('background-color', 'black')
-                            .css('color', 'white')
-                            .css('font-weight', 'bold');
+        function getTableButtons() {
+            const baseConfig = {
+                columns: ':visible:not(:first-child):not(:last-child)',
+                rows: (idx, data) => selectedRackIds.has(data.RackId.toString()),
+                action: function (e, dt, button, config) {
+                    if (selectedRackIds.size === 0) {
+                        toastr.warning("Please select at least one rack before exporting.", "No Selection");
+                        return;
                     }
+                    $.fn.dataTable.ext.buttons[config.extend].action.call(this, e, dt, button, config);
+                }
+            };
+
+            return [
+                createPrintButton(baseConfig),
+                createPdfButton(baseConfig),
+                createExcelButton(baseConfig),
+                createCsvButton(baseConfig)
+            ];
+        }
+
+        function createPrintButton(baseConfig) {
+            return {
+                extend: 'print',
+                text: '<i class="bi bi-printer-fill text-dark fs-5" data-bs-toggle="tooltip" title="Print"></i>',
+                title: '',
+                exportOptions: baseConfig,
+                customize: function (win) {
+                    let serialNumber = 1;
+                    $(win.document.body).find('table tbody tr').each(function () {
+                        $(this).find('td:first').text(serialNumber++);
+                    });
+
+                    $(win.document.body).prepend(
+                        '<h2 style="text-align: center; margin-bottom: 10px;">Rack List</h2>' +
+                        '<p style="text-align: center; margin-bottom: 20px; color: #666;">Generated Date: ' + new Date().toLocaleDateString("en-GB") + '</p>' +
+                        '<hr style="margin-bottom: 20px;">'
+                    );
+
+                    $(win.document.body).find('table')
+                        .css('border', '1px solid black').css('border-collapse', 'collapse').css('width', '100%')
+                        .find('th, td').css('border', '1px solid black').css('padding', '8px').css('text-align', 'center');
+
+                    $(win.document.body).find('th')
+                        .css('background-color', 'black').css('color', 'white').css('font-weight', 'bold');
                 },
-                {
-                    extend: 'pdfHtml5',
-                    text: '<i class="bi bi-file-earmark-pdf text-danger fs-5" data-bs-toggle="tooltip" title="Export PDF"></i>',
-                    title: '',
-                    exportOptions: {
-                        columns: ':visible:not(:first-child):not(:last-child)',
-                        rows: function (idx, data, node) {
-                            return selectedRackIds.has(data.RackId.toString());
+                action: function (e, dt, button, config) {
+                    if (selectedRackIds.size === 0) {
+                        toastr.warning("Please select at least one rack before printing.", "No Selection");
+                        return;
+                    }
+                    $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config);
+                }
+            };
+        }
+
+        function createPdfButton(baseConfig) {
+            return {
+                extend: 'pdfHtml5',
+                text: '<i class="bi bi-file-earmark-pdf text-danger fs-5" data-bs-toggle="tooltip" title="Export PDF"></i>',
+                title: '',
+                exportOptions: baseConfig,
+                customize: function (doc) {
+                    // Get selected data manually
+                    let selectedRows = [];
+                    table.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                        let rowData = this.data();
+                        if (selectedRackIds.has(rowData.RackId.toString())) {
+                            selectedRows.push(rowData);
                         }
-                    },
-                    action: function (e, dt, button, config) {
-                        if (selectedRackIds.size === 0) {
-                            toastr.warning("Please select at least one rack before exporting PDF.", "No Selection");
-                            return;
-                        }
-                        $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, button, config);
-                    },
-                    customize: function (doc) {
-                        // Get selected data manually to ensure correct serial numbers
-                        let selectedData = [];
-                        table.rows().every(function () {
-                            let rowData = this.data();
-                            if (selectedRackIds.has(rowData.RackId.toString())) {
-                                selectedData.push(rowData);
-                            }
-                        });
+                    });
 
-                        // Clear default content and build custom PDF
-                        doc.content = [];
+                    doc.content = [];
+                    doc.content.push(
+                        { text: 'RACK LIST', style: 'header', alignment: 'center', margin: [0, 0, 0, 10] },
+                        { text: 'Generated Date: ' + new Date().toLocaleDateString("en-GB"), style: 'subheader', alignment: 'center', margin: [0, 0, 0, 20] }
+                    );
 
-                        // Add title and date
-                        doc.content.push(
-                            {
-                                text: 'Rack List',
-                                alignment: 'center',
-                                fontSize: 16,
-                                bold: true,
-                                margin: [0, 0, 0, 10]
-                            },
-                            {
-                                text: 'Generated on: ' + new Date().toLocaleDateString("en-GB"),
-                                alignment: 'center',
-                                fontSize: 10,
-                                color: '#666',
-                                margin: [0, 0, 0, 15]
-                            }
-                        );
+                    let tableData = [
+                        [
+                            { text: 'SR NO', style: 'tableHeader' },
+                            { text: 'RACK CODE', style: 'tableHeader' },
+                            { text: 'RACK NAME', style: 'tableHeader' },
+                            { text: 'SECTION NAME', style: 'tableHeader' },
+                            { text: 'WAREHOUSE NAME', style: 'tableHeader' },
+                            { text: 'ADDED DATE', style: 'tableHeader' },
+                            { text: 'ADDED BY', style: 'tableHeader' },
+                            { text: 'DESCRIPTION', style: 'tableHeader' }
+                        ]
+                    ];
 
-                        // Create table with proper serial numbers
-                        let tableBody = [];
-
-                        // Table headers
-                        tableBody.push([
-                            { text: 'Sr No', style: 'tableHeader', alignment: 'center' },
-                            { text: 'Rack Code', style: 'tableHeader', alignment: 'center' },
-                            { text: 'Rack Name', style: 'tableHeader', alignment: 'center' },
-                            { text: 'Section Name', style: 'tableHeader', alignment: 'center' },
-                            { text: 'Warehouse Name', style: 'tableHeader', alignment: 'center' },
-                            { text: 'Added Date', style: 'tableHeader', alignment: 'center' },
-                            { text: 'Added By', style: 'tableHeader', alignment: 'center' },
-                            { text: 'Description', style: 'tableHeader', alignment: 'center' }
+                    selectedRows.forEach((row, index) => {
+                        tableData.push([
+                            { text: (index + 1).toString(), style: 'tableBody' },
+                            { text: row.RackCode || '', style: 'tableBody' },
+                            { text: row.RackName || '', style: 'tableBody' },
+                            { text: row.SectionName || '', style: 'tableBody' },
+                            { text: row.WarehouseName || '', style: 'tableBody' },
+                            { text: utils.formatDate(row.AddedDate) || '', style: 'tableBody' },
+                            { text: row.AddedBy || '', style: 'tableBody' },
+                            { text: row.Description || '', style: 'tableBody' }
                         ]);
+                    });
 
-                        // Add selected rows with sequential serial numbers
-                        selectedData.forEach(function (row, index) {
-                            tableBody.push([
-                                { text: (index + 1).toString(), alignment: 'center', fontSize: 9 },
-                                { text: row.RackCode || '-', alignment: 'center', fontSize: 9 },
-                                { text: row.RackName || '-', alignment: 'center', fontSize: 9 },
-                                { text: row.SectionName || '-', alignment: 'center', fontSize: 9 },
-                                { text: row.WarehouseName || '-', alignment: 'center', fontSize: 9 },
-                                { text: row.AddedDate ? new Date(row.AddedDate).toLocaleDateString("en-GB") : '-', alignment: 'center', fontSize: 9 },
-                                { text: row.AddedBy || '-', alignment: 'center', fontSize: 9 },
-                                { text: row.Description || '-', alignment: 'center', fontSize: 9 }
-                            ]);
-                        });
+                    doc.content.push({
+                        table: {
+                            widths: ['8%', '12%', '15%', '15%', '15%', '12%', '10%', '13%'],
+                            body: tableData
+                        },
+                        layout: {
+                            hLineWidth: (i, node) => 1,
+                            vLineWidth: (i, node) => 1,
+                            hLineColor: (i, node) => '#000000',
+                            vLineColor: (i, node) => '#000000',
+                            paddingTop: (i, node) => 5,
+                            paddingBottom: (i, node) => 5
+                        }
+                    });
 
-                        // Add table to document
-                        doc.content.push({
-                            table: {
-                                headerRows: 1,
-                                widths: ['8%', '15%', '15%', '15%', '15%', '12%', '10%', '10%'],
-                                body: tableBody
-                            },
-                            layout: {
-                                hLineWidth: function (i, node) { return 0.5; },
-                                vLineWidth: function (i, node) { return 0.5; },
-                                hLineColor: function (i, node) { return '#000000'; },
-                                vLineColor: function (i, node) { return '#000000'; },
-                                paddingLeft: function (i, node) { return 5; },
-                                paddingRight: function (i, node) { return 5; }
-                            }
-                        });
+                    doc.styles = {
+                        header: { fontSize: 18, bold: true, alignment: 'center' },
+                        subheader: { fontSize: 10, color: '#666666', alignment: 'center' },
+                        tableHeader: { bold: true, fontSize: 9, color: 'white', fillColor: '#000000', alignment: 'center' },
+                        tableBody: { fontSize: 8, alignment: 'center' }
+                    };
 
-                        // Styles
-                        doc.styles = {
-                            tableHeader: {
-                                bold: true,
-                                fontSize: 10,
-                                color: 'white',
-                                fillColor: '#000000',
-                                alignment: 'center'
-                            }
-                        };
-
-                        doc.defaultStyle = {
-                            fontSize: 9,
-                            alignment: 'center'
-                        };
-                    }
+                    doc.defaultStyle = { fontSize: 8, alignment: 'center' };
                 },
-                {
-                    extend: 'excelHtml5',
-                    text: '<i class="bi bi-file-earmark-excel text-success fs-5" data-bs-toggle="tooltip" title="Export Excel"></i>',
-                    title: 'Rack List',
-                    message: 'Generated on: ' + new Date().toLocaleDateString("en-GB"),
-                    exportOptions: {
-                        columns: ':visible:not(:first-child):not(:last-child)',
-                        rows: function (idx, data, node) {
-                            return selectedRackIds.has(data.RackId.toString());
-                        }
-                    },
-                    action: function (e, dt, button, config) {
-                        if (selectedRackIds.size === 0) {
-                            toastr.warning("Please select at least one rack before exporting Excel.", "No Selection");
-                            return;
-                        }
-                        $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
+                action: function (e, dt, button, config) {
+                    if (selectedRackIds.size === 0) {
+                        toastr.warning("Please select at least one rack before exporting.", "No Selection");
+                        return;
                     }
-                },
-                {
-                    extend: 'csvHtml5',
-                    text: '<i class="bi bi-filetype-csv text-success fs-5" data-bs-toggle="tooltip" title="Export CSV"></i>',
-                    title: 'Rack List',
-                    message: 'Generated on: ' + new Date().toLocaleDateString("en-GB"),
-                    exportOptions: {
-                        columns: ':visible:not(:first-child):not(:last-child)',
-                        rows: function (idx, data, node) {
-                            return selectedRackIds.has(data.RackId.toString());
-                        }
-                    },
-                    action: function (e, dt, button, config) {
-                        if (selectedRackIds.size === 0) {
-                            toastr.warning("Please select at least one rack before exporting CSV.", "No Selection");
-                            return;
-                        }
-                        $.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, button, config);
-                    }
+                    $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, button, config);
                 }
-            ],
-            "drawCallback": function (settings) {
-                setTimeout(function () {
-                    initTooltips();
-                }, 100);
-            },
-            "initComplete": function (settings, json) {
-                setTimeout(function () {
-                    initTooltips();
-                }, 100);
-            }
-        });
+            };
+        }
 
-        // --- Checkbox Selection Tracking ---
-        $("#rackTable").on("change", ".rack-checkbox", function () {
-            let id = $(this).val();
-            if ($(this).prop("checked")) {
-                selectedRackIds.add(id);
-            } else {
-                selectedRackIds.delete(id);
-            }
+        function createExcelButton(baseConfig) {
+            return {
+                extend: 'excelHtml5',
+                text: '<i class="bi bi-file-earmark-excel text-success fs-5" data-bs-toggle="tooltip" title="Export Excel"></i>',
+                title: 'Rack List',
+                messageTop: `Generated Date: ${moment().format("DD/MM/YYYY")}`,
+                exportOptions: baseConfig,
+                customize: function (xlsx) {
+                    const sheet = xlsx.xl.worksheets['sheet1.xml'];
+                    let serial = 1;
 
-            let total = $(".rack-checkbox").length;
-            let checked = $(".rack-checkbox:checked").length;
+                    $('row', sheet).each(function () {
+                        const rowIndex = parseInt($(this).attr('r'));
+                        if (rowIndex === 3) {
+                            $(this).find('c:first').before('<c t="inlineStr" s="2"><is><t>Sr. No</t></is></c>');
+                        } else if (rowIndex > 3) {
+                            $(this).find('c:first').before(`<c t="inlineStr" s="2"><is><t>${serial}</t></is></c>`);
+                            serial++;
+                        }
+                    });
 
-            if (total > 0 && total === checked) {
-                $("#selectAllRack").prop("checked", true);
-            } else {
-                $("#selectAllRack").prop("checked", false);
-            }
-        });
+                    $('row[r="1"] c, row[r="2"] c', sheet).attr('s', '51');
+                },
+                action: function (e, dt, button, config) {
+                    if (selectedRackIds.size === 0) {
+                        toastr.warning("Please select at least one rack before exporting Excel.", "No Selection");
+                        return;
+                    }
+                    $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
+                }
+            };
+        }
 
-        // --- Select All functionality ---
-        $("#selectAllRack").on("change", function () {
-            let isChecked = $(this).prop("checked");
-            $(".rack-checkbox").prop("checked", isChecked).trigger("change");
-        });
+        function createCsvButton(baseConfig) {
+            return {
+                extend: 'csvHtml5',
+                text: '<i class="bi bi-filetype-csv text-success fs-5" data-bs-toggle="tooltip" title="Export CSV"></i>',
+                filename: 'Rack List',
+                title: 'Rack List',
+                message: 'Generated Date: ' + new Date().toLocaleDateString("en-GB"),
+                exportOptions: {
+                    columns: ':visible:not(:first-child):not(:nth-child(2)):not(:last-child)',
+                    rows: function (idx, data, node) {
+                        // Debug: Check what data is available
+                        console.log('Row data:', data);
+                        console.log('Selected Rack IDs:', Array.from(selectedRackIds));
 
-        // --- Add date range picker above Rack table ---
-        $("#rackTable_wrapper").prepend(`
-            <div class="input-group mb-2 mt-3" style="max-width: 280px;">
-                <span class="input-group-text bg-primary text-white">
-                    <i class="bi bi-calendar-date"></i>
-                </span>
-                <input type="text" id="rackDateRange" class="form-control" placeholder="Select date range" readonly />
-            </div>
-        `);
+                        // Try different ways to get the ID
+                        const rackId = data.RackId || data.rackId || data.id || data[2]; // index 2 is Rack ID column
 
-        // Initialize date range picker
-        $('#rackDateRange').daterangepicker({
-            autoUpdateInput: false,
-            locale: { cancelLabel: 'Clear' },
-            ranges: {
-                'Today': [moment(), moment()],
-                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                'This Month': [moment().startOf('month'), moment().endOf('month')],
-                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-            }
-        });
+                        // Convert both to string for comparison
+                        const rackIdStr = rackId ? rackId.toString() : '';
+                        const isSelected = selectedRackIds.has(rackIdStr);
 
-        // Custom filter function for DataTable
-        $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
-            if (settings.nTable.id !== "rackTable") return true;
+                        console.log('Checking rackId:', rackIdStr, 'Selected:', isSelected);
+                        return isSelected;
+                    }
+                },
+                customize: function (csv) {
+                    console.log('Raw CSV:', csv);
 
-            var dateRange = $('#rackDateRange').val();
-            if (!dateRange) return true;
+                    if (!csv || csv.trim() === '') {
+                        console.log('Empty CSV data - no selected rows?');
+                        return '';
+                    }
 
-            var minMax = dateRange.split(' to ');
-            var min = moment(minMax[0], 'YYYY-MM-DD');
-            var max = moment(minMax[1], 'YYYY-MM-DD');
+                    let lines = csv.split('\n');
+                    let newCsv = '';
+                    let serial = 1;
 
-            // Added Date column index = 7 (0-based)
-            var date = moment(data[7], 'DD/MM/YYYY');
-            return date.isBetween(min, max, 'day', '[]');
-        });
+                    // Add header with "Sr No"
+                    if (lines.length > 0 && lines[0].trim()) {
+                        newCsv = '"Sr No",' + lines[0] + '\n';
+                    }
 
-        // Apply filter on selection
-        $('#rackDateRange').on('apply.daterangepicker', function (ev, picker) {
-            $(this).val(picker.startDate.format('YYYY-MM-DD') + ' to ' + picker.endDate.format('YYYY-MM-DD'));
-            table.draw();
-        });
+                    // Add data rows with serial numbers
+                    for (let i = 1; i < lines.length; i++) {
+                        if (lines[i].trim()) {
+                            newCsv += '"' + serial + '",' + lines[i] + '\n';
+                            serial++;
+                        }
+                    }
 
-        // Clear filter
-        $('#rackDateRange').on('cancel.daterangepicker', function () {
-            $(this).val('');
-            table.draw();
-        });
+                    console.log('Final CSV:', newCsv);
+                    return newCsv;
+                },
+                action: function (e, dt, button, config) {
+                    console.log('Selected Rack IDs before export:', Array.from(selectedRackIds));
 
-        //  Add Rack
-        $('#btnAddrack').on('click', function () {
-            $('#rackForm')[0].reset();
-            $('#RackId').val('');
+                    if (selectedRackIds.size === 0) {
+                        toastr.warning("Please select at least one rack before exporting CSV.", "No Selection");
+                        return;
+                    }
+                    $.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, button, config);
+                }
+            };
+        }
 
-            // Set modal title and button text for Add
-            $('#rackModalTitle').text('Add Rack');
-            $('#rackModalSubmitBtn').html('<i class="bi bi-check-circle me-2 text-white"></i>Save');
+        // ================= DATE RANGE PICKER =================
+        function addDateRangePicker() {
+            $("#rackTable_wrapper").prepend(`
+                <div class="input-group mb-2 mt-3" style="max-width: 280px;">
+                    <span class="input-group-text bg-primary text-white">
+                        <i class="bi bi-calendar-date"></i>
+                    </span>
+                    <input type="text" id="rackDateRange" class="form-control" placeholder="Select date range" readonly />
+                </div>
+            `);
 
-            loadWarehouses();
+            $('#rackDateRange').daterangepicker({
+                autoUpdateInput: false,
+                locale: { cancelLabel: 'Clear' },
+                ranges: {
+                    'Today': [moment(), moment()],
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'Last 1 Month': [moment().subtract(1, 'months').startOf('day'), moment()],
+                    'Last 3 Months': [moment().subtract(3, 'months').startOf('day'), moment()],
+                    'Last 1 Year': [moment().subtract(12, 'months').startOf('day'), moment()]
+                }
+            });
 
-            // Get Next Rack Code
-            $.get("/Inventory/GetNextRackCodeSK", function (res) {
+            $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+                if (settings.nTable.id !== "rackTable") return true;
+                const dateRange = $('#rackDateRange').val();
+                if (!dateRange) return true;
+
+                const [minStr, maxStr] = dateRange.split(' to ');
+                const min = moment(minStr, 'DD/MM/YYYY');
+                const max = moment(maxStr, 'DD/MM/YYYY');
+                const date = moment(data[7], 'DD/MM/YYYY');
+                return date.isBetween(min, max, 'day', '[]');
+            });
+
+            $('#rackDateRange').on('apply.daterangepicker', function (ev, picker) {
+                $(this).val(picker.startDate.format('DD/MM/YYYY') + ' to ' + picker.endDate.format('DD/MM/YYYY'));
+                table.draw();
+            });
+
+            $('#rackDateRange').on('cancel.daterangepicker', function () {
+                $(this).val('');
+                table.draw();
+            });
+        }
+
+        // ================= EVENT HANDLERS =================
+        function setupEventHandlers() {
+            // Checkbox selection
+            $("#selectAllRack").on("change", function () {
+                const isChecked = $(this).prop("checked");
+                $(".rack-checkbox").prop("checked", isChecked).trigger("change");
+            });
+
+            $(CONFIG.selectors.table).on("change", ".rack-checkbox", function () {
+                const id = $(this).val();
+                $(this).prop("checked") ? selectedRackIds.add(id) : selectedRackIds.delete(id);
+
+                const total = $(".rack-checkbox").length;
+                const checked = $(".rack-checkbox:checked").length;
+                $("#selectAllRack").prop("checked", total > 0 && total === checked);
+            });
+
+            // Add Rack
+            $("#btnAddrack").on("click", function () {
+                $(CONFIG.selectors.addForm)[0].reset();
+                utils.clearAllErrors(CONFIG.selectors.addForm);
+                loadWarehouses();
+                loadNextRackCode();
+                $(CONFIG.selectors.addModal).modal("show");
+            });
+
+            // Form submissions
+            $(CONFIG.selectors.addForm).on("submit", function (e) {
+                e.preventDefault();
+                submitAddRack();
+            });
+
+            $(CONFIG.selectors.editForm).on("submit", function (e) {
+                e.preventDefault();
+                submitEditRack();
+            });
+
+            // Action buttons
+            $(CONFIG.selectors.table).on("click", ".view-rack", function () {
+                viewRack($(this).data("id"));
+            });
+
+            $(CONFIG.selectors.table).on("click", ".edit-rack", function () {
+                editRack($(this).data("id"));
+            });
+
+            $(CONFIG.selectors.table).on("click", ".delete-rack", function () {
+                deleteRack($(this).data("id"));
+            });
+
+            // Live validation
+            $(document).on("input change", "#addRackName, #addWarehouseId, #addSectionId, #editRackName", function () {
+                const id = $(this).attr("id");
+                const errorMap = {
+                    addRackName: "addRackNameError",
+                    addWarehouseId: "addRackWhNameError",
+                    addSectionId: "addRackSectinError",
+                    editRackName: "editRackNameError"
+                };
+                if (errorMap[id] && $(this).val()) {
+                    utils.clearFieldError(id, errorMap[id]);
+                }
+            });
+
+            // Warehouse change handler
+            $('#addWarehouseId').on('change', function () {
+                const warehouseCode = $(this).val();
+                const $ddl = $("#addSectionId");
+                $ddl.empty().append('<option value="">-- Select Section --</option>');
+                if (warehouseCode) {
+                    $.get(CONFIG.urls.getSections, { warehouseCode }, function (data) {
+                        data.forEach(item => {
+                            $ddl.append(`<option value="${item.SectionCode}">${item.SectionName}</option>`);
+                        });
+                    }).fail(() => utils.handleError("Error loading sections."));
+                }
+            });
+
+            // Modal cleanup
+            $(CONFIG.selectors.addModal).on("hidden.bs.modal", function () {
+                $(CONFIG.selectors.addForm)[0].reset();
+                utils.clearAllErrors(CONFIG.selectors.addForm);
+            });
+
+            $(CONFIG.selectors.editModal).on("hidden.bs.modal", function () {
+                $(CONFIG.selectors.editForm)[0].reset();
+                utils.clearAllErrors(CONFIG.selectors.editForm);
+            });
+        }
+
+        // ================= DATA OPERATIONS =================
+        function loadWarehouses(selectedCode = "") {
+            $.get(CONFIG.urls.getWarehouses, function (data) {
+                const $ddl = $("#addWarehouseId");
+                $ddl.empty().append('<option value="">-- Select Warehouse --</option>');
+                data.forEach(item => {
+                    $ddl.append(`<option value="${item.WarehouseCode}">${item.WarehouseName}</option>`);
+                });
+                if (selectedCode) $ddl.val(selectedCode).trigger('change');
+            }).fail(() => utils.handleError("Error loading warehouses."));
+        }
+
+        function loadNextRackCode() {
+            $.get(CONFIG.urls.getNextCode, function (res) {
                 if (res && res.NextCode) {
-                    $('#RackCode').val(res.NextCode);
+                    $('#addRackCode').val(res.NextCode);
                 } else {
                     toastr.error("Failed to get next rack code");
                 }
             });
+        }
 
-            $('#rackModal').modal('show');
-        });
+        // ================= CRUD OPERATIONS =================
+        function submitAddRack() {
+            utils.clearAllErrors(CONFIG.selectors.addForm);
 
-        //  Save (Add/Edit) - 
-        $('#rackForm').on('submit', function (e) {
-            e.preventDefault();
+            if (!validators.rackForm(CONFIG.selectors.addForm)) {
+                return;
+            }
 
-            var formData = $(this).serialize();
-            console.log(formData)
+            const formData = {
+                RackCode: $('#addRackCode').val(),
+                RackName: $('#addRackName').val(),
+                WarehouseCode: $('#addWarehouseId').val(),
+                SectionCode: $('#addSectionId').val(),
+                Description: $('#addDescription').val()
+            };
+
             $.ajax({
-                url: "/Inventory/SaveRackSK",
+                url: CONFIG.urls.saveRack,
                 type: "POST",
                 data: formData,
                 success: function (res) {
                     if (res.success) {
-                        $("#rackModal").modal("hide");
+                        $(CONFIG.selectors.addModal).modal("hide");
                         table.ajax.reload(null, false);
-                        Swal.fire({
-                            title: "Success",
-                            text: res.message || "Rack saved successfully!",
-                            icon: "success",
-                            showConfirmButton: false,
-                            timer: 2000
-                        });
+                        utils.showAlert("Success", "Rack saved successfully!", "success");
                     } else {
-                        Swal.fire({
-                            title: "Error",
-                            text: res.message || "Something went wrong",
-                            icon: "error",
-                            confirmButtonText: "OK"
-                        });
+                        handleRackError(res.message, "addRackName", "addRackNameError");
                     }
                 },
                 error: function () {
-                    Swal.fire({
-                        title: "Error",
-                        text: "Server error while saving rack.",
-                        icon: "error",
-                        confirmButtonText: "OK"
-                    });
+                    utils.handleError("Server error while saving rack.");
                 }
             });
-        });
+        }
 
-        //  Edit Rack
-        $('#rackTable').on('click', '.edit-rack', function () {
-            var rackId = $(this).data("id");
-            $.get("/Inventory/GetRackByIdSKK/" + rackId, function (res) {
+        function handleRackError(message, inputId, errorId) {
+            if (message && message.toLowerCase().includes("already exists")) {
+                utils.showFieldError(inputId, errorId, message);
+            } else {
+                utils.handleError(message || "Something went wrong");
+            }
+        }
+
+        function editRack(id) {
+            $.get(CONFIG.urls.getRackById + id, function (res) {
                 if (res) {
-                    $('#RackId').val(res.RackId);
-                    $('#RackCode').val(res.RackCode);
-                    $('#RackName').val(res.RackName);
-                    $('#Description').val(res.Description);
-
-                    // Set modal title and button text for Edit
-                    $('#rackModalTitle').text('Update Rack');
-                    $('#rackModalSubmitBtn').html('<i class="bi bi-check-circle me-2 text-white"></i>Update');
-
-                    loadWarehouses(res.WarehouseCode);
-
-                    setTimeout(function () {
-                        $.get("/Inventory/GetSectionsSKK", { warehouseCode: res.WarehouseCode }, function (data) {
-                            var ddl = $("#SectionId");
-                            ddl.empty().append('<option value="">-- Select Section --</option>');
-                            $.each(data, function (i, item) {
-                                ddl.append(`<option value="${item.SectionCode}">${item.SectionName}</option>`);
-                            });
-                            ddl.val(res.SectionCode);
-                        });
-                    }, 300);
-
-                    $('#rackModal').modal('show');
+                    $('#editRackId').val(res.RackId);
+                    $('#editRackCode').val(res.RackCode);
+                    $('#editRackName').val(res.RackName);
+                    $('#editDescription').val(res.Description || '');
+                    $('#editWarehouseId').val(res.WarehouseCode);
+                    $('#editWarehouseName').val(res.WarehouseName);
+                    $('#editSectionId').val(res.SectionCode);
+                    $('#editSectionName').val(res.SectionName);
+                    $(CONFIG.selectors.editModal).modal("show");
                 } else {
-                    Swal.fire("Error", "Rack not found!", "error");
+                    utils.handleError("Rack details not found.");
                 }
-            }).fail(function () {
-                Swal.fire("Error", "Error loading rack details.", "error");
-            });
-        });
+            }).fail(() => utils.handleError("Server error while fetching rack details."));
+        }
 
-        // Delete Rack
-        $('#rackTable').on('click', '.delete-rack', function () {
-            var rackId = $(this).data("id");
+        function submitEditRack() {
+            if (!validators.editRackForm()) {
+                return;
+            }
 
-            Swal.fire({
-                title: "Are you sure?",
-                text: "You won't be able to revert this!",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonText: "Yes, delete it!",
-                cancelButtonText: "No, cancel!",
-                reverseButtons: true,
-                customClass: {
-                    confirmButton: "btn btn-success me-2",
-                    cancelButton: "btn btn-danger"
+            const formData = $(CONFIG.selectors.editForm).serialize();
+            $.ajax({
+                url: CONFIG.urls.saveRack,
+                type: 'POST',
+                data: formData,
+                success: function (res) {
+                    if (res.success) {
+                        $(CONFIG.selectors.editModal).modal("hide");
+                        table.ajax.reload(null, false);
+                        utils.showAlert("Success", res.message, "success");
+                    } else {
+                        handleRackError(res.message, "editRackName", "editRackNameError");
+                    }
                 },
-                buttonsStyling: false
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.post("/Inventory/DeleteRackSK/" + rackId, function (res) {
-                        if (res.success) {
-                            table.ajax.reload();
-                            Swal.fire({
-                                title: "Deleted!",
-                                text: res.message || "Rack has been deleted.",
-                                icon: "success",
-                                showConfirmButton: false,
-                                timer: 2000
-                            });
-                        } else {
-                            Swal.fire("Error", res.message || "Error deleting rack!", "error");
-                        }
-                    }).fail(function () {
-                        Swal.fire("Error", "Server error while deleting.", "error");
-                    });
+                error: function () {
+                    utils.handleError("Server error while updating rack.");
                 }
             });
-        });
+        }
 
-        //  View Rack
-        $('#rackTable').on('click', '.view-rack', function () {
-            var rackId = $(this).data("id");
-            $.get("/Inventory/GetRackByIdSKK/" + rackId, function (res) {
+        function viewRack(id) {
+            $.get(CONFIG.urls.getRackById + id, function (res) {
                 if (res) {
                     $('#viewRackCode').val(res.RackCode);
                     $('#viewRackName').val(res.RackName);
@@ -759,70 +959,57 @@
                     $('#viewSectionName').val(res.SectionName);
                     $('#viewDescription').val(res.Description);
                     $('#viewAddedBy').val(res.AddedBy);
-
-                    // Date parsing
-                    let formattedDate = "";
-                    if (res.AddedDate) {
-                        var match = /\/Date\((\d+)\)\//.exec(res.AddedDate);
-                        if (match) {
-                            var d = new Date(parseInt(match[1]));
-                            formattedDate = d.toLocaleDateString("en-GB", {
-                                day: "2-digit", month: "2-digit", year: "numeric"
-                            });
-                        } else {
-                            var d2 = new Date(res.AddedDate);
-                            if (!isNaN(d2.getTime())) {
-                                formattedDate = d2.toLocaleDateString("en-GB", {
-                                    day: "2-digit", month: "2-digit", year: "numeric"
-                                });
-                            }
-                        }
-                    }
-                    $('#viewAddedDate').val(formattedDate || "N/A");
-
-                    $('#viewRackModal').modal('show');
+                    $('#viewAddedDate').val(utils.formatDate(res.AddedDate) || "N/A");
+                    $(CONFIG.selectors.viewModal).modal("show");
                 } else {
-                    Swal.fire("Error", "Rack details not found.", "error");
+                    utils.handleError("Rack details not found.");
                 }
-            }).fail(function () {
-                Swal.fire("Error", "Server error while loading rack details.", "error");
-            });
-        });
+            }).fail(() => utils.handleError("Server error while loading rack details."));
+        }
 
-        //  Load Warehouses
-        function loadWarehouses(selectedCode = "") {
-            $.get("/Inventory/GetWarehousesListSK", function (data) {
-                var ddl = $("#WarehouseId");
-                ddl.empty().append('<option value="">-- Select Warehouse --</option>');
-                $.each(data, function (i, item) {
-                    ddl.append(`<option value="${item.WarehouseCode}">${item.WarehouseName}</option>`);
-                });
-                if (selectedCode) ddl.val(selectedCode).trigger('change');
-            }).fail(function () {
-                Swal.fire("Error", "Error loading warehouses.", "error");
+        function deleteRack(rackId) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes",
+                cancelButtonText: "Cancel",
+                reverseButtons: false,
+                customClass: {
+                    confirmButton: "btn btn-primary me-2",
+                    cancelButton: "btn btn-danger"
+                },
+                buttonsStyling: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post(CONFIG.urls.deleteRack + rackId, function (res) {
+                        if (res.success) {
+                            table.ajax.reload();
+                            utils.showAlert("Deleted!", res.message || "Rack has been deleted.", "success");
+                        } else {
+                            utils.handleError(res.message || "Error deleting rack!");
+                        }
+                    }).fail(() => utils.handleError("Server error while deleting."));
+                }
             });
         }
 
-        //  Load Sections on warehouse change
-        $('#WarehouseId').on('change', function () {
-            var warehouseCode = $(this).val();
-            var ddl = $("#SectionId");
-          //  console.log(ddl)
-            ddl.empty().append('<option value="">-- Select Section --</option>');
-            if (warehouseCode) {
-                $.get("/Inventory/GetSectionsSKK", { warehouseCode: warehouseCode }, function (data) {
-                    $.each(data, function (i, item) {
-                        ddl.append(`<option value="${item.SectionCode}">${item.SectionName}</option>`);
-                    });
-                }).fail(function () {
-                    Swal.fire("Error", "Error loading sections.", "error");
-                });
-            }
-        });
+        // ================= INITIALIZATION =================
+        window.initRackTab = function () {
+            if (isRackInitialized) return;
+            isRackInitialized = true;
 
-        // Initial tooltip initialization
-        setTimeout(function () {
-            initTooltips();
-        }, 500);
+            if (window.setLoaderTimeout) {
+                window.setLoaderTimeout(5000);
+            }
+
+            initializeDataTable();
+            setupEventHandlers();
+            setTimeout(utils.initTooltips, 500);
+        };
+
+        // Auto-initialize if needed
+        // initRackTab();
     });
 </script>

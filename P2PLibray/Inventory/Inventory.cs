@@ -104,7 +104,7 @@ namespace P2PLibray.Inventory
         public string GRNCode { get; set; }
         public string AddedDate { get; set; }
 
-        public string StatusName { get; set; }
+        //public string StatusName { get; set; }
 
     }
 
@@ -630,7 +630,7 @@ namespace P2PLibray.Inventory
         public string RowName { get; set; }
         public string BinName { get; set; }
         public string ItemName { get; set; }
-        public int MaxQuantity { get; set; }
+        public string MaxQuantity { get; set; }
         public int CurrentItems { get; set; }
 
 

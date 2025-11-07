@@ -1,19 +1,26 @@
-﻿<!DOCTYPE html>
+
+
+<!DOCTYPE html>
 <style>
-    .modal-backdrop {
-        display: none;
+    button.dt-button.processing,
+    div.dt-button.processing {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        background: none !important;
     }
 
-    .modal-blur {
-        filter: blur(5px);
-        transition: filter 0.3s ease;
+        button.dt-button.processing:after {
+            content: none !important;
+        }
+
+    table th {
+        white-space: nowrap; /* Prevents text wrapping */
+        text-overflow: ellipsis; /* Adds "..." if text is too long */
+        overflow: hidden; /* Hides overflow text */
     }
 
-    .toast-top-right .toast-warning {
-        background-color: #ffc107 !important; /* yellow background */
-        color: #ffffff !important; /* white text */
-    }
 </style>
+
 <html lang="en">
 <body>
     <div id="overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1040;"></div>
@@ -23,16 +30,127 @@
         <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3" style="z-index : 1100;"></div>
 
 
-        <!-- Modal -->
-        <div class="modal fade" data-bs-backdrop="true" id="itemModal" tabindex="-1" aria-labelledby="itemModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-xl modal-dialog-scrollable">
-                <!-- XL size for full form -->
-                <div class="modal-content">
-                    <div class="modal-header bg-primary ">
-                        <h5 class="modal-title w-100 text-center fw-bolder text-white " id="itemModalLabel">Create New Item</h5>
+        <!-- View Item Modal -->
 
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal fade" id="viewItemModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                <div class="modal-content shadow-lg rounded-3">
+                    <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-1">
+                        <!-- Modal title -->
+                        <h5 class="modal-title fw-bold text-white mb-0 fs-5">  View Item Details</h5>
+                        <!-- Close button -->
+                        <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
+
+                    <!-- Body -->
+                    <div class="modal-body" style="background-color: #ffffff;">
+                        <!-- modal body white -->
+                        <form id="viewItemForm" class="p-3">
+
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold text-secondary">Item Code</label>
+                                    <input type="text" id="v_itemCode" class="form-control form-control-sm  bg-opacity-25 border" readonly>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold text-secondary">Item Name</label>
+                                    <input type="text" id="v_itemName" class="form-control form-control-sm  bg-opacity-25 border" readonly>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold text-secondary">Item Category</label>
+                                    <input type="text" id="v_itemCategory" name="ItemCategoryId" class="form-control form-control-sm  bg-opacity-25 border" readonly>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold text-secondary">Cost Per Unit</label>
+                                    <input type="text" id="v_costPerUnit" class="form-control form-control-sm  bg-opacity-25 border" readonly>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold text-secondary">Reorder Quantity</label>
+                                    <input type="text" id="v_reorderQuantity" class="form-control form-control-sm  bg-opacity-25 border" readonly>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold text-secondary">Min Quantity</label>
+                                    <input type="text" id="v_minQuantity" class="form-control form-control-sm  bg-opacity-25 border" readonly>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold text-secondary">UOM</label>
+                                    <input type="text" id="v_uom" class="form-control form-control-sm  bg-opacity-25 border" readonly>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold text-secondary">HSN Code</label>
+                                    <input type="text" id="v_hsnCode" class="form-control form-control-sm  bg-opacity-25 border" readonly>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold text-secondary">Item Make</label>
+                                    <input type="text" id="v_itemMake" class="form-control form-control-sm  bg-opacity-25 border" readonly>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold text-secondary">Expiry Days</label>
+                                    <input type="text" id="v_ExpiryDays" class="form-control form-control-sm  bg-opacity-25 border" readonly>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold text-secondary">Quality Check</label>
+                                    <input type="text" id="v_qualityCheck" class="form-control form-control-sm  bg-opacity-25 border" readonly>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold text-secondary">Item Status</label>
+                                    <input type="text" id="v_itemStatus" class="form-control form-control-sm  bg-opacity-25 border" readonly>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold text-secondary">Description</label>
+                                    <textarea id="v_description" class="form-control form-control-sm  bg-opacity-25 border" rows="3" readonly></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Inspection Plan Section -->
+                            <div id="v_inspectionfrm" style="display:none;" class="mt-4">
+                                <div class="table-responsive">
+                                    <table id="v_paralistTable" class="table table-hover table-bordered align-middle">
+                                        <thead class="table-success text-center">
+                                            <tr>
+                                                <th>Sr.No</th>
+                                                <th>Quality Parameters</th>
+                                                <th>Parameters</th>
+                                                <th>UOM</th>
+                                            </tr>
+
+                                        </thead>
+                                        <tbody id="v_paralist"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+        <div class="modal fade" id="itemModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                <div class="modal-content shadow-lg rounded-3">
+                    <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-1">
+                        <!-- Modal title -->
+                        <h5 class="modal-title fw-bold text-white mb-0 fs-5" id="itemModalLabel">Create New Item</h5>
+                        <!-- Close button -->
+                        <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
 
                     <div class="modal-body container mt-5 px-8  ">
 
@@ -44,57 +162,65 @@
                                 <!-- Item Code -->
                                 <div class="col-md-6">
                                     <label for="itemCode" class="form-label">Item Code</label>
-                                    <input type="text" id="itemCode" name="ItemCode" class="form-control" readonly placeholder="Enter item code" />
+                                    <input type="text" id="itemCode" name="ItemCode" class="form-control form-control-sm shadow-sm" readonly placeholder="Enter item code" />
                                 </div>
 
                                 <!-- Item Name -->
                                 <div class="col-md-6">
-                                    <label for="itemName" class="form-label">Item Name</label>
-                                    <input type="text" id="itemName" name="ItemName" class="form-control" placeholder="Enter item name" required />
+                                    <label for="itemName" class="form-label">Item Name <span class="ic" style="color:red;">*</span></label>
+                                    <input type="text" id="itemName" name="ItemName" class="form-control form-control-sm shadow-sm" placeholder="Enter item name" />
+                                    <small id="itemError" class="text-danger" style="display:none;"></small>
+
                                 </div>
 
                                 <!-- Cost Per Unit -->
                                 <div class="col-md-6">
-                                    <label for="costPerUnit" class="form-label">Cost Per Unit</label>
-                                    <input type="number" step="0.01" id="costPerUnit" name="UnitRates" class="form-control" placeholder="Enter cost per unit" required />
+                                    <label for="costPerUnit" class="form-label">Cost Per Unit <span style="color:red;">*</span></label>
+                                    <input type="number" id="costPerUnit" name="UnitRates" class="form-control form-control-sm shadow-sm" placeholder="Enter cost per unit" />
+                                    <small id="costError" class="text-danger" style="display:none;"></small>
+
                                 </div>
 
                                 <!-- Min Quantity -->
                                 <div class="col-md-6">
-                                    <label for="minQuantity" class="form-label">Min Quantity</label>
-                                    <input type="number" id="minQuantity" name="MinQuantity" class="form-control" placeholder="Enter minimum quantity" required />
+                                    <label for="minQuantity" class="form-label">Min Quantity <span style="color:red;">*</span></label>
+                                    <input type="number" id="minQuantity" name="MinQuantity" class="form-control form-control-sm shadow-sm" placeholder="Enter minimum quantity" min="1" />
+                                    <small id="minError" class="text-danger" style="display:none;"></small>
+
                                 </div>
 
                                 <!-- Item Category -->
                                 <div class="col-md-6">
-                                    <label for="itemCategory" class="form-label">Item Category</label>
-                                    <select id="itemCategory" name="ItemCategoryId" class="form-select" required>
-                                        <option value="">Select Category</option>
+                                    <label for="itemCategory" class="form-label">Item Category <span class="ic" style="color:red;">*</span></label>
+                                    <select id="itemCategory" name="ItemCategoryId" class="form-select form-select-sm shadow-sm ">
+                                        <option value="">--Select Category--</option>
                                     </select>
                                 </div>
 
                                 <!-- HSN Code -->
                                 <div class="col-md-6">
-                                    <label for="hsnCode" class="form-label">HSN Code</label>
-                                    <input type="text" id="hsnCode" name="HSNCode" class="form-control" placeholder="Enter HSN code" readonly />
+                                    <label for="hsnCode" class="form-label">HSN Code <span class="ic" style="color:red;">*</span></label>
+                                    <input type="text" id="hsnCode" name="HSNCode" class="form-control form-control-sm shadow-sm" placeholder="Enter HSN code" readonly />
                                 </div>
 
                                 <!-- Reorder Quantity -->
                                 <div class="col-md-6">
-                                    <label for="reorderQuantity" class="form-label">Reorder Quantity</label>
-                                    <input type="number" id="reorderQuantity" name="RecorderQuantity" class="form-control" placeholder="Enter reorder quantity" required />
+                                    <label for="reorderQuantity" class="form-label">Reorder Quantity <span style="color:red;">*</span></label>
+                                    <input type="number" id="reorderQuantity" name="RecorderQuantity" class="form-control form-control-sm shadow-sm" placeholder="Enter reorder quantity" />
+                                    <small id="reorderError" class="text-danger" style="display:none;"></small>
+
                                 </div>
 
                                 <!-- Description -->
                                 <div class="col-md-12">
-                                    <label for="description" class="form-label">Description</label>
-                                    <textarea id="description" name="Description" class="form-control" rows="3" placeholder="Enter item description" required></textarea>
+                                    <label for="description" class="form-label">Description <span class="ic" style="color:red;">*</span></label>
+                                    <textarea id="description" name="Description" class="form-control shadow-sm" rows="3" placeholder="Enter item description"></textarea>
                                 </div>
 
                                 <!-- Item Status -->
                                 <div class="col-md-6">
-                                    <label for="itemStatus" class="form-label">Item Status</label>
-                                    <select id="itemStatus" name="ItemStatusId" class="form-select" required>
+                                    <label for="itemStatus" class="form-label">Item Status <span style="color:red;">*</span></label>
+                                    <select id="itemStatus" name="ItemStatusId" class="form-select form-select-sm shadow-sm">
                                         <option value="">Select Status</option>
                                     </select>
                                 </div>
@@ -103,90 +229,93 @@
 
                                 <!-- Item Make -->
                                 <div class="col-md-6">
-                                    <label for="itemMake" class="form-label">Item Make</label>
-                                    <select id="itemMake" name="ItemMakeId" class="form-select" required>
-                                        <option value="">Select Make</option>
+                                    <label for="itemMake" class="form-label">Item Make <span class="ic" style="color:red;">*</span></label>
+                                    <select id="itemMake" name="ItemMakeId" class="form-select form-select-sm shadow-sm">
+                                        <option value="">--Select Make--</option>
                                     </select>
                                 </div>
 
                                 <!-- UOM -->
                                 <div class="col-md-6">
-                                    <label for="uom" class="form-label">UOM</label>
-                                    <select id="uom" name="UOMId" class="form-select" required>
-                                        <option value="">Select UOM</option>
+                                    <label for="uom" class="form-label">UOM <span class="ic" style="color:red;">*</span></label>
+                                    <select id="uom" name="UOMId" class="form-select form-select-sm shadow-sm">
+                                        <option value="">--Select UOM--</option>
                                     </select>
                                 </div>
 
                                 <!-- Expiry Days -->
                                 <div class="col-md-6">
-                                    <label for="EXD" class="form-label">ExpireDays</label>
-                                    <input type="text" id="ExpiryDays" name="ExpiryDays" class="form-control" required />
+                                    <label for="EXD" class="form-label">ExpireDays <span style="color:red;">*</span></label>
+                                    <input type="number" id="ExpiryDays" name="ExpiryDays" class="form-control form-control-sm shadow-sm" />
+                                    <small id="expiryError" class="text-danger" style="display:none;"></small>
+
                                 </div>
 
                                 <!-- Quality Check -->
                                 <div class="col-md-6">
                                     <label for="qualityCheck" class="form-label">Quality Check</label>
-                                    <select id="qualityCheck" name="ISQualityBit" class="form-select">
-                                        <option value="">Select</option>
+                                    <select id="qualityCheck" name="ISQualityBit" class="form-select form-select-sm shadow-sm">
+                                        <option value="">--Select--</option>
                                         <option value="1">Yes</option>
                                         <option value="0">No</option>
                                     </select>
                                 </div>
                             </div>
+                            <hr />
 
                             <!-- Inspection Form -->
                             <div class="container mt-5 " id="inspectionfrm" style="display:none;">
-                                <h5 class="w-100 text-center fw-bolder bg-primary text-white" id="inspec">Inspection Plan</h5>
+                                <h3 class="w-100 text-center fw-bolder  text-primary" id="inspec">Inspection Plan</h3>
                                 <div class="row g-3">
                                     <input type="hidden" id="itemqualityid" name="ItemQualityId" value="" />
 
                                     <div class="col-md-6">
                                         <label for="plantype" class="form-label">Plan Type</label>
-                                        <select id="plantype" name="PlanId" class="form-select">
+                                        <select id="plantype" name="PlanId" class="form-select form-select-sm shadow-sm">
                                             <option value="">Select</option>
                                         </select>
                                     </div>
 
                                     <div class="col-md-6">
                                         <label for="plancode" class="form-label">Plan Code</label>
-                                        <input type="text" id="plancode" name="PlanCode" readonly class="form-control" />
+                                        <input type="text" id="plancode" name="PlanCode" readonly class="form-control form-control-sm shadow-sm" />
                                     </div>
 
                                     <div class="col-md-12">
                                         <label for="pdescription" class="form-label">Description</label>
-                                        <textarea id="pdescription" name="PlanDescription" class="form-control" rows="3" placeholder="Enter item description"></textarea>
+                                        <textarea id="pdescription" name="PlanDescription" class="form-control shadow-sm" rows="3" placeholder="Enter item description"></textarea>
                                     </div>
 
-                                    <div class="col-md-6">
+                                    <div class="col-md-6 scroll-select">
                                         <label for="inspetype" class="form-label">Inspection Type</label>
-                                        <select id="inspetype" name="InspectionId" class="form-select">
-                                            <option value="">Select</option>
+                                        <select id="inspetype" name="InspectionId" class="form-select form-select-sm shadow-sm">
+                                            <option value="">--Select--</option>
                                         </select>
                                     </div>
 
-                                    <div class="col-md-6">
+                                    <div class="col-md-6" id="quantitiDiv">
                                         <label for="quantiti" class="form-label">Quantitative Parameters</label>
-                                        <select id="quantiti" name="QualityParametersId" class="form-select">
-                                            <option value="">Select</option>
+                                        <select id="quantiti" name="QualityParametersId" class="form-select form-select-sm shadow-sm">
+                                            <option value="">--Select--</option>
                                         </select>
                                     </div>
 
-                                    <div class="col-md-6">
+                                    <div class="col-md-6" id="qualityDiv">
                                         <label for="quality" class="form-label">Qualitative Parameters</label>
-                                        <select id="quality" name="QuantityParametersId" class="form-select">
-                                            <option value="">Select</option>
+                                        <select id="quality" name="QuantityParametersId" class="form-select form-select-sm shadow-sm">
+                                            <option value="">--Select--</option>
                                         </select>
                                     </div>
 
                                     <div class="col-md-6">
-                                        <label for="qua" class="form-label">Quantity</label>
-                                        <input type="text" id="qua" name="PQuality" class="form-control" />
+                                        <label for="qua" class="form-label">Parameters</label>
+                                        <input type="text" id="qua" name="PQuality" class="form-control form-control-sm shadow-sm" />
                                     </div>
 
                                     <div class="col-md-6">
                                         <label for="uompara" class="form-label">UOM</label>
-                                        <select id="uompara" name="PUOMId" class="form-select">
-                                            <option value="">Select UOM</option>
+                                        <select id="uompara" name="PUOMId" class="form-select form-select-sm shadow-sm">
+                                            <option value="">--Select UOM--</option>
                                         </select>
                                     </div>
                                 </div>
@@ -201,7 +330,14 @@
                                             <tr>
                                                 <th>Sr.No</th>
                                                 <th>Quality Parameters</th>
-                                                <th>Quantity</th>
+<<<<<<< HEAD
+
+                                                <th>Parameters</th>
+                                                @*<th>Parameters</th>*@
+=======
+                                                <th>Parameters</th>
+
+>>>>>>> 53678e2a1bbf2611e4b0740e78e71692daadbeaf
                                                 <th>UOM</th>
                                                 <th>Action</th>
                                             </tr>
@@ -228,14 +364,16 @@
 
 
     <!-- table and button for item master-->
-    <div class="container-fluid">
+    <div>
 
         <div class="card">
             <div class="card-body">
-                <h3 class="w-100 text-center  text-primary fw-bolder ">Item Master List</h3>
 
                 <!-- 🔹 Header Row inside Card -->
                 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+
+                    <h3 class="w-100 text-center  text-primary fw-bolder ">Item Master List</h3>
+
 
                     <!-- Left: Create New Item button -->
 
@@ -245,8 +383,13 @@
                         </span>
                         <input type="text" id="itemdatefilter" class="form-control" placeholder="Select date range" readonly style="height: 100%;" />
                     </div>
+
+
                     <!-- Right: Date Range Picker + Export -->
-                    <div class="d-flex align-items-center gap-3 ms-auto">
+                    <div class="d-flex align-items-center gap-3 ms-2">
+
+
+
 
                         <!-- Date Range Picker -->
                         <div>
@@ -254,9 +397,10 @@
                                     data-bs-toggle="modal"
                                     id="createitem"
                                     data-bs-target="#itemModal">
-                                <i class="bi bi-plus-circle"></i> Create New Item
+                                <i class="bi bi-plus-circle me-2"></i>  Create New Item
                             </button>
                         </div>
+
 
                         <!-- Export Buttons -->
                         <div id="exportContainer" class="d-flex" style="height: 40px; align-items: center;">
@@ -267,24 +411,22 @@
 
                 <!-- 🔹 Table -->
                 <div id="recordList">
-                    <table id="table" class="display table table-striped table-bordered">
+                    <table id="table" class="display table table-striped table-bordered tblrl">
                         <thead class="table-dark">
                             <tr>
                                 <th>Select Item</th>
                                 <th>Sr.No</th>
                                 <th>ItemCode</th>
                                 <th>ItemName</th>
-                                <th>UOM</th>
                                 <th>Date</th>
                                 <th>Cost per Unit</th>
                                 <th>ItemCategory</th>
-                                <th>Min Quantity</th>
                                 <th>Item Status</th>
                                 <th>Quality Check</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody id="table"></tbody>
+                        <tbody id="table" ></tbody>
                     </table>
                 </div>
 
@@ -303,8 +445,107 @@
 <script>
     $(document).ready(function () {
 
+        $(document).on("click", ".btnview", function () {
+            var id = $(this).data("id");
+            var itemCode = $(this).data("code");
+
+            $("#viewItemModal").modal("show");
+
+            // Reset previous content
+            $("#viewItemForm")[0].reset();
+            $("#v_inspectionfrm").hide();
+
+            $.ajax({
+                url: '/Inventory/GetitemsidOJ',
+                type: 'GET',
+                data: { id: id },
+                success: function (data) {
+                    console.log()
+                    if (data.success) {
+
+                        // Fill form fields
+                        $("#v_itemCode").val(data.itemcode);
+                        $("#v_itemName").val(data.name);
+                        $("#v_description").val(data.descri);
+                        $("#v_costPerUnit").val(data.unitR);
+                        $("#v_reorderQuantity").val(data.recQ);
+                        $("#v_minQuantity").val(data.minQ);
+                        $("#v_itemMake").val(data.itemmake);
+                        $("#v_ExpiryDays").val(data.exp);
+                        $("#v_qualityCheck").val(data.isqua == 1 ? "Yes" : "No");
+                        $("#v_hsnCode").val(data.hsn);
+                        $("#v_itemCategory").val(data.categoryname);
+                        $("#v_uom").val(data.uom);
+                        $("#v_itemStatus").val(data.Status);
+
+                        if (data.isqua == 1) {
+                            $("#v_inspectionfrm").show();
+
+                            // Initialize / Reinitialize DataTable
+                            if ($.fn.DataTable.isDataTable('#v_paralistTable')) {
+                                $('#v_paralistTable').DataTable().clear().destroy();
+                            }
+
+                            var planTable = $('#v_paralistTable').DataTable({
+                                columns: [
+                                    { data: 'srno', title: 'Sr.No' },
+                                    { data: 'parametersname', title: 'Quality Parameters' },
+                                    { data: 'pquality', title: 'Parameters' },
+                                    { data: 'puomname', title: 'UOM' }
+                                ],
+                                columnDefs: [
+                                    {
+                                        targets: 0,
+                                        title: `<input type="checkbox" id="select-all">`,
+                                        orderable: false
+                                    },
+                                    { targets: "_all", className: "text-center" }
+
+                                ],
+                                paging: true,
+                                searching: true,
+                                ordering: false,
+                                info: true,
+                                autoWidth: false,
+                                lengthChange: false,
+                                dom: '<"d-flex justify-content-end mb-3"f>rt<"d-flex justify-content-between mt-2"<"text-center"i><"text-end"p>>'
+                            });
+
+                            // Fetch inspection plan data
+                            $.ajax({
+                                url: '/Inventory/GetInspeplanOJ',
+                                type: 'GET',
+                                data: { itemCode: itemCode },
+                                success: function (plan) {
+                                    var tableData = [];
+                                    if (plan.success && plan.data.length > 0) {
+                                        $(plan.data).each(function (i, inspe) {
+                                            tableData.push({
+                                                srno: i + 1,
+                                                parametersname: inspe.parametersname,
+                                                pquality: inspe.pquality,
+                                                puomname: inspe.puomname
+                                            });
+                                        });
+                                    }
+                                    planTable.clear().rows.add(tableData).draw();
+                                }
+                            });
+                        }
+                    } else {
+                        alert(data.message);
+                    }
+                }
+            });
+        });
+      
+
+
+
+
         // get list of item
         $(document).ready(function () {
+
             dom: '<"d-flex justify-content-between align-items-center mb-3"<"dt-left"B><"dt-search"f>>rt<"bottom d-flex justify-content-between align-items-center"ip>'
 
             let table = $('#table').DataTable({
@@ -336,7 +577,6 @@
                     },
                     { data: 'ItemCode' },
                     { data: 'ItemName' },
-                    { data: 'UOM' },
                     {
                         data: "Date",
                         render: function (data) {
@@ -367,16 +607,24 @@
 
                     { data: 'UnitRates' },
                     { data: 'ItemCategory' },
-                    { data: 'MinQuantity' },
                     { data: 'Status' },
                     { data: 'ISQuality' },
                     {
                         data: null,
                         render: function (data, type, row) {
-                            return `<button class="btn btn-primary btnedit"
+                            return `<div class="d-flex "><button class="btn btn-secondary me-2 btn-sm btnedit"
                         data-id="${row.ItemIdOJ}" data-code="${row.ItemCode}"
                         data-bs-toggle="tooltip" data-bs-placement="top"
-                        title="View Item"><i class="bi bi-eye-fill text-white"></i></button>`;
+                        title="Edit Item"><i class="bi bi-pencil-square"></i></button> 
+                        
+
+                         <button class="btn btn-primary btn-sm btnview"
+                         data-id="${row.ItemIdOJ}" 
+                         data-code="${row.ItemCode}"
+                         data-bs-toggle="tooltip" 
+                         data-bs-placement="top"
+                         title="View Item">
+                         <i class="bi bi-eye-fill text-white"></i></button></div>`                        
                         }
                     }
                 ],
@@ -450,10 +698,10 @@
                             {
                                 extend: 'pdfHtml5',
                                 text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
-                                title: " ",
+                                title: "",
                                 action: function (e, dt, button, config) {
                                     if ($('.row-checkbox:checked').length === 0) {
-                                        showExportToast(); // 🔔 will now work
+                                        showExportToast();
                                         return;
                                     }
                                     $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, button, config);
@@ -465,80 +713,238 @@
                                     columns: ':visible:not(:first-child):not(:last-child)'
                                 },
                                 customize: function (doc) {
-                                    // Reset serial no
-                                    doc.content[1].table.body.forEach((row, i) => {
-                                        if (i > 0) row[0].text = i;
+                                    // ✅ Find the table
+                                    var tableNode = doc.content.find(obj => obj.table);
+                                    if (!tableNode) return;
+                                    var table = tableNode.table;
+
+                                    // ✅ Reset serial number
+                                    table.body.forEach((row, i) => {
+                                        if (i > 0 && row[0] && row[0].text !== undefined) {
+                                            row[0].text = i;
+                                        }
                                     });
 
-                                    // Apply background color to header
-                                    var headerRow = doc.content[1].table.body[0];
-                                    headerRow.forEach(function (cell) {
-                                        cell.fillColor = '#000000';   // Black background
-                                        cell.color = '#ffffff';       // White text
+                                    // ✅ Header styling
+                                    var headerRow = table.body[0];
+                                    headerRow.forEach(cell => {
+                                        cell.fillColor = '#000000';
+                                        cell.color = '#ffffff';
                                         cell.bold = true;
                                         cell.alignment = 'center';
                                     });
 
-                                    // ✅ Add title and date above the table
-                                    var title = "Inventory List";
-                                    var date = "Generated Date: " + moment().format("DD/MM/YYYY");
+                                    // ✅ Add Title and Date above the table
                                     doc.content.unshift(
-                                        { text: title, style: 'header', alignment: 'center', margin: [0, 0, 0, 2] },
-                                        { text: date, style: 'subheader', alignment: 'center', margin: [0, 0, 0, 10] }
+                                        { text: 'Inventory List', style: 'header', alignment: 'center', margin: [0, 0, 0, 2] },
+                                        { text: 'Generated Date: ' + moment().format('DD/MM/YYYY'), style: 'subheader', alignment: 'center', margin: [0, 0, 0, 10] }
                                     );
 
-                                    // Styles
+                                    // ✅ Apply full grid with visible borders
+                                    table.layout = {
+                                        // Always draw both horizontal and vertical lines
+                                        hLineWidth: function (i, node) { return 1; },
+                                        vLineWidth: function (i, node) { return 1; },
+                                        hLineColor: function (i, node) { return '#000000'; },
+                                        vLineColor: function (i, node) { return '#000000'; },
+                                        // ✅ Padding for better spacing
+                                        paddingLeft: function (i, node) { return 6; },
+                                        paddingRight: function (i, node) { return 6; },
+                                        paddingTop: function (i, node) { return 4; },
+                                        paddingBottom: function (i, node) { return 4; },
+                                        // ✅ Ensure all lines are drawn, even internal ones
+                                        drawHorizontalLine: function (i, node) { return true; },
+                                        drawVerticalLine: function (i, node) { return true; }
+                                    };
+
+                                    // ✅ Optional zebra background (light gray)
+                                    table.body.forEach((row, i) => {
+                                        if (i > 0 && i % 2 === 0) {
+                                            row.forEach(cell => { cell.fillColor = '#f2f2f2'; });
+                                        }
+                                    });
+
+                                    // ✅ Font styling
                                     doc.styles.header = { fontSize: 16, bold: true };
                                     doc.styles.subheader = { fontSize: 12, italics: true };
                                 }
 
+
                             },
-                            {
+
+
+
+                           {
                                 extend: 'excelHtml5',
                                 text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
-                                title: "Inventory List",
+                                title: 'Item Master List',
+                                messageTop: 'Generated Date: ' + moment().format('DD/MM/YYYY'),
+
                                 action: function (e, dt, button, config) {
                                     if ($('.row-checkbox:checked').length === 0) {
-                                        showExportToast(); // 🔔 will now work
+                                        showExportToast();
                                         return;
                                     }
                                     $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
                                 },
+
                                 exportOptions: {
                                     rows: function (idx, data, node) {
                                         return $(node).find('.row-checkbox').prop('checked');
                                     },
-                                    columns: ':visible:not(:first-child):not(:last-child)'
+                                    columns: ':visible:not(:first-child):not(:last-child):not(:nth-last-child(2))',
+                                    format: {
+                                        body: function (data, row, column, node) {
+                                            return $('<div>').html(data).text(); // remove HTML
+                                        }
+                                    }
                                 },
-                                customizeData: function (data) {
-                                    data.body.forEach((row, i) => {
-                                        row[0] = i + 1; // Reset serial numbers
+
+                                customize: function (xlsx) {
+                                    const sheet = xlsx.xl.worksheets['sheet1.xml'];
+                                    const $sheet = $(sheet);
+
+                                    // ✅ Apply black borders to all cells
+                                    $('row c', $sheet).attr('s', '2'); // Style index 2 usually has border in default Excel XML
+
+                                    // ✅ Center-align title and date rows
+                                    const stylesXml = xlsx.xl['styles.xml'];
+                                    const $styles = $(stylesXml);
+                                    const $cellXfs = $styles.find('cellXfs');
+
+                                    // Create new centered style
+                                    const xfXml =
+                                        '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1">' +
+                                        '<alignment horizontal="center" vertical="center"/></xf>';
+                                    $cellXfs.append(xfXml);
+                                    const centerStyleIndex = $cellXfs.children().length - 1;
+
+                                    // Center align Generated Date row (A2)
+                                    $('row c[r^="A2"]', $sheet).attr('s', centerStyleIndex);
+
+                                    // ✅ Renumber Sr.No. column
+                                    let rowIndex = 0;
+                                    $('sheetData row', $sheet).each(function () {
+                                        const r = parseInt($(this).attr('r'), 10);
+                                        // skip first 3 rows (title, date, headers)
+                                        if (r > 3) {
+                                            const firstCell = $(this).find('c').first();
+                                            if (firstCell.length) {
+                                                firstCell.attr('t', 'n'); // numeric
+                                                firstCell.find('v').remove();
+                                                firstCell.append(`<v>${++rowIndex}</v>`);
+                                            }
+                                        }
                                     });
+
+                                    // ✅ Merge title + date cells across columns
+                                    const $mergeCells = $sheet.find('mergeCells');
+                                    if ($mergeCells.length === 0) {
+                                        $sheet.append('<mergeCells count="2"><mergeCell ref="A1:H1"/><mergeCell ref="A2:H2"/></mergeCells>');
+                                    } else {
+                                        const count = parseInt($mergeCells.attr('count') || '0', 10);
+                                        $mergeCells.attr('count', count + 2);
+                                        $mergeCells.append('<mergeCell ref="A1:H1"/><mergeCell ref="A2:H2"/>');
+                                    }
+
+                                    // Apply center style to title (A1) and date (A2)
+                                    $sheet.find('c[r="A1"]').attr('s', centerStyleIndex);
+                                    $sheet.find('c[r="A2"]').attr('s', centerStyleIndex);
                                 }
                             },
+
+
+
+
                             {
                                 extend: 'csvHtml5',
-                                text: '<i class="bi bi-filetype-csv text-dark fs-5"></i>',
+                                text: '<i class="bi bi-filetype-csv text-success fs-5"></i>',
                                 title: "Inventory List",
                                 action: function (e, dt, button, config) {
-                                    if ($('.row-checkbox:checked').length === 0) {
-                                        showExportToast(); // 🔔 will now work
+                                    const selectedRows = [];
+                                    dt.rows().every(function () {
+                                        const node = this.node();
+                                        if ($(node).find('.row-checkbox').is(':checked')) {
+                                            selectedRows.push(this.data());
+                                        }
+                                    });
+                                    if (selectedRows.length === 0) {
+                                        showExportToast();
                                         return;
                                     }
-                                    $.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, button, config);
-                                },
-                                exportOptions: {
-                                    rows: function (idx, data, node) {
-                                        return $(node).find('.row-checkbox').prop('checked');
-                                    },
-                                    columns: ':visible:not(:first-child):not(:last-child)'
-                                },
-                                customizeData: function (data) {
-                                    data.body.forEach((row, i) => {
-                                        row[0] = i + 1;
+
+                                    function parseDotNetDate(value) {
+                                        if (value == null) return '';
+                                        if (value instanceof Date && !isNaN(value)) return value;
+                                        if (typeof value === 'number' && isFinite(value)) return null; // Prevent numeric cost confusion
+                                        const match = ('' + value).match(/\/Date\((-?\d+)(?:[+-]\d+)?\)\//);
+                                        if (match) return new Date(parseInt(match[1], 10));
+                                        const parsed = Date.parse(value);
+                                        return isNaN(parsed) ? null : new Date(parsed);
+                                    }
+
+                                    function formatDateForCsv(dateObj) {
+                                        if (!(dateObj instanceof Date) || isNaN(dateObj)) return '';
+                                        const dd = String(dateObj.getDate()).padStart(2, '0');
+                                        const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+                                        const yyyy = dateObj.getFullYear();
+                                        return `${dd}/${mm}/${yyyy}`;
+                                    }
+
+                                    const fileName = `Inventory_List.csv`;
+
+                                    const headers = dt.columns(':visible:not(:last-child)').header().toArray().map(h => $(h).text().trim());
+                                    const csvData = [];
+                                    csvData.push(headers.join(','));
+
+                                    let srIndex = headers.findIndex(h => h.toLowerCase().includes('sr.no') || h.toLowerCase().includes('srno'));
+                                    if (srIndex === -1) srIndex = 0;
+
+                                    selectedRows.forEach((row, i) => {
+                                        const rowData = headers.map((header, colIndex) => {
+                                            if (colIndex === srIndex) return i + 1;
+
+                                            const col = dt.column(colIndex);
+                                            let value = '';
+                                            try {
+                                                const dataSrc = col.dataSrc();
+                                                if (dataSrc && typeof row === 'object' && dataSrc in row) {
+                                                    value = row[dataSrc];
+                                                }
+                                            } catch (ex) { value = ''; }
+
+                                            // Only try date conversion if column name contains "date"
+                                            const headerName = header.toLowerCase();
+                                            if (headerName.includes('date') || headerName.includes('created') || headerName.includes('updated')) {
+                                                const maybeDate = parseDotNetDate(value);
+                                                if (maybeDate) return formatDateForCsv(maybeDate);
+                                            }
+
+                                            const s = value == null ? '' : String(value);
+                                            if (s.includes(',') || s.includes('"') || s.includes('\n')) {
+                                                return `"${s.replace(/"/g, '""')}"`;
+                                            }
+                                            return s;
+                                        });
+                                        csvData.push(rowData.join(','));
                                     });
+
+                                    const blob = new Blob([csvData.join('\n')], { type: 'text/csv;charset=utf-8;' });
+                                    const link = document.createElement("a");
+                                    const url = URL.createObjectURL(blob);
+                                    link.setAttribute("href", url);
+                                    link.setAttribute("download", fileName);
+                                    document.body.appendChild(link);
+                                    link.click();
+                                    document.body.removeChild(link);
                                 }
-                            },
+                            }
+
+
+                       
+
+
+
 
                         ]
                     }
@@ -550,6 +956,10 @@
             });
         });
 
+
+       
+
+
         //datepicker
         $('#itemdatefilter').daterangepicker({
             autoUpdateInput: false,
@@ -557,33 +967,34 @@
             drops: "down",
             locale: { cancelLabel: 'Clear' },
             ranges: {
-                'Today': [moment(), moment()],
-                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                'This Month': [moment().startOf('month'), moment().endOf('month')],
-                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                'Today': [moment().startOf('day'), moment().endOf('day')],
+                'Last 7 Days': [moment().subtract(6, 'days').startOf('day'), moment().endOf('day')],
+                'Last 1 Month': [moment().subtract(1, 'month').startOf('day'), moment().endOf('day')],
+                'Last 3 Months': [moment().subtract(3, 'months').startOf('day'), moment().endOf('day')],
+                'Last 1 Year': [moment().subtract(1, 'year').startOf('day'), moment().endOf('day')]
             }
         }, function (start, end) {
-            $('#itemdatefilter').val(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+            $('#itemdatefilter').val(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
 
-            // Remove old filter
+            // ✅ Remove old filters
             $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(f => f.name !== 'dateFilter');
 
-            var dateFilter = function (settings, data, dataIndex) {
-                var dateStr = data[5]; // your Date column index
+            // ✅ Create new filter
+            var dateFilter = function (settings, data) {
+                var dateStr = data[5]; // column index of your date
                 if (!dateStr || dateStr === "--") return false;
 
-                // Extract plain text if wrapped in span
-                var html = document.createElement('div');
-                html.innerHTML = dateStr;
-                var textDate = html.textContent || html.innerText;
+                // Clean HTML if needed
+                var div = document.createElement('div');
+                div.innerHTML = dateStr;
+                var cleanDate = div.textContent || div.innerText;
 
-                // Match format used in render ("DD/MM/YYYY")
-                var rowDate = moment(textDate, "DD/MM/YYYY");
+                // Parse in same format used in DataTable
+                var rowDate = moment(cleanDate, "DD/MM/YYYY");
                 if (!rowDate.isValid()) return false;
 
-                return rowDate.isBetween(start, end, 'day', '[]'); // inclusive
+                // Inclusive range check
+                return rowDate.isSameOrAfter(start, 'day') && rowDate.isSameOrBefore(end, 'day');
             };
             dateFilter.name = 'dateFilter';
             $.fn.dataTable.ext.search.push(dateFilter);
@@ -591,19 +1002,15 @@
             $('#table').DataTable().draw();
         });
 
-        // Clear filter on cancel
+        // ✅ Clear filter on cancel
         $('#itemdatefilter').on('cancel.daterangepicker', function () {
             $(this).val('');
             $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(f => f.name !== 'dateFilter');
             $('#table').DataTable().draw();
         });
 
-        // Extra clear button if you have one
-        $('#clearFilter').on('click', function () {
-            $('#itemdatefilter').val('');
-            $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(f => f.name !== 'dateFilter');
-            $('#table').DataTable().draw();
-        });
+
+
 
 
         // When header checkbox is clicked
@@ -612,6 +1019,17 @@
             $('.row-checkbox').prop('checked', checked);
         });
 
+        $(document).on('click', '.row-checkbox', function () {
+            // If any one row is unchecked → uncheck "Select All"
+            if (!$(this).is(':checked')) {
+                $('#select-all').prop('checked', false);
+            } else {
+                // If all rows are checked → check "Select All"
+                if ($('.row-checkbox:checked').length === $('.row-checkbox').length) {
+                    $('#select-all').prop('checked', true);
+                }
+            }
+        });
 
         //toaster for form
         function showToast(message, type = 'danger') {
@@ -650,32 +1068,37 @@
         });
 
 
-        // function for close button
+       
         $('#itemModal').on('hidden.bs.modal', function () {
-            // Reset all values
-            $('#itemForm')[0].reset();
+            const $form = $('#itemForm');
 
-            // Clear extra fields
-            $('#itemIdOJ, #itemqualityid, #itemStatus, #itemCategory, #itemMake, #uom, #qualityCheck').val('');
+            // 🔹 Remove errors
+            $form.find('.error-text, .text-danger').remove();
+            $form.find('input, select, textarea').removeClass('is-invalid');
+
+            // 🔹 Reset form fields
+            $form[0].reset();
+
+            // 🔹 Reset dropdowns
+            $form.find('#itemIdOJ, #itemqualityid, #itemStatus, #itemCategory, #itemMake, #uom, #qualityCheck').val('');
+
+            // 🔹 Clear dynamic table (if any)
             $("#paralist").empty();
 
-            // Reset readonly/disabled states
-            $("#itemForm input, #itemForm textarea").prop("readonly", false);
-            $("#itemForm select, #itemForm input[type='checkbox'], #itemForm input[type='radio']")
-                .prop("disabled", false);
+            // 🔹 Enable fields
+            $form.find('input, textarea').prop('readonly', false);
+            $form.find('select').prop('disabled', false);
 
-            $("#itemCode").prop("disabled", false);
-            $("#plancode").prop("readonly", false);
-            $("#hsnCode").prop("readonly", false);
+            // 🔹 Reset special read-only fields
+            $("#itemCode, #hsnCode, #plancode").prop('readonly', false);
 
-            // Reset sections visibility
+            // 🔹 Reset visibility & labels
             $('#inspectionfrm').hide();
             $('#itemaster').show();
-
-            // Reset labels/buttons if needed
             $("#itemModalLabel").text("");
             $("#subitem").text("");
         });
+
 
 
         // getting status for item master form
@@ -785,6 +1208,8 @@
             console.log(insp)
             //quantitive
             if (insp == 53) {
+                $('#quantitiDiv').show();
+                $('#qualityDiv').hide();;
                 $.ajax({
                     url: '/Inventory/GetQuanOJ',
                     type: 'GET',
@@ -795,11 +1220,15 @@
                         $(plan).each(function (i, p) {
                             $('#quantiti').append(`<option value="${p.QuantitativeId}">${p.QuantitativeName}</option>`)
                         })
+
                     }
                 })
 
             }
             else if (insp == 54) {
+                $('#qualityDiv').show();
+                $('#quantitiDiv').hide();
+
                 $.ajax({
                     url: '/Inventory/GetQualityOJ',
                     type: 'GET',
@@ -811,8 +1240,16 @@
                         $(qual).each(function (i, q) {
                             $('#quality').append(`<option value="${q.Qualitative}">${q.QualitativeName}</option>`)
                         })
+                      
+
                     }
+
                 })
+
+            }
+            else {
+                $('#quantitiDiv').show();
+                $('#qualityDiv').show();
             }
         })
 
@@ -823,26 +1260,57 @@
 
             $("#QP").val(finalValue);
         });
-
-
+        
 
 
         $("#createitem").on("click", function () {
-            // Enable all inputs and selects
-            $("#itemForm input, #itemForm textarea").prop("disabled", false).prop("readonly", false);
-            $("#itemForm select, #itemForm input[type='checkbox'], #itemForm input[type='radio']")
-                .prop("disabled", false);
 
-            // Apply specific rules
-            $("#itemCode").prop("disabled", true); // should stay disabled
-            $("#plancode").prop("readonly", true);
-            $("#hsnCode").prop("readonly", true);
 
-            $("#inspectionfrm label, #inspectionfrm input, #inspectionfrm select, #inspectionfrm button").show();
-            $("#pdescription").show();
-            $("#subitem").show();
 
-            $("#paralist .btndelete").show();
+
+
+            $('#itemForm .text-danger').hide();
+            $('#itemForm .form-control, #itemForm .form-select').removeClass('is-invalid');
+            $('#itemForm .error-text').remove();
+            $('#itemForm input, #itemForm select').removeClass('is-invalid');
+
+            // Real-time correction (scoped only to form)
+            $('#itemForm input, #itemForm select')
+                .off('input.removeError change.removeError')
+                .on('input.removeError change.removeError', function () {
+                    $(this).removeClass('is-invalid');
+                    $(this).next('.error-text').remove();
+                });
+
+
+
+            $(" #itemName, #description, #itemMake, #itemCategory, #uom")
+                .prop("disabled", false)
+                .css({
+                    color: "",                // reset to default
+                    backgroundColor: "",      // reset background
+                    opacity: "",              // reset opacity
+                    cursor: ""                // reset cursor
+                });
+            //$("#hsnCode").prop("disabled", true);
+            $("#hsnCode").prop("disabled", true).css({
+                color: "#000",            // black text
+                backgroundColor: "#e9ecef", // light gray background like Bootstrap disabled
+                opacity: 1                // prevent fading
+            });
+
+            $("#itemCode").prop("disabled", true).css({
+                color: "#000",            // black text
+                backgroundColor: "#e9ecef", // light gray background like Bootstrap disabled
+                opacity: 1 
+            });
+            $("#plancode").prop("disabled", true).css({
+                color: "#000",            // black text
+                backgroundColor: "#e9ecef", // light gray background like Bootstrap disabled
+                opacity: 1 
+            });
+
+           
 
             // Overlay behavior
             $('#itemModal').off('show.bs.modal').on('show.bs.modal', function () {
@@ -875,7 +1343,7 @@
                         columns: [
                             { data: 'srno', title: 'Sr.No' },
                             { data: 'parametersname', title: 'Quality Parameters' },
-                            { data: 'pquality', title: 'Quantity' },
+                            { data: 'pquality', title: 'Parameters' },
                             { data: 'puomname', title: 'UOM' },
                             { data: 'action', title: 'Action', orderable: false }
                         ],
@@ -908,7 +1376,7 @@
                                         parametersname: inspe.parametersname,
                                         pquality: inspe.pquality,
                                         puomname: inspe.puomname,
-                                        action: '<button class="btn btn-danger btndelete" data-id="' + inspe.ItemQualityId + '"><i class="bi bi-trash3"></i></button>'
+                                        action: '<button class="btn btn-danger   btndelete btn-sm " data-id="' + inspe.ItemQualityId + '"><i class="bi bi-trash3 fs-6"></i></button>'
                                     });
                                 });
                             }
@@ -924,66 +1392,302 @@
 
             // Show the modal
             $("#itemModal").modal("show");
+            if ($("#itemModalLabel").text().trim() === "Update Item Plan") {
+                $(".ic").hide();
+            } else {
+                $(".ic").show();
+            }
+        });
+
+        // Prevent typing negative numbers in all numeric fields
+        $('#minQuantity, #reorderQuantity, #costPerUnit, #ExpiryDays').on('keypress', function (e) {
+            if (e.key === '-' || e.key === '+') {
+                e.preventDefault();
+            }
+        });
+
+        $('#qua').on('input', function () {
+            // Remove any character that is not a letter, number, or space
+            let cleanValue = $(this).val().replace(/[^a-zA-Z0-9\s]/g, '');
+            if ($(this).val() !== cleanValue) {
+                $(this).val(cleanValue);
+            }
         });
 
 
-        // saving item form
-        $('#itemForm').on('submit', function (e) {
-            e.preventDefault();
+        // ✅ Minimum Quantity Validation
+        $('#minQuantity').on('input', function () {
+            let minQuantity = parseFloat($(this).val()) || 0;
+            let reorderQuantity = parseFloat($('#reorderQuantity').val()) || 0;
 
-            var item = $(this).serialize();
-            console.log(item);
-            $.ajax({
-                url: '/Inventory/AddItemOJ',
-                type: 'POST',
-                data: item,
-                success: function (data) {
-                    if (data.status === 1) {
-                        // Success
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Inserted ✅',
-                            text: data.message,
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
+            if (minQuantity <= 0) {
+                $('#minError').text('Minimum Quantity must be greater than 0.').show();
+                $(this).addClass('is-invalid');
+            } else {
+                $('#minError').hide();
+                $(this).removeClass('is-invalid');
+            }
 
-                        $('#itemForm')[0].reset();
-                        $('#itemModal').modal('hide');
-                        $('#table').DataTable().ajax.reload();
-                    }
-                    else if (data.status === 0) {
-                        // Duplicate
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Duplicate ⚠️',
-                            text: data.message,
-                            showConfirmButton: true
-                        });
-                    }
-                    else {
-                        // Unexpected error
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error ❌',
-                            text: data.message,
-                            showConfirmButton: true
-                        });
-                    }
-                },
-                error: function (err) {
-                    console.log(err);
+            // Check reorderQuantity again whenever minQuantity changes
+            if (reorderQuantity > 0 && reorderQuantity <= minQuantity) {
+                $('#reorderError').text('Reorder Quantity must be greater than Minimum Quantity.').show();
+                $('#reorderQuantity').addClass('is-invalid');
+            } else if (reorderQuantity > minQuantity) {
+                $('#reorderError').hide();
+                $('#reorderQuantity').removeClass('is-invalid');
+            }
+        });
 
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error ❌',
-                        text: 'Error while saving item!',
-                        showConfirmButton: true
-                    });
+        // ✅ Cost Per Unit Validation
+        $('#costPerUnit').on('input', function () {
+            let value = parseFloat($(this).val()) || 0;
+
+            if (value <= 0) {
+                $('#costError').text('Cost Per Unit must be greater than 0.').show();
+                $(this).addClass('is-invalid');
+            } else {
+                $('#costError').hide();
+                $(this).removeClass('is-invalid');
+            }
+        });
+
+        // ✅ Expiry Days Validation
+        $('#ExpiryDays').on('input', function () {
+            let value = parseInt($(this).val()) || 0;
+
+            if (value <= 0) {
+                $('#expiryError').text('Expiry Days must be greater than 0.').show();
+                $(this).addClass('is-invalid');
+            } else {
+                $('#expiryError').hide();
+                $(this).removeClass('is-invalid');
+            }
+        });
+
+        // ✅ Reorder Quantity Validation
+        $('#reorderQuantity').on('input', function () {
+            let reorderQuantity = parseFloat($(this).val()) || 0;
+            let minQuantity = parseFloat($('#minQuantity').val()) || 0;
+
+            if (reorderQuantity <= 0) {
+                $('#reorderError').text('Reorder Quantity must be greater than 0.').show();
+                $(this).addClass('is-invalid');
+            } else if (reorderQuantity < minQuantity && minQuantity > 0) {
+                $('#reorderError').text('Reorder Quantity must be greater than or equal to Minimum Quantity.').show();
+                $(this).addClass('is-invalid');
+            } else {
+                $('#reorderError').hide();
+                $(this).removeClass('is-invalid');
+            }
+        });
+
+
+
+
+        
+
+      
+        function validateItemForm() {
+            let isValid = true;
+            const $form = $('#itemForm');
+
+            // 🔹 Clear old errors inside the form
+            $form.find('.text-danger').hide();
+            $form.find('.form-control, .form-select').removeClass('is-invalid');
+
+            // 🔹 Basic required field checks
+            const fields = [
+                { id: '#itemName', message: 'Please enter the item name.' },
+                { id: '#costPerUnit', message: 'Please enter the cost per unit.' },
+                { id: '#minQuantity', message: 'Please enter the minimum quantity.' },
+                { id: '#itemCategory', message: 'Please select an item category.' },
+                { id: '#hsnCode', message: 'Please enter the HSN code.' },
+                { id: '#reorderQuantity', message: 'Please enter the reorder quantity.' },
+                { id: '#description', message: 'Please enter a description.' },
+                { id: '#itemStatus', message: 'Please select an item status.' },
+                { id: '#itemMake', message: 'Please select an item make.' },
+                { id: '#uom', message: 'Please select the UOM.' },
+                { id: '#ExpiryDays', message: 'Please enter expiry days.' },
+                { id: '#qualityCheck', message: 'Please select if quality check is required.' }
+            ];
+
+            fields.forEach(f => {
+                const $field = $form.find(f.id);
+                const value = $field.val()?.trim();
+
+                if (!value) {
+                    isValid = false;
+                    $field.addClass('is-invalid');
+                    if ($field.next('.text-danger').length === 0) {
+                        $field.after(`<small class="text-danger">${f.message}</small>`);
+                    } else {
+                        $field.next('.text-danger').text(f.message).show();
+                    }
+                } else {
+                    $field.removeClass('is-invalid');
+                    $field.next('.text-danger').hide();
                 }
             });
 
-        });
+            // 🔹 Numeric / logical validations
+            const minQuantity = parseFloat($('#minQuantity').val()) || 0;
+            const reorderQuantity = parseFloat($('#reorderQuantity').val()) || 0;
+            const costPerUnit = parseFloat($('#costPerUnit').val()) || 0;
+            const expiryDays = parseInt($('#ExpiryDays').val()) || 0;
+
+            // Min Quantity > 0
+            if (minQuantity <= 0) {
+                isValid = false;
+                $('#minQuantity').addClass('is-invalid');
+                if ($('#minQuantity').next('.text-danger').length === 0)
+                    $('#minQuantity').after('<small class="text-danger">Minimum Quantity must be greater than 0.</small>');
+                else
+                    $('#minQuantity').next('.text-danger').text('Minimum Quantity must be greater than 0.').show();
+            }
+
+            // Reorder Quantity > 0 and > Min Quantity
+            if (reorderQuantity < 0) {
+                isValid = false;
+                $('#reorderQuantity').addClass('is-invalid');
+                if ($('#reorderQuantity').next('.text-danger').length === 0)
+                    $('#reorderQuantity').after('<small class="text-danger">Reorder Quantity cannot be negative.</small>');
+                else
+                    $('#reorderQuantity').next('.text-danger').text('Reorder Quantity cannot be negative.').show();
+
+            } else if (reorderQuantity < minQuantity && minQuantity > 0) {
+                isValid = false;
+                $('#reorderQuantity').addClass('is-invalid');
+                if ($('#reorderQuantity').next('.text-danger').length === 0)
+                    $('#reorderQuantity').after('<small class="text-danger">Reorder Quantity must be greater than or equal to Minimum Quantity.</small>');
+                else
+                    $('#reorderQuantity').next('.text-danger').text('Reorder Quantity must be greater than or equal to Minimum Quantity.').show();
+
+            } else if (reorderQuantity === 0) {
+                isValid = false;
+                $('#reorderQuantity').addClass('is-invalid');
+                if ($('#reorderQuantity').next('.text-danger').length === 0)
+                    $('#reorderQuantity').after('<small class="text-danger">Reorder Quantity must be greater than 0.</small>');
+                else
+                    $('#reorderQuantity').next('.text-danger').text('Reorder Quantity must be greater than 0.').show();
+
+            } else {
+                $('#reorderQuantity').removeClass('is-invalid');
+                $('#reorderQuantity').next('.text-danger').hide();
+            }
+
+
+            // Cost per Unit > 0
+            if (costPerUnit <= 0) {
+                isValid = false;
+                $('#costPerUnit').addClass('is-invalid');
+                if ($('#costPerUnit').next('.text-danger').length === 0)
+                    $('#costPerUnit').after('<small class="text-danger">Cost Per Unit must be greater than 0.</small>');
+                else
+                    $('#costPerUnit').next('.text-danger').text('Cost Per Unit must be greater than 0.').show();
+            }
+
+            // Expiry Days > 0
+            if (expiryDays <= 0) {
+                isValid = false;
+                $('#ExpiryDays').addClass('is-invalid');
+                if ($('#ExpiryDays').next('.text-danger').length === 0)
+                    $('#ExpiryDays').after('<small class="text-danger">Expiry Days must be greater than 0.</small>');
+                else
+                    $('#ExpiryDays').next('.text-danger').text('Expiry Days must be greater than 0.').show();
+            }
+
+            // 🔹 Real-time error removal
+            $form.find('input, select, textarea')
+                .off('input.changeAll change.changeAll')
+                .on('input.changeAll change.changeAll', function () {
+                    $(this).removeClass('is-invalid');
+                    $(this).next('.text-danger').hide();
+                });
+
+            return isValid;
+        }
+
+
+
+     
+$('#itemForm').on('submit', function (e) {
+    e.preventDefault();
+
+    if (!validateItemForm()) return;
+
+    var item = $(this).serialize();
+    console.log("Serialized item:", item);
+
+    $.ajax({
+        url: '/Inventory/AddItemOJ',
+        type: 'POST',
+        data: item,
+        dataType: 'json',
+        success: function (data) {
+            console.log("✅ AJAX Success Response:", data);
+
+            if (!data || typeof data.status === 'undefined') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: '⚠️ Unexpected Response',
+                    text: 'Server did not return a valid status.',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                return;
+            }
+
+            if (data.status === 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Duplicate ❌',
+                    text: data.message || 'Item already exists!',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                $('#itemName').addClass('is-invalid').focus();
+            }
+                else if (data.status === 1) {
+                // Hide modal first, then show success message
+                $('#itemModal').modal('hide');
+    
+                setTimeout(() => {
+                Swal.fire({
+                icon: 'success',
+                title: ' Item Added Success',
+                text: data.message || 'Item added successfully!',
+                timer: 2000,
+                showConfirmButton: false
+                }).then(() => {
+                $('#itemForm')[0].reset();
+                $('#table').DataTable().ajax.reload(null, false);
+                });
+                }, 300);
+                }
+            else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Oops ⚠️',
+                    text: 'Unexpected status value!',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("❌ AJAX Error:", error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error ❌',
+                text: 'Something went wrong while saving item.',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }
+    });
+});
+
+
         // checking quality of item form
         $("#qualityCheck").on("change", function () {
             if ($(this).val() === "1") {  // Yes selected
@@ -1023,14 +1727,36 @@
         });
         // button for updating item form
         $(document).on("click", ".btnedit", function () {
+          
+
+            // Real-time correction
+            $('input, select').off('input.removeError change.removeError').on('input.removeError change.removeError', function () {
+                $(this).removeClass('is-invalid');
+                $(this).next('.error-text').remove();
+            });
+            $("#viewItemModal").modal('hide');
+
+
+            $("#subitem").text("Update Item");
             var id = $(this).data("id");
             var itemCode = $(this).data("code");
-
+            console.log("editid",id)
             $("#itemModal").modal("show");
             $("#itemForm").show();
-            $("#itemModalLabel").text("View Item Plan");
+            $("#itemModalLabel").text("Update Item Plan");
             $("#inspec").hide();
             $("#itemIdOJ").val(id);
+
+
+           
+            setTimeout(function () {
+                if ($("#itemModalLabel").text().trim() === "Update Item Plan") {
+                    $(".ic").hide();
+                } else {
+                    $(".ic").show();
+                }
+            }, 100);
+      
 
             // Get item details
             $.ajax({
@@ -1040,7 +1766,7 @@
                 success: function (data) {
                     if (data.success) {
                         // Fill form fields and make read-only
-                        $("#itemIdOJ").val(data.id);
+                        $("#itemId").val(data.id);
                         $("#itemCode").val(data.itemcode);
                         $("#itemName").val(data.name);
                         $("#description").val(data.descri);
@@ -1058,14 +1784,15 @@
                         if (data.isqua == 1) $("#inspectionfrm").show();
                         else $("#inspectionfrm").hide();
 
-                        $("#itemForm input, #itemForm textarea").prop("disabled", true);
-                        $("#itemForm select, #itemForm input[type='checkbox'], #itemForm input[type='radio']").prop("disabled", true);
-
-                        $("#inspectionfrm label, #inspectionfrm input, #inspectionfrm select, #inspectionfrm button")
-                            .not("#paralistTable, #paralistTable *")
-                            .hide();
-                        $("#pdescription").hide();
-                        $("#subitem").hide();
+                        $("#itemCode, #itemName, #description, #itemMake, #hsnCode, #itemCategory, #uom")
+                            .prop("disabled", true)
+                            .css({
+                                color: "#000",            // keep text dark
+                                backgroundColor: "#e9ecef", // Bootstrap-style disabled background
+                                opacity: 1,               // prevent faded look
+                                cursor: "not-allowed"
+                            });
+                      
                     } else {
                         alert(data.message);
                     }
@@ -1075,6 +1802,23 @@
             // Wait until modal is fully visible to initialize DataTable
             $('#itemModal').one('shown.bs.modal', function () {
                 // Destroy previous table if exists
+
+                $('.error-text').remove();
+                $('input, select').removeClass('is-invalid');
+
+                // Real-time correction
+                $('input, select').off('input.removeError change.removeError').on('input.removeError change.removeError', function () {
+                    $(this).removeClass('is-invalid');
+                    $(this).next('.error-text').remove();
+                });
+
+                if ($("#itemModalLabel").text().trim() === "Update Item Plan") {
+                    $(".ic").hide();
+                } else {
+                    $(".ic").show();
+                }
+
+
                 if ($.fn.DataTable.isDataTable('#paralistTable')) {
                     $('#paralistTable').DataTable().clear().destroy();
                 }
@@ -1084,13 +1828,22 @@
                     columns: [
                         { data: 'srno', title: 'Sr.No' },
                         { data: 'parametersname', title: 'Quality Parameters' },
-                        { data: 'pquality', title: 'Quantity' },
+                        { data: 'pquality', title: 'Parameters' },
                         { data: 'puomname', title: 'UOM' },
                         { data: 'action', title: 'Action', orderable: false }
                     ],
+                    columnDefs: [
+                        {
+                            targets: 0,
+                            title: `<input type="checkbox" id="select-all">`,
+                            orderable: false
+                        },
+                        { targets: "_all", className: "text-center" }
+
+                    ],
                     paging: true,
                     searching: true,
-                    ordering: true,
+                    ordering: false,
                     info: true,        // show info text
                     autoWidth: false,
                     lengthChange: false, // hide "Show entries"
@@ -1102,45 +1855,52 @@
                         // Bottom row: info center, pagination right
                         '<"d-flex justify-content-between mt-2"<"text-center"i><"text-end"p>>'
                 });
-                planTable.column(4).visible(false); // 0-based index, so 4 = Action column
+                //   planTable.column(4).visible(false); // 0-based index, so 4 = Action column
 
 
                 // Load inspection plan via AJAX
-                $.ajax({
-                    url: '/Inventory/GetInspeplanOJ',
-                    type: 'GET',
-                    data: { itemCode: itemCode },
-                    success: function (plan) {
-                        var tableData = [];
-                        if (plan.success && plan.data.length > 0) {
-                            $(plan.data).each(function (i, inspe) {
-                                tableData.push({
-                                    srno: i + 1,
-                                    parametersname: inspe.parametersname,
-                                    pquality: inspe.pquality,
-                                    puomname: inspe.puomname,
-                                    action: "" // read-only view
-                                });
-                            });
-                        }
+                    $.ajax({
+                        url: '/Inventory/GetInspeplanOJ',
+                        type: 'GET',
+                        data: { itemCode: itemCode },
+                        success: function (plan) {
+                            console.log(plan.data)
+                            var tableData = [];
+                            if (plan.success && plan.data.length > 0) {
+                                $(plan.data).each(function (i, inspe) {
+                                    $("#plancode").val(inspe.plancode);
+                                    tableData.push({
+                                        srno: i + 1,
+                                        parametersname: inspe.parametersname,
+                                        pquality: inspe.pquality,
+                                        puomname: inspe.puomname,
+                                        action: `<button type="button" class="btn btn-danger btn-sm btndelete" data-id="${inspe.itemquality}">
+                                        <i class="bi bi-trash3 fs-6"></i>
+                                    </button>`
 
-                        planTable.clear().rows.add(tableData).draw();
-                        planTable.columns.adjust().draw(); // ensures search bar displays correctly
-                    }
+                                    });
+                                });
+                            }
+
+                            planTable.clear().rows.add(tableData).draw();
+                            planTable.columns.adjust().draw(); // ensures search bar displays correctly
+                        }
+                    });
                 });
             });
-        });
 
-        // button for delteting parameters
-        $(document).on("click", ".btndelete", function () {
-            const id = $(this).data("id");  // ItemQualityId
-            const row = $(this).closest("tr");
-            const planCode = $("#plancode").val();
-
-            Swal.fire({
-                title: "Are you sure?",
-                text: "This will delete the inspection plan!",
-                icon: "warning",
+            // button for delteting parameters
+            $(document).on("click", ".btndelete", function () {
+            
+                const id = $(this).data("id");  // ItemQualityId
+                const row = $(this).closest("tr");
+                const planCode = $("#plancode").val();
+                // alert("id", id)
+               console.log(id)
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "This will delete the inspection plan!",
+                    icon: "warning",
                 showCancelButton: true,
                 confirmButtonColor: "#d33",
                 cancelButtonColor: "#3085d6",
@@ -1200,9 +1960,71 @@
         }
 
     })
-    //adding parameters to the list
+ 
     $("#addpara").on("click", function (e) {
         e.preventDefault();
+
+        const fields = [
+            { id: '#plantype', message: 'Please select the Plan Type.' },
+            { id: '#pdescription', message: 'Please enter the Plan Description.' },
+            { id: '#inspetype', message: 'Please select the Inspection Type.' },
+            // Quantitative & Qualitative will be handled conditionally below
+            { id: '#qua', message: 'Please enter the Parameter value.' },
+            { id: '#uompara', message: 'Please select the Unit of Measure (UOM).' }
+        ];
+
+        let isValid = true;
+
+        // Remove old errors
+        $('.error-text').remove();
+        $('input, select').removeClass('is-invalid');
+
+        // Real-time correction
+        $('input, select').off('input.removeError change.removeError').on('input.removeError change.removeError', function () {
+            $(this).removeClass('is-invalid');
+            $(this).next('.error-text').remove();
+        });
+
+        // Basic field validation
+        fields.forEach(f => {
+            const $field = $(f.id);
+            const val = ($field.val() || '').trim();
+            if (val === '' || val === '--Select--' || val === '--Select UOM--') {
+                $field.addClass('is-invalid');
+                if (!$field.next('.error-text').length)
+                    $field.after(`<small class="error-text text-danger">${f.message}</small>`);
+                isValid = false;
+            }
+        });
+
+        // 🧠 Conditional validation: Either Quantitative OR Qualitative required
+        const inspType = $("#inspetype").val();
+        const quantVal = ($("#quantiti").val() || '').trim();
+        const qualVal = ($("#quality").val() || '').trim();
+
+        // If inspection type produces quantitative dropdown
+        if ($("#quantiti").is(":visible") && (quantVal === '' || quantVal === '--Select--')) {
+            $("#quantiti").addClass('is-invalid');
+            if (!$("#quantiti").next('.error-text').length)
+                $("#quantiti").after('<small class="error-text text-danger">Please select the Quantitative Parameter.</small>');
+            isValid = false;
+        }
+
+        // If inspection type produces qualitative dropdown
+        if ($("#quality").is(":visible") && (qualVal === '' || qualVal === '--Select--')) {
+            $("#quality").addClass('is-invalid');
+            if (!$("#quality").next('.error-text').length)
+                $("#quality").after('<small class="error-text text-danger">Please select the Qualitative Parameter.</small>');
+            isValid = false;
+        }
+
+        // Stop if invalid
+        if (!isValid) {
+            console.log("❌ Validation failed — please fill required fields");
+            return;
+        }
+
+        console.log("✅ Validation passed — proceeding to AJAX");
 
         var paramData = {
             PlanCode: $("#plancode").val(),
@@ -1226,15 +2048,12 @@
                 console.log("Insert response:", response);
 
                 if (response.success) {
-                    // update hidden fields
                     $("#plancode").val(response.planCode);
                     $("#itemCode").val(response.itemCode);
                     $("#pdescription").val("");
 
-                    // reload parameter list **once**
                     loadParameterList(response.planCode);
 
-                    // clear form fields
                     $("#inspetype").val("");
                     $("#quantiti").val("");
                     $("#quality").val("");
@@ -1251,19 +2070,18 @@
         });
     });
 
+
+
     // loading parameters from the in parameters list
 
 
     function loadParameterList(planCode) {
-
         // Destroy existing DataTable if exists
         if ($.fn.dataTable.isDataTable('#paralistTable')) {
             $('#paralistTable').DataTable().clear().destroy();
         }
 
         $.ajax({
-            dom: '<"d-flex justify-content-between align-items-center mb-3"<"dt-left"B><"dt-search"f>>rt<"bottom d-flex justify-content-between align-items-center"ip>',
-
             url: '/Inventory/ShowPlanOJ',
             type: 'GET',
             data: { planCode: planCode },
@@ -1277,8 +2095,8 @@
                             QualityParametersName: inspe.QualityParametersName,
                             PQuality: inspe.PQuality,
                             PUOMName: inspe.PUOMName,
-                            Action: `<button type="button" class="btn btn-danger btndelete" data-id="${inspe.ItemQualityId}">
-                                    <i class="bi bi-trash3"></i>
+                            Action: `<button type="button" class="btn btn-danger btn-sm btndelete" data-id="${inspe.ItemQualityId}">
+                                    <i class="bi bi-trash3 fs-6"></i>
                                 </button>`
                         };
                     });
@@ -1286,21 +2104,26 @@
 
                 $('#paralistTable').DataTable({
                     data: tableData,
+                    ordering:false,
                     columns: [
                         { data: 'srno', title: 'Sr.No' },
                         { data: 'QualityParametersName', title: 'Quality Parameters' },
-                        { data: 'PQuality', title: 'Quantity' },
+                        { data: 'PQuality', title: 'Parameters' },
                         { data: 'PUOMName', title: 'UOM' },
-                        { data: 'Action', title: 'Action', orderable: false },
-
+                        { data: 'Action', title: 'Action', orderable: false }
                     ],
-
                     columnDefs: [
+                        {
+                            targets: 0,
+                            title: `<input type="checkbox" id="select-all">`,
+                            orderable: false
+                        },
                         { targets: "_all", className: "text-center" }
+
                     ],
                     paging: true,
                     searching: true,
-                    ordering: true,
+                    ordering: false,
                     info: true,        // show info text
                     autoWidth: false,
                     lengthChange: false, // hide "Show entries"
@@ -1321,9 +2144,6 @@
             }
         });
     }
-
-
-
 
 </script>
 

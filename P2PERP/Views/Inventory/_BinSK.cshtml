@@ -1,19 +1,50 @@
-﻿
-<div class="d-flex justify-content-between align-items-center mb-3">
-
+﻿<div class="d-flex justify-content-between align-items-center mb-3">
     <div class="flex-grow-1 text-center">
-        <h4 class="mb-0 text-primary">Bin List</h4>
+        <h4 class="mb-0 h3 text-primary">Bin List</h4>
     </div>
-
     <button class="btn btn-success" id="btnAddbin">
         <i class="bi bi-plus-circle"></i> Add Bin
     </button>
-
 </div>
 
+<style>
+    button.dt-button.processing,
+    div.dt-button.processing {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        background: none !important;
+    }
+
+        button.dt-button.processing:after {
+            content: none !important;
+        }
+
+    /* Optimized CSS */
+    .bin-table-container {
+        position: relative;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+        border-color: #86b7fe;
+    }
+    .text-red {
+        color: red;
+    }
+    .form-select:disabled {
+        background-color: #e9ecef !important;
+        opacity: 1;
+        cursor: not-allowed;
+    }
+
+        .form-select:disabled + .form-floating-outline label {
+            color: #6c757d;
+        }
+</style>
 
 <!-- Responsive wrapper -->
-<div class="table-responsive">
+<div class="table-responsive bin-table-container">
     <table id="binTable" class="table table-bordered table-hover align-middle w-100">
         <thead class="table-dark text-center">
             <tr>
@@ -38,130 +69,121 @@
 
 <!-- Add Bin Modal -->
 <div class="modal fade" id="addBinModal" tabindex="-1" aria-labelledby="addBinModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
-            <div class="modal-header bg-primary text-white position-relative">
-                <h5 class="modal-title text-white w-100 text-center" id="addBinModalLabel">Add New Bin</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header bg-primary text-white position-relative py-2">
+                <h5 class="modal-title h5 text-white text-center mb-1 w-100" id="addBinModalLabel" style="line-height: 1.2;">
+                    Add New Bin
+                </h5>
+                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
             <div class="modal-body">
-                <form id="addBinForm" class="row g-3">
-                    <!-- Bin Code -->
+                <form id="addBinForm" novalidate class="row g-3">
                     <div class="col-md-6">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-barcode-line"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <input type="text" class="form-control" id="BinCodes" name="BinCode" required readonly>
-                                <label for="BinCodes">Bin Code</label>
-                            </div>
+                        <label for="addBinCode">Bin Code</label>
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" class="form-control bg-gray" id="addBinCode" name="BinCode" required readonly>
+
                         </div>
+
                     </div>
 
-                    <!-- Bin Name -->
                     <div class="col-md-6">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-archive-drawer-line"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <input type="text" class="form-control" id="BinName" name="BinName" required>
-                                <label for="BinName">Bin Name</label>
-                            </div>
+                        <label for="addBinName">Bin Name <span class="text-red">*</span></label>
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" class="form-control" id="addBinName" name="BinName" required>
+
                         </div>
+
+                        <span id="addBinNameError" class="text-danger d-none"></span>
                     </div>
 
-                    <!-- Item Name -->
                     <div class="col-md-6">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-box-3-line"></i></span>
+                        <label for="addItemCode">Item Name <span class="text-red">*</span></label>
                             <div class="form-floating form-floating-outline">
-                                <select class="form-select" id="ddlItems" name="ItemCode" required>
+                                <select class="form-select" id="addItemCode" name="ItemCode" required>
                                     <option value="">-- Select Items --</option>
                                 </select>
-                                <label for="ddlItems">Item Name</label>
+                                
                             </div>
-                        </div>
+                       
+                        <span id="addItemCodeError" class="text-danger d-none"></span>
                     </div>
 
-                    <!-- Max Quantity -->
                     <div class="col-md-6">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-numbers-line"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <input type="number" class="form-control" id="MaxQuantity" name="MaxQuantity" min="1">
-                                <label for="MaxQuantity">Max Quantity</label>
-                            </div>
+                        <label for="addMaxQuantity">Max Quantity <span class="text-red">*</span></label>
+                        <div class="form-floating form-floating-outline">
+                            <input type="number" class="form-control" id="addMaxQuantity" name="MaxQuantity" min="1">
+
                         </div>
+
+                        <span id="addMaxQuantityError" class="text-danger d-none"></span>
                     </div>
 
-                    <!-- Warehouse -->
+                    <span id="addFormGeneralError" class="text-danger d-none"></span>
+
                     <div class="col-md-3">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-building-4-line"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <select class="form-select" id="ddlWarehouse" name="WarehouseId" required>
-                                    <option value="">-- Select Warehouse --</option>
-                                </select>
-                                <label for="ddlWarehouse">Warehouse</label>
-                            </div>
+                        <label for="addWarehouse">Warehouse <span class="text-red">*</span></label>
+                        <div class="form-floating form-floating-outline">
+                            <select class="form-select" id="addWarehouse" name="WarehouseId" required>
+                                <option value="">--Select Warehouse--</option>
+                            </select>
+
                         </div>
+
+                        <span id="addWarehouseError" class="text-danger d-none"></span>
                     </div>
 
-                    <!-- Section -->
                     <div class="col-md-3">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-layout-masonry-line"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <select class="form-select" id="ddlSection" name="SectionId" required>
-                                    <option value="">-- Select Section --</option>
-                                </select>
-                                <label for="ddlSection">Section</label>
-                            </div>
+                        <label for="addSection">Section <span class="text-red">*</span></label>
+                        <div class="form-floating form-floating-outline">
+                            <select class="form-select" id="addSection" name="SectionId" required>
+                                <option value="">-- Select Section --</option>
+                            </select>
+
                         </div>
+
+                        <span id="addSectionError" class="text-danger d-none"></span>
                     </div>
 
-                    <!-- Rack -->
                     <div class="col-md-3">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-stack-line"></i></span>
+                        <label for="addRack">Rack <span class="text-red">*</span></label>
                             <div class="form-floating form-floating-outline">
-                                <select class="form-select" id="ddlRack" name="RackId" required>
+                                <select class="form-select" id="addRack" name="RackId" required>
                                     <option value="">-- Select Rack --</option>
                                 </select>
-                                <label for="ddlRack">Rack</label>
+                                
                             </div>
-                        </div>
+                        
+                        <span id="addRackError" class="text-danger d-none"></span>
                     </div>
 
-                    <!-- Row -->
                     <div class="col-md-3">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-table-line"></i></span>
+                        <label for="addRow">Row <span class="text-red">*</span></label>
                             <div class="form-floating form-floating-outline">
-                                <select class="form-select" id="ddlRow" name="RowId" required>
+                                <select class="form-select" id="addRow" name="RowId" required>
                                     <option value="">-- Select Row --</option>
                                 </select>
-                                <label for="ddlRow">Row</label>
+                                
                             </div>
-                        </div>
+                        
+                        <span id="addRowError" class="text-danger d-none"></span>
                     </div>
 
-                    <!-- Description -->
                     <div class="col-12">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-file-text-line"></i></span>
+                        <label for="addDescription">Description</label>
                             <div class="form-floating form-floating-outline">
-                                <textarea class="form-control" id="Descriptionss" name="Description" rows="3"></textarea>
-                                <label for="Descriptionss">Description</label>
+                                <textarea class="form-control" id="addDescription" name="Description" rows="3"></textarea>
+                                
                             </div>
-                        </div>
+                        
                     </div>
                 </form>
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-danger bg-danger text-white px-4" data-bs-dismiss="modal">
-                    <i class="bi bi-x-circle me-2"></i>Close
-                </button>
                 <button type="submit" form="addBinForm" class="btn btn-success px-4">
                     <i class="bi bi-check-circle me-2 text-white"></i>Save
                 </button>
@@ -169,1070 +191,1134 @@
         </div>
     </div>
 </div>
-<!-- View Bin Modal -->
-<div class="modal fade" id="viewBinModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
-        <div class="modal-content">
 
-            <!-- Header -->
-            <div class="modal-header bg-primary text-white position-relative">
-                <h5 class="d-flex justify-content-center text-center ms-auto text-white">
-                    Bin Details
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-
-            <!-- Body -->
-            <div class="modal-body">
-                <form class="row g-3">
-
-                    <!-- Bin Code -->
-                    <div class="col-md-6">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-barcode-line"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <input type="text" class="form-control" id="vBinCode" readonly>
-                                <label for="vBinCode">Bin Code</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Bin Name -->
-                    <div class="col-md-6">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-archive-drawer-line"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <input type="text" class="form-control" id="vBinName" readonly>
-                                <label for="vBinName">Bin Name</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Warehouse -->
-                    <div class="col-md-6">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-building-4-line"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <input type="text" class="form-control" id="vWarehouse" readonly>
-                                <label for="vWarehouse">Warehouse</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Section -->
-                    <div class="col-md-6">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-layout-masonry-line"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <input type="text" class="form-control" id="vSection" readonly>
-                                <label for="vSection">Section</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Rack -->
-                    <div class="col-md-6">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-shelf-line"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <input type="text" class="form-control" id="vRack" readonly>
-                                <label for="vRack">Rack</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Row -->
-                    <div class="col-md-6">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-list-check-2"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <input type="text" class="form-control" id="vRow" readonly>
-                                <label for="vRow">Row</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Item -->
-                    <div class="col-md-6">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-box-3-line"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <input type="text" class="form-control" id="vItem" readonly>
-                                <label for="vItem">Item</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Max Quantity -->
-                    <div class="col-md-6">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-number-9"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <input type="text" class="form-control" id="vMaxQuantity" readonly>
-                                <label for="vMaxQuantity">Max Quantity</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Current Items -->
-                    <div class="col-md-6">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-inbox-line"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <input type="text" class="form-control" id="vCurrentItems" readonly>
-                                <label for="vCurrentItems">Current Items</label>
-                            </div>
-                        </div>
-                    </div>
-
-
-
-                    <!-- Description -->
-                    <div class="col-12">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-file-text-line"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <textarea class="form-control" id="vBDescription" rows="2" readonly></textarea>
-                                <label for="vBDescription">Description</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Added Date -->
-                    <div class="col-md-6">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-calendar-line"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <input type="text" class="form-control" id="vBAddedDate" readonly>
-                                <label for="vBAddedDate">Added Date</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Added By -->
-                    <div class="col-md-6">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-user-3-line"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <input type="text" class="form-control" id="demo" readonly>
-                                <label for="demo">Added By</label>
-                            </div>
-                        </div>
-                    </div>
-
-                </form>
-            </div>
-
-
-
-        </div>
-    </div>
-</div></div>
 <!-- Edit Bin Modal -->
 <div class="modal fade" id="editBinModal" tabindex="-1" aria-labelledby="editBinModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
-
-            <!-- Modal Header -->
-            <div class="modal-header bg-primary text-white position-relative">
-                <h5 class="modal-title text-white w-100 text-center" id="editBinModalLabel">Edit Bin</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header bg-primary text-white position-relative py-2">
+                <h5 class="modal-title h5 text-white text-center mb-1 w-100" id="editBinModalLabel" style="line-height: 1.2;">
+                    Update Bin
+                </h5>
+                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <!-- Modal Body -->
             <div class="modal-body">
                 <form id="editBinForm" class="row g-3">
-                    <input type="hidden" id="eBinId" />
+                    <input type="hidden" id="editBinId" name="BinId" />
 
-                    <!-- Bin Code -->
                     <div class="col-md-6">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-barcode-line"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <input type="text" class="form-control" id="eBinCode" readonly>
-                                <label for="eBinCode">Bin Code</label>
-                            </div>
+                        <label for="editBinCode">Bin Code</label>
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" class="form-control bg-gray" id="editBinCode" name="BinCode" required readonly>
+
                         </div>
+
                     </div>
 
-                    <!-- Bin Name -->
                     <div class="col-md-6">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-archive-drawer-line"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <input type="text" class="form-control" id="eBinName" required>
-                                <label for="eBinName">Bin Name</label>
-                            </div>
+                        <label for="editBinName">Bin Name <span class="text-red">*</span></label>
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" class="form-control" id="editBinName" name="BinName" required>
+
                         </div>
+
+                        <span id="editBinNameError" class="text-danger d-none"></span>
                     </div>
 
-                    <!-- Item Name -->
                     <div class="col-md-6">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-box-3-line"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <select class="form-select" id="eItemCode" required>
-                                    <option value="">-- Select Item --</option>
-                                </select>
-                                <label for="eItemCode">Item Name</label>
-                            </div>
+                        <label for="editItemCode">Item Name <span class="text-red">*</span></label>
+                        <div class="form-floating form-floating-outline">
+                            <select class="form-select" id="editItemCode" name="ItemCode" required>
+                                <option value="">-- Select Item --</option>
+                            </select>
                         </div>
+                        <span id="editItemHelp" class="form-text text-muted d-none">
+                            Item cannot be changed because this bin contains items
+                        </span>
                     </div>
 
-                    <!-- Max Quantity -->
                     <div class="col-md-6">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-numbers-line"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <input type="number" class="form-control" id="eMaxQuantity" min="1">
-                                <label for="eMaxQuantity">Max Quantity</label>
-                            </div>
+                        <label for="editMaxQuantity">Max Quantity <span class="text-red">*</span></label>
+                        <div class="form-floating form-floating-outline">
+                            <input type="number" class="form-control" id="editMaxQuantity" name="MaxQuantity" min="1">
+
                         </div>
+
+                        <span id="editMaxQuantityError" class="text-danger d-none"></span>
                     </div>
 
-                    <!-- Warehouse -->
+                    <span id="editFormGeneralError" class="text-danger d-none"></span>
+
                     <div class="col-md-3">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-building-4-line"></i></span>
+                        <label for="editWarehouseName">Warehouse</label>
                             <div class="form-floating form-floating-outline">
-                                <select class="form-select" id="eWarehouse" required></select>
-                                <label for="eWarehouse">Warehouse</label>
+                                <input type="text" class="form-control bg-gray" id="editWarehouseNameForBin" readonly>
+                                <input type="hidden" id="editWarehouseCode" name="WarehouseId">
+                                
                             </div>
-                        </div>
+                        
                     </div>
 
-                    <!-- Section -->
                     <div class="col-md-3">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-layout-masonry-line"></i></span>
+                        <label for="editSectionName">Section</label>
                             <div class="form-floating form-floating-outline">
-                                <select class="form-select" id="eSection" required></select>
-                                <label for="eSection">Section</label>
+                                <input type="text" class="form-control bg-gray" id="editSectionNameForBin" readonly>
+                                <input type="hidden" id="editSectionCode" name="SectionId">
+                                
                             </div>
-                        </div>
+                        
                     </div>
 
-                    <!-- Rack -->
                     <div class="col-md-3">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-stack-line"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <select class="form-select" id="eRack" required></select>
-                                <label for="eRack">Rack</label>
-                            </div>
+                        <label for="editRackName">Rack</label>
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" class="form-control bg-gray" id="editRackNameForBin" readonly>
+                            <input type="hidden" id="editRackCode" name="RackId">
+
                         </div>
+
                     </div>
 
-                    <!-- Row -->
                     <div class="col-md-3">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-table-line"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <select class="form-select" id="eRow" required></select>
-                                <label for="eRow">Row</label>
-                            </div>
+                        <label for="editRowName">Row</label>
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" class="form-control bg-gray" id="editRowNameForBin" readonly>
+                            <input type="hidden" id="editRowCode" name="RowId">
+
                         </div>
+
                     </div>
 
-                    <!-- Description -->
                     <div class="col-12">
-                        <div class="input-group input-group-merge mb-3">
-                            <span class="input-group-text"><i class="ri-file-text-line"></i></span>
-                            <div class="form-floating form-floating-outline">
-                                <textarea class="form-control" id="eDescription" rows="3"
-                                          data-bs-toggle="tooltip" data-bs-placement="top" title="Edit bin description"></textarea>
-                                <label for="eDescription">Description</label>
-                            </div>
+                        <label for="editDescription">Description</label>
+                        <div class="form-floating form-floating-outline">
+                            <textarea class="form-control" id="editDescriptionForBin" name="Description" rows="3"></textarea>
+
                         </div>
+
                     </div>
                 </form>
             </div>
 
-            <!-- Modal Footer -->
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-danger px-4" data-bs-dismiss="modal">
-                    <i class="bi bi-x-circle me-2"></i>Close
-                </button>
                 <button type="submit" form="editBinForm" class="btn btn-success px-4">
                     <i class="bi bi-check-circle me-2 text-white"></i>Update
                 </button>
             </div>
-
         </div>
     </div>
 </div>
 
+<!-- View Bin Modal -->
+<div class="modal fade" id="viewBinModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white position-relative py-2">
+                <h5 class="modal-title h5 text-white text-center mb-1 w-100" id="binDetailsModalTitle" style="line-height: 1.2;">
+                    Bin Details
+                </h5>
+                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <form class="row g-3">
+                    <div class="col-md-6">
+                        <label for="vBinCode">Bin Code</label>
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" class="form-control" id="vBinCode" readonly>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="vBinName">Bin Name</label>
+                            <div class="form-floating form-floating-outline">
+                                <input type="text" class="form-control" id="vBinName" readonly>
+                                
+                            </div>
+                        
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="vWarehouse">Warehouse</label>
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" class="form-control" id="vWarehouse" readonly>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="vSection">Section</label>
+                            <div class="form-floating form-floating-outline">
+                                <input type="text" class="form-control" id="vSection" readonly>
+                                
+                            </div>
+                        
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="vRack">Rack</label>
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" class="form-control" id="vRack" readonly>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="vRow">Row</label>
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" class="form-control" id="vRow" readonly>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="vItem">Item</label>
+                            <div class="form-floating form-floating-outline">
+                                <input type="text" class="form-control" id="vItem" readonly>
+                                
+                            </div>
+                        
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="vMaxQuantity">Max Quantity</label>
+                            <div class="form-floating form-floating-outline">
+                                <input type="text" class="form-control" id="vMaxQuantity" readonly>
+                                
+                            </div>
+                        
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="vCurrentItems">Current Items</label>
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" class="form-control" id="vCurrentItems" readonly>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-12">
+                        <label for="vBDescription">Description</label>
+                        <div class="form-floating form-floating-outline">
+                            <textarea class="form-control" id="vBDescription" rows="2" readonly></textarea>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="vBAddedDate">Added Date</label>
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" class="form-control" id="vBAddedDate" readonly>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="demo">Added By</label>
+                        <div class="form-floating form-floating-outline">
+                            <input type="text" class="form-control" id="demo" readonly>
+
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
-    $(document).ready(function () {
+    // Cache DOM elements and configurations
+    const BinManager = {
+        // Cached selectors
+        selectors: {
+            table: '#binTable',
+            addModal: '#addBinModal',
+            editModal: '#editBinModal',
+            viewModal: '#viewBinModal',
+            addForm: '#addBinForm',
+            editForm: '#editBinForm',
+            dateRange: '#binDateRange',
+            selectAll: '#selectAllBin'
+        },
 
-        // Initialize DataTable
-        var table = $('#binTable').DataTable({
-            "processing": true,
-            paging: true,
+        // DataTable instance
+        dataTable: null,
 
-            "serverSide": false,
-            "ajax": {
-                "url": "/Inventory/BinsSKK",
-                "type": "GET",
-                "datatype": "json"
-            },
-            dom: '<"d-flex justify-content-between align-items-center mt-1 mb-2"Bf>rt<"d-flex justify-content-between mt-2"<"datatable-info"i><"datatable-pagination"p>>',
+        // URLs
+        urls: {
+            getBins: "/Inventory/BinsSKK",
+            getNextCode: "/Inventory/GetNextBinCodeSKK",
+            getItems: "/Inventory/GetItemsSKK",
+            getWarehouses: "/Inventory/GetWarehousesListSK",
+            getSections: "/Inventory/GetSectionsSKK",
+            getRacks: "/Inventory/GetRackss",
+            getRows: "/Inventory/GetRowsSBK",
+            saveBin: "/Inventory/SaveBinSKK",
+            getBinById: "/Inventory/GetBinByIdSBK",
+            deleteBin: "/Inventory/DeleteBinSBK"
+        },
 
-            buttons: [
-                {
-                    extend: 'print',
-                    text: '<i class="bi bi-printer-fill text-dark fs-5"></i>',
-                    title: '',
-                    exportOptions: {
-                        rows: function (idx, data, node) {
-                            return $(node).find('input.selectRow').is(':checked');
-                        },
-                        columns: ':visible:not(:first-child):not(:last-child)'
-                    },
-                    action: function (e, dt, button, config) {
-                        if ($('.selectRow:checked').length === 0) {
-                            toastr.warning("Please select at least one row!");
-                            return;
-                        }
-                        $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config);
-                    },
-                    customize: function (win) {
-                        let serialNumber = 1;
-                        $(win.document.body).find('table tbody tr').each(function() {
-                            $(this).find('td:eq(0)').text(serialNumber++);
-                        });
+        // Initialize the application
+        init: function () {
+            this.initDataTable();
+            this.bindEvents();
+            this.initDateRange();
+        },
 
-                        $(win.document.body).prepend(
-                            '<h2 style="text-align: center; margin-bottom: 10px;">Bin List</h2>' +
-                            '<p style="text-align: center; margin-bottom: 20px; color: #666;">Generated on: ' + new Date().toLocaleDateString("en-GB") + '</p>' +
-                            '<hr style="margin-bottom: 20px;">'
-                        );
-
-                        $(win.document.body).find('table')
-                            .css('border', '1px solid black')
-                            .css('border-collapse', 'collapse')
-                            .find('th, td')
-                            .css('border', '1px solid black')
-                            .css('padding', '5px');
-
-                        $(win.document.body).find('th')
-                            .css('background-color', 'black')
-                            .css('color', 'white');
-                    }
+        // Initialize DataTable with optimized configuration
+        initDataTable: function () {
+            this.dataTable = $(this.selectors.table).DataTable({
+                processing: true,
+                paging: true,
+                serverSide: false,
+                ajax: {
+                    url: this.urls.getBins,
+                    type: "GET",
+                    datatype: "json"
                 },
-                {
-                    extend: 'pdfHtml5',
-                    text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
-                    title: '',
-                    exportOptions: {
-                        rows: function (idx, data, node) {
-                            return $(node).find('input.selectRow').is(':checked');
-                        },
-                        columns: ':visible:not(:first-child):not(:last-child)'
-                    },
-                    action: function (e, dt, button, config) {
-                        if ($('.selectRow:checked').length === 0) {
-                            toastr.warning("Please select at least one row!");
-                            return;
-                        }
-                        $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, button, config);
-                    },
-                    customize: function (doc) {
-                        let selectedData = [];
-                        $('#binTable').DataTable().rows().every(function() {
-                            let rowData = this.data();
-                            if ($(this.node()).find('input.selectRow').is(':checked')) {
-                                selectedData.push(rowData);
-                            }
-                        });
-
-                        doc.content = [];
-
-                        doc.content.push(
-                            {
-                                text: 'Bin List',
-                                alignment: 'center',
-                                fontSize: 16,
-                                bold: true,
-                                margin: [0, 0, 0, 10]
-                            },
-                            {
-                                text: 'Generated on: ' + new Date().toLocaleDateString("en-GB"),
-                                alignment: 'center',
-                                fontSize: 10,
-                                color: '#666',
-                                margin: [0, 0, 0, 15]
-                            }
-                        );
-
-                        let tableBody = [];
-
-                        tableBody.push([
-                            { text: 'Sr No', style: 'tableHeader', alignment: 'center' },
-                            { text: 'Bin Code', style: 'tableHeader', alignment: 'center' },
-                            { text: 'Row Code', style: 'tableHeader', alignment: 'center' },
-                            { text: 'Row Name', style: 'tableHeader', alignment: 'center' },
-                            { text: 'Bin Name', style: 'tableHeader', alignment: 'center' },
-                            { text: 'Item Name', style: 'tableHeader', alignment: 'center' },
-                            { text: 'Max Quantity', style: 'tableHeader', alignment: 'center' },
-                            { text: 'Current Items', style: 'tableHeader', alignment: 'center' },
-                            { text: 'Added Date', style: 'tableHeader', alignment: 'center' },
-                            { text: 'Added By', style: 'tableHeader', alignment: 'center' }
-                        ]);
-
-                        selectedData.forEach(function(row, index) {
-                            let addedDate = "";
-                            if (row.AddedDate) {
-                                let match = /Date\((\d+)\)/.exec(row.AddedDate);
-                                if (match) {
-                                    let dt = new Date(parseInt(match[1], 10));
-                                    addedDate = dt.toLocaleDateString("en-GB");
-                                } else {
-                                    let dt2 = new Date(row.AddedDate);
-                                    if (!isNaN(dt2.getTime())) {
-                                        addedDate = dt2.toLocaleDateString("en-GB");
-                                    }
-                                }
-                            }
-
-                            tableBody.push([
-                                { text: (index + 1).toString(), alignment: 'center', fontSize: 9 },
-                                { text: row.BinCode || '-', alignment: 'center', fontSize: 9 },
-                                { text: row.RowCode || '-', alignment: 'center', fontSize: 9 },
-                                { text: row.RowName || '-', alignment: 'center', fontSize: 9 },
-                                { text: row.BinName || '-', alignment: 'center', fontSize: 9 },
-                                { text: row.ItemName || '-', alignment: 'center', fontSize: 9 },
-                                { text: row.MaxQuantity || '-', alignment: 'center', fontSize: 9 },
-                                { text: row.CurrentItems || '-', alignment: 'center', fontSize: 9 },
-                                { text: addedDate || '-', alignment: 'center', fontSize: 9 },
-                                { text: row.AddedBy || '-', alignment: 'center', fontSize: 9 }
-                            ]);
-                        });
-
-                        doc.content.push({
-                            table: {
-                                headerRows: 1,
-                                widths: ['8%', '12%', '12%', '12%', '12%', '12%', '10%', '10%', '10%', '10%'],
-                                body: tableBody
-                            },
-                            layout: {
-                                hLineWidth: function(i, node) { return 0.5; },
-                                vLineWidth: function(i, node) { return 0.5; },
-                                hLineColor: function(i, node) { return '#000000'; },
-                                vLineColor: function(i, node) { return '#000000'; },
-                                paddingLeft: function(i, node) { return 5; },
-                                paddingRight: function(i, node) { return 5; }
-                            }
-                        });
-
-                        doc.styles = {
-                            tableHeader: {
-                                bold: true,
-                                fontSize: 10,
-                                color: 'white',
-                                fillColor: '#000000',
-                                alignment: 'center'
-                            }
-                        };
-
-                        doc.defaultStyle = {
-                            fontSize: 9,
-                            alignment: 'center'
-                        };
-                    }
-                },
-                {
-                    extend: 'excelHtml5',
-                    text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
-                    title: 'Bin List',
-                    message: 'Generated on: ' + new Date().toLocaleDateString("en-GB"),
-                    exportOptions: {
-                        rows: function (idx, data, node) {
-                            return $(node).find('input.selectRow').is(':checked');
-                        },
-                        columns: ':visible:not(:first-child):not(:last-child)'
-                    },
-                    action: function (e, dt, button, config) {
-                        if ($('.selectRow:checked').length === 0) {
-                            toastr.warning("Please select at least one row!");
-                            return;
-                        }
-                        $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
-                    }
-                },
-                {
-                    extend: 'csvHtml5',
-                    text: '<i class="bi bi-filetype-csv text-success fs-5"></i>',
-                    title: 'Bin List',
-                    message: 'Generated on: ' + new Date().toLocaleDateString("en-GB"),
-                    exportOptions: {
-                        rows: function (idx, data, node) {
-                            return $(node).find('input.selectRow').is(':checked');
-                        },
-                        columns: ':visible:not(:first-child):not(:last-child)'
-                    },
-                    action: function (e, dt, button, config) {
-                        if ($('.selectRow:checked').length === 0) {
-                            toastr.warning("Please select at least one row!");
-                            return;
-                        }
-                        $.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, button, config);
-                    }
-                }
-            ],
-
-            "columns": [
-                {
-                    "data": "BinId",
-                    "render": function (data) {
-                        return '<input type="checkbox" class="selectRow" value="' + data + '">';
-                    },
-                    "orderable": false
-                },
-                {
-                    "data": null,
-                    "render": function (data, type, row, meta) {
-                        return meta.row + 1;
-                    },
-                    "orderable": false
-                },
-                { "data": "BinId", visible: false },
-                { "data": "BinCode" },
-                { "data": "RowCode" },
-                { "data": "RowName" },
-                { "data": "BinName" },
-                { "data": "ItemName" },
-                { "data": "MaxQuantity" },
-                { "data": "CurrentItems" },
-                {
-                    "data": "AddedDate",
-                    "render": function (data) {
-                        if (!data) return "";
-
-                        var match = /Date\((\d+)\)/.exec(data);
-                        if (match) {
-                            var dt = new Date(parseInt(match[1], 10));
-                            return dt.toLocaleDateString("en-GB");
-                        }
-
-                        var dt2 = new Date(data);
-                        if (!isNaN(dt2.getTime())) {
-                            return dt2.toLocaleDateString("en-GB");
-                        }
-
-                        return data;
-                    }
-
-                },
-                { "data": "AddedBy" },
-                {
-                    "data": "BinId",
-                    "render": function (data) {
-                        return `
-                       <div class="d-flex justify-content-center gap-1">
-        <button class="btn btn-sm btn-primary view-bin" data-id="${data}"
-            data-bs-toggle="tooltip" data-bs-placement="top" title="View Bin Details">
-            <i class="bi bi-eye me-1"></i>
-        </button>
-
-        <button class="btn btn-sm btn-warning edit-bin" data-id="${data}"
-            data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Bin">
-            <i class="bi bi-pencil-square"></i>
-        </button>
-
-        <button class="btn btn-sm btn-danger delete-bin" data-id="${data}"
-            data-bs-toggle="tooltip" data-bs-placement="top" title="Delete Bin">
-            <i class="bi bi-trash"></i>
-        </button>
-    </div>
-                        `;
-                    },
-                    "orderable": false
-                }
-            ],
-            columnDefs: [
-                { orderable: false, targets: "_all" }
-            ],
-        });
-
-        // DataTable init ke baad ye code lagao
-        $("#binTable_wrapper").prepend(`
-  <div class="input-group mb-2 mt-3" style="max-width: 280px;">
-    <span class="input-group-text bg-primary text-white">
-      <i class="bi bi-calendar-date"></i>
-    </span>
-    <input type="text" id="binDateRange" class="form-control" placeholder="Select date range" readonly />
-  </div>
-`);
-
-//  Date Range Picker
-
-        $('#binDateRange').daterangepicker({
-            autoUpdateInput: false,
-            locale: { cancelLabel: 'Clear' },
-            ranges: {
-                'Today': [moment(), moment()],
-                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                'This Month': [moment().startOf('month'), moment().endOf('month')],
-                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-            }
-        });
-
-
-        $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
-            if (settings.nTable.id !== "binTable") return true;
-
-            var dateRange = $('#binDateRange').val();
-            if (!dateRange) return true;
-
-            var minMax = dateRange.split(' to ');
-            var min = moment(minMax[0], 'YYYY-MM-DD');
-            var max = moment(minMax[1], 'YYYY-MM-DD');
-
-            var date = moment(data[10], 'DD/MM/YYYY');
-
-            return date.isBetween(min, max, 'day', '[]');
-        });
-
-
-        $('#binDateRange').on('apply.daterangepicker', function (ev, picker) {
-            $(this).val(picker.startDate.format('YYYY-MM-DD') + ' to ' + picker.endDate.format('YYYY-MM-DD'));
-            $('#binTable').DataTable().draw();
-        });
-
-        $('#binDateRange').on('cancel.daterangepicker', function () {
-            $(this).val('');
-            $('#binTable').DataTable().draw();
-        });
-
-
-
-        //Select All
-
-        $('#selectAllBin').on('click', function () {
-            var isChecked = $(this).prop('checked');
-            var table = $('#binTable').DataTable();
-
-            $(table.rows({ page: 'current' }).nodes()).find('.selectRow').prop('checked', isChecked);
-        });
-
-
-        $('#binTable').on('change', '.selectRow', function () {
-            var table = $('#binTable').DataTable();
-
-            var total = table.rows({ page: 'current' }).nodes().to$().find('.selectRow').length;
-            var checked = table.rows({ page: 'current' }).nodes().to$().find('.selectRow:checked').length;
-
-            $('#selectAllBin').prop('checked', total === checked);
-        });
-
-        // Add Bin button
-        $('#btnAddbin').on('click', function () {
-            loadWarehouses();
-            loadItems();
-            $.get("/Inventory/GetNextBinCodeSKK", function (res) {
-                if (res && res.BnextCode) {
-                    $('#BinCodes').val(res.BnextCode);
-                } else {
-                    Swal.fire("Error", "Next bin code not found", "error");
+                dom: '<"d-flex justify-content-between align-items-center mt-1 mb-2"Bf>rt<"d-flex justify-content-between mt-2"<"datatable-info"i><"datatable-pagination"p>>',
+                buttons: this.getTableButtons(),
+                columns: this.getTableColumns(),
+                columnDefs: [
+                    { orderable: false, targets: "_all" },
+                    { className: "text-center", targets: "_all" }
+                ],
+                createdRow: function (row, data, dataIndex) {
+                    $(row).attr('data-bin-id', data.BinId);
                 }
             });
-            $("#addBinModal").modal("show");
-        });
+        },
 
+        // Get table buttons configuration
+        getTableButtons: function () {
+            return [
+                this.getPrintButton(),
+                this.getPdfButton(),
+                this.getExcelButton(),
+                this.getCsvButton()
+            ];
+        },
 
-        // ✅ Load Items
-        function loadItems() {
-            $.ajax({
-                url: '@Url.Action("GetItemsSKK", "Inventory")',
-                type: 'GET',
-                success: function (data) {
-                    let $ddl = $("#ddlItems");
-                    $ddl.empty().append('<option value="">-- Select Items --</option>');
-                    $.each(data, function (i, item) {
-                        $ddl.append('<option value="' + item.ItemCode + '">' + item.ItemName + '</option>');
-                    });
-                }
-            });
-        }
-
-        // ✅ Load Warehouses
-        function loadWarehouses() {
-            $.ajax({
-                url: '@Url.Action("GetWarehousesListSK", "Inventory")',
-                type: 'GET',
-                success: function (data) {
-                    let $ddl = $("#ddlWarehouse");
-                    $ddl.empty().append('<option value="">-- Select Warehouse --</option>');
-                    $.each(data, function (i, item) {
-                        $ddl.append('<option value="' + item.WarehouseCode + '">' + item.WarehouseName + '</option>');
-                    });
-                }
-            });
-        }
-
-        // ✅ Load Sections based on Warehouse
-        $("#ddlWarehouse").change(function () {
-            let warehouseId = $(this).val();
-            if (warehouseId) {
-                $.ajax({
-                    url: '@Url.Action("GetSectionsSKK", "Inventory")',
-                    type: 'GET',
-                    data: { warehouseCode: warehouseId },
-                    success: function (data) {
-                        let $ddl = $("#ddlSection");
-                        $ddl.empty().append('<option value="">-- Select Section --</option>');
-                        $.each(data, function (i, item) {
-                            $ddl.append('<option value="' + item.SectionCode + '">' + item.SectionName + '</option>');
-                        });
-                        $("#ddlRack").empty().append('<option value="">-- Select Rack --</option>');
-                    }
-                });
-            } else {
-                $("#ddlSection").empty().append('<option value="">-- Select Section --</option>');
-                $("#ddlRack").empty().append('<option value="">-- Select Rack --</option>');
-            }
-        });
-
-        // ✅ Load Racks based on Section
-        $("#ddlSection").change(function () {
-            let sectionId = $(this).val();
-            if (sectionId) {
-                $.ajax({
-                    url: '@Url.Action("GetRackss", "Inventory")',
-                    type: 'GET',
-                    data: { sectionCode: sectionId },
-                    success: function (data) {
-                        let $ddl = $("#ddlRack");
-                        $ddl.empty().append('<option value="">-- Select Rack --</option>');
-                        $.each(data, function (i, item) {
-                            $ddl.append('<option value="' + item.RackCodes + '">' + item.RackNames + '</option>');
-                        });
-                    }
-                });
-            } else {
-                $("#ddlRack").empty().append('<option value="">-- Select Rack --</option>');
-            }
-        });
-
-        // ✅ Load Rows based on Rack
-        $("#ddlRack").change(function () {
-            let rackId = $(this).val();
-            if (rackId) {
-                $.ajax({
-                    url: '@Url.Action("GetRowsSBK", "Inventory")',
-                    type: 'GET',
-                    data: { rowCode: rackId },
-                    success: function (data) {
-                        let $ddl = $("#ddlRow");
-                        $ddl.empty().append('<option value="">-- Select Row --</option>');
-                        $.each(data, function (i, item) {
-                            $ddl.append('<option value="' + item.RowCode + '">' + item.RowName + '</option>');
-                        });
-                    }
-                });
-            } else {
-                $("#ddlRow").empty().append('<option value="">-- Select Row --</option>');
-            }
-        });
-
-        // ✅ Add Bin Form Submit
-        $("#addBinForm").on("submit", function (e) {
-            e.preventDefault();
-
-            var formData = {
-                BinCode: $("#BinCodes").val(),
-                BinName: $("#BinName").val(),
-                ItemCode: $("#ddlItems").val(),
-                MaxQuantity: $("#MaxQuantity").val(),
-                WarehouseId: $("#ddlWarehouse").val(),
-                SectionId: $("#ddlSection").val(),
-                RackId: $("#ddlRack").val(),
-                RowCode: $("#ddlRow").val(),
-                Descriptions: $("#Descriptionss").val()
+        // Print button configuration
+        getPrintButton: function () {
+            return {
+                extend: 'print',
+                text: '<i class="bi bi-printer-fill text-dark fs-5"></i>',
+                title: '',
+                exportOptions: {
+                    rows: (idx, data, node) => $(node).find('input.selectRow').is(':checked'),
+                    columns: ':visible:not(:first-child):not(:last-child)'
+                },
+                action: (e, dt, button, config) => this.validateExportSelection(() =>
+                    $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config)
+                ),
+                customize: (win) => this.customizePrint(win)
             };
+        },
+
+        // PDF button configuration
+        getPdfButton: function () {
+            return {
+                extend: 'pdfHtml5',
+                text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
+                title: '',
+                exportOptions: {
+                    rows: (idx, data, node) => $(node).find('input.selectRow').is(':checked'),
+                    columns: ':visible:not(:first-child):not(:last-child)'
+                },
+                action: (e, dt, button, config) => this.validateExportSelection(() =>
+                    $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, button, config)
+                ),
+                customize: (doc) => this.customizePdf(doc)
+            };
+        },
+
+        // Excel button configuration
+        getExcelButton: function () {
+            return {
+                extend: 'excelHtml5',
+                text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
+                title: 'Bin List',
+                messageTop: `Generated Date: ${moment().format("DD/MM/YYYY")}`,
+                exportOptions: {
+                    columns: ':visible:not(:first-child):not(:last-child)',
+                    rows: (idx, data, node) => $(node).find('input.selectRow').is(':checked')
+                },
+                action: (e, dt, button, config) => this.validateExportSelection(() =>
+                    $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config)
+                ),
+                customize: (xlsx) => this.customizeExcel(xlsx)
+            };
+        },
+
+        // CSV button configuration
+        getCsvButton: function () {
+            return {
+                extend: 'csvHtml5',
+                text: '<i class="bi bi-filetype-csv text-success fs-5"></i>',
+                filename: 'Bin List',
+                title: 'Bin List',
+                message: 'Generated Date: ' + new Date().toLocaleDateString("en-GB"),
+                exportOptions: {
+                   
+                    rows: (idx, data, node) => $(node).find('input.selectRow').is(':checked'),
+                    columns: ':visible:not(:first-child):not(:nth-child(2)):not(:last-child)',
+                    format: {
+                        body: function (data, row, column, node) {
+                            return data;
+                        }
+                    }
+                },
+                action: (e, dt, button, config) => this.validateExportSelection(() =>
+                    $.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, button, config)
+                ),
+                customize: function (csv, btn, dt, node, config) {
+                    // Add serial numbers to CSV
+                    let lines = csv.split('\n');
+                    let newCsv = '';
+                    let serialNumber = 1;
+
+                    // Add Sr No header
+                    newCsv += '"Sr No",' + lines[0] + '\n';
+
+                    // Add serial numbers to each data row
+                    for (let i = 1; i < lines.length; i++) {
+                        if (lines[i].trim() !== '') {
+                            newCsv += '"' + serialNumber + '",' + lines[i] + '\n';
+                            serialNumber++;
+                        }
+                    }
+
+                    return newCsv;
+                }
+            };
+        },
+
+        // Table columns configuration
+        getTableColumns: function () {
+            return [
+                {
+                    data: "BinId",
+                    render: (data) => `<input type="checkbox" class="selectRow" value="${data}">`,
+                    orderable: false
+                },
+                {
+                    data: null,
+                    render: (data, type, row, meta) => meta.row + 1,
+                    orderable: false
+                },
+                { data: "BinId", visible: false },
+                { data: "BinCode" },
+                { data: "RowCode" },
+                { data: "RowName" },
+                { data: "BinName" },
+                { data: "ItemName" },
+                { data: "MaxQuantity" },
+                { data: "CurrentItems" },
+                {
+                    data: "AddedDate",
+                    render: (data) => this.formatDate(data)
+                },
+                { data: "AddedBy" },
+                {
+                    data: "BinId",
+                    render: (data) => this.getActionButtons(data),
+                    orderable: false
+                }
+            ];
+        },
+
+        // Format date for display
+        formatDate: function (dateString) {
+            if (!dateString) return "";
+
+            let date;
+            const match = /Date\((\d+)\)/.exec(dateString);
+
+            if (match) {
+                date = new Date(parseInt(match[1], 10));
+            } else {
+                date = new Date(dateString);
+            }
+
+            return !isNaN(date.getTime()) ? date.toLocaleDateString("en-GB") : dateString;
+        },
+
+        // Get action buttons HTML
+        getActionButtons: function (binId) {
+            return `
+                <div class="d-flex justify-content-center gap-1">
+                    <button class="btn btn-sm btn-primary view-bin" data-id="${binId}"
+                        data-bs-toggle="tooltip" data-bs-placement="top" title="View Bin Details">
+                        <i class="bi bi-eye-fill me-1"></i>
+                    </button>
+                    <button class="btn btn-sm btn-secondary edit-bin" data-id="${binId}"
+                        data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Bin">
+                        <i class="bi bi-pencil-square"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger delete-bin" data-id="${binId}"
+                        data-bs-toggle="tooltip" data-bs-placement="top" title="Delete Bin">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            `;
+        },
+    
+        // Bind all event listeners
+        bindEvents: function () {
+            this.bindButtonEvents();
+            this.bindFormEvents();
+            this.bindTableEvents();
+            this.bindModalEvents();
+        },
+
+        // Bind button events
+        bindButtonEvents: function () {
+            // Add bin button
+            $('#btnAddbin').on('click', () => this.openAddModal());
+
+            // Select all checkbox
+            $(this.selectors.selectAll).on('click', (e) => this.toggleSelectAll(e.target.checked));
+        },
+
+        // Bind form events
+        bindFormEvents: function () {
+            // Add form submission
+            $(this.selectors.addForm).on('submit', (e) => this.handleAddForm(e));
+
+            // Edit form submission
+            $(this.selectors.editForm).on('submit', (e) => this.handleEditForm(e));
+
+            // Cascade dropdown changes
+            $('#addWarehouse').change(() => this.loadSections());
+            $('#addSection').change(() => this.loadRacks());
+            $('#addRack').change(() => this.loadRows());
+
+            // Clear errors on input
+            $(document).on("input change", "input.form-control, select.form-select, textarea.form-control",
+                (e) => this.clearFieldError(e.target));
+        },
+
+        // Bind table events
+        bindTableEvents: function () {
+            const table = $(this.selectors.table);
+
+            // Row selection
+            table.on('change', '.selectRow', () => this.updateSelectAllState());
+
+            // Action buttons
+            table.on('click', '.view-bin', (e) => this.viewBin($(e.currentTarget).data('id')));
+            table.on('click', '.edit-bin', (e) => this.editBin($(e.currentTarget).data('id')));
+            table.on('click', '.delete-bin', (e) => this.deleteBin($(e.currentTarget).data('id')));
+
+            // Tooltip initialization on table draw
+            table.on('draw.dt', () => this.initTooltips());
+        },
+
+        // Bind modal events
+        bindModalEvents: function () {
+            // Clear forms when modals are hidden
+            $(this.selectors.addModal).on('hidden.bs.modal', () => this.resetForm(this.selectors.addForm));
+            $(this.selectors.editModal).on('hidden.bs.modal', () => this.resetForm(this.selectors.editForm));
+        },
+
+        // Initialize date range picker
+        initDateRange: function () {
+            $(this.selectors.table).closest('.dataTables_wrapper').prepend(`
+                <div class="input-group mb-2 mt-3" style="max-width: 280px;">
+                    <span class="input-group-text bg-primary text-white">
+                        <i class="bi bi-calendar-date"></i>
+                    </span>
+                    <input type="text" id="binDateRange" class="form-control" placeholder="Select date range" readonly />
+                </div>
+            `);
+
+            $('#binDateRange').daterangepicker({
+                autoUpdateInput: false,
+                locale: { cancelLabel: 'Clear' },
+                ranges: {
+                    'Today': [moment(), moment()],
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'Last 1 Month': [moment().subtract(1, 'months').startOf('day'), moment()],
+                    'Last 3 Months': [moment().subtract(3, 'months').startOf('day'), moment()],
+                    'Last 1 Year': [moment().subtract(12, 'months').startOf('day'), moment()]
+                }
+            });
+
+            // Add date range filter to DataTable
+            $.fn.dataTable.ext.search.push((settings, data, dataIndex) => {
+                if (settings.nTable.id !== "binTable") return true;
+
+                const dateRange = $('#binDateRange').val();
+                if (!dateRange) return true;
+
+                const minMax = dateRange.split(' to ');
+                const min = moment(minMax[0], 'DD/MM/YYYY');
+                const max = moment(minMax[1], 'DD/MM/YYYY');
+                const date = moment(data[10], 'DD/MM/YYYY');
+
+                return date.isBetween(min, max, 'day', '[]');
+            });
+
+            $('#binDateRange').on('apply.daterangepicker', (ev, picker) => {
+                $(ev.target).val(picker.startDate.format('DD/MM/YYYY') + ' to ' + picker.endDate.format('DD/MM/YYYY'));
+                this.dataTable.draw();
+            });
+
+            $('#binDateRange').on('cancel.daterangepicker', (ev) => {
+                $(ev.target).val('');
+                this.dataTable.draw();
+            });
+        },
+
+        // Open add modal
+        openAddModal: function () {
+            this.loadAddWarehouses();
+            this.loadAddItems();
+
+            $.get(this.urls.getNextCode, (res) => {
+                if (res?.BnextCode) {
+                    $('#addBinCode').val(res.BnextCode);
+                    $(this.selectors.addModal).modal("show");
+                } else {
+                    this.showAlert("Error", "Next bin code not found", "error");
+                }
+            });
+        },
+
+        // Load items for add modal
+        loadAddItems: function () {
+            this.loadDropdown(this.urls.getItems, '#addItemCode', '-- Select Items --');
+        },
+
+        // Load warehouses for add modal
+        loadAddWarehouses: function () {
+            this.loadDropdown(this.urls.getWarehouses, '#addWarehouse', '--Select Warehouse--');
+        },
+
+        // Load sections based on warehouse
+        loadSections: function () {
+            const warehouseId = $('#addWarehouse').val();
+            if (warehouseId) {
+                this.loadDropdown(`${this.urls.getSections}?warehouseCode=${warehouseId}`, '#addSection', '-- Select Section --');
+                $("#addRack").html('<option value="">-- Select Rack --</option>');
+            } else {
+                $("#addSection").html('<option value="">-- Select Section --</option>');
+            }
+        },
+
+        // Load racks based on section
+        loadRacks: function () {
+            const sectionId = $('#addSection').val();
+            if (sectionId) {
+                this.loadDropdown(`${this.urls.getRacks}?sectionCode=${sectionId}`, '#addRack', '-- Select Rack --');
+            } else {
+                $("#addRack").html('<option value="">-- Select Rack --</option>');
+            }
+        },
+
+        // Load rows based on rack
+        loadRows: function () {
+            const rackId = $('#addRack').val();
+            if (rackId) {
+                this.loadDropdown(`${this.urls.getRows}?rowCode=${rackId}`, '#addRow', '-- Select Row --');
+            } else {
+                $("#addRow").html('<option value="">-- Select Row --</option>');
+            }
+        },
+
+        // Generic dropdown loader
+        loadDropdown: function (url, selector, defaultText) {
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: (data) => {
+                    const $ddl = $(selector);
+                    $ddl.empty().append(`<option value="">${defaultText}</option>`);
+                    $.each(data, (i, item) => {
+                        const value = item.ItemCode || item.WarehouseCode || item.SectionCode || item.RackCodes || item.RowCode;
+                        const text = item.ItemName || item.WarehouseName || item.SectionName || item.RackNames || item.RowName;
+                        $ddl.append(`<option value="${value}">${text}</option>`);
+                    });
+                }
+            });
+        },
+
+        // Handle add form submission
+        handleAddForm: function (e) {
+            e.preventDefault();
+            this.clearAllErrors(this.selectors.addForm);
+
+            if (!this.validateBinForm(this.selectors.addForm)) return;
+
+            const formData = this.getFormData(this.selectors.addForm);
 
             $.ajax({
-                url: '@Url.Action("SaveBinSKK", "Inventory")',
+                url: this.urls.saveBin,
                 type: "POST",
                 contentType: "application/json; charset=utf-8",
                 data: JSON.stringify(formData),
-                success: function (res) {
+                success: (res) => {
                     if (res.success) {
-                        Swal.fire({
-                            title: "Success",
-                            text: res.message,
-                            icon: "success",
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
-                        $("#addBinModal").modal("hide");
-                        $('#binTable').DataTable().ajax.reload();
+                        this.showAlert("Success", res.message, "success");
+                        $(this.selectors.addModal).modal("hide");
+                        this.dataTable.ajax.reload();
                     } else {
-                        Swal.fire({
-                            title: "Error",
-                            text: res.message,
-                            icon: "error",
-                            timer: 2500,
-                            showConfirmButton: false
-                        });
+                        this.handleAddInlineError(res.message);
                     }
                 },
-                error: function () {
-                    Swal.fire({
-                        title: "Error",
-                        text: "Something went wrong while saving bin.",
-                        icon: "error",
-                        timer: 2500,
-                        showConfirmButton: false
-                    });
+                error: () => {
+                    this.handleAddInlineError("Something went wrong while saving bin.");
                 }
             });
-        });
+        },
 
-        // ✅ Delete button click
-        $('#binTable').on('click', '.delete-bin', function () {
-            var id = $(this).data("id");
+        // Handle edit form submission
+        handleEditForm: function (e) {
+            e.preventDefault();
+            this.clearAllErrors(this.selectors.editForm);
 
+            const formData = this.getFormData(this.selectors.editForm);
+
+            $.ajax({
+                url: this.urls.saveBin,
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(formData),
+                success: (res) => {
+                    if (res.success) {
+                        this.showAlert("Updated!", res.message, "success");
+                        $(this.selectors.editModal).modal("hide");
+                        this.dataTable.ajax.reload();
+                    } else {
+                        this.handleEditInlineError(res.message);
+                    }
+                },
+                error: (xhr, status, error) => {
+                    this.handleEditInlineError("Something went wrong while updating bin: " + error);
+                }
+            });
+        },
+
+        // View bin details
+        viewBin: function (id) {
+            $.get(this.urls.getBinById, { binId: id }, (res) => {
+                if (res) {
+                    this.populateViewModal(res);
+                    $(this.selectors.viewModal).modal("show");
+                } else {
+                    this.showAlert("Error", "Bin details not found", "error");
+                }
+            });
+        },
+
+        // Edit bin
+        editBin: function (id) {
+            $.get(this.urls.getBinById, { binId: id }, (res) => {
+                if (res) {
+                    this.populateEditModal(res);
+                    $(this.selectors.editModal).modal("show");
+                } else {
+                    this.showAlert("Error", "Unable to fetch bin details", "error");
+                }
+            });
+        },
+
+        // Delete bin
+       
+        deleteBin: function (id) {
             Swal.fire({
                 title: "Are you sure?",
                 text: "This Bin will be permanently deleted!",
                 icon: "warning",
                 showCancelButton: true,
-                confirmButtonColor: "#d33",
-                cancelButtonColor: "#3085d6",
-                confirmButtonText: "Yes, delete it!"
+                confirmButtonColor: '#66b2ff',
+                cancelButtonColor: '#dc3545',
+                confirmButtonText: "Yes"
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: "/Inventory/DeleteBinSBK",
+                        url: this.urls.deleteBin,
                         type: "POST",
                         contentType: "application/json; charset=utf-8",
                         data: JSON.stringify({ binId: id }),
-                        success: function (res) {
+                        success: (res) => {
                             if (res.success) {
-                                $('#binTable').DataTable().ajax.reload();
-
-                                Swal.fire({
-                                    title: "Deleted!",
-                                    text: res.message,
-                                    icon: "success",
-                                    timer: 2000,
-                                    showConfirmButton: false
-                                });
+                                this.dataTable.ajax.reload();
+                                this.showAlert("Deleted!", res.message, "success");
                             } else {
-                                Swal.fire({
-                                    title: "Error",
-                                    text: res.message,
-                                    icon: "error",
-                                    timer: 2500,
-                                    showConfirmButton: false
-                                });
+                                this.showAlert("Error", res.message, "error");
                             }
                         },
-                        error: function () {
-                            Swal.fire({
-                                title: "Error",
-                                text: "Something went wrong while deleting Bin.",
-                                icon: "error",
-                                timer: 2500,
-                                showConfirmButton: false
-                            });
+                        error: () => {
+                            this.showAlert("Error", "Something went wrong while deleting Bin.", "error");
                         }
                     });
                 }
             });
-        });
+        },
 
-        // View button click
-        $('#binTable').on('click', '.view-bin', function () {
-            var id = $(this).data("id");
+        
+        // Populate edit modal
+        populateEditModal: function (data) {
+            $("#editBinId").val(data.BinId || '');
+            $("#editBinCode").val(data.BinCode || '');
+            $("#editBinName").val(data.BinName || '');
+            $("#editMaxQuantity").val(data.MaxQuantity || '');
+            $("#editDescriptionForBin").val(data.Description || '');
 
-            $.get("/Inventory/GetBinByIdSBK", { binId: id }, function (res) {
-                if (res) {
-                    $("#vBinId").val(res.BinId);
-                    $("#vBinCode").val(res.BinCode);
-                    $("#vBinName").val(res.BinName);
-                    $("#vRow").val(res.RowName);
-                    $("#vRack").val(res.RackName);
-                    $("#vSection").val(res.SectionName);
-                    $("#vWarehouse").val(res.WarehouseName);
-                    $("#vItem").val(res.ItemName);
-                    $("#vMaxQuantity").val(res.MaxQuantity);
-                    $("#demo").val(res.AddedBy);
-                    $("#vCurrentItems").val(res.CurrentItems);
-                    $("#vBDescription").val(res.Description || "-");
+            $("#editWarehouseNameForBin").val(data.WarehouseName || '');
+            $("#editWarehouseCode").val(data.WarehouseCode || '');
+            $("#editSectionNameForBin").val(data.SectionName || '');
+            $("#editSectionCode").val(data.SectionCode || '');
+            $("#editRackNameForBin").val(data.RackName || '');
+            $("#editRackCode").val(data.RackCode || '');
+            $("#editRowNameForBin").val(data.RowName || '');
+            $("#editRowCode").val(data.RowCode || '');
 
-                    let rawDate = res.AddedDate;
-                    let timestamp = parseInt(rawDate.replace(/[^0-9]/g, ''));
-                    let date = new Date(timestamp);
-                    $("#vBAddedDate").val(date.toLocaleDateString());
+            // Check if current items > 0 and make item dropdown readonly
+            const currentItems = parseInt(data.CurrentItems) || 0;
+            if (currentItems > 0) {
+                $("#editItemHelp").removeClass("d-none");
+            } else {
+                $("#editItemHelp").addClass("d-none");
+            }
+            const $itemDropdown = $("#editItemCode");
 
-                    $("#viewBinModal").modal("show");
-                } else {
-                    Swal.fire("Error", "Bin details not found", "error");
-                }
-            });
-        });
+            if (currentItems > 0) {
+                $itemDropdown.prop('disabled', true);
+                $itemDropdown.addClass('bg-light');
+                // Add a tooltip or hint to explain why it's disabled
+                $itemDropdown.attr('title', 'Cannot change item because bin contains items');
+            } else {
+                $itemDropdown.prop('disabled', false);
+                $itemDropdown.removeClass('bg-light');
+                $itemDropdown.removeAttr('title');
+            }
 
-        // Edit button click
-        $('#binTable').on('click', '.edit-bin', function () {
-            var id = $(this).data("id");
+            this.loadEditItems(data.ItemCode);
+            
+           
+        },
 
-            $.get("/Inventory/GetBinByIdSBK", { binId: id }, function (res) {
-                if (res) {
-                    $("#eBinId").val(res.BinId);
-                    $("#eBinCode").val(res.BinCode);
-                    $("#eBinName").val(res.BinName);
-                    $("#eMaxQuantity").val(res.MaxQuantity);
-                    $("#eDescription").val(res.Description);
-
-                    loadEditItems(res.ItemCode);
-                    loadEditWarehouses(res.WarehouseCode, res.SectionCode, res.RackCode, res.RowCode);
-
-                    $("#editBinModal").modal("show");
-                } else {
-                    Swal.fire({
-                        title: "Error",
-                        text: "Unable to fetch bin details",
-                        icon: "error",
-                        timer: 2500,
-                        showConfirmButton: false
-                    });
-                }
-            });
-        });
-
-        // ✅ Load Items for Edit
-        function loadEditItems(selectedItem) {
-            $.get("/Inventory/GetItemsSKK", function (data) {
-                let $ddl = $("#eItemCode");
+        
+        // Load items for edit modal
+        loadEditItems: function (selectedItem) {
+            $.get(this.urls.getItems, (data) => {
+                const $ddl = $("#editItemCode");
                 $ddl.empty().append('<option value="">-- Select Item --</option>');
-                $.each(data, function (i, item) {
-                    $ddl.append('<option value="' + item.ItemCode + '">' + item.ItemName + '</option>');
+                $.each(data, (i, item) => {
+                    $ddl.append(`<option value="${item.ItemCode}">${item.ItemName}</option>`);
                 });
                 $ddl.val(selectedItem);
-            });
-        }
 
-        // load Warehouses, Sections, Racks, Rows for Edit
-        function loadEditWarehouses(whCode, secCode, rackCode, rowCode) {
-            $.get("/Inventory/GetWarehousesListSK", function (data) {
-                let $ddl = $("#eWarehouse");
-                $ddl.empty().append('<option value="">-- Select Warehouse --</option>');
-                $.each(data, function (i, item) {
-                    $ddl.append('<option value="' + item.WarehouseCode + '">' + item.WarehouseName + '</option>');
-                });
-                $ddl.val(whCode);
-
-                // Load Sections
-                $.get("/Inventory/GetSectionsSKK", { warehouseCode: whCode }, function (sections) {
-                    let $sec = $("#eSection");
-                    $sec.empty().append('<option value="">-- Select Section --</option>');
-                    $.each(sections, function (i, item) {
-                        $sec.append('<option value="' + item.SectionCode + '">' + item.SectionName + '</option>');
-                    });
-                    $sec.val(secCode);
-
-                    // Load Racks
-                    $.get("/Inventory/GetRackss", { sectionCode: secCode }, function (racks) {
-                        let $rack = $("#eRack");
-                        $rack.empty().append('<option value="">-- Select Rack --</option>');
-                        $.each(racks, function (i, item) {
-                            $rack.append('<option value="' + item.RackCodes + '">' + item.RackNames + '</option>');
-                        });
-                        $rack.val(rackCode);
-
-                        // Load Rows
-                        $.get("/Inventory/GetRowsSBK", { rowCode: rackCode }, function (rows) {
-                            let $row = $("#eRow");
-                            $row.empty().append('<option value="">-- Select Row --</option>');
-                            $.each(rows, function (i, item) {
-                                $row.append('<option value="' + item.RowCode + '">' + item.RowName + '</option>');
-                            });
-                            $row.val(rowCode);
-                        });
-                    });
-                });
-            });
-        }
-
-        //  Edit For Main
-        $("#editBinForm").on("submit", function (e) {
-            e.preventDefault();
-
-            var formData = {
-                BinId: $("#eBinId").val(),
-                BinCode: $("#eBinCode").val(),
-                BinName: $("#eBinName").val(),
-                ItemCode: $("#eItemCode").val(),
-                MaxQuantity: $("#eMaxQuantity").val(),
-                WarehouseId: $("#eWarehouse").val(),
-                SectionId: $("#eSection").val(),
-                RackId: $("#eRack").val(),
-                RowCode: $("#eRow").val(),
-                Description: $("#eDescription").val()
-            };
-
-            $.ajax({
-                url: "/Inventory/SaveBinSKK",
-                type: "POST",
-                contentType: "application/json; charset=utf-8",
-                data: JSON.stringify(formData),
-                success: function (res) {
-                    if (res.success) {
-                        Swal.fire({
-                            title: "Updated!",
-                            text: res.message,
-                            icon: "success",
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
-                        $("#editBinModal").modal("hide");
-                        $('#binTable').DataTable().ajax.reload();
-                    } else {
-                        Swal.fire({
-                            title: "Error",
-                            text: res.message,
-                            icon: "error",
-                            timer: 2500,
-                            showConfirmButton: false
-                        });
-                    }
-                },
-                error: function () {
-                    Swal.fire({
-                        title: "Error",
-                        text: "Something went wrong while updating bin",
-                        icon: "error",
-                        timer: 2500,
-                        showConfirmButton: false
-                    });
+                // Re-apply tooltip if needed
+                if ($ddl.prop('disabled')) {
+                    $ddl.attr('title', 'Cannot change item because bin contains items');
                 }
             });
-        });
+        },
 
-        // Initialize Bootstrap tooltips (for dynamically created buttons too)
-        function initTooltips() {
-            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
+        // Populate view modal
+        populateViewModal: function (data) {
+            $("#vBinCode").val(data.BinCode || '');
+            $("#vBinName").val(data.BinName || '');
+            $("#vRow").val(data.RowName || '');
+            $("#vRack").val(data.RackName || '');
+            $("#vSection").val(data.SectionName || '');
+            $("#vWarehouse").val(data.WarehouseName || '');
+            $("#vItem").val(data.ItemName || '');
+            $("#vMaxQuantity").val(data.MaxQuantity || '');
+            $("#demo").val(data.AddedBy || '');
+            $("#vCurrentItems").val(data.CurrentItems || '');
+            $("#vBDescription").val(data.Description || "-");
+            $("#vBAddedDate").val(this.formatDate(data.AddedDate));
+        },
+
+        // Form validation
+        validateBinForm: function (formSelector) {
+            const fields = [
+                { id: 'addBinCode', errorId: 'addBinCodeError', message: 'Bin Code is required.' },
+                { id: 'addBinName', errorId: 'addBinNameError', message: 'Bin Name is required.' },
+                { id: 'addItemCode', errorId: 'addItemCodeError', message: 'Please select an Item.' },
+                { id: 'addMaxQuantity', errorId: 'addMaxQuantityError', message: 'Max Quantity must be a positive number.' },
+                { id: 'addWarehouse', errorId: 'addWarehouseError', message: 'Please select a Warehouse.' },
+                { id: 'addSection', errorId: 'addSectionError', message: 'Please select a Section.' },
+                { id: 'addRack', errorId: 'addRackError', message: 'Please select a Rack.' },
+                { id: 'addRow', errorId: 'addRowError', message: 'Please select a Row.' }
+            ];
+
+            let isValid = true;
+
+            fields.forEach(field => {
+                const value = $(`${formSelector} #${field.id}`).val()?.trim();
+                if (!value || (field.id === 'addMaxQuantity' && (isNaN(value) || parseInt(value) <= 0))) {
+                    this.showFieldError(field.id, field.errorId, field.message);
+                    isValid = false;
+                }
             });
+
+            return isValid;
+        },
+
+        // Get form data as object
+        getFormData: function (formSelector) {
+            const form = $(formSelector)[0];
+            const formData = new FormData(form);
+            const data = {};
+
+            for (let [key, value] of formData.entries()) {
+                data[key] = value;
+            }
+
+            // Add additional fields for edit form
+            if (formSelector === this.selectors.editForm) {
+                data.WarehouseId = $("#editWarehouseCode").val();
+                data.SectionId = $("#editSectionCode").val();
+                data.RackId = $("#editRackCode").val();
+                data.RowCode = $("#editRowCode").val();
+            } else {
+                data.RowCode = $("#addRow").val();
+            }
+
+            return data;
+        },
+
+        // Error handling methods
+        handleAddInlineError: function (message) {
+            if (message.includes("Bin with same name")) {
+                this.showFieldError("addBinName", "addBinNameError", message);
+            } else if (message.includes("Max Quantity")) {
+                this.showFieldError("addMaxQuantity", "addMaxQuantityError", message);
+            } else {
+                this.showFieldError("", "addFormGeneralError", message);
+            }
+        },
+
+        handleEditInlineError: function (message) {
+            if (message.includes("Bin with same name")) {
+                this.showFieldError("editBinName", "editBinNameError", message);
+            } else if (message.includes("Max Quantity")) {
+                this.showFieldError("editMaxQuantity", "editMaxQuantityError", message);
+            } else if (message.includes("Cannot update")) {
+                this.showFieldError("", "editFormGeneralError", message);
+            } else {
+                this.showFieldError("", "editFormGeneralError", message);
+            }
+        },
+
+        showFieldError: function (inputId, errorId, message) {
+            if (inputId) {
+                $("#" + inputId).addClass("is-invalid");
+            }
+            $("#" + errorId).text(message).removeClass("d-none");
+        },
+
+        clearFieldError: function (element) {
+            $(element).removeClass("is-invalid");
+            const errorId = $(element).attr("id") + "Error";
+            $("#" + errorId).text("").addClass("d-none");
+        },
+
+        clearAllErrors: function (formSelector) {
+            $(`${formSelector} .form-control, ${formSelector} .form-select`).removeClass("is-invalid");
+            $(`${formSelector} .text-danger`).text("").addClass("d-none");
+        },
+
+        // Selection methods
+        toggleSelectAll: function (isChecked) {
+            const rows = this.dataTable.rows({ page: 'current' }).nodes();
+            $(rows).find('.selectRow').prop('checked', isChecked);
+        },
+
+        updateSelectAllState: function () {
+            const rows = this.dataTable.rows({ page: 'current' }).nodes().to$();
+            const total = rows.find('.selectRow').length;
+            const checked = rows.find('.selectRow:checked').length;
+            $(this.selectors.selectAll).prop('checked', total === checked);
+        },
+
+        validateExportSelection: function (callback) {
+            if ($('.selectRow:checked').length === 0) {
+                toastr.warning("Please select at least one row!");
+                return;
+            }
+            callback();
+        },
+
+        // Utility methods
+        resetForm: function (formSelector) {
+            $(formSelector)[0].reset();
+            this.clearAllErrors(formSelector);
+        },
+
+        showAlert: function (title, text, icon, showCancel = false) {
+            return Swal.fire({
+                title: title,
+                text: text,
+                icon: icon,
+                showCancelButton: showCancel,
+                confirmButtonColor: '#0d6efd',
+                cancelButtonColor: '#dc3545',
+                confirmButtonText: "Yes",
+                timer: showCancel ? null : 2000,
+                showConfirmButton: !showCancel
+            });
+        },
+
+        initTooltips: function () {
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+        },
+
+        // Export customization methods
+        customizePrint: function (win) {
+            let serialNumber = 1;
+            $(win.document.body).find('table tbody tr').each(function () {
+                $(this).find('td:eq(0)').text(serialNumber++);
+            });
+
+            $(win.document.body).prepend(
+                '<h2 style="text-align: center; margin-bottom: 10px;">Bin List</h2>' +
+                '<p style="text-align: center; margin-bottom: 20px; color: #666;">Generated Date: ' + new Date().toLocaleDateString("en-GB") + '</p>' +
+                '<hr style="margin-bottom: 20px;">'
+            );
+
+            $(win.document.body).find('table')
+                .css('border', '1px solid black')
+                .css('border-collapse', 'collapse')
+                .find('th, td')
+                .css('border', '1px solid black')
+                .css('padding', '5px');
+
+            $(win.document.body).find('th')
+                .css('background-color', 'black')
+                .css('color', 'white');
+        },
+
+        customizePdf: function (doc) {
+            const selectedData = [];
+            this.dataTable.rows().every(function () {
+                const rowData = this.data();
+                if ($(this.node()).find('input.selectRow').is(':checked')) {
+                    selectedData.push(rowData);
+                }
+            });
+
+            doc.content = [];
+            doc.content.push(
+                {
+                    text: 'Bin List',
+                    alignment: 'center',
+                    fontSize: 16,
+                    bold: true,
+                    margin: [0, 0, 0, 10]
+                },
+                {
+                    text: 'Generated Date: ' + new Date().toLocaleDateString("en-GB"),
+                    alignment: 'center',
+                    fontSize: 10,
+                    color: '#666',
+                    margin: [0, 0, 0, 15]
+                }
+            );
+
+            const tableBody = [];
+            tableBody.push([
+                { text: 'Sr No', style: 'tableHeader', alignment: 'center' },
+                { text: 'Bin Code', style: 'tableHeader', alignment: 'center' },
+                { text: 'Row Code', style: 'tableHeader', alignment: 'center' },
+                { text: 'Row Name', style: 'tableHeader', alignment: 'center' },
+                { text: 'Bin Name', style: 'tableHeader', alignment: 'center' },
+                { text: 'Item Name', style: 'tableHeader', alignment: 'center' },
+                { text: 'Max Quantity', style: 'tableHeader', alignment: 'center' },
+                { text: 'Current Items', style: 'tableHeader', alignment: 'center' },
+                { text: 'Added Date', style: 'tableHeader', alignment: 'center' },
+                { text: 'Added By', style: 'tableHeader', alignment: 'center' }
+            ]);
+
+            selectedData.forEach((row, index) => {
+                tableBody.push([
+                    { text: (index + 1).toString(), alignment: 'center', fontSize: 9 },
+                    { text: row.BinCode || '-', alignment: 'center', fontSize: 9 },
+                    { text: row.RowCode || '-', alignment: 'center', fontSize: 9 },
+                    { text: row.RowName || '-', alignment: 'center', fontSize: 9 },
+                    { text: row.BinName || '-', alignment: 'center', fontSize: 9 },
+                    { text: row.ItemName || '-', alignment: 'center', fontSize: 9 },
+                    { text: row.MaxQuantity || '-', alignment: 'center', fontSize: 9 },
+                    { text: row.CurrentItems || '-', alignment: 'center', fontSize: 9 },
+                    { text: this.formatDate(row.AddedDate) || '-', alignment: 'center', fontSize: 9 },
+                    { text: row.AddedBy || '-', alignment: 'center', fontSize: 9 }
+                ]);
+            });
+
+            doc.content.push({
+                table: {
+                    headerRows: 1,
+                    widths: ['8%', '12%', '12%', '12%', '12%', '12%', '10%', '10%', '10%', '10%'],
+                    body: tableBody
+                },
+                layout: {
+                    hLineWidth: (i, node) => 0.5,
+                    vLineWidth: (i, node) => 0.5,
+                    hLineColor: (i, node) => '#000000',
+                    vLineColor: (i, node) => '#000000',
+                    paddingLeft: (i, node) => 5,
+                    paddingRight: (i, node) => 5
+                }
+            });
+
+            doc.styles = {
+                tableHeader: {
+                    bold: true,
+                    fontSize: 10,
+                    color: 'white',
+                    fillColor: '#000000',
+                    alignment: 'center'
+                }
+            };
+
+            doc.defaultStyle = {
+                fontSize: 9,
+                alignment: 'center'
+            };
+        },
+
+        customizeExcel: function (xlsx) {
+            const sheet = xlsx.xl.worksheets['sheet1.xml'];
+            let serial = 1;
+
+            $('row', sheet).each(function () {
+                const rowIndex = parseInt($(this).attr('r'));
+
+                if (rowIndex === 3) {
+                    $(this).find('c:first').before(`<c t="inlineStr" s="2"><is><t>Sr. No</t></is></c>`);
+                } else if (rowIndex > 3) {
+                    $(this).find('c:first').before(`<c t="inlineStr" s="2"><is><t>${serial}</t></is></c>`);
+                    serial++;
+                }
+            });
+
+            $('row[r="1"] c', sheet).attr('s', '51');
+            $('row[r="2"] c', sheet).attr('s', '51');
         }
+    };
 
-        // Initialize after DataTable draw (so tooltips work after pagination/sorting)
-        $('#binTable').on('draw.dt', function () {
-            initTooltips();
-        });
-
-        // Initial load
-        initTooltips();
+    // Initialize the application when DOM is ready
+    $(document).ready(() => {
+        BinManager.init();
+        BinManager.initTooltips();
     });
 </script>
-
-
-
-

@@ -2,100 +2,420 @@
     Layout = null; // No layout for partial view
 }
 
-<!-- Table Container -->
-<div class="table-responsive">
-    <table id="requestedRfqTable" class="table table-bordered table-hover align-middle shadow-sm">
-        <thead class="table-dark text-center">
-            <tr>
-                <th>Sr No.</th> <!-- Serial Number column -->
-                <th>PO Code</th>
-                <th>Added Date</th>
-                <th>Total Amount</th>
-                <th>Created By</th>
-            </tr>
-        </thead>
-        <tbody id="tbodyRequestedRfq" class="text-center">
-            <tr>
-                <td colspan="5" class="text-muted py-3">Loading...</td>
-            </tr>
-        </tbody>
-    </table>
+<!-- ✅ Date Filter + Table Container -->
+<div class="p-3 bg-white rounded shadow-sm">
+   
+
+    <!-- Table -->
+    <div class="table-responsive shadow-sm rounded mt-3">
+        <table id="pendingPoTable" class="table table-striped table-hover table-bordered align-middle">
+            <thead class="table-dark text-center">
+                <tr>
+                    <th><input type="checkbox" id="selectAll" data-bs-toggle="tooltip" title="Select All"></th>
+                    <th>Sr No.</th>
+                    <th>PO Code</th>
+                    <th>Added Date</th>
+                    <th>Total Amount</th>
+                    <th>Created By</th>
+                </tr>
+            </thead>
+            <tbody id="tbodyPendingPo" class="text-center">
+                <tr>
+                    <td colspan="6" class="text-muted py-3">Loading...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<!-- Center align all cells -->
+<!-- ✅ Styles -->
 <style>
-    #requestedRfqTable thead th,
-    #requestedRfqTable tbody td {
+    #pendingPoTable thead th,
+    #pendingPoTable tbody td {
         text-align: center;
         vertical-align: middle;
     }
+
+    #pendingPoTable tbody tr:hover td {
+        background-color: #f1f5f9;
+        transform: translateY(-2px);
+        transition: background-color 0.3s, transform 0.3s;
+    }
+    button.dt-button.processing,
+    div.dt-button.processing {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        background: none !important;
+    }
+
+        button.dt-button.processing:after {
+            content: none !important;
+        }
+    thead th {
+        white-space: nowrap !important;
+    }
 </style>
 
-<!-- JavaScript -->
+<!-- ✅ JavaScript -->
 <script>
     $(document).ready(function () {
-        const tableId = "#requestedRfqTable";
+        const tableId = "#pendingPoTable";
+        let table;
 
-        // Load Pending PO list
-        $.ajax({
-            url: '/Purchase/ShowPendingPOPRK', // JSON endpoint
-            type: 'GET',
-            success: function (data) {
-                const $tbody = $("#tbodyRequestedRfq");
-                $tbody.empty();
+        // 🔸 Toast setup
+        function showToast(message, type = "info") {
+            toastr.options = {
+                closeButton: true,
+                progressBar: true,
+                positionClass: "toast-top-right",
+                timeOut: "3000"
+            };
+            toastr[type](message);
+        }
 
-                if (!data || data.length === 0) {
-                    $tbody.append('<tr><td colspan="5" class="text-center text-muted">No records found</td></tr>');
-                    return;
+
+                function destroyDataTable(tableSelector) {
+    if ($.fn.DataTable.isDataTable(tableSelector)) {
+        $(tableSelector).DataTable().clear().destroy(true); // destroy completely
+
+    }
+    $(tableSelector).find('tbody').empty();
+}
+
+const startDate = "@ViewBag.StartDate";
+const endDate = "@ViewBag.EndDate";
+
+
+
+        // 🔹 Load Pending PO Data
+        function loadPendingPO() {
+            $.ajax({
+                url: '/Purchase/ShowPendingPOPRK',
+                type: 'GET',
+                data: { startDate: startDate, endDate: endDate },
+                dataType: 'json',
+                cache: false,
+                success: function (data) {
+                    const $tbody = $("#tbodyPendingPo");
+                    $tbody.empty();
+
+
+
+                    // ✅ Properly destroy any existing DataTable
+                    if ($.fn.DataTable.isDataTable(tableId)) {
+                        $(tableId).DataTable().clear().destroy();
+                    }
+
+
+
+                    if (!data || data.length === 0) {
+                        $tbody.append('<tr><td colspan="6" class="text-center text-muted py-3">No records found</td></tr>');
+                        return;
+                    }
+
+                    data.forEach(function (i, index) {
+                        const addedDate = i.AddedDate ? moment(i.AddedDate).format("DD/MM/YYYY") : "";
+                        $tbody.append(`
+                            <tr>
+                                <td><input type="checkbox" class="row-select" value="${i.POCode}"></td>
+                                <td>${index + 1}</td>
+                                <td>${i.POCode}</td>
+                                <td>${addedDate}</td>
+                                <td>₹${i.TotalAmount.toLocaleString('en-IN')}</td>
+                                <td>${i.FullName}</td>
+                            </tr>
+                        `);
+                    });
+
+                    // ✅ Reinitialize DataTable
+                    if ($.fn.DataTable.isDataTable(tableId)) $(tableId).DataTable().destroy();
+
+                    table = $(tableId).DataTable({
+                        responsive: true,
+                        pageLength: 10,
+                        dom: '<"dt-toolbar d-flex justify-content-between"<"dt-left"B><"dt-search"f>>rt<"bottom d-flex justify-content-between align-items-center mt-2"ip>',
+                        ordering: false,
+                        buttons: [
+                            // ✅ PRINT
+                            {
+                                extend: 'print',
+                                text: '<i class="bi bi-printer-fill text-dark fs-5" data-bs-toggle="tooltip" title="Print Selected Rows"></i>',
+                                titleAttr: 'Print',
+                                title: 'Requested RFQ List',
+                                action: function (e, dt, button, config) {
+                                    if ($('.row-select:checked').length === 0) {
+                                        showToast("Please select at least one row to Print", "warning");
+                                        return;
+                                    }
+                                    $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config);
+                                },
+                                exportOptions: {
+                                    columns: ':not(:first-child)',
+                                    rows: function (idx, data, node) {
+                                        return $(node).find('.row-select').prop('checked');
+                                    }
+                                },
+                                customize: function (win) {
+                                    const today = new Date();
+                                    const generatedDate = today.toLocaleDateString('en-GB');
+                                    $(win.document.body).find('h1').remove();
+                                    $(win.document.body).prepend(`
+                <div style="text-align:center; margin-bottom:10px;">
+                    <h2 style="margin:0;">Requested RFQ List</h2>
+                    <div style="font-size:12px; color:gray;">Generated Date: ${generatedDate}</div>
+                </div>
+            `);
+                                    const $table = $(win.document.body).find('table');
+                                    $table.addClass('table table-bordered table-striped').css({
+                                        'font-size': '14px',
+                                        'width': '100%',
+                                        'border-collapse': 'collapse',
+                                        'margin-top': '20px'
+                                    });
+                                    $table.find('thead th').css({
+                                        'background-color': '#000000',
+                                        'color': '#ffffff',
+                                        'text-align': 'center'
+                                    });
+                                    $table.find('tbody td').css('text-align', 'center');
+                                    $table.find('tbody tr').each(function (i) {
+                                        $(this).find('td:first').text(i + 1);
+                                    });
+                                }
+                            },
+
+                            // ✅ PDF
+                            {
+                                extend: 'pdfHtml5',
+                                text: '<i class="bi bi-file-earmark-pdf text-danger fs-5" data-bs-toggle="tooltip" title="Export to PDF"></i>',
+                                titleAttr: 'Export PDF',
+                                title: 'Requested RFQ List',
+                                action: function (e, dt, button, config) {
+                                    if ($('.row-select:checked').length === 0) {
+                                        showToast("Please select at least one row to export PDF", "warning");
+                                        return;
+                                    }
+                                    $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, button, config);
+                                },
+                                exportOptions: {
+                                    columns: ':not(:first-child)',
+                                    rows: function (idx, data, node) {
+                                        return $(node).find('.row-select').prop('checked');
+                                    },
+                                    format: {
+                                        body: function (data, rowIdx, colIdx) {
+                                            if (colIdx === 1) return rowIdx + 1;
+                                            if (colIdx === 3) {
+                                                const formatted = moment(data, ["YYYY-MM-DD", "DD/MM/YYYY HH:mm:ss"]).format("DD/MM/YYYY");
+                                                return formatted === "Invalid date" ? data : formatted;
+                                            }
+                                            if (typeof data === "string") return data.replace(/<\/?[^>]+(>|$)/g, "").trim();
+                                            return data;
+                                        }
+                                    }
+                                },
+                                customize: function (doc) {
+                                    try {
+                                        doc.content[0].alignment = 'center';
+                                        doc.content[0].fontSize = 14;
+                                        const exportDate = new Date().toLocaleDateString('en-GB');
+                                        doc.content.splice(1, 0, {
+                                            text: 'Generated Date: ' + exportDate,
+                                            alignment: 'center',
+                                            margin: [0, 0, 0, 8],
+                                            fontSize: 10
+                                        });
+                                        const tableNode = doc.content.find(c => c.table);
+                                        if (!tableNode) return;
+                                        doc.styles = doc.styles || {};
+                                        doc.styles.tableHeader = {
+                                            alignment: 'center',
+                                            fillColor: '#212529',
+                                            color: '#ffffff',
+                                            bold: true
+                                        };
+                                        tableNode.layout = {
+                                            hLineWidth: () => 0.5,
+                                            vLineWidth: () => 0.5,
+                                            hLineColor: () => '#dddddd',
+                                            vLineColor: () => '#dddddd',
+                                            paddingLeft: () => 30,
+                                            paddingRight: () => 30,
+                                            paddingTop: () => 4,
+                                            paddingBottom: () => 4
+                                        };
+                                        tableNode.table.body.forEach((row, i) => {
+                                            if (i > 0) row[0] = { text: String(i), alignment: 'center' };
+                                        });
+                                    } catch (err) { console.error('PDF customize error:', err); }
+                                }
+                            },
+
+                            // ✅ EXCEL
+                            {
+                                extend: 'excelHtml5',
+                                text: '<i class="bi bi-file-earmark-excel text-success fs-5" data-bs-toggle="tooltip" title="Export to Excel"></i>',
+                                titleAttr: 'Export Excel',
+                                title: 'Requested RFQ List',
+                                action: function (e, dt, button, config) {
+                                    if ($('.row-select:checked').length === 0) {
+                                        showToast("Please select at least one row to export Excel", "warning");
+                                        return;
+                                    }
+                                    window.__excelSrCounter = 0;
+                                    $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
+                                },
+                                exportOptions: {
+                                    columns: ':not(:first-child)',
+                                    rows: function (idx, data, node) {
+                                        return $(node).find('.row-select').prop('checked');
+                                    },
+                                    format: {
+                                        body: function (data, rowIdx, colIdx) {
+                                            if (colIdx === 1) return ++window.__excelSrCounter;
+                                            if (colIdx === 3) {
+                                                const formatted = moment(data, ["YYYY-MM-DD", "DD/MM/YYYY HH:mm:ss"]).format("DD/MM/YYYY");
+                                                return formatted === "Invalid date" ? data : formatted;
+                                            }
+                                            if (typeof data === "string") return data.replace(/<\/?[^>]+(>|$)/g, "").trim();
+                                            return data;
+                                        }
+                                    }
+                                },
+                                customize: function (xlsx) {
+                                    const sheet = xlsx.xl.worksheets['sheet1.xml'];
+                                    const now = new Date();
+                                    const formattedDate = now.toLocaleDateString('en-GB'); // DD/MM/YYYY
+
+                                    const newRowNumber = 2;
+
+                                    // Create "Generated On" row
+                                    const dateRow = `
+            <row r="${newRowNumber}">
+                <c t="inlineStr" r="A${newRowNumber}">
+                    <is><t>Generated Date: ${formattedDate}</t></is>
+                </c>
+            </row>`;
+
+                                    // Shift existing rows down by +1
+                                    $('row', sheet).each(function () {
+                                        const r = parseInt($(this).attr('r'));
+                                        if (r >= newRowNumber) $(this).attr('r', r + 1);
+                                    });
+                                    $('c', sheet).each(function () {
+                                        const cellRef = $(this).attr('r');
+                                        const col = cellRef.replace(/[0-9]/g, '');
+                                        const row = parseInt(cellRef.replace(/[A-Z]/g, ''));
+                                        if (row >= newRowNumber) $(this).attr('r', col + (row + 1));
+                                    });
+
+                                    // Add the new date row right after the title
+                                    $('row[r="1"]', sheet).after(dateRow);
+
+                                    // ✅ Merge across all columns
+                                    const totalCols = $('row[r="3"] c', sheet).length; // Check the next row to get column count
+                                    const lastCol = String.fromCharCode(64 + totalCols); // Convert number to letter
+                                    let mergeCells = $('mergeCells', sheet);
+                                    if (mergeCells.length === 0) {
+                                        $('worksheet', sheet).prepend(`<mergeCells count="1"><mergeCell ref="A${newRowNumber}:${lastCol}${newRowNumber}"/></mergeCells>`);
+                                    } else {
+                                        const count = parseInt(mergeCells.attr('count')) + 1;
+                                        mergeCells.attr('count', count);
+                                        mergeCells.append(`<mergeCell ref="A${newRowNumber}:${lastCol}${newRowNumber}"/>`);
+                                    }
+
+                                    // ✅ Center align the merged cell
+                                    const styles = xlsx.xl['styles.xml'];
+                                    const styleIndex = $('cellXfs xf', styles).length;
+                                    $('cellXfs', styles).append('<xf xfId="0" applyAlignment="1"><alignment horizontal="center"/></xf>');
+                                    $(`c[r="A${newRowNumber}"]`, sheet).attr('s', styleIndex);
+                                }
+                            },
+
+
+                            // ✅ CSV
+                            {
+                                extend: 'csvHtml5',
+                                text: '<i class="bi bi-filetype-csv text-primary fs-5" data-bs-toggle="tooltip" title="Export to CSV"></i>',
+                                titleAttr: 'Export CSV',
+                                title: 'Requested RFQ List',
+                                action: function (e, dt, button, config) {
+                                    if ($('.row-select:checked').length === 0) {
+                                        showToast("Please select at least one row to export CSV", "warning");
+                                        return;
+                                    }
+                                    $.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, button, config);
+                                },
+                                exportOptions: {
+                                    columns: ':not(:first-child)',
+                                    rows: function (idx, data, node) {
+                                        return $(node).find('.row-select').prop('checked');
+                                    },
+                                    format: {
+                                        body: function (data, rowIdx, colIdx) {
+                                            // Remove HTML tags and trim
+                                            if (typeof data === 'string') data = data.replace(/<[^>]*>/g, '').trim();
+
+                                            // Serial number column
+                                            if (colIdx === 0 || colIdx === 1) {
+                                                // Initialize counter once
+                                                if (typeof this.srnoCounter === 'undefined') this.srnoCounter = 0;
+                                                return ++this.srnoCounter;
+                                            }
+
+                                            return data; // fallback
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+
+                    });
+
+                    // ✅ Select All logic
+                    $(document).on("change", "#selectAll", function () {
+                        $(".row-select").prop("checked", $(this).prop("checked"));
+                    });
+                    $(document).on("change", ".row-select", function () {
+                        $("#selectAll").prop("checked", $(".row-select:checked").length === $(".row-select").length);
+                    });
+                },
+                error: function () {
+                    $("#tbodyPendingPo").html('<tr><td colspan="6" class="text-danger text-center">Error loading records</td></tr>');
                 }
+            });
+        }
 
-                data.forEach(function (i, index) {
-                    // Format date using moment.js
-                    const addedDate = i.AddedDate ? moment(i.AddedDate).format('DD/MM/YYYY') : '';
+        // 🔹 Load initially
+        loadPendingPO();
 
-                    // Format amount with ₹ and 2 decimals
-                    const totalAmount = i.TotalAmount ? `₹${parseFloat(i.TotalAmount).toFixed(2)}` : '₹0.00';
-
-                    $tbody.append(`
-                        <tr>
-                            <td>${index + 1}</td> <!-- Serial Number -->
-                            <td>${i.POCode}</td>
-                            <td>${addedDate}</td>
-                            <td>${totalAmount}</td>
-                            <td>${i.FullName}</td>
-                        </tr>
-                    `);
-                });
-
-                // Initialize or re-initialize DataTable
-                if ($.fn.DataTable.isDataTable(tableId)) {
-                    $(tableId).DataTable().destroy();
-                }
-
-                $(tableId).DataTable({
-                    paging: true,
-                    searching: true,
-                    ordering: false,
-                    responsive: true,
-                    lengthChange: false,   // ✅ Show "entries per page"
-                    info: true,           // ✅ Show "Showing 1 to 10 of N entries"
-                    pageLength: 10,
-                    lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
-
-                    // ✅ Custom layout: entries on left, pagination on right
-                    dom: '<"row mb-2"<"col-sm-6"l><"col-sm-6 text-end"f>>' +
-                        'rt' +
-                        '<"row mt-2"<"col-sm-6"i><"col-sm-6 text-end"p>>',
-
-                    columnDefs: [
-                        { orderable: false, targets: 0 }
-                    ]
-                });
-
-            },
-            error: function () {
-                $("#tbodyRequestedRfq").html('<tr><td colspan="5" class="text-danger text-center">Error loading records</td></tr>');
+        // ✅ Date Range Filter
+        $('#poDateFilter').daterangepicker({
+            autoUpdateInput: false,
+            opens: "center",
+            drops: "down",
+            locale: { cancelLabel: 'Clear', applyLabel: 'Apply' },
+            ranges: {
+                'Today': [moment(), moment()],
+                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                'Last 1 Month': [moment().subtract(1, 'months').startOf('day'), moment()],
+                'Last 3 Months': [moment().subtract(3, 'months').startOf('day'), moment()],
+                'Last 1 Year': [moment().subtract(12, 'months').startOf('day'), moment()]
             }
+        }, function (start, end) {
+            $('#poDateFilter').val(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
+            $.fn.dataTable.ext.search.push(function (settings, data) {
+                if (settings.nTable.id !== 'pendingPoTable') return true;
+                const addedDate = moment(data[3], 'DD/MM/YYYY');
+                return addedDate.isBetween(start, end, undefined, '[]');
+            });
+            table.draw();
+            $.fn.dataTable.ext.search.pop();
+        });
+
+        $('#poDateFilter').on('cancel.daterangepicker', function () {
+            $(this).val('');
+            table.draw();
         });
     });
 </script>

@@ -14,8 +14,8 @@
 	  <add key="X-CSCAPI-KEY" value="TVNUZHVpMVRjYVUwYlZ0TGtqdVl4bk9pYWtDMDN5WDFKdndEMmxpUw=="/>
   </appSettings>
   <system.web>
-    <compilation debug="true" targetFramework="4.8.1" />
-    <httpRuntime targetFramework="4.8.1" />
+	  <compilation debug="true" targetFramework="4.8.1" />
+	  <httpRuntime targetFramework="4.8.1" requestValidationMode="2.0" />
 	  <sessionState mode="InProc" timeout="1440"></sessionState>
   </system.web>
   <runtime>

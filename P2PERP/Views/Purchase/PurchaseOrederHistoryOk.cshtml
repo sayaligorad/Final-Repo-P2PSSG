@@ -1,5 +1,5 @@
 ﻿@{
-    ViewBag.Title = "PurchaseOrederHistoryOk";
+    ViewBag.Title = "Purchase Oreder History";
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -14,25 +14,33 @@
             justify-content: end;
             margin-right: 20px;
         }
-/*        .dt-search {
-            display: none;
-        }*/
-
-        .daterangepicker-container {
-            border: 1px solid #ccc;
-            padding: 6px 10px;
+        /*.daterangepicker-container {
+            border: 1px solid #ccc !important;
             border-radius: 6px;
-            cursor: pointer;
-            display: inline-block;
-            min-width: 200px;
-            background: #fff;
+            overflow: hidden;*/ /* ensures the border applies cleanly around input-group */
+            /*background-color: #fff;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
+
+            .daterangepicker-container .form-control:focus {
+                box-shadow: none;
+            }
+
+            .daterangepicker-container .input-group-text {
+                background-color: #7357ff !important;*/ /* match your theme */
+                /*color: #fff !important;
+            }
+
+        #Purchasedatepicker {
+            cursor: pointer;
+        }
+
 
         #exportContainer .dt-buttons {
             display: flex;
-            justify-content: end; /* center align */
-            gap: 8px;
-        }
+            justify-content: end;*/ /* center align */
+            /*gap: 8px;
+        }*/
         .table-container {
             overflow-x: auto; /* enable horizontal scroll if needed */
             width: 100%; /* force to parent container width */
@@ -58,6 +66,11 @@
         {
            margin-top:70px!important;
         }
+        /* Common container style for both */
+        .expbtndate .input-group {
+            width: 230px !important; /* or match your preferred width */
+            min-width: 230px;
+        }
 
     </style>
 </head>
@@ -68,31 +81,56 @@
          style="z-index: 2000;">
     </div>
 
-    <div class="container-fluid px-4">
-        <div class="card shadow-lg mb-4 ps-3 pe-3">
-            <h3 class="text-primary d-flex justify-content-center align-content-center">
+    <div class="container-fluid px-4 mt-3">
+        <div class="card shadow-lg ps-3 m-0 pe-3">
+            <h3 class="text-primary d-flex justify-content-center align-content-center m-0">
                 Purchase Order History
             </h3>
 
-            <div class="d-flex justify-content-between align-items-start mb-5 flex-wrap">
-                <!-- Left side -->
-                <div class="d-flex flex-column gap-3">
-                    <!-- Date Range Picker -->
-                    <div class="input-group shadow-sm rounded" style="min-width: 250px; height: 53px;">
-                        <span class="input-group-text bg-primary text-white border-0">
-                            <i class="bi bi-calendar-date"></i>
-                        </span>
-                        <input type="text" id="Purchasedatepicker"
-                               class="form-control border-0 shadow-none"
-                               placeholder="Select date range" readonly style="height: 100%;" />
+            <!--<div class="d-flex justify-content-between align-items-start mb-5 flex-wrap">
+        <div class="d-flex flex-column gap-3 expbtndate">-->
+            <!-- Date Range Picker -->
+            <!--<div class="daterangepicker-container input-group">
+        <span class="input-group-text bg-primary text-white border-0 rounded-start">
+            <i class="bi bi-calendar-date"></i>
+        </span>
+        <input type="text"
+               id="Purchasedatepicker"
+               class="form-control border-0"
+               placeholder="Select date range"
+               readonly />
+    </div>-->
+            <!-- Export Buttons -->
+            <!--<div id="exportContainer" class="d-flex align-items-center gap-2"></div>
+    </div>-->
+            <!-- Right side -->
+            <!--<div id="searchContainer"></div>
+    </div>-->
+            <div class="tab-content p-0 ps-1 pe-1 mt-0" id="approval">
+
+                <!-- ✅ Toolbar -->
+                <div class="table-toolbar d-flex justify-content-between align-items-center flex-wrap mb-2 mt-4 px-3">
+
+                    <!-- ✅ Left Section: Date Picker + Export Buttons -->
+                    <div class="row d-flex align-items-center flex-wrap gap-3">
+
+                        <!-- ✅ Date Picker Column -->
+                        <div class="col-6 p-0">
+                            <div class="input-group">
+                                <span class="input-group-text bg-primary text-white">
+                                    <i class="bi bi-calendar-event"></i>
+                                </span>
+                                <input type="text" id="Purchasedatepicker" class="form-control" placeholder="Select Date Range" readonly />
+                            </div>
+                        </div>
+
+                        <!-- ✅ Export Buttons -->
+                        <div id="exportContainer" class="d-flex align-items-center gap-2 ps-0"></div>
                     </div>
 
-                    <!-- Export Buttons -->
-                    <div id="exportContainer" class="d-flex align-items-center gap-2"></div>
+                    <!-- ✅ Right Section: Search Box -->
+                    <div id="searchContainer" class="d-flex align-items-center mb-4"></div>
                 </div>
-
-                <!-- Right side -->
-                <div id="searchContainer"></div>
             </div>
 
 
@@ -112,7 +150,7 @@
                             <th><div>Vendor Name</div></th>
                             <th><div>Company Name</div></th>
                             <th><div>Total Amount</div></th>
-                            <th class="d-none"><div>State Name</div></th>
+                            <th><div>State Name</div></th>
                             <th><div>Action</div></th>
                         </tr>
                     </thead>
@@ -132,9 +170,16 @@
                     alignment: 'center'
                 };
 
-                // Generated on date
+                // ✅ Generate date in dd/mm/yyyy format
+                var now = new Date();
+                var day = String(now.getDate()).padStart(2, '0');
+                var month = String(now.getMonth() + 1).padStart(2, '0');
+                var year = now.getFullYear();
+                var formattedDate = day + '/' + month + '/' + year;
+
+                // ✅ Insert generated date
                 doc.content.splice(1, 0, {
-                    text: 'Generated on: ' + new Date().toISOString().split('T')[0],
+                    text: 'Generated Date: ' + formattedDate,
                     fontSize: 10,
                     italics: true,
                     alignment: 'center',
@@ -171,6 +216,7 @@
                 tableNode.alignment = 'center';
                 tableNode.margin = [0, 0, 0, 0];
             }
+
 
             // Clear processing state for all DataTable buttons
             window.__dt_clearAllProcessing = function () {
@@ -239,7 +285,7 @@
 
             // ✅ Helper function for warning toast
             function showExportToast() {
-                toastr.warning("Please select at least one row before exporting.", "Warning");
+                toastr.warning("Please select at least one row before exporting.");
             }
 
         // Initialize Purchase Order History DataTable
@@ -286,20 +332,22 @@
                         return "₹ " + data;
                     }
                 },
-                { data: "StateName", title: "State Name", visible: false },
+                { data: "StateName", title: "Status Name","visible": false},
                 {
                     data: null,
                     render: function (data, type, row) {
                         return `
-                            <button class="btn btn-sm btn-primary btn-view"
-                                    data-row='${JSON.stringify(row)}'
-                                    data-bs-toggle="tooltip"
-                                    data-bs-placement="top"
-                                    title="View PO">
-                                <i class="bi bi-eye-fill"></i>
-                            </button>`;
+                        <button type="button" 
+                                class="btn btn-primary btn-view square-pill d-inline-flex align-items-center px-2 py-1"
+                                data-row='${JSON.stringify(row)}'
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
+                                title="View PO">
+                            <i class="bi bi-eye-fill fs-6"></i>
+                        </button>`;
                     }
                 }
+
             ],
             paging: true,
             searching: true,
@@ -319,7 +367,7 @@
                     titleAttr: 'Print',
                     title: 'Purchase Order History List',
                     exportOptions: {
-                        columns: [1, 2, 3, 4, 5, 6, 7],
+                        columns: [1, 2, 3, 4, 5, 6],
                         rows: function (idx, data, node) {
                             return $(tblPOHistory.row(idx).node()).find('input.row-select').prop('checked');
                         },
@@ -357,11 +405,19 @@
                         // Center title
                         $body.find('h1').css('text-align', 'center');
 
-                        // Insert generated date
+                        // Insert generated date in dd/mm/yyyy format
                         $body.find('h1').after(
-                            '<div style="text-align:center;font-style:italic;font-size:10pt;margin-bottom:12px;">Generated on: '
-                            + new Date().toISOString().split('T')[0] + '</div>'
+                            '<div style="text-align:center;font-style:italic;font-size:10pt;margin-bottom:12px;">Generated Date: ' +
+                            (function () {
+                                const d = new Date();
+                                const day = String(d.getDate()).padStart(2, '0');
+                                const month = String(d.getMonth() + 1).padStart(2, '0');
+                                const year = d.getFullYear();
+                                return `${day}/${month}/${year}`;
+                            })() +
+                            '</div>'
                         );
+
 
                         // Add bootstrap table styles
                         $body.find('table')
@@ -400,13 +456,13 @@
                 // PDF Export button
                 {
                     extend: 'pdfHtml5',
-                    text: '<i class="bi bi-file-earmark-pdf-fill text-danger fs-5"></i>',
+                    text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
                     titleAttr: 'PDF',
                     title: 'Purchase Order History List',
                     orientation: 'landscape',
                     pageSize: 'A4',
                     exportOptions: {
-                        columns: [1, 2, 3, 4, 5, 6, 7],
+                        columns: [1, 2, 3, 4, 5, 6],
                         rows: function (idx, data, node) {
                             return $(tblPOHistory.row(idx).node()).find('input.row-select').prop('checked');
                         },
@@ -459,11 +515,11 @@
                 // Excel Export button
                 {
                     extend: 'excelHtml5',
-                    text: '<i class="bi bi-file-earmark-excel-fill text-success fs-5"></i>',
+                    text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
                     titleAttr: 'Excel',
-                    title: 'Purchase Order History List',
+                    title: '',//Purchase Order History List
                     exportOptions: {
-                        columns: [1, 2, 3, 4, 5, 6, 7],
+                        columns: [1, 2, 3, 4, 5, 6],
                         rows: function (idx, data, node) {
                             return $(tblPOHistory.row(idx).node()).find('input.row-select').prop('checked');
                         },
@@ -489,10 +545,119 @@
                         // Call original excelHtml5 action
                         $.fn.dataTable.ext.buttons.excelHtml5.__originalAction.call(this, e, dt, button, config);
 
-                        // Fallback clear spinner after 1.5s
+                        // Fallback clear spinner after short delay
                         setTimeout(function () { try { btnApi.processing(false); } catch (err) { } }, 300);
+                    },
+                    customize: function (xlsx) {
+                        // ✅ Rename worksheet
+                        var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                        $('sheet', xlsx.xl['workbook.xml']).attr('name', 'PO_History');
+
+                        // ✅ Date in dd/mm/yyyy format
+                        var now = new Date();
+                        var day = String(now.getDate()).padStart(2, '0');
+                        var month = String(now.getMonth() + 1).padStart(2, '0');
+                        var year = now.getFullYear();
+                        var formattedDate = day + '/' + month + '/' + year;
+
+                        var sheetData = $('sheetData', sheet);
+
+                        // Shift all data rows down by 2 (for title + date)
+                        sheetData.find('row').each(function () {
+                            var r = parseInt($(this).attr('r'));
+                            $(this).attr('r', r + 2);
+                            $(this).find('c').each(function () {
+                                var cellRef = $(this).attr('r');
+                                var col = cellRef.replace(/[0-9]/g, '');
+                                $(this).attr('r', col + (r + 2));
+                            });
+                        });
+
+                        // ✅ Insert Title row (now in A1, will be merged A1:G1 for centering across 7 columns)
+                        var titleRow =
+                            '<row r="1">' +
+                            '<c t="inlineStr" r="A1">' +
+                            '<is><t>Purchase Order History List</t></is>' +
+                            '</c>' +
+                            '</row>';
+
+                        // ✅ Insert Generated Date row (now in A2, will be merged A2:G2 for centering)
+                        var dateRow =
+                            '<row r="2">' +
+                            '<c t="inlineStr" r="A2">' +
+                            '<is><t>Generated Date: ' + formattedDate + '</t></is>' +
+                            '</c>' +
+                            '</row>';
+
+                        // Add rows to the top
+                        sheetData.prepend(dateRow);
+                        sheetData.prepend(titleRow);
+
+                        // ✅ Add merge cells for centering title and date across columns A:G (7 columns from export)
+                        var mergeCells = $('mergeCells', sheet);
+                        if (mergeCells.length === 0) {
+                            // If no mergeCells exist, create the element
+                            $('worksheet', sheet).append('<mergeCells count="2"/>');
+                            mergeCells = $('mergeCells', sheet);
+                        } else {
+                            // Update existing count
+                            var currentCount = parseInt(mergeCells.attr('count') || 0);
+                            mergeCells.attr('count', currentCount + 2);
+                        }
+                        // Add title merge (A1:G1)
+                        mergeCells.append('<mergeCell ref="A1:G1"/>');
+                        // Add date merge (A2:G2)
+                        mergeCells.append('<mergeCell ref="A2:G2"/>');
+
+                        // ✅ Add styles for centering + font (fonts, fills, etc.)
+                        var styles = xlsx.xl['styles.xml'];
+                        var cellXfs = $('cellXfs', styles);
+                        var fonts = $('fonts', styles);
+
+                        // Count existing fonts (default is usually 1: fontId=0)
+                        var fontCount = $('font', fonts).length;
+
+                        // Add new font for title (bold, size 14)
+                        fonts.append(
+                            '<font>' +
+                            '<sz val="14"/>' +  // Font size 14
+                            '<b/>' +             // Bold
+                            '<color rgb="000000"/>' +  // Black (default)
+                            '</font>'
+                        );
+
+                        // Add new font for date (italic, size 11)
+                        fonts.append(
+                            '<font>' +
+                            '<sz val="11"/>' +   // Font size 11 (default size)
+                            '<i/>' +             // Italic
+                            '<color rgb="000000"/>' +  // Black (default)
+                            '</font>'
+                        );
+
+                        // Count existing cellXfs
+                        var styleCount = $('xf', cellXfs).length;
+
+                        // Add new style for title (use new bold/large font, center alignment)
+                        cellXfs.append(
+                            '<xf numFmtId="0" fontId="' + fontCount + '" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1">' +
+                            '<alignment horizontal="center" vertical="center" wrapText="1"/>' +  // Center, wrap for long text
+                            '</xf>'
+                        );
+
+                        // Add new style for date (use new italic font, center alignment)
+                        cellXfs.append(
+                            '<xf numFmtId="0" fontId="' + (fontCount + 1) + '" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1">' +
+                            '<alignment horizontal="center" vertical="center" wrapText="1"/>' +  // Center, wrap for long text
+                            '</xf>'
+                        );
+
+                        // Apply new style indexes to the cells
+                        $('c[r=A1]', sheet).attr('s', styleCount);       // Title style
+                        $('c[r=A2]', sheet).attr('s', styleCount + 1);   // Date style
                     }
                 },
+
                 // CSV Export button
                 {
                     extend: 'csvHtml5',
@@ -500,7 +665,7 @@
                     titleAttr: 'CSV',
                     title: 'Purchase Order History List',
                     exportOptions: {
-                        columns: [1, 2, 3, 4, 5, 6, 7],
+                        columns: [1, 2, 3, 4, 5, 6],
                         rows: function (idx, data, node) {
                             return $(tblPOHistory.row(idx).node()).find('input.row-select').prop('checked');
                         },
@@ -604,16 +769,21 @@
                 },
                 ranges: {
                     'Today': [moment(), moment()],
-                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    //'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
                     'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                    'This Month': [moment().startOf('month'), moment().endOf('month')],
-                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                    'Last 1 Month': [moment().subtract(1, 'months').startOf('day'), moment()],
+                    'Last 3 Months': [moment().subtract(3, 'months').startOf('day'), moment()],
+                    'Last 1 Year': [moment().subtract(12, 'months').startOf('day'), moment()]
+                    //'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    //'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
                 }
             }, function (start, end) {
+                // Update input field
                 $('#Purchasedatepicker').val(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
+
+                // Filter DataTable rows based on selected date range
                 $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
-                    var addedDate = moment(data[3], 'DD/MM/YYYY');
+                    var addedDate = moment(data[3], 'DD/MM/YYYY'); // assuming 4th column is date
                     return addedDate.isBetween(start, end, undefined, '[]');
                 });
 
@@ -621,7 +791,7 @@
                 $.fn.dataTable.ext.search.pop();
             });
 
-            // Clear date picker
+            // Clear date picker when cancell
             $('#Purchasedatepicker').on('cancel.daterangepicker', function () {
                 $(this).val('');
                 tblPOHistory.draw();

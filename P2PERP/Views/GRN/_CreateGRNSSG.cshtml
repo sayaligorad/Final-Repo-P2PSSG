@@ -1,126 +1,153 @@
 ﻿@{
     Layout = null;
 }
-
+<style>
+    #itemTable thead th {
+        padding: 0.10rem 0.11rem !important;
+    }
+</style>
 <div class="card shadow p-3">
-    <!-- PO & GRN Info -->
-    <div class="row mb-2">
-        <div class="col-md-4">
-            <label>PONO:</label>
-            <input type="text" id="txtPOCode" class="form-control form-control-sm bg-secondary-subtle" value="@ViewBag.POCode" readonly>
-        </div>
-        <div class="col-md-4">
-            <label>PO DATE:</label>
-            <input type="text"
-                   id="txtPODate"
-                   class="form-control form-control-sm bg-secondary-subtle"
-                   value="@Convert.ToDateTime(ViewBag.PODate).ToString("dd\\/MM\\/yyyy")"
-                   readonly>
+    <!-- 🔹 PO & GRN Information -->
+    <div class="border rounded-3 p-3 mb-3 bg-light-subtle">
+        <h6 class="fw-bold text-dark mb-2">PO & GRN Information</h6>
+
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label fw-bold text-dark">PO No:</label>
+                <input type="text" id="txtPOCode" class="form-control form-control-sm text-dark shadow-sm bg-light" value="@ViewBag.POCode" readonly>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold">GRN No:</label>
+                <input type="text" id="txtGRNCode" class="form-control form-control-sm text-dark shadow-sm bg-light" value="@ViewBag.GRNCode" readonly>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold">PO Date:</label>
+                <input type="text"
+                       id="txtPODate"
+                       class="form-control form-control-sm text-dark shadow-sm bg-light"
+                       value="@Convert.ToDateTime(ViewBag.PODate).ToString("dd\\/MM\\/yyyy")"
+                       readonly>
+            </div>
         </div>
 
-        <div class="col-md-4">
-            <label>VENDOR NAME:</label>
-            <input type="text" id="txtVendorName" class="form-control form-control-sm bg-secondary-subtle" value="@ViewBag.VendorName" readonly>
+        <div class="row g-3 mt-1">
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Vendor Name:</label>
+                <input type="text" id="txtVendorName" class="form-control form-control-sm text-dark shadow-sm bg-light" value="@ViewBag.VendorName" readonly>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Company Address:</label>
+                <textarea id="txtCompanyAddress"
+                          class="form-control form-control-sm text-dark shadow-sm bg-light"
+                          rows="2"
+                          readonly>@ViewBag.CompanyAddress</textarea>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Billing Address:</label>
+                <textarea id="txtBillingAddress"
+                          class="form-control form-control-sm text-dark shadow-sm bg-light"
+                          rows="2"
+                          readonly>@ViewBag.BillingAddress</textarea>
+            </div>
+        </div>
+
+        <div class="row g-3 mt-1">
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Warehouse Name:</label>
+                <input type="text"
+                       id="txtWarehouseName"
+                       class="form-control form-control-sm text-dark shadow-sm bg-light"
+                       readonly
+                       value="@ViewBag.WarehouseName" />
+            </div>
+            <input type="hidden" id="txtWareHouseId" value="@ViewBag.WareHouseId" />
+
+            <!-- 🔹 Invoice No -->
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Invoice No:<span class="text-danger">*</span></label>
+                <input type="text"
+                       id="txtInvoiceNo"
+                       class="form-control form-control-sm text-dark shadow-sm bg-white"
+                       placeholder="Enter Invoice Number">
+                <span id="invoiceNoError" class="text-danger small fw-semibold"></span>
+            </div>
+
+            <!-- 🔹 Invoice Date -->
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Invoice Date:<span class="text-danger">*</span></label>
+                <input type="date"
+                       id="txtInvoiceDate"
+                       class="form-control form-control-sm text-dark shadow-sm bg-white"
+                       min="@Convert.ToDateTime(ViewBag.PODate).ToString("yyyy-MM-dd")"
+                       max="@DateTime.Now.ToString("yyyy-MM-dd")"
+                       value=""
+                       placeholder="dd-mm-yyyy">
+                <span id="invoiceDateError" class="text-danger small fw-semibold"></span>
+            </div>
         </div>
     </div>
 
-    <div class="row mb-2">
-        <div class="col-md-4">
-            <label>GRNNO:</label>
-            <input type="text" id="txtGRNCode" class="form-control form-control-sm bg-secondary-subtle" value="@ViewBag.GRNCode" readonly>
-        </div>
-        <div class="col-md-4">
-            <label><span class="text-danger">*</span> INVOICE NO:</label>
-            <input type="text" id="txtInvoiceNo" class="form-control form-control-sm" placeholder="Enter Invoice Number">
-        </div>
-        <div class="col-md-4">
-            <label><span class="text-danger">*</span> INVOICE DATE:</label>
-            <input type="date"
-                   id="txtInvoiceDate"
-                   class="form-control form-control-sm"
-                   value="@(ViewBag.InvoiceDate != null ? Convert.ToDateTime(ViewBag.InvoiceDate).ToString("yyyy-MM-dd") : "")"
-                   onchange="formatDate(this)">
+    <!-- 🔹 Add Item Details -->
+    <div class="border rounded-3 m-2 p-3 bg-light-subtle">
+        <h6 class="fw-bold text-dark mb-2">Add Item Details</h6>
+
+        <div class="row g-3">
+            <!-- 🔸 Item Dropdown -->
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Item Name:<span class="text-danger">*</span></label>
+                <select id="itemDropdown" class="form-select form-select-sm item-select shadow-sm bg-white">
+                    <option value="">Select Item</option>
+                </select>
+                <span id="itemError" class="text-danger small fw-semibold"></span>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Quantity:<span class="text-danger">*</span></label>
+                <input type="number" id="txtQty" class="form-control form-control-sm text-dark shadow-sm bg-white" placeholder="Enter Quantity">
+                <span id="qtyError" class="text-danger small fw-semibold"></span> <!-- Inline error -->
+            </div>
+
+            <!-- 🔸 Unit Rate -->
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Unit Rate (₹):</label>
+                <input type="text" id="txtUnitRate" class="form-control form-control-sm text-dark shadow-sm bg-light" readonly>
+            </div>
         </div>
 
 
-    </div>
+        <div class="row g-3 mt-1">
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Discount (%):</label>
+                <input type="text" id="txtDiscount" class="form-control form-control-sm text-dark shadow-sm bg-light" readonly>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold">GST (%):</label>
+                <input type="text" id="txtGST" class="form-control form-control-sm text-dark shadow-sm bg-light" readonly>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Amount (₹):</label>
+                <input type="text" id="txtAmount" class="form-control form-control-sm text-dark shadow-sm bg-light" readonly>
+            </div>
+        </div>
 
-    <!-- Addresses -->
-    <div class="row mb-2">
-        <div class="col-md-6">
-            <label>COMPANY ADDRESS:</label>
-            <textarea id="txtCompanyAddress" class="form-control form-control-sm bg-secondary-subtle" readonly rows="2">@ViewBag.CompanyAddress</textarea>
+        <div class="row g-3 mt-1">
+            <div class="col-md-4">
+                <label class="form-label fw-bold">UOM:</label>
+                <input type="text" id="txtUOM" class="form-control form-control-sm text-dark shadow-sm bg-light" readonly>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Quality Check:</label>
+                <input type="text" id="txtQC" class="form-control form-control-sm text-dark shadow-sm bg-light" readonly>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Item Description:</label>
+                <textarea id="txtItemDesc" class="form-control form-control-sm text-dark shadow-sm bg-light" readonly rows="2"></textarea>
+            </div>
         </div>
-        <div class="col-md-6">
-            <label>BILLING ADDRESS:</label>
-            <textarea id="txtBillingAddress" class="form-control form-control-sm bg-secondary-subtle" readonly rows="2">@ViewBag.BillingAddress</textarea>
-        </div>
-    </div>
 
-    <!-- Add Item Section -->
-    <h6 class="mt-3 fw-bold text-dark">Add Item Details</h6>
-    <div class="row mb-2">
-        <div class="col-md-4">
-            <label><span class="text-danger">*</span> ITEM NAME:</label>
-            <select id="itemDropdown" class="form-select form-select-sm">
-                <option value="">Select Item</option>
-            </select>
-        </div>
-        <div class="col-md-4">
-            <label><span class="text-danger">*</span> QTY:</label>
-            <input type="number" id="txtQty" class="form-control form-control-sm" placeholder="Enter Quantity">
-        </div>
-        <div class="col-md-4">
-            <label><span class="text-danger">*</span> WAREHOUSE NAME:</label>
-            <select id="ddlWarehouse" class="form-select form-select-sm">
-                <option value="">Select Warehouse</option>
-            </select>
-        </div>
-    </div>
-
-
-    <div class="row mb-2">
-        <div class="col-md-4">
-            <label>UNIT RATE (₹):</label>
-            <input type="text" id="txtUnitRate" class="form-control form-control-sm bg-secondary-subtle" readonly>
-        </div>
-        <div class="col-md-4">
-            <label>DISCOUNT %:</label>
-            <input type="text" id="txtDiscount" class="form-control form-control-sm bg-secondary-subtle" readonly>
-        </div>
-        <div class="col-md-4">
-            <label>GST %:</label>
-            <input type="text" id="txtGST" class="form-control form-control-sm bg-secondary-subtle" readonly>
-        </div>
-    </div>
-
-    <div class="row mb-3">
-        <div class="col-md-4">
-            <label>AMOUNT:</label>
-            <input type="text" id="txtAmount" class="form-control form-control-sm bg-secondary-subtle" readonly>
-        </div>
-        <div class="col-md-4">
-            <label>UOM:</label>
-            <input type="text" id="txtUOM" class="form-control form-control-sm bg-secondary-subtle" readonly>
-        </div>
-        <div class="col-md-4">
-            <label>QUALITY CHECK:</label>
-            <input type="text" id="txtQC" class="form-control form-control-sm bg-secondary-subtle" readonly>
-        </div>
-    </div>
-
-    <div class="row mb-2">
-        <div class="col-md-6">
-            <label>ITEM DESCRIPTION:</label>
-            <textarea id="txtItemDesc" class="form-control form-control-sm bg-secondary-subtle" readonly rows="2"></textarea>
-        </div>
-    </div>
-
-    <!-- Add button on the right, large and bold -->
-    <div class="row mb-2">
-        <div class="col text-end">
-            <button type="button" id="btnAddItem" class="btn btn-success btn-l fw-bold">
-                <i class="bi bi-plus-circle me-2"></i> Add Item
+        <div class="text-end mt-3">
+            <button type="button" id="btnAddItem" class="btn btn-success me-2 fw-bold btn-sm px-4">
+                <i class="bi bi-plus-circle"></i>&nbsp;Add Item
             </button>
         </div>
     </div>
@@ -134,11 +161,12 @@
                     <th>Item Name</th>
                     <th>Description</th>
                     <th>Quantity</th>
-                    <th>Unit Rate (₹)</th>
+                    <th>Unit Rate</th>
                     <th>Discount</th>
-                    <th>GST %</th>
+                    <th>GST</th>
                     <th>Amount</th>
                     <th>Action</th>
+                    <th>WarehouseId</th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -157,309 +185,521 @@
 <!-- Toast container -->
 <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3" style="z-index:1100;"></div>
 
+<style>
+    .input-error {
+        border: 1px solid red !important;
+    }
+</style>
+
 <script>
-    $(document).ready(function () {
-
-
-        // Initialize Bootstrap tooltips
-        function initTooltips() {
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
-            });
+window.setLoaderTimeout = function(ms) {
+    try {
+        if (window.pageLoader && typeof window.pageLoader.setMaxTimeout === 'function') {
+            window.pageLoader.setMaxTimeout(ms);
+            return;
         }
-
-        // Initial page load
-        initTooltips();
-
-        const POCode = '@ViewBag.POCode';
-        let POItems = [], selectedItems = new Set();
-
-        // Convert value to number safely
-        const num = v => parseFloat(String(v).replace(/[, ]/g,'').replace('%','')) || 0;
-
-        //  Calculate discount amount
-        const discountAmount = (base, val) => base * (num(val)/100);
-
-        //  Fetch warehouses and bind to dropdown
-        $.get('/GRN/GetWarehousesSSG', data=>{
-            const ddl = $('#ddlWarehouse').empty().append('<option value="">Select Warehouse</option>');
-            (data.data||data).forEach(w=> ddl.append(`<option value="${w.WareHouseId}">${w.WarehouseName}</option>`));
-        });
-
-        // Load PO Items into dropdown
-        const loadPOItems = (code) => {
-            if(!code) return;
-            $.get('/GRN/POItemsSSG', { POCode: code }, res=>{
-                POItems = res.data || [];
-                const dropdown = $('#itemDropdown').empty().append('<option value="">Select Item</option>');
-                POItems.forEach(i=> dropdown.append(`<option value="${i.ItemCode}">${i.ItemName}</option>`));
-            });
-        };
-
-        loadPOItems(POCode);
-
-        // Get selected row item codes
-        function getSelectedRowCodes() {
-            return $('#itemTable tbody .rowCheckboxItem:checked').map(function () {
-                return $(this).val();
-            }).get();
+        if (window.someLoader && typeof window.someLoader.setMaxTimeout === 'function') {
+            window.someLoader.setMaxTimeout(ms);
+            return;
         }
+        console.warn('setLoaderTimeout: loader not available', ms);
+    } catch (err) {
+        console.warn('setLoaderTimeout error', err);
+    }
+};
 
-        // Initialize DataTable for items
-        const itemTable = $('#itemTable').DataTable({
-            ordering: false,
-            responsive: true,
-            dom: '<"row mb-2"<"col-md-6"><"col-md-6 d-flex justify-content-end"f>>t<"row mt-2"<"col-md-6"i><"col-md-6 d-flex justify-content-end"p>>',
-            columns: [
-                { data: null, render: (data, type, row, meta) => meta.row + 1, className: 'text-center' }, // Sr.No
-                { data: 'ItemName', className: 'text-center' },
-                {
-                    data: 'Description',
-                    className: 'text-center',
-                    render: data => `<span data-bs-toggle="tooltip" title="${data}">${data}</span>`
-                },
-                { data: 'Quantity', className: 'text-center' },
-                {
-                    data: 'UnitRate',
-                    className: 'text-center',
-                    render: data => `₹${data}`
-                },
-                {
-                    data: 'Discount',
-                    className: 'text-center',
-                    render: data => `${data}%`
-                },
-                { data: 'GST', className: 'text-center' },
-                {
-                    data: 'Amount',
-                    className: 'text-center',
-                    render: data => `₹${data}`
-                },
-                {
-                    data: null,
-                    render: () => `<button class="btn btn-danger btn-sm deleteRow" data-bs-toggle="tooltip" title="Delete this item"><i class="bi bi-trash3"></i></button>`,
-                    orderable: false,
-                    className: 'text-center'
-                }
-            ]
+document.addEventListener("DOMContentLoaded", function() {
+
+    const txtDisplay = document.getElementById("txtInvoiceDateDisplay");
+    const txtHidden = document.getElementById("txtInvoiceDate");
+
+    function formatDate(dateStr) {
+        if(!dateStr) return "";
+        const [year, month, day] = dateStr.split("-");
+        return `${day}/${month}/${year}`;
+    }
+
+    function parseDate(displayStr) {
+        if(!displayStr) return "";
+        const [day, month, year] = displayStr.split("/");
+        return `${year}-${month}-${day}`;
+    }
+
+    const serverDate = '@(ViewBag.InvoiceDate != null ? Convert.ToDateTime(ViewBag.InvoiceDate).ToString("yyyy-MM-dd") : "")';
+    if(serverDate && txtHidden) {
+        txtHidden.value = serverDate;
+        if (txtDisplay) txtDisplay.value = formatDate(serverDate);
+    }
+
+    if(txtDisplay && txtHidden){
+        txtDisplay.addEventListener("click", () => {
+            txtHidden.focus();
+            txtHidden.click();
         });
 
-        //  Update total amount after rows change
-        const updateTotal = () => {
-            let total = 0;
-            itemTable.rows().every(function () {
-                total += num(this.data().Amount);
-            });
-
-            // Remove previous total
-            $('#totalAmount').remove();
-
-            // Append new total
-            $('#itemTable_wrapper').after(`
-                <div id="totalAmount" class="d-flex justify-content-end mt-2 mb-2">
-                    <div class="fw-bold p-2 bg-primary text-white rounded">
-                        Total Amount: ₹${total.toFixed(2)}
-                    </div>
-                </div>
-            `);
-        };
-
-        $('#itemDropdown').change(function () {
-            const item = POItems.find(x => x.ItemCode == $(this).val());
-            if (!item) return;
-
-            $('#txtQty').val(item.Quantity);
-            $('#txtUnitRate').val(item.CostPerUnit);
-            $('#txtDiscount').val(item.Discount + "%");
-            $('#txtGST').val(item.GST);
-            $('#txtAmount').val(item.TotalAmount); 
-            $('#txtItemDesc').val(item.Description);
-            $('#txtQC').val(item.IsQuality);
-            $('#txtUOM').val(item.UOMName);
+        txtHidden.addEventListener("change", () => {
+            if (txtDisplay) txtDisplay.value = formatDate(txtHidden.value);
+            if(txtHidden.value) txtHidden.classList.remove('input-error');
         });
+    }
 
+});
 
-        //  Qty validation against PO Qty
-        $('#txtQty').on('input', function(){
-            const entered = num($(this).val());
-            const item = POItems.find(x=>x.ItemCode==$('#itemDropdown').val());
-            if(item && entered>num(item.Quantity)){
-                Swal.fire({ icon:'warning', title:`Qty cannot exceed PO Qty (${item.Quantity})`, showConfirmButton:false, timer:1800 });
-                $(this).val(item.Quantity);
-            }
-        });
+$(document).ready(function () {
 
-        //  Auto add % when typing in Discount textbox
-        $('#txtDiscount').on('input', function(){
-            let val = $(this).val().replace('%','');
-            if(val && !isNaN(val)) {
-                $(this).val(val + '%');
-            }
-        });
-
-        // Add item to DataTable
-        $('#btnAddItem').click(() => {
-            const itemCode = $('#itemDropdown').val();
-            const qty = num($('#txtQty').val());
-            const warehouse = $('#ddlWarehouse').val();
-
-
-            if (!itemCode || qty <= 0) {
-                Swal.fire({ icon: 'warning', title: 'Enter valid quantity', showConfirmButton: false, timer: 1800 });
-                return;
-            }
-            if (!warehouse) {
-                Swal.fire({ icon: 'warning', title: 'Select warehouse', showConfirmButton: false, timer: 1800 });
-                return;
-            }
-            if (selectedItems.has(itemCode)) {
-                Swal.fire({ icon: 'warning', title: 'Item already added', showConfirmButton: false, timer: 1800 });
-                return;
-            }
-
-            const item = POItems.find(x => x.ItemCode === itemCode);
-            if (!item) return;
-
-            selectedItems.add(itemCode);
-
-            itemTable.row.add({
-                ItemCode: itemCode,
-                ItemName: item.ItemName,
-                Description: item.Description,
-                Quantity: qty,
-                UnitRate: item.CostPerUnit,
-                Discount: item.DiscountPercent,
-                GST: item.GST,
-                Amount: item.TotalAmount 
-            }).draw(false);
-
-
-            updateTotal();
-            Swal.fire({ icon: 'success', title: 'Item added!', showConfirmButton: false, timer: 1500 });
-        });
-
-
-        //  Delete row from DataTable
-        $('#itemTable tbody').on('click', '.deleteRow', function(){
-            const row = itemTable.row($(this).parents('tr'));
-            selectedItems.delete(row.data().ItemCode);
-            row.remove().draw();
-            updateTotal();
-        });
-
-        //  Create GRN
-        $('#btnCreateGRN').click(function () {
-            if (!$('#txtInvoiceNo').val().trim()) {
-                Swal.fire({ icon: 'warning', title: 'Please enter Invoice No', showConfirmButton: false, timer: 1800 });
-                return;
-            }
-            if (!$('#txtInvoiceDate').val()) {
-                Swal.fire({ icon: 'warning', title: 'Please select Invoice Date', showConfirmButton: false, timer: 1800 });
-                return;
-            }
-            if (itemTable.rows().count() === 0) {
-                Swal.fire({ icon: 'warning', title: 'Please select at least one row', showConfirmButton: false, timer: 1800 });
-                return;
-            }
-
-            var grnHeader = {
-                GRNCode: $('#txtGRNCode').val(),
-                POCode: $('#txtPOCode').val(),
-                InvoiceNo: $('#txtInvoiceNo').val(),
-                InvoiceDate: $('#txtInvoiceDate').val(),
-                AddedDate: new Date().toISOString(),
-                Items: []
-            };
-
-            itemTable.rows().every(function () {
-                var d = this.data();
-                grnHeader.Items.push({ ItemCode: d.ItemCode, Quantity: parseFloat(d.Quantity), WareHouseId: $('#ddlWarehouse').val() });
-            });
-
-            var formData = new FormData();
-            formData.append('GRNCode', grnHeader.GRNCode);
-            formData.append('POCode', grnHeader.POCode);
-            formData.append('InvoiceNo', grnHeader.InvoiceNo);
-            formData.append('InvoiceDate', grnHeader.InvoiceDate);
-            formData.append('AddedDate', grnHeader.AddedDate);
-
-            grnHeader.Items.forEach(function (item, index) {
-                formData.append(`Items[${index}].ItemCode`, item.ItemCode);
-                formData.append(`Items[${index}].Quantity`, item.Quantity);
-                formData.append(`Items[${index}].WareHouseId`, item.WareHouseId);
-            });
-
-            $.ajax({
-                url: '/GRN/CreateSSG',
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function (res) {
-                    if (res.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'GRN created successfully!',
-                            showConfirmButton: false,
-                            timer: 1500
-                        }).then(() => {
-                            // Close the modal using Bootstrap 5 Modal API
-                            var grnModalEl = document.getElementById('createGrnModal');
-                            var grnModal = bootstrap.Modal.getInstance(grnModalEl) || new bootstrap.Modal(grnModalEl);
-                            grnModal.hide();
-
-                            // Clear item table and selections
-                            itemTable.clear().draw();
-                            selectedItems.clear();
-                            $('#totalAmount').remove();
-
-                            // Reload Approved PO table if exists
-                            if ($.fn.DataTable.isDataTable('#approvedPoTable')) {
-                                $('#approvedPoTable').DataTable().ajax.reload(null, false);
-                            }
-
-                            // Reload GRN table if exists
-                            if ($.fn.DataTable.isDataTable('#grnTable')) {
-                                $('#grnTable').DataTable().ajax.reload(null, false);
-                            }
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: res.message,
-                            showConfirmButton: false,
-                            timer: 2000
-                        });
-                    }
-                }
-            });
-
-
-
-        });
-
-    });
-
-    //  Custom tooltip initialization
     function initTooltips() {
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        tooltipTriggerList.map(function (el) {
-            if (el._tooltip) el._tooltip.dispose();
-            el._tooltip = new bootstrap.Tooltip(el, {
-                template: '<div class="tooltip" role="tooltip">' +
-                    '<div class="tooltip-arrow"></div>' +
-                    '<div class="tooltip-inner" style="background-color:#000; color:#fff;"></div>' +
-                    '</div>'
-            });
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
+            try {
+                const existing = bootstrap.Tooltip.getInstance(el);
+                if (existing && typeof existing.dispose === 'function') {
+                    existing.dispose();
+                }
+                if (typeof bootstrap.Tooltip.getOrCreateInstance === 'function') {
+                    bootstrap.Tooltip.getOrCreateInstance(el, {
+                        template: '<div class="tooltip" role="tooltip">' +
+                                  '<div class="tooltip-arrow"></div>' +
+                                  '<div class="tooltip-inner" style="background-color:#000; color:#fff;"></div>' +
+                                  '</div>'
+                    });
+                } else {
+                    new bootstrap.Tooltip(el, {
+                        template: '<div class="tooltip" role="tooltip">' +
+                                  '<div class="tooltip-arrow"></div>' +
+                                  '<div class="tooltip-inner" style="background-color:#000; color:#fff;"></div>' +
+                                  '</div>'
+                    });
+                }
+            } catch (e) {
+                console.warn('Tooltip init failed for element', el, e);
+            }
         });
     }
 
     initTooltips();
+
+    const POCode = '@ViewBag.POCode';
+    let POItems = [], selectedItems = new Set();
+    const num = v => parseFloat(String(v).replace(/[, ]/g,'').replace('%','')) || 0;
+
+    const loadPOItems = (code) => {
+        if(!code) {
+            POItems = [];
+            refreshItemDropdown();
+            return;
+        }
+        $.get('/GRN/POItemsSSG', { POCode: code }, function(res){
+            try {
+                if (!res) {
+                    POItems = [];
+                    console.warn('POItemsSSG returned empty response');
+                } else if (Array.isArray(res)) {
+                    POItems = res;
+                } else if (Array.isArray(res.data)) {
+                    POItems = res.data;
+                } else if (Array.isArray(res.items)) {
+                    POItems = res.items;
+                } else {
+                    POItems = res.data || res.items || [];
+                }
+            } catch (err) {
+                console.warn('Error processing POItemsSSG response', err, res);
+                POItems = [];
+            }
+            if (!Array.isArray(POItems)) POItems = [];
+
+            refreshItemDropdown();
+        }).fail(function (xhr, status, err) {
+            console.warn('/GRN/POItemsSSG failed', status, err);
+            POItems = [];
+            refreshItemDropdown();
+        });
+    };
+
+    loadPOItems(POCode);
+
+    function refreshItemDropdown() {
+        const dropdown = $('#itemDropdown').empty().append('<option value="">Select Item</option>');
+        POItems.forEach(item => {
+            if (!item) return;
+            const code = item.ItemCode || item.itemCode || item.Code || '';
+            const name = item.ItemName || item.itemName || item.Name || item.Item || '';
+            if (!code) return;
+            if (!selectedItems.has(code)) {
+                dropdown.append(`<option value="${code}">${name || code}</option>`);
+            }
+        });
+    }
+
+    const itemTable = $('#itemTable').DataTable({
+        ordering: false,
+        responsive: true,
+        paging: false,
+        info:false,
+        dom: '<"row mb-2"<"col-md-6"><"col-md-6 d-flex justify-content-end"f>>t<"row mt-2"<"col-md-6"i><"col-md-6 d-flex justify-content-end"p>>',
+        columns: [
+            { data: null, render: (data, type, row, meta) => meta.row + 1, className: 'text-center' },
+            { data: 'ItemName', className: 'text-center' },
+            {
+                data: 'Description',
+                className: 'text-center',
+                render: data => {
+                    const safe = (data === null || data === undefined) ? '' : String(data).replace(/"/g,'&quot;');
+                    return `<span data-bs-toggle="tooltip" title="${safe}">${safe}</span>`;
+                }
+            },
+            { data: 'Quantity', className: 'text-center' },
+            { data: 'UnitRate', className: 'text-center', render: data => `₹${data}` },
+            { data: 'Discount', className: 'text-center', render: data => `${data}%` },
+            { data: 'GST', className: 'text-center' },
+            { data: 'Amount', className: 'text-center', render: data => `₹${data}` },
+            { data: null, render: () => `<button class="btn btn-danger btn-sm deleteRow" data-bs-toggle="tooltip" title="Delete this item"><i class="bi bi-trash3"></i></button>`, orderable: false, className: 'text-center' },
+             { data: 'WareHouseId', visible: false }
+        ]
+    });
+
+    const updateTotal = () => {
+        let total = 0;
+        itemTable.rows().every(function () {
+            const d = this.data();
+            total += num(d && d.Amount ? d.Amount : 0);
+        });
+
+        $('#totalAmount').remove();
+
+        $('#itemTable_wrapper').after(`
+        <div id="totalAmount" class="d-flex justify-content-end mt-2 mb-2">
+            <div class="d-flex align-items-center px-3 py-1 bg-light rounded-3 shadow-sm">
+                <label class="fw-semibold text-dark mb-0 me-2" style="font-size: 0.9rem;">
+                    Total Amount:
+                </label>
+                <div class="px-3 py-1 bg-primary text-white fw-bold rounded-2 shadow-sm" 
+                     style="font-size: 0.9rem; min-width: 110px; text-align: center;">
+                    ₹${total.toFixed(2)}
+                </div>
+            </div>
+        </div>
+    `);
+    };
+
+    $('#itemDropdown').change(function () {
+        const sel = $(this).val();
+        if (!sel) {
+            $('#txtQty').val('');
+            $('#txtUnitRate').val('');
+            $('#txtDiscount').val('');
+            $('#txtGST').val('');
+            $('#txtAmount').val('');
+            $('#txtItemDesc').val('');
+            $('#txtQC').val('');
+            $('#txtUOM').val('');
+            return;
+        }
+        const item = POItems.find(x => x && (x.ItemCode == sel || x.itemCode == sel || x.Code == sel));
+        if (!item) return;
+
+        $('#txtQty').val(item.Quantity || item.Qty || '');
+        $('#txtUnitRate').val(item.CostPerUnit || item.UnitRate || '');
+        $('#txtDiscount').val((item.Discount !== undefined ? item.Discount : item.DiscountPercent) + "%");
+        $('#txtGST').val(item.GST || '');
+        $('#txtAmount').val(item.TotalAmount || item.Amount || '');
+        $('#txtItemDesc').val(item.Description || '');
+        $('#txtQC').val(item.IsQuality || '');
+        $('#txtUOM').val(item.UOMName || '');
+        $('#qtyError').text('');
+        $('#itemDropdown').removeClass('input-error');
+        $('#txtQty').removeClass('input-error');
+    });
+
+    $('#txtQty').on('input', function () {
+        const qtyStr = $(this).val().trim();
+        const itemCode = $('#itemDropdown').val();
+        const item = POItems.find(x => x && (x.ItemCode == itemCode || x.itemCode == itemCode || x.Code == itemCode));
+
+        if (!qtyStr) {
+            $('#qtyError').text('');
+            $('#txtQty').removeClass('input-error');
+            return;
+        }
+
+        const qty = num(qtyStr);
+
+        if (!itemCode) {
+            $('#qtyError').text('Please select an item first, then enter quantity.');
+            $('#itemDropdown').addClass('input-error').focus();
+            $('#txtQty').removeClass('input-error');
+            return;
+        } else {
+            $('#itemDropdown').removeClass('input-error');
+        }
+
+        if (qty <= 0) {
+            $('#qtyError').text('Please enter a valid quantity.');
+            $('#txtQty').addClass('input-error');
+            return;
+        } else {
+            $('#txtQty').removeClass('input-error');
+        }
+
+        if (item && qty > num(item.Quantity || item.Qty || 0)) {
+            $('#qtyError').text(`Quantity cannot exceed PO quantity (${item.Quantity || item.Qty || 0}).`);
+            $('#txtQty').addClass('input-error');
+            return;
+        } else {
+            $('#txtQty').removeClass('input-error');
+        }
+
+        $('#qtyError').text('');
+    });
+
+    $('#txtDiscount').on('input', function(){
+        let val = $(this).val().replace('%','');
+        if(val && !isNaN(val)) {
+            $(this).val(val + '%');
+        }
+    });
+
+    $('#itemDropdown').change(function () {
+        if ($(this).val()) $('#itemError').text('');
+        $('#itemDropdown').removeClass('input-error');
+    });
+
+    $('#btnAddItem').click(() => {
+        $('#qtyError').text('');
+        $('#itemError').text('');
+
+        const itemCode = $('#itemDropdown').val();
+        const qty = num($('#txtQty').val());
+
+        if (!itemCode) {
+            $('#itemError').text('Please select an item.');
+            $('#itemDropdown').addClass('input-error');
+            return;
+        }
+
+        const item = POItems.find(x => x && (x.ItemCode === itemCode || x.itemCode === itemCode || x.Code === itemCode));
+
+        if (qty <= 0) {
+            $('#qtyError').text('Please enter a valid quantity.');
+            $('#txtQty').addClass('input-error');
+            return;
+        }
+
+        if (item && qty > num(item.Quantity || item.Qty || 0)) {
+            $('#qtyError').text(`Quantity cannot exceed PO quantity (${item.Quantity || item.Qty || 0}).`);
+            $('#txtQty').addClass('input-error');
+            return;
+        }
+
+        // Build a clean row-data object using available properties
+        const rowObj = {
+            ItemCode: itemCode,
+            ItemName: item ? (item.ItemName || item.Name || item.itemName || '') : '',
+            Description: item ? (item.Description || item.Desc || '') : '',
+            Quantity: qty,
+            UnitRate: item ? (item.CostPerUnit || item.UnitRate || 0) : 0,
+            Discount: item ? (item.DiscountPercent || item.Discount || 0) : 0,
+            GST: item ? (item.GST || 0) : 0,
+            Amount: item ? (item.TotalAmount || item.Amount || (qty * (item.CostPerUnit || item.UnitRate || 0))) : (qty * 0),
+            WareHouseId: $('#txtWareHouseId').val()
+        };
+
+        itemTable.row.add(rowObj).draw(false);
+
+        selectedItems.add(itemCode);
+        refreshItemDropdown();
+        updateTotal();
+        $('#txtQty').val('');
+        $('#txtQty').removeClass('input-error');
+        $('#itemDropdown').removeClass('input-error');
+
+        Swal.fire({ icon: 'success', title: 'Item added!', showConfirmButton: false, timer: 1500 });
+    });
+
+    $('#itemTable').on('draw.dt', function () {
+        $('#itemTable tbody tr').each(function (index) {
+            $(this).find('td:first').html(index + 1);
+        });
+        initTooltips();
+    });
+
+    $('#itemTable tbody').on('click', '.deleteRow', function () {
+        const row = itemTable.row($(this).closest('tr'));
+        const rowData = row.data() || {};
+        const itemCode = rowData.ItemCode;
+        if (itemCode) selectedItems.delete(itemCode);
+        row.remove().draw();
+        refreshItemDropdown();
+        updateTotal();
+    });
+
+    const invoicePattern = /^[A-Za-z0-9/-]{3,10}$/;
+
+    function validateInvoiceNo() {
+        const invoiceNo = $('#txtInvoiceNo').val().trim();
+        if (!invoiceNo) {
+            $('#invoiceNoError').text('Please enter Invoice No.');
+            $('#txtInvoiceNo').addClass('input-error');
+            return false;
+        } else if (!invoicePattern.test(invoiceNo)) {
+            $('#invoiceNoError').text('Invoice No must be 3-10 chars (letters, digits, - or /).');
+            $('#txtInvoiceNo').addClass('input-error');
+            return false;
+        } else {
+            $('#invoiceNoError').text('');
+            $('#txtInvoiceNo').removeClass('input-error');
+            return true;
+        }
+    }
+
+    function validateInvoiceDate() {
+        const invoiceDate = $('#txtInvoiceDate').val();
+        if (!invoiceDate) {
+            $('#invoiceDateError').text('Please select Invoice Date.');
+            $('#txtInvoiceDate').addClass('input-error');
+            return false;
+        } else {
+            $('#invoiceDateError').text('');
+            $('#txtInvoiceDate').removeClass('input-error');
+            return true;
+        }
+    }
+
+    function validateItemAdded() {
+        if ($('#itemTable').DataTable().rows().count() === 0) {
+            $('#itemError').text('Please add at least one item.');
+            $('#itemDropdown').addClass('input-error');
+            return false;
+        } else {
+            $('#itemError').text('');
+            $('#itemDropdown').removeClass('input-error');
+            return true;
+        }
+    }
+
+    // Immediate validation while typing/selecting
+    $('#txtInvoiceNo').on('input', validateInvoiceNo);
+    $('#txtInvoiceDate').on('change input', validateInvoiceDate);
+    $('#itemDropdown').on('change', function () {
+        if ($(this).val()) {
+            $('#itemError').text('');
+            $('#itemDropdown').removeClass('input-error');
+        }
+    });
+    $('#txtQty').on('input', function () {
+        if ($(this).val() && $('#itemDropdown').val()) {
+            $('#itemError').text('');
+            $('#itemDropdown').removeClass('input-error');
+        }
+    });
+
+    $('#btnCreateGRN').click(function () {
+
+        const isInvoiceNoValid = validateInvoiceNo();
+        const isInvoiceDateValid = validateInvoiceDate();
+        const isItemValid = validateItemAdded();
+
+        if (!isInvoiceNoValid || !isInvoiceDateValid || !isItemValid) {
+            if (!isInvoiceNoValid) {
+                $('#txtInvoiceNo').focus();
+            } else if (!isInvoiceDateValid) {
+                $('#txtInvoiceDate').focus();
+            } else if (!isItemValid) {
+                $('#itemDropdown').focus();
+            }
+            return;
+        }
+
+        // Show confirmation popup
+        Swal.fire({
+            title: "Are you sure?",
+            text: "Do you want to create this GRN?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, create it!",
+            cancelButtonText: "No, cancel",
+            reverseButtons: false,
+            customClass: {
+                confirmButton: 'btn btn-success me-2',
+                cancelButton: 'btn btn-danger'
+            },
+            buttonsStyling: false
+
+        }).then((result) => {
+            if (result.isConfirmed) {
+
+                const invoiceNo = $('#txtInvoiceNo').val().trim();
+                const invoiceDate = $('#txtInvoiceDate').val();
+
+                var grnHeader = {
+                    GRNCode: $('#txtGRNCode').val(),
+                    POCode: $('#txtPOCode').val(),
+                    InvoiceNo: invoiceNo,
+                    InvoiceDate: invoiceDate,
+                    AddedDate: new Date().toISOString(),
+                    Items: []
+                };
+
+                itemTable.rows().every(function () {
+                    var d = this.data();
+                    grnHeader.Items.push({ ItemCode: d.ItemCode, Quantity: parseFloat(d.Quantity) });
+                });
+
+                var formData = new FormData();
+                formData.append('GRNCode', grnHeader.GRNCode);
+                formData.append('POCode', grnHeader.POCode);
+                formData.append('InvoiceNo', grnHeader.InvoiceNo);
+                formData.append('InvoiceDate', grnHeader.InvoiceDate);
+                formData.append('AddedDate', grnHeader.AddedDate);
+                formData.append('WareHouseId', $('#txtWareHouseId').val());
+
+
+                grnHeader.Items.forEach(function (item, index) {
+                    formData.append(`Items[${index}].ItemCode`, item.ItemCode);
+                    formData.append(`Items[${index}].Quantity`, item.Quantity);
+                    formData.append(`Items[${index}].WareHouseId`, $('#txtWareHouseId').val());
+                });
+
+                $.ajax({
+                    url: '/GRN/CreateSSG',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (res) {
+                        if (res && res.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'GRN created successfully!',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                var grnModalEl = document.getElementById('createGrnModal');
+                                var grnModal = bootstrap.Modal.getInstance(grnModalEl) || new bootstrap.Modal(grnModalEl);
+                                grnModal.hide();
+                                itemTable.clear().draw();
+                                selectedItems.clear();
+                                $('#totalAmount').remove();
+                                if ($.fn.DataTable.isDataTable('#approvedPoTable'))
+                                    $('#approvedPoTable').DataTable().ajax.reload(null, false);
+                                if ($.fn.DataTable.isDataTable('#grnTable'))
+                                    $('#grnTable').DataTable().ajax.reload(null, false);
+                            });
+                        } else {
+                            Swal.fire({ icon: 'error', title: (res && res.message) || 'Failed to create GRN', showConfirmButton: false, timer: 2000 });
+                        }
+                    },
+                    error: function(xhr, status, err) {
+                        console.warn('CreateSSG error', status, err, xhr);
+                        Swal.fire({ icon: 'error', title: 'Error creating GRN', showConfirmButton: false, timer: 2000 });
+                    }
+                });
+
+            }
+        });
+    });
+
+    initTooltips();
     $('#itemTable').on('draw.dt', function () { initTooltips(); });
 
+});
 </script>
-
-
-
-

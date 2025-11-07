@@ -1,11 +1,10 @@
 ﻿<style>
     .circular-glass-btn {
-        width: 43px;
+        width: 40px;
         height: 38px;
         border-radius: 5px;
         background: rgba(59, 217, 56);
         backdrop-filter: blur(4px);
-        border: 1px solid rgba(0, 100, 0, 0.8);
         color: #fff;
         display: inline-flex;
         align-items: center;
@@ -13,11 +12,13 @@
         cursor: pointer;
         font-size: 1.1rem;
         padding: 0;
+        border: none;
+        box-shadow: 0 2px 6px rgba(0, 100, 0, 0.35);
     }
 
         .circular-glass-btn:hover {
             background: rgba(0, 180, 0, 0.8);
-            color: #ffffff;
+            color: #fff !important;
         }
 
     #nonMovingStockTable thead th {
@@ -34,11 +35,27 @@
         margin-top: 3px;
         margin-bottom: 5px;
     }
+
+    /* Buffer on export icon proccess remove */
+    button.dt-button.processing,
+    div.dt-button.processing {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        background: none !important;
+    }
+
+        button.dt-button.processing:after {
+            content: none !important;
+        }
+
+    #nonMovingStockTable thead th {
+        padding: 0.3rem 0.4rem !important;
+    }
 </style>
 
 
 <div class="container mt-4 card shadow-sm">
-    <h3 class="text-primary text-center fw-bolder mt-3">Non Moving Stock</h3>
+    <h3 class="text-primary text-center fw-bolder mt-3">Non-Moving Stock Check</h3>
     <table id="nonMovingStockTable" class="table table-bordered table-striped wrap">
         <thead class="table-dark text-center">
             <tr>
@@ -56,6 +73,47 @@
     </table>
 
 </div>
+
+
+<!-- Transfer Modal (Vertical Inputs) -->
+<div class="modal fade" id="transferModal" tabindex="-1" aria-labelledby="transferModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header bg-primary justify-content-center position-relative" style="padding-top: 0.7rem; padding-bottom: 0.7rem;">
+                <h4 class="modal-title text-white text-center fs-5 p-1" id="transferModalLabel">Transfer Dead Stock</h4>
+                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <!-- Bin Selection -->
+                <div class="mb-3">
+                    <label class="form-label form-label-sm fw-bold text-dark">Select Bin:</label>
+                    <select id="binSelect" class="form-select form-select-sm item-select shadow-sm"></select>
+                </div>
+
+
+                <!-- Transfer Quantity -->
+                <div class="mb-3">
+                    <label for="transferQtyInput" class="form-label fw-bold text-dark">
+                        Transfer Quantity: <span class="text-danger">*</span>
+                    </label>
+                    <input type="number" id="transferQtyInput" class="form-control form-control-sm  text-dark shadow-sm" min="1" placeholder="Enter quantity">
+                    <div class="invalid-feedback"></div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                @*<button type="button" id="transferCancelBtn" class="btn btn-sm btn-danger" data-bs-dismiss="modal">Cancel</button>*@
+                <button type="button" id="transferConfirmBtn" class="btn btn-sm btn-success">Transfer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script>
 // --- Toastr Global Options ---
 toastr.options = {
@@ -99,54 +157,23 @@ var nonMovingTable = $('#nonMovingStockTable').DataTable({
         { data: "ItemName", orderable: false, className: "text-center" },
         { data: "CurrentQty", orderable: false, className: "text-center" },
         {
-            data: "AddedDate",
-            orderable: false,
-            className: "text-center",
-            render: function (data) {
+            data: "AddedDate", render: function (data, type, row) {
                 if (!data) return "";
-
-                // .NET JSON format: /Date(1736985600000)/
-                var match = /Date\((\d+)\)/.exec(data);
-                if (match) {
-                    var dt = new Date(parseInt(match[1], 10));
-                    return dt.toLocaleDateString("en-GB"); // dd/mm/yyyy
-                }
-
-                // ISO string fallback
-                var dt2 = new Date(data);
-                if (!isNaN(dt2.getTime())) {
-                    return dt2.toLocaleDateString("en-GB");
-                }
-
-                return data;
-            }
-        },
+                return data.replace(/-/g, "/");
+            },orderable: false, className: "text-center"  },
         {
-            data: "ExpiryDate",
-            orderable: false,
-            className: "text-center",
-            render: function (data) {
+            data: "ExpiryDate", render: function (data, type, row) {
                 if (!data) return "";
+                return data.replace(/-/g, "/");
+            }, orderable: false,  className: "text-center"  },
 
-                var match = /Date\((\d+)\)/.exec(data);
-                if (match) {
-                    var dt = new Date(parseInt(match[1], 10));
-                    return dt.toLocaleDateString("en-GB");
-                }
-
-                var dt2 = new Date(data);
-                if (!isNaN(dt2.getTime())) {
-                    return dt2.toLocaleDateString("en-GB");
-                }
-
-                return data;
-            }
-        },
         {
             data: null,
             orderable: false,
             className: "text-center",
             render: function (data, type, row) {
+                // Directly show BinList from DB (BinName + Qty)
+                // and keep BinCodeList in data attribute
                 return `<span data-bincode="${row.BinCode}">${row.BinName}</span>`;
             }
         },
@@ -157,7 +184,7 @@ var nonMovingTable = $('#nonMovingStockTable').DataTable({
             render: function (data, type, row) {
                 return `
                 <button class="btn btn-sm transfer-btn circular-glass-btn bg-danger" data-id="${row.ItemCode}">
-                    <i class="bi bi-box-arrow-in-right"
+                    <i class="bi bi-arrow-right-circle-fill"
                        title="Transfer Dead Stock"
                        data-bs-toggle="tooltip"
                        data-bs-placement="top"></i>
@@ -168,11 +195,11 @@ var nonMovingTable = $('#nonMovingStockTable').DataTable({
 
     dom: '<"d-flex justify-content-between align-items-center mb-2"Bf>rt<"d-flex justify-content-between align-items-center mt-2"ip>',
     buttons: [
-        // --- Print ---
+        // --- PRINT ---
         {
             extend: 'print',
             text: '<i class="bi bi-printer-fill text-dark fs-5"></i>',
-            title: `Non-Moving Stock - ${moment().format("YYYY-MM-DD")}`,
+            title: '',
             exportOptions: {
                 columns: ':visible:not(:first-child):not(:last-child)',
                 rows: function (idx, data, node) {
@@ -180,12 +207,9 @@ var nonMovingTable = $('#nonMovingStockTable').DataTable({
                 },
                 format: {
                     body: function (data, row, column, node) {
+                        // ✅ Handle serial number manually in print order
+                        if (column === 1) return ++serialCounter;
                         if (column === 7) return nonMovingTable.row(row).data().BinName;
-                        if (column === 1) {
-                            return nonMovingTable.rows({ filter: 'applied' }).indexes()
-                                .filter(i => selectedNonMovingIds.has(nonMovingTable.row(i).data().ItemCode))
-                                .indexOf(row) + 1;
-                        }
                         return data;
                     }
                 }
@@ -195,26 +219,74 @@ var nonMovingTable = $('#nonMovingStockTable').DataTable({
                     toastr.warning("Please select at least one item before printing.");
                     return;
                 }
+
+                // ✅ Reset serial counter before printing
+                serialCounter = 0;
                 $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config);
             },
             customize: function (win) {
-                $(win.document.body).find('table')
-                    .css('border', '1px solid black')
-                    .css('border-collapse', 'collapse')
-                    .find('th, td')
-                    .css('border', '1px solid black')
-                    .css('padding', '5px');
-                $(win.document.body).find('th')
-                    .css('background-color', 'black')
-                    .css('color', 'white');
+                var $body = $(win.document.body);
+
+                // ✅ Add print styles (same as Confirm/Current Stock)
+                $body.append(`
+<style>
+    thead th {
+        background-color: black !important;
+        color: white !important;
+        text-align: center !important;
+        vertical-align: middle !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        font-weight: bold !important;
+        padding: 8px !important;
+    }
+    table {
+        border-collapse: collapse !important;
+        width: 100% !important;
+        margin: 0 auto !important;
+    }
+    td, th {
+        border: 1px solid #000 !important;
+        padding: 6px !important;
+        text-align: center !important;
+        vertical-align: middle !important;
+    }
+    tbody td {
+        text-align: center !important;
+        vertical-align: middle !important;
+    }
+    h3, p {
+        text-align: center !important;
+    }
+</style>
+        `);
+
+                // ✅ Add header & metadata
+                $body.prepend(`
+            <h3>Non-Moving Stock Report</h3>
+            <p>Generated Date:${moment().format("DD/MM/YYYY")}</p>
+        `);
+
+                // ✅ Apply font & layout styling
+                $body.css({
+                    'font-size': '12pt',
+                    'font-family': 'Arial, sans-serif'
+                });
+
+                // ✅ Fix serial numbers for printed rows
+                const $table = $body.find('table');
+                $table.find('tbody tr').each(function (index) {
+                    $(this).find('td:first').text(index + 1);
+                });
             }
         },
+
 
         // --- PDF ---
         {
             extend: 'pdfHtml5',
             text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
-            title: `Non-Moving Stock - ${moment().format("YYYY-MM-DD")}`,
+            title: `Non-Moving Stock`,
             exportOptions: {
                 columns: ':visible:not(:first-child):not(:last-child)',
                 rows: function (idx, data, node) {
@@ -259,7 +331,7 @@ var nonMovingTable = $('#nonMovingStockTable').DataTable({
                 // ✅ Add "Generated Date" just below the title
                 var generatedDate = moment().format("YYYY-MM-DD");
                 doc.content.splice(1, 0, {
-                    text: `Generated Date: ${generatedDate}`,
+                    text: `Generated Date: ${moment().format("DD/MM/YYYY")}`,
                     alignment: 'center',
                     margin: [0, 0, 0, 10],
                     fontSize: 10,
@@ -284,27 +356,48 @@ var nonMovingTable = $('#nonMovingStockTable').DataTable({
         {
             extend: 'excelHtml5',
             text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
-            title: `Non-Moving Stock - ${moment().format("YYYY-MM-DD")}`,
+            title: 'Non-Moving Stock',
+            messageTop: `Generated Date: ${moment().format("DD/MM/YYYY")}`,
             exportOptions: {
-                columns: ':visible:not(:first-child):not(:last-child)',
+                columns: [1, 2, 3, 4, 5, 6, 7], // Exclude checkbox & action button columns
                 rows: function (idx, data, node) {
+                    // Export only selected rows
                     return selectedNonMovingIds.has(data.ItemCode);
                 },
                 format: {
                     body: function (data, row, column, node) {
-                        if (column === 7) return nonMovingTable.row(row).data().BinName;
-                        if (column === 1) {
-                            return nonMovingTable.rows({ filter: 'applied' }).indexes()
-                                .filter(i => selectedNonMovingIds.has(nonMovingTable.row(i).data().ItemCode))
-                                .indexOf(row) + 1;
-                        }
+                        // Remove HTML (like span or buttons) from cells
+                        if (typeof data === 'string') data = data.replace(/<[^>]*>/g, '').trim();
                         return data;
                     }
                 }
             },
+            customize: function (xlsx) {
+                const sheet = xlsx.xl.worksheets['sheet1.xml'];
+
+                // Center & bold title row (row 1)
+                $('row[r="1"] c', sheet).attr('s', '51');
+
+                // Center & bold generated date row (row 2)
+                $('row[r="2"] c', sheet).attr('s', '51');
+
+                // Insert Sr. No column at the start and recalc serial for exported rows
+                let serial = 1;
+                $('row', sheet).each(function () {
+                    const rowIndex = parseInt($(this).attr('r'));
+                    if (rowIndex === 3) {
+                        // Header row: add Sr. No
+                        $(this).find('c:first').before(`<c t="inlineStr" s="2"><is><t>Sr. No</t></is></c>`);
+                    } else if (rowIndex > 3) {
+                        // Data rows: add serial starting from 1
+                        $(this).find('c:first').before(`<c t="inlineStr" s="2"><is><t>${serial}</t></is></c>`);
+                        serial++;
+                    }
+                });
+            },
             action: function (e, dt, button, config) {
-                if (selectedNonMovingIds.size === 0) {
-                    toastr.warning("Please select at least one item before exporting Excel.");
+                if (!selectedNonMovingIds || selectedNonMovingIds.size === 0) {
+                    toastr.warning("Please select at least one item before exporting.");
                     return;
                 }
                 $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
@@ -315,7 +408,7 @@ var nonMovingTable = $('#nonMovingStockTable').DataTable({
         {
             extend: 'csvHtml5',
             text: '<i class="bi bi-filetype-csv text-success fs-5"></i>',
-            title: `Non-Moving Stock - ${moment().format("YYYY-MM-DD")}`,
+            title: `Non-Moving Stock - ${moment().format("DD/MM/YYYY")}`,
             exportOptions: {
                 columns: ':visible:not(:first-child):not(:last-child)',
                 rows: function (idx, data, node) {
@@ -361,150 +454,254 @@ var nonMovingTable = $('#nonMovingStockTable').DataTable({
     });
 
 
-    // ======================
-    // Non-Moving Stock Date Range Filter (Integrated)
-    // ======================
+    // ✅ Add Date Range Picker
     $("#nonMovingStockTable_wrapper").prepend(`
-  <div class="input-group mb-2 mt-5" style="max-width: 280px;">
-    <span class="input-group-text bg-primary text-white">
-      <i class="bi bi-calendar-date"></i>
-    </span>
-    <input type="text" id="returnGoodsRange" class="form-control" placeholder="Select date range" readonly />
-  </div>
+    <div class="input-group mb-2 mt-3" style="max-width: 300px;">
+        <span class="input-group-text bg-primary text-white">
+            <i class="bi bi-calendar-date"></i>
+        </span>
+        <input type="text" id="nonMovingDateRange" class="form-control" placeholder="Select date range" readonly />
+    </div>
 `);
 
-    $('#returnGoodsRange').daterangepicker({
+    // Initialize Date Range Picker
+    $('#nonMovingDateRange').daterangepicker({
         autoUpdateInput: false,
-        locale: { cancelLabel: 'Clear' },
+        locale: {
+            cancelLabel: 'Clear',
+            format: 'DD/MM/YYYY',
+            applyLabel: 'Apply',
+            customRangeLabel: 'Custom Range'
+        },
         ranges: {
             'Today': [moment(), moment()],
-            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
             'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-            'This Month': [moment().startOf('month'), moment().endOf('month')],
-            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            'Last 1 Month': [moment().subtract(1, 'month'), moment()],
+            'Last 3 Months': [moment().subtract(3, 'months'), moment()],
+            'Last 1 Year': [moment().subtract(1, 'year'), moment()],
         }
+
     });
 
+    // Custom filter for DataTable
     $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
         if (settings.nTable.id !== "nonMovingStockTable") return true;
 
-        var dateRange = $('#returnGoodsRange').val();
-        if (!dateRange) return true;
+        var dateRange = $('#nonMovingDateRange').val();
+        if (!dateRange || dateRange === 'Select Date Range') return true;
 
-        var minMax = dateRange.split(' to ');
-        var min = moment(minMax[0], 'YYYY-MM-DD');
-        var max = moment(minMax[1], 'YYYY-MM-DD');
+        try {
+            var dates = dateRange.split(' - ');
+            var min = moment(dates[0], 'DD/MM/YYYY');
+            var max = moment(dates[1], 'DD/MM/YYYY');
 
-        var date = moment(data[5], 'YYYY-MM-DD'); // AddedDate column index = 5
-        return date.isBetween(min, max, 'day', '[]');
-    });
+            // Get both date columns (Adjust index if your columns are different)
+            var addedDateStr = data[5];   // AddedDate column index
+            var expiryDateStr = data[6];  // ExpiryDate column index
 
-    $('#returnGoodsRange').on('apply.daterangepicker', function (ev, picker) {
-        $(this).val(picker.startDate.format('YYYY-MM-DD') + ' to ' + picker.endDate.format('YYYY-MM-DD'));
-        nonMovingTable.draw();
-    });
+            var isInRange = false;
 
-    $('#returnGoodsRange').on('cancel.daterangepicker', function () {
-        $(this).val('');
-        nonMovingTable.draw();
-    });
-
-
-// --- Transfer Button Click with Bin Dropdown ---
-$('#nonMovingStockTable').on('click', '.transfer-btn', function () {
-    var row = $(this).closest('tr');
-    var itemCode = $(this).data('id');
-
-    var binSpan = row.find('td:eq(7) span');
-    var binNames = binSpan.text().split(',').map(b => b.trim());
-    var binCodes = binSpan.data('bincode').split(',').map(b => b.trim());
-
-    if (!binNames.length || !binCodes.length) {
-        toastr.error("No bin found for this item.", "Error");
-        return;
-    }
-
-    var inputOptions = {};
-    for (var i = 0; i < binCodes.length; i++) {
-        inputOptions[binCodes[i]] = binNames[i];
-    }
-
-    Swal.fire({
-        title: 'Select Bin',
-        input: 'select',
-        inputOptions: inputOptions,
-        showCancelButton: true,
-        confirmButtonText: 'OK',
-        cancelButtonText: 'Cancel',
-        cancelButtonColor: '#d33' // 🔴 red / danger color
-    }).then((binResult) => {
-        if (!binResult.isConfirmed) return;
-        var selectedBinCode = binResult.value;
-   
-
-        Swal.fire({
-            title: 'Transfer Dead Stock Quantity',
-            input: 'number',
-            inputAttributes: { min: 1 },
-            showCancelButton: true,
-            confirmButtonText: 'Transfer',
-            cancelButtonText: 'Cancel',
-            cancelButtonColor: '#d33', // 🔴 red / danger color
-            showLoaderOnConfirm: true,
-        preConfirm: (qty) => {
-            if (!qty || qty <= 0) {
-                Swal.getInput().classList.add('is-invalid');
-                Swal.showValidationMessage("Please enter a valid quantity");
-                return false;
-            }
-            return $.ajax({
-                url: '@Url.Action("TransferNonMovingToMovingByBinLM","Inventory")',
-                type: 'POST',
-                data: { itemCode: itemCode, transferQty: qty, binCode: selectedBinCode },
-                dataType: 'json'
-            }).then(response => {
-                if (!response.success) {
-                    Swal.showValidationMessage(response.message || "Transfer failed");
+            [addedDateStr, expiryDateStr].forEach(function (dStr) {
+                if (!dStr) return;
+                var d = moment(dStr, ['DD/MM/YYYY', 'DD/MM/YYYY']);
+                if (d.isValid() && d.isBetween(min, max, 'day', '[]')) {
+                    isInRange = true;
                 }
-                return response;
-            }).catch(error => {
-                Swal.showValidationMessage(`Request failed: ${error.responseText || error.statusText}`);
             });
-        },
-        didOpen: () => { Swal.getInput().focus(); }
-    }).then((result) => {
-        if (result.isConfirmed && result.value) {
 
-            // Success message
-            if (result.value.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Item transferred successfully!',
-                    showConfirmButton: false,
-                    timer: 1500  // auto-close after 1.5 seconds
-                });
-            }
-            // Failure message
-            else {
-                Swal.fire({
-                    icon: 'error',
-                    title: result.value.message || 'Transfer failed',
-                    showConfirmButton: false,
-                    timer: 1500  // auto-close after 1.5 seconds
-                });
-            }
-
-            // Reload DataTables without resetting pagination
-            nonMovingTable.ajax.reload(null, false);
-            currentStockTable.ajax.reload(null, false);
+            return isInRange;
+        } catch (e) {
+            console.error('Date filter error:', e);
+            return true;
         }
     });
-});
+
+    // Event handlers
+    $('#nonMovingDateRange').on('apply.daterangepicker', function (ev, picker) {
+        $(this).val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY'));
+        if (typeof nonMovingTable !== 'undefined') nonMovingTable.draw();
+    });
+
+    $('#nonMovingDateRange').on('cancel.daterangepicker', function () {
+        $(this).val('Select Date Range');
+        if (typeof nonMovingTable !== 'undefined') nonMovingTable.draw();
+    });
+
+    // Set initial placeholder
+    $('#nonMovingDateRange')
+        .val('Select Date Range')
+        .css({
+            'color': '#6c757d'
+        });
+
+    $('#nonMovingStockTable').on('click', '.transfer-btn', function () {
+        var row = $(this).closest('tr');
+        var itemCode = $(this).data('id');
+
+        var binSpan = row.find('td:eq(7) span');
+        var binList = binSpan.text();
+        var binCodes = binSpan.data('bincode');
+
+        if (!binList || !binCodes) {
+            toastr.error("No bin found for this item.", "Error");
+            return;
+        }
+
+        var binEntries = binList.split(',').map(x => x.trim());
+        var binCodeArray = binCodes.split(',').map(x => x.trim());
+
+        var bins = [];
+        for (var i = 0; i < binEntries.length; i++) {
+            var match = binEntries[i].match(/^(.*)\s*\((\d+)\)$/);
+            if (match) {
+                bins.push({
+                    name: match[1].trim(),
+                    qty: parseInt(match[2]),
+                    code: binCodeArray[i]
+                });
+            }
+        }
+
+        var $binSelect = $('#binSelect');
+        $binSelect.empty();
+        bins.forEach(bin => {
+            $binSelect.append(`
+            <option value="${bin.code}" data-qty="${bin.qty}">
+                ${bin.name} (Available: ${bin.qty})
+            </option>
+        `);
+        });
+
+        var $qtyInput = $('#transferQtyInput');
+        $qtyInput.val('').removeClass('is-invalid');
+
+        // Add invalid-feedback div if not present
+        if ($qtyInput.next('.invalid-feedback').length === 0) {
+            $qtyInput.after('<div class="invalid-feedback"></div>');
+        }
+        $qtyInput.next('.invalid-feedback').text(''); // clear previous errors
+
+        var transferModal = new bootstrap.Modal(document.getElementById('transferModal'));
+        transferModal.show();
+
+        // **Live validation as user types**
+        $qtyInput.off('input').on('input', function () {
+            var selectedBinCode = $binSelect.val();
+            var qty = parseInt($qtyInput.val());
+            var selectedBin = bins.find(b => b.code === selectedBinCode);
+
+            $qtyInput.removeClass('is-invalid');
+            $qtyInput.next('.invalid-feedback').text('');
+
+            if (!qty || qty <= 0) {
+                $qtyInput.addClass('is-invalid');
+                $qtyInput.next('.invalid-feedback').text('Please enter a valid quantity.');
+                return;
+            }
+
+            if (qty > selectedBin.qty) {
+                $qtyInput.addClass('is-invalid');
+                $qtyInput.next('.invalid-feedback').text(`Only ${selectedBin.qty} items available in ${selectedBin.name}.`);
+                return;
+            }
+        });
+
+        // Confirm transfer button
+        $('#transferConfirmBtn').off('click').on('click', function () {
+            var selectedBinCode = $binSelect.val();
+            var qty = parseInt($qtyInput.val());
+            var selectedBin = bins.find(b => b.code === selectedBinCode);
+
+            // Final validation before transfer
+            $qtyInput.removeClass('is-invalid');
+            $qtyInput.next('.invalid-feedback').text('');
+
+            if (!qty || qty <= 0 || qty > selectedBin.qty) {
+                $qtyInput.addClass('is-invalid');
+                $qtyInput.next('.invalid-feedback').text('Please enter a valid quantity.');
+                return;
+            }
+
+            // Proceed with transfer logic here...
+            console.log('Transfer', qty, 'items from bin', selectedBin.name);
+            transferModal.hide();
 
 
+        // ✅ SweetAlert confirmation before AJAX
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'Do you want to transfer this item to Scratch stock?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, Transfer',
+                cancelButtonText: 'Cancel',
+                customClass: {
+                    confirmButton: 'btn btn-success me-2 p-3', // Bootstrap success + margin-end
+                    cancelButton: 'btn btn-danger p-3'
+                },
+                buttonsStyling: false, // important to use Bootstrap classes
+                reverseButtons: false
 
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // ✅ AJAX call to backend
+                $.ajax({
+                    url: '@Url.Action("TransferNonMovingToMovingByBinLM", "Inventory")',
+                    type: 'POST',
+                    data: {
+                        itemCode: itemCode,
+                        transferQty: qty,
+                        binCode: selectedBinCode
+                    },
+                    dataType: 'json',
+                    success: function (response) {
+                        transferModal.hide(); // Hide modal
 
+                        $('#transferQtyInput').val('').removeClass('is-invalid');
+                        $binSelect.val($binSelect.find('option:first').val());
+
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Item transferred successfully!',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                if ($.fn.DataTable.isDataTable('#nonMovingStockTable')) {
+                                    $('#nonMovingStockTable').DataTable().ajax.reload(null, false);
+                                }
+                                if ($.fn.DataTable.isDataTable('#currentStockTable')) {
+                                    $('#currentStockTable').DataTable().ajax.reload(null, false);
+                                }
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message || 'Transfer failed',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                if ($.fn.DataTable.isDataTable('#nonMovingStockTable')) {
+                                    $('#nonMovingStockTable').DataTable().ajax.reload(null, false);
+                                }
+                                if ($.fn.DataTable.isDataTable('#currentStockTable')) {
+                                    $('#currentStockTable').DataTable().ajax.reload(null, false);
+                                }
+                            });
+                        }
+                    },
+                    error: function () {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Something went wrong during transfer!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                    }
+                });
+            }
+        });
+    });
 
 
     // Initialize Bootstrap tooltips

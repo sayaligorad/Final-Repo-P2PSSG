@@ -13,10 +13,26 @@
         margin-top: 10px;
         margin-bottom: 10px;
     }
+
+    /* Buffer on export icon proccess remove */
+    button.dt-button.processing,
+    div.dt-button.processing {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        background: none !important;
+    }
+
+        button.dt-button.processing:after {
+            content: none !important;
+        }
+
+    #qualityCheackStockTable thead th {
+        padding: 0.3rem 0.4rem !important;
+    }
 </style>
 
 <div class="container mt-4 card shadow-sm">
-    <h3 class="text-primary text-center fw-bolder mt-3">Quality Cheak Stock</h3>
+    <h3 class="text-primary text-center fw-bolder mt-3">Quality Check Stock</h3>
     <table id="qualityCheackStockTable" class="table table-bordered table-striped wrap">
         <thead class="table-dark text-center">
             <tr>
@@ -76,7 +92,11 @@ var qualityCheackTable = $('#qualityCheackStockTable').DataTable({
         { "data": "QualityCheackCode", orderable: false, "className": "text-center" },
         { "data": "ItemName", orderable: false, "className": "text-center" },
         { "data": "ItemCount", orderable: false, "className": "text-center" },
-        { "data": "Date", orderable: false, "className": "text-center" },
+        {
+            "data": "Date", render: function (data, type, row) {
+                if (!data) return "";
+                return data.replace(/-/g, "/");
+            }, orderable: false, "className": "text-center" },
         {
             "data": "Status",
             orderable: false,
@@ -98,26 +118,28 @@ var qualityCheackTable = $('#qualityCheackStockTable').DataTable({
     ],
     dom: '<"d-flex justify-content-between align-items-center mb-2"Bf>rt<"d-flex justify-content-between align-items-center mt-2"ip>',
     buttons: [
-        // --- Print ---
+        // --- PRINT ---
         {
             extend: 'print',
             text: '<i class="bi bi-printer-fill text-dark fs-5"></i>',
-            title: `Quality Cheak Stock - ${moment().format("YYYY-MM-DD")}`,
+            title: '',
             exportOptions: {
-                columns: ':visible:not(:first-child)', // last column included
+                columns: ':visible:not(:first-child)', // exclude checkbox
                 rows: function (idx, data, node) {
                     let uniqueId = data.ItemCode + "_" + idx;
                     return selectedQualityIds.has(uniqueId);
                 },
                 format: {
                     body: function (data, row, column, node) {
+                        // ✅ Proper serial numbering for selected rows only
                         if (column === 1) {
-                            return qualityCheackTable.rows({ filter: 'applied' }).indexes()
+                            const filteredIndexes = qualityCheackTable.rows({ filter: 'applied' }).indexes()
                                 .filter(i => {
-                                    let d = qualityCheackTable.row(i).data();
-                                    let uid = d.ItemCode + "_" + i;
+                                    const d = qualityCheackTable.row(i).data();
+                                    const uid = d.ItemCode + "_" + i;
                                     return selectedQualityIds.has(uid);
-                                }).indexOf(row) + 1;
+                                });
+                            return filteredIndexes.indexOf(row) + 1;
                         }
                         return data;
                     }
@@ -131,16 +153,59 @@ var qualityCheackTable = $('#qualityCheackStockTable').DataTable({
                 $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config);
             },
             customize: function (win) {
-                $(win.document.body).find('table')
-                    .css('border', '1px solid black')
-                    .css('border-collapse', 'collapse')
-                    .find('th, td')
-                    .css('border', '1px solid black')
-                    .css('padding', '5px');
+                var $body = $(win.document.body);
 
-                $(win.document.body).find('th')
-                    .css('background-color', 'black')
-                    .css('color', 'white');
+                // ✅ Add consistent print styling
+                $body.append(`
+<style>
+    thead th {
+        background-color: black !important;
+        color: white !important;
+        text-align: center !important;
+        vertical-align: middle !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        font-weight: bold !important;
+        padding: 8px !important;
+    }
+    table {
+        border-collapse: collapse !important;
+        width: 100% !important;
+        margin: 0 auto !important;
+    }
+    td, th {
+        border: 1px solid #000 !important;
+        padding: 6px !important;
+        text-align: center !important;
+        vertical-align: middle !important;
+    }
+    tbody td {
+        text-align: center !important;
+        vertical-align: middle !important;
+    }
+    h3, p {
+        text-align: center !important;
+    }
+</style>
+        `);
+
+                // ✅ Add title and metadata at top
+                $body.prepend(`
+            <h3>Quality Check Stock Report</h3>
+            <p>Generated Date: ${moment().format("DD/MM/YYYY")}</p>
+        `);
+
+                // ✅ Global font & layout styling
+                $body.css({
+                    'font-size': '12pt',
+                    'font-family': 'Arial, sans-serif'
+                });
+
+                // ✅ Ensure serial numbers in print view are correct
+                const $table = $body.find('table');
+                $table.find('tbody tr').each(function (index) {
+                    $(this).find('td:first').text(index + 1);
+                });
             }
         },
 
@@ -148,15 +213,19 @@ var qualityCheackTable = $('#qualityCheackStockTable').DataTable({
         {
             extend: 'pdfHtml5',
             text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
-            title: `Quality Check Stock - ${moment().format("YYYY-MM-DD")}`,
+            title: `Quality Check Stock`,
             exportOptions: {
-                columns: ':visible:not(:first-child)', // last column included
+                columns: ':visible:not(:first-child)', // Exclude first column (checkbox)
                 rows: function (idx, data, node) {
                     let uniqueId = data.ItemCode + "_" + idx;
                     return selectedQualityIds.has(uniqueId);
                 },
                 format: {
                     body: function (data, row, column, node) {
+                        var tmp = document.createElement("DIV");
+                        tmp.innerHTML = data;
+                        var text = tmp.textContent || tmp.innerText || "";
+
                         if (column === 1) {
                             return qualityCheackTable.rows({ filter: 'applied' }).indexes()
                                 .filter(i => {
@@ -165,7 +234,8 @@ var qualityCheackTable = $('#qualityCheackStockTable').DataTable({
                                     return selectedQualityIds.has(uid);
                                 }).indexOf(row) + 1;
                         }
-                        return data;
+
+                        return text.trim();
                     }
                 }
             },
@@ -177,13 +247,13 @@ var qualityCheackTable = $('#qualityCheackStockTable').DataTable({
                 $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, button, config);
             },
             customize: function (doc) {
-                // --- Table header style ---
+                // Table header style
                 doc.styles.tableHeader.fillColor = 'black';
                 doc.styles.tableHeader.color = 'white';
                 doc.styles.tableHeader.alignment = 'center';
                 doc.styles.tableHeader.bold = true;
 
-                // --- Table layout ---
+                // Table layout
                 var objLayout = {};
                 objLayout['hLineWidth'] = function (i) { return 0.5; };
                 objLayout['vLineWidth'] = function (i) { return 0.5; };
@@ -193,10 +263,14 @@ var qualityCheackTable = $('#qualityCheackStockTable').DataTable({
                 objLayout['paddingRight'] = function (i) { return 5; };
                 doc.content[1].layout = objLayout;
 
-                // ✅ Add "Generated Date" just below the heading
+                // ✅ Center table horizontally
+                doc.content[1].table.widths = Array(doc.content[1].table.body[0].length).fill('*');
+                doc.content[1].alignment = 'center';
+
+                // Add "Generated Date" under title
                 var generatedDate = moment().format("YYYY-MM-DD");
                 doc.content.splice(1, 0, {
-                    text: `Generated Date: ${generatedDate}`,
+                    text: `Generated Date:  ${moment().format("DD/MM/YYYY")}`,
                     alignment: 'center',
                     margin: [0, 0, 0, 10],
                     fontSize: 10,
@@ -205,30 +279,50 @@ var qualityCheackTable = $('#qualityCheackStockTable').DataTable({
             }
         },
 
+
         // --- Excel ---
         {
             extend: 'excelHtml5',
             text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
-            title: `Quality Cheak Stock - ${moment().format("YYYY-MM-DD")}`,
+            title: 'Quality Check Stock',
+            messageTop: `Generated Date: ${moment().format("DD/MM/YYYY")}`,
             exportOptions: {
-                columns: ':visible:not(:first-child)', // last column included
+                columns: [1, 2, 3, 4, 5, 6], // Include hidden serial + actual data columns
                 rows: function (idx, data, node) {
-                    let uniqueId = data.ItemCode + "_" + idx;
+                    // Export only selected rows
+                    const uniqueId = data.ItemCode + "_" + idx;
                     return selectedQualityIds.has(uniqueId);
                 },
                 format: {
                     body: function (data, row, column, node) {
-                        if (column === 1) {
-                            return qualityCheackTable.rows({ filter: 'applied' }).indexes()
-                                .filter(i => {
-                                    let d = qualityCheackTable.row(i).data();
-                                    let uid = d.ItemCode + "_" + i;
-                                    return selectedQualityIds.has(uid);
-                                }).indexOf(row) + 1;
-                        }
+                        // Remove any HTML tags from cell
+                        if (typeof data === 'string') data = data.replace(/<[^>]*>/g, '').trim();
                         return data;
                     }
                 }
+            },
+            customize: function (xlsx) {
+                const sheet = xlsx.xl.worksheets['sheet1.xml'];
+
+                // Center & bold title row (row 1)
+                $('row[r="1"] c', sheet).attr('s', '51');
+
+                // Center & bold generated date row (row 2)
+                $('row[r="2"] c', sheet).attr('s', '51');
+
+                // Insert Sr. No column at the start and recalc serial for selected rows
+                let serial = 1;
+                $('row', sheet).each(function () {
+                    const rowIndex = parseInt($(this).attr('r'));
+                    if (rowIndex === 3) {
+                        // Header row: add Sr. No
+                        $(this).find('c:first').before(`<c t="inlineStr" s="2"><is><t>Sr. No</t></is></c>`);
+                    } else if (rowIndex > 3) {
+                        // Data rows: add serial starting from 1
+                        $(this).find('c:first').before(`<c t="inlineStr" s="2"><is><t>${serial}</t></is></c>`);
+                        serial++;
+                    }
+                });
             },
             action: function (e, dt, button, config) {
                 if (!selectedQualityIds || selectedQualityIds.size === 0) {
@@ -238,20 +332,20 @@ var qualityCheackTable = $('#qualityCheackStockTable').DataTable({
                 $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
             }
         },
-
         // --- CSV ---
         {
             extend: 'csvHtml5',
             text: '<i class="bi bi-filetype-csv text-success fs-5"></i>',
-            title: `Quality Cheak Stock - ${moment().format("YYYY-MM-DD")}`,
+            title: `Quality Cheak Stock - ${moment().format("DD/MM/YYYY")}`,
             exportOptions: {
-                columns: ':visible:not(:first-child)', // last column included
+                columns: ':visible:not(:first-child)', // exclude first column
                 rows: function (idx, data, node) {
                     let uniqueId = data.ItemCode + "_" + idx;
                     return selectedQualityIds.has(uniqueId);
                 },
                 format: {
                     body: function (data, row, column, node) {
+                        // Column 1: serial number logic
                         if (column === 1) {
                             return qualityCheackTable.rows({ filter: 'applied' }).indexes()
                                 .filter(i => {
@@ -260,7 +354,9 @@ var qualityCheackTable = $('#qualityCheackStockTable').DataTable({
                                     return selectedQualityIds.has(uid);
                                 }).indexOf(row) + 1;
                         }
-                        return data;
+
+                        // All other columns: strip HTML tags
+                        return $('<div>').html(data).text().trim();
                     }
                 }
             },
@@ -276,10 +372,9 @@ var qualityCheackTable = $('#qualityCheackStockTable').DataTable({
 
 });
 
-// ======================
-// Quality Check Date Range Filter
-// ======================
-$("#qualityCheackStockTable_wrapper").prepend(`
+
+    // ✅ Add Date Range Picker
+    $("#qualityCheackStockTable_wrapper").prepend(`
   <div class="input-group mb-2 mt-5" style="max-width: 280px;">
     <span class="input-group-text bg-primary text-white">
       <i class="bi bi-calendar-date"></i>
@@ -288,45 +383,68 @@ $("#qualityCheackStockTable_wrapper").prepend(`
   </div>
 `);
 
-$('#qualityRange').daterangepicker({
-    autoUpdateInput: false,
-    locale: { cancelLabel: 'Clear' },
-    ranges: {
-        'Today': [moment(), moment()],
-        'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-        'This Month': [moment().startOf('month'), moment().endOf('month')],
-        'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-    }
-});
+    // Initialize Date Range Picker
+    $('#qualityRange').daterangepicker({
+        autoUpdateInput: false,
+        locale: {
+            cancelLabel: 'Clear',
+            format: 'DD/MM/YYYY',
+            applyLabel: 'Apply'
+        },
+        ranges: {
+            'Today': [moment(), moment()],
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+            'Last 1 Month': [moment().subtract(1, 'month').startOf('day'), moment()],
+            'Last 3 Months': [moment().subtract(3, 'months').startOf('day'), moment()],
+            'Last 1 Year': [moment().subtract(1, 'year').startOf('day'), moment()]
+        }
 
-// Custom filter for Date column (index = 5)
-$.fn.dataTable.ext.search.push(function(settings, data, dataIndex){
-    if(settings.nTable.id !== "qualityCheackStockTable") return true;
+    });
 
-    var dateRange = $('#qualityRange').val();
-    if(!dateRange) return true;
+    // Set initial placeholder with gray text
+    $('#qualityRange').val('Select Date Range').css({
+        'color': '#6c757d',
+        'font-weight': '500'
+    });
 
-    var minMax = dateRange.split(' to ');
-    var min = moment(minMax[0], 'YYYY-MM-DD');
-    var max = moment(minMax[1], 'YYYY-MM-DD');
+    // Custom DataTables filter
+    $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+        if (settings.nTable.id !== "qualityCheackStockTable") return true;
 
-    var date = moment(data[5], 'YYYY-MM-DD'); // Date column
-    return date.isBetween(min, max, 'day', '[]');
-});
+        var dateRange = $('#qualityRange').val();
+        if (!dateRange || dateRange === 'Select Date Range') return true;
 
-// Apply filter on selection
-$('#qualityRange').on('apply.daterangepicker', function(ev, picker){
-    $(this).val(picker.startDate.format('YYYY-MM-DD') + ' to ' + picker.endDate.format('YYYY-MM-DD'));
-    qualityCheackTable.draw();
-});
+        try {
+            var dates = dateRange.split(' to ');
+            var min = moment(dates[0], 'DD/MM/YYYY');
+            var max = moment(dates[1], 'DD/MM/YYYY');
 
-// Clear filter
-$('#qualityRange').on('cancel.daterangepicker', function(){
-    $(this).val('');
-    qualityCheackTable.draw();
-});
+            var rowDateStr = data[5]; // Date column index
+            if (!rowDateStr) return false;
+
+            var rowDate = moment(rowDateStr, ['DD/MM/YYYY', 'DD/MM/YYYY', 'DD/MM/YYYY']);
+            if (!rowDate.isValid()) return false;
+
+            return rowDate.isBetween(min, max, 'day', '[]');
+        } catch (e) {
+            console.error('Date filter error:', e);
+            return true;
+        }
+    });
+
+    // Event handlers for apply and cancel
+    $('#qualityRange').on('apply.daterangepicker', function (ev, picker) {
+        $(this).val(picker.startDate.format('DD/MM/YYYY') + ' to ' + picker.endDate.format('DD/MM/YYYY'))
+            .css({ 'color': '#212529' }); // Reset color after selection
+        if (typeof qualityCheackTable !== 'undefined') qualityCheackTable.draw();
+    });
+
+    $('#qualityRange').on('cancel.daterangepicker', function () {
+        $(this).val('Select Date Range').css({ 'color': '#6c757d' });
+        if (typeof qualityCheackTable !== 'undefined') qualityCheackTable.draw();
+    });
+
+
 
 // --- Row checkbox logic ---
 $('#qualityCheackStockTable tbody').on('change', '.row-checkbox-quality', function () {

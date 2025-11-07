@@ -2,49 +2,65 @@
     ViewBag.Title = "Goods Return Report";
 }
 
+<style>
+    /* Compact table */
+    .dataTable td, .dataTable th {
+        padding: 0.35rem 0.5rem !important;
+        font-size: 0.78rem !important;
+        vertical-align: middle;
+
+
+    }
+
+    td, th {
+        text-align: center !important;
+    }
+
+</style>
+
 <div class="container">
     <div class="card shadow-lg border-0 rounded-4 p-4">
         <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
-            <div class="mb-2">
+            <div class="mb-1">
                 <div class="input-group" style="max-width: 280px;">
                     <span class="input-group-text bg-primary text-white">
                         <i class="bi bi-calendar-date"></i>
                     </span>
-                    <input type="text" id="SecondreportrangePSM" class="form-control" readonly placeholder="Select Date" />
+                    <input type="text" id="SecondreportrangePSM" class="form-control" readonly placeholder="Select Date Range" />
                 </div>
             </div>
             <div class="flex-grow-1 text-center">
-                <h4 class="text-primary fw-bold mb-0">
-                    <i class="bi bi-bar-chart-fill me-2"></i> Goods Return Report
-                </h4>
+                <h3 class="text-primary mb-0">
+                    Goods Return Report
+                </h3>
             </div>
-            <div class="mb-2" style="width:280px;"></div>
+            <div class="mb-1" style="width:280px;"></div>
         </div>
 
         <!-- Chart -->
         <div class="position-relative border rounded-3 p-3 shadow-sm mb-4">
-            <div id="GoodsReturnChartsPSM" style="height:400px;"></div>
+            <div class="w-80" id="GoodsReturnChartsPSM" style="height:350px;"></div>
         </div>
 
         <!-- DataTable -->
-        <h5 class="text-primary fw-bold text-center mb-3">Goods Return Detailed Records</h5>
+        <h3 class="text-primary text-center mb-3">Goods Return Records</h3>
         <div class="table-responsive">
-            <table id="GoodsReturntablePSM" class="table table-striped table-bordered w-100">
-                <thead class="table-dark">
+            <table id="GoodsReturntablePSM" class="table table-striped text-center table-bordered w-100">
+                <thead class="table-dark text-center">
                     <tr>
                         <th><input type="checkbox" id="selectAll" /></th>
-                        <th>S.No</th>
-                        <th>Goods Return Code</th>
-                        <th>Transporter Name</th>
-                        <th>Transport Contact No</th>
-                        <th>Vehicle No</th>
-                        <th>Vehicle Type</th>
-                        <th>Reason</th>
-                        <th>Added Date</th>
-                        <th>Status</th>
+                        <th class="text-center">SR.No</th>
+                        <th class="text-center">GR.Code</th>
+                        <th class="text-center">Transporter Name</th>
+                        <th class="text-center">Contact No</th>
+                        <th class="text-center">Vehicle No</th>
+                        <th class="text-center">Vehicle Type</th>
+                        <th class="text-center">Reason</th>
+                        <th class="text-center">Added Date</th>
+                        <th class="text-center">Status</th>
                     </tr>
                 </thead>
-                <tbody></tbody>
+                <tbody class="text-center"></tbody>
             </table>
         </div>
     </div>
@@ -52,7 +68,9 @@
 
 <script type="text/javascript">
 let table;
-let selectedStatus = null; // store clicked status filter
+let selectedStatus = null;
+let currentFromDate = null;
+let currentToDate = null;
 
 // -------------------- Toastr Options --------------------
 toastr.options = {
@@ -65,251 +83,774 @@ toastr.options = {
 };
 
 // -------------------- Date Range Picker --------------------
-    $('#SecondreportrangePSM').daterangepicker({
-        autoUpdateInput: false,
-        opens: 'right',
-        drops: 'down',
-        locale: { cancelLabel: 'Clear' },
-        ranges: {
-            'Today': [moment(), moment()],
-            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-            'This Month': [moment().startOf('month'), moment().endOf('month')],
-            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-        }
-    }, function (start, end) {
-        $('#SecondreportrangePSM').val(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
-        $(document).trigger('dateRangeChanged', [start.format('YYYY-MM-DD'), end.format('YYYY-MM-DD')]);
-    });
-    $('#SecondreportrangePSM').on('cancel.daterangepicker', function (ev, picker) {
-        $(this).val('');
-        $(document).trigger('dateRangeChanged', ['', '']); 
-    });
-// -------------------- Highcharts --------------------
+$('#SecondreportrangePSM').daterangepicker({
+    autoUpdateInput: false,
+    opens: 'right',
+    drops: 'down',
+    locale: {
+        cancelLabel: 'Clear',
+        format: 'DD/MM/YYYY'
+    },
+    ranges: {
+        'Today': [moment(), moment()],
+        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+        'Last 1 Month': [moment().subtract(1, 'months').startOf('day'), moment()],
+        'Last 3 Months': [moment().subtract(3, 'months').startOf('day'), moment()],
+        'Last 1 Year': [moment().subtract(12, 'months').startOf('day'), moment()]
+    }
+}, function (start, end) {
+    let displayText = '';
+    let fromDate = '';
+    let toDate = '';
+
+    if (start.isSame(end, 'day')) {
+        displayText = start.format('DD/MM/YYYY');
+        fromDate = start.format('DD/MM/YYYY');
+        toDate = start.format('DD/MM/YYYY');
+    } else {
+        displayText = start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY');
+        fromDate = start.format('DD/MM/YYYY');
+        toDate = end.format('DD/MM/YYYY');
+    }
+
+    $('#SecondreportrangePSM').val(displayText);
+    // Reset selected status when date range changes
+    selectedStatus = null;
+    $(document).trigger('dateRangeChanged', [fromDate, toDate]);
+});
+
+$('#SecondreportrangePSM').on('cancel.daterangepicker', function (ev, picker) {
+    $(this).val('');
+    // Reset selected status when date range is cleared
+    selectedStatus = null;
+    $(document).trigger('dateRangeChanged', ['', '']);
+});
+
+// -------------------- Highcharts Pie Chart --------------------
 async function loadChart(fromDate, toDate) {
     let url = '@Url.Action("GoodsReturnChartsPSM", "GRN")';
-    if (fromDate && toDate) url += `?fromDate=${fromDate}&toDate=${toDate}`;
 
-    const res = await fetch(url);
-    const data = await res.json();
+    const params = new URLSearchParams();
+    if (fromDate && fromDate !== '') params.append('fromDate', fromDate);
+    if (toDate && toDate !== '') params.append('toDate', toDate);
 
-    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-    const assignData = new Array(7).fill(0);
-    const dispatchData = new Array(7).fill(0);
-
-    if (Array.isArray(data)) {
-        data.forEach(d => {
-            const idx = days.indexOf(d.DayName);
-            if (idx !== -1) {
-                if (d.StatusName === "Assign") assignData[idx] += d.Count;
-                if (d.StatusName === "Dispatch") dispatchData[idx] += d.Count;
-            }
-        });
+    if (params.toString()) {
+        url += '?' + params.toString();
     }
-    const totalCount = assignData.reduce((a, b) => a + b, 0) + dispatchData.reduce((a, b) => a + b, 0);
-    if (totalCount === 0) {
-        document.getElementById("GoodsReturnChartsPSM").innerHTML =
-            "<div class='text-center fw-bold text-muted p-4'>No Data Available</div>";
-        return;
-    }
-    Highcharts.chart('GoodsReturnChartsPSM', {
-        chart: { type: 'column', height: 400 },
-        title: { text: '' },
-        xAxis: { categories: days, title: { text: 'Day of Week' } },
-        yAxis: { min: 0, title: { text: 'Count' } },
-        tooltip: { shared: true },
-        plotOptions: {
-            series: {
-                cursor: 'pointer',
-                point: {
-                    events: {
-                        click: function () {
-                            selectedStatus = this.series.name;
-                            initTable(fromDate, toDate);
+
+    try {
+        console.log('Fetching chart data from:', url);
+        const res = await fetch(url);
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+
+        const data = await res.json();
+        console.log('Chart data received:', data);
+
+        // Prepare pie chart data
+        const pieData = [];
+        let totalCount = 0;
+
+        if (Array.isArray(data) && data.length > 0) {
+            data.forEach(d => {
+                if (d.StatusName !== undefined && d.Count !== undefined) {
+                    const countValue = parseInt(d.Count) || 0;
+                    if (countValue > 0) {
+                        const color = d.StatusName.toLowerCase() === "assign" ? '#36A2EB' : '#FF6384';
+                        pieData.push({
+                            name: d.StatusName,
+                            y: countValue,
+                            color: color
+                        });
+                        totalCount += countValue;
+                    }
+                }
+            });
+        }
+
+        console.log('Processed pie data:', pieData);
+        console.log('Total count:', totalCount);
+
+        // Destroy existing chart if any
+        const existingChart = Highcharts.charts.find(chart =>
+            chart && chart.renderTo && chart.renderTo.id === 'GoodsReturnChartsPSM'
+        );
+        if (existingChart) {
+            existingChart.destroy();
+        }
+
+        if (totalCount === 0 || pieData.length === 0) {
+            document.getElementById("GoodsReturnChartsPSM").innerHTML =
+                "<div class='text-center fw-bold text-muted p-4'>No Data Available for Selected Date Range</div>";
+            return;
+        }
+
+        Highcharts.chart('GoodsReturnChartsPSM', {
+            chart: {
+                type: 'pie',
+                height: 400,
+                events: {
+                    load: function() {
+                        console.log('Pie chart loaded successfully with data');
+                    }
+                }
+            },
+            title: {
+                text: null,
+            },
+            subtitle: {
+                text: `Total: ${totalCount} Returns`,
+                align: 'center',
+                style: {
+                    fontSize: '16px',
+                    color: '#666',
+                    fontWeight: 'bold'
+                }
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.y}</b> ({point.percentage:.1f}%)'
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        format: '<b>{point.name}</b>: {point.y}',
+                        distance: 20,
+                        style: {
+                            fontSize: '12px',
+                            fontWeight: 'bold'
+                        }
+                    },
+                    showInLegend: true,
+                    point: {
+                        events: {
+                            click: function () {
+                                selectedStatus = this.name;
+                                console.log('Pie slice clicked - Status:', selectedStatus, 'From:', fromDate, 'To:', toDate);
+                                initTable(fromDate, toDate, selectedStatus);
+                            }
                         }
                     }
                 }
-            }
-        },
-        series: [
-            { name: 'Assign', data: assignData, color: '#36A2EB' },
-            { name: 'Dispatch', data: dispatchData, color: '#FF6384' }
-        ],
-        credits: { enabled: false }
-    });
-}
-    // -------------------- Export Helpers --------------------
-    function getSelectedData() {
-        let selected = [];
-        table.rows().every(function () {
-            let node = this.node();
-            if ($(node).find('.rowCheckbox').prop('checked')) {
-                selected.push(this.data());
-            }
-        });
-        return selected;
-    }
-
-    function makeExportButton(type, text) {
-        return {
-            extend: type,
-            text: text,
-            exportOptions: { columns: ':visible:not(:first-child)' },
-            action: function (e, dt, button, config) {
-                let selected = getSelectedData();
-                if (selected.length === 0) {
-                    toastr.warning("Please select at least one row to export.");
-                    return;
+            },
+            series: [{
+                name: 'Goods Returns',
+                colorByPoint: true,
+                data: pieData
+            }],
+            credits: {
+                enabled: false
+            },
+            legend: {
+                enabled: true,
+                align: 'center',
+                verticalAlign: 'bottom',
+                layout: 'horizontal',
+                itemStyle: {
+                    fontSize: '12px',
+                    fontWeight: 'bold'
                 }
-
-                // PDF
-                if (type === 'pdfHtml5') {
-                    config.customize = function (doc) {
-                        let datetime = moment().format("DD/MM/YYYY HH:mm");
-
-                        let header = [
-                            { text: "S.No", style: 'tableHeader' },
-                            { text: "Goods Return Code", style: 'tableHeader' },
-                            { text: "Transporter Name", style: 'tableHeader' },
-                            { text: "Transport Contact No", style: 'tableHeader' },
-                            { text: "Vehicle No", style: 'tableHeader' },
-                            { text: "Vehicle Type", style: 'tableHeader' },
-                            { text: "Reason", style: 'tableHeader' },
-                            { text: "Added Date", style: 'tableHeader' },
-                            { text: "Status", style: 'tableHeader' }
-                        ];
-
-                        let body = [header];
-                        selected.forEach((row, i) => {
-                            body.push([
-                                (i + 1).toString(),
-                                row.GoodsReturnCode,
-                                row.TransporterName,
-                                row.TransportContactNo,
-                                row.VehicleNo,
-                                row.VehicleTypeName,
-                                row.Reason,
-                                moment(row.AddedDate).format("DD/MM/YYYY"),
-                                row.StatusName
-                            ]);
-                        });
-
-                        doc.content = [
-                            { text: "Goods Return Report", alignment: "center", fontSize: 14, bold: true, margin: [0, 0, 0, 4] },
-                            { text: "Generated on: " + datetime, alignment: "center", fontSize: 10, margin: [0, 0, 0, 8] },
-                            {
-                                table: { headerRows: 1, body: body },
-                                layout: {
-                                    fillColor: function (rowIndex) {
-                                        return rowIndex === 0 ? '#343a40' : null;
-                                    }
+            },
+            responsive: {
+                rules: [{
+                    condition: {
+                        maxWidth: 500
+                    },
+                    chartOptions: {
+                        legend: {
+                            enabled: false
+                        },
+                        plotOptions: {
+                            pie: {
+                                dataLabels: {
+                                    enabled: false
                                 }
                             }
-                        ];
-                        doc.styles.tableHeader = { bold: true, fontSize: 11, color: 'white' };
-                    };
-                }
-
-                // Print
-                if (type === 'print') {
-                    let newBody = '<h3 class="text-center">Goods Return Report</h3>';
-                    newBody += '<p class="text-center">Generated on: ' + moment().format("DD/MM/YYYY HH:mm") + '</p>';
-                    newBody += '<table border="1" cellspacing="0" cellpadding="5" style="width:100%; border-collapse:collapse;"><thead><tr style="background-color:#343a40; color:white;">';
-                    newBody += "<th>S.No</th><th>Goods Return Code</th><th>Transporter Name</th><th>Transport Contact No</th><th>Vehicle No</th><th>Vehicle Type</th><th>Reason</th><th>Added Date</th><th>Status</th></tr></thead><tbody>";
-
-                    selected.forEach((row, i) => {
-                        newBody += "<tr>" +
-                            "<td>" + (i + 1) + "</td>" +
-                            "<td>" + row.GoodsReturnCode + "</td>" +
-                            "<td>" + row.TransporterName + "</td>" +
-                            "<td>" + row.TransportContactNo + "</td>" +
-                            "<td>" + row.VehicleNo + "</td>" +
-                            "<td>" + row.VehicleTypeName + "</td>" +
-                            "<td>" + row.Reason + "</td>" +
-                            "<td>" + moment(row.AddedDate).format("DD/MM/YYYY") + "</td>" +
-                            "<td>" + row.StatusName + "</td>" +
-                            "</tr>";
-                    });
-                    newBody += "</tbody></table>";
-
-                    let printWin = window.open('', '', 'height=600,width=900');
-                    printWin.document.write(newBody);
-                    printWin.document.close();
-                    printWin.print();
-                    return;
-                }
-
-                $.fn.dataTable.ext.buttons[type].action.call(this, e, dt, button, config);
+                        }
+                    }
+                }]
             }
-        };
+        });
+    } catch (error) {
+        console.error('Error loading chart:', error);
+        document.getElementById("GoodsReturnChartsPSM").innerHTML =
+            "<div class='text-center fw-bold text-danger p-4'>Error loading chart data: " + error.message + "</div>";
     }
+}
+
 // -------------------- Init DataTable --------------------
-function initTable(fromDate,toDate){
-    if (table) { table.destroy(); $('#GoodsReturntablePSM tbody').empty(); }
+function initTable(fromDate, toDate, statusFilter = null) {
+    // Store current filter values
+    currentFromDate = fromDate;
+    currentToDate = toDate;
+
+    if (statusFilter) {
+        selectedStatus = statusFilter;
+    }
+
+    if (table) {
+        table.destroy();
+        $('#GoodsReturntablePSM tbody').empty();
+    }
 
     table = $('#GoodsReturntablePSM').DataTable({
         dom: '<"d-flex justify-content-between align-items-center mb-2"Bf>rt<"d-flex justify-content-between align-items-center"i p>',
         responsive: true,
         processing: true,
+        serverSide: false,
         buttons: [
-            makeExportButton('print', '<i class="bi bi-printer-fill text-dark fs-5"></i>'),
-            makeExportButton('pdfHtml5', '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>'),
-            makeExportButton('excelHtml5', '<i class="bi bi-file-earmark-excel text-success fs-5"></i>'),
-            makeExportButton('csvHtml5', '<i class="bi bi-filetype-csv text-success fs-5"></i>')
-        ],
-        ajax:{
-            url:'@Url.Action("GetGoodsReturnSummaryPSM", "GRN")',
-            type:'GET',
-            data: d => {
-                d.fromDate = fromDate ?? null;
-                d.toDate = toDate ?? null;
-                d.status = selectedStatus ?? null;
+            {
+                extend: 'print',
+                text: '<i class="bi bi-printer-fill text-dark fs-5"></i>',
+                titleAttr: 'Print',
+                title: 'Goods Return Report',
+                exportOptions: {
+                    columns: [2, 3, 4, 5, 6, 7, 8, 9],
+                    rows: function (idx, data, node) {
+                        return $(node).find('input.rowCheckbox').prop('checked');
+                    }
+                },
+                customize: function (win) {
+                    var $body = $(win.document.body);
+                    $body.append(`<style>thead th {
+                   background-color: black !important;
+                   color: white !important;
+                    text-align: center !important;
+                  -webkit-print-color-adjust: exact !important;
+                  print-color-adjust: exact !important;
+                  }
+                 table { border-collapse: collapse !important; width: 100% !important; }
+                 td, th { border: 1px solid #000 !important; padding: 6px !important; }
+                 </style>`);
+                    $body.find('h1').css('text-align', 'center');
+                    var today = new Date();
+                    var formattedDate = String(today.getDate()).padStart(2, '0') + '/' +
+                        String(today.getMonth() + 1).padStart(2, '0') + '/' +
+                        today.getFullYear();
+                    $body.find('h1').after('<div style="text-align:center;font-style:italic;font-size:10pt;margin-bottom:12px;">Generated Date: ' + formattedDate + '</div>');
+
+                    // Add status filter info if applied
+                    if (selectedStatus) {
+                        $body.find('h1').after('<div style="text-align:center;font-style:italic;font-size:10pt;margin-bottom:8px;">Filtered by Status: ' + selectedStatus + '</div>');
+                    }
+
+                    var $table = $body.find('table');
+                    $table.addClass('table table-bordered table-striped').css('width', '100%');
+                    $table.find('thead tr').prepend('<th>Sr No</th>');
+                    $table.find('tbody tr').each(function (index) {
+                        $(this).prepend('<td style="text-align:center;">' + (index + 1) + '</td>');
+                    });
+                    $body.css('font-size', '12pt');
+                },
+                action: function (e, dt, button, config) {
+                    var selected = dt.rows().nodes().to$().find('input.rowCheckbox:checked').length;
+                    var btnApi = dt.button(button);
+
+                    if (selected === 0) {
+                        toastr.warning("Please select at least one row before printing!");
+                        try { btnApi.processing(false); } catch (err) { }
+                        return;
+                    }
+                    try { btnApi.processing(true); } catch (err) { }
+
+                    try {
+                        if (!$.fn.dataTable.ext.buttons.print._orig) {
+                            $.fn.dataTable.ext.buttons.print._orig = $.fn.dataTable.ext.buttons.print.action || $.fn.dataTable.ext.buttons.print;
+                        }
+                        $.fn.dataTable.ext.buttons.print._orig.call(this, e, dt, button, config);
+                    } catch (err) {
+                        setTimeout(function () { try { btnApi.processing(false); } catch (e) { } }, 300);
+                        throw err;
+                    }
+
+                    setTimeout(function () { try { btnApi.processing(false); } catch (err) { } }, 2000);
+                }
             },
-            dataSrc: json => json?.data ?? []
-        },
-        columns:[
-            { data:null, orderable:false, render:d=>`<input type="checkbox" class="rowCheckbox" value="${d.GoodsReturnCode}" />` },
-            { data:null, render:(d,t,r,meta)=>meta.row+1 },
-            { data:"GoodsReturnCode" },
-            { data:"TransporterName" },
-            { data:"TransportContactNo" },
-            { data:"VehicleNo" },
-            { data:"VehicleTypeName" },
-            { data:"Reason" },
-            { data:"AddedDate", render:(d,t,r)=>{
-                if(!d) return "";
-                if(t==="display"||t==="filter") return new Date(d).toLocaleDateString("en-GB");
-                if(t==="sort") return moment(d).format("YYYYMMDD");
-                return d;
-            }},
-            { data:"StatusName", render:data=>{
-                if (data === "Assign") return `<span class="badge bg-danger fw-semibold">${data}</span>`;
-                if (data === "Dispatch") return `<span class="badge bg-success fw-semibold">${data}</span>`;
-                return data? `<span class="fw-semibold">${data}</span>`:"";
-            }}
+            {
+                extend: 'pdfHtml5',
+                text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
+                titleAttr: 'PDF',
+                title: 'Goods Return Report',
+                orientation: 'landscape',
+                pageSize: 'A4',
+                exportOptions: {
+                    columns: [2, 3, 4, 5, 6, 7, 8, 9],
+                    rows: function (idx, data, node) {
+                        return $(node).find('input.rowCheckbox').prop('checked');
+                    },
+                    format: {
+                        body: function (data, rowIdx, colIdx, node) {
+                            if (colIdx === 1) return rowIdx + 1;
+                            return $('<div>').html(data).text();
+                        }
+                    }
+                },
+                customize: function (doc) {
+                    // Add status filter info if applied
+                    if (selectedStatus) {
+                        doc.content.splice(1, 0, {
+                            text: `Filtered by Status: ${selectedStatus}`,
+                            alignment: 'center',
+                            margin: [0, 0, 0, 8],
+                            fontSize: 10,
+                            bold: true
+                        });
+                    }
+
+                    doc.content.splice(selectedStatus ? 2 : 1, 0, {
+                        text: `Generated on: ${moment().format("DD-MM-YYYY HH:mm")}`,
+                        alignment: 'center',
+                        margin: [0, 0, 0, 12],
+                        fontSize: 9,
+                        italics: true
+                    });
+
+                    // Rest of the PDF customization code remains the same...
+                    doc.pageSize = 'A4';
+                    doc.pageOrientation = 'landscape';
+                    doc.defaultStyle.fontSize = 9;
+                    doc.defaultStyle.alignment = 'center';
+                    doc.styles.tableHeader.fontSize = 10;
+                    doc.styles.tableHeader.fillColor = '#343a40';
+                    doc.styles.tableHeader.color = 'white';
+                    doc.styles.tableHeader.bold = true;
+                    doc.styles.tableHeader.alignment = 'center';
+
+                    function findTableNodeIndex(doc) {
+                        for (var i = 0; i < doc.content.length; i++) {
+                            if (doc.content[i].table) return i;
+                        }
+                        return -1;
+                    }
+
+                    const stripHtml = html => $('<div>').html(html).text();
+                    var tableNodeIndex = findTableNodeIndex(doc);
+                    if (tableNodeIndex < 0) return;
+                    var tableNode = doc.content[tableNodeIndex];
+                    if (!tableNode || !tableNode.table || !tableNode.table.body) return;
+
+                    var headerRow = tableNode.table.body[0];
+                    headerRow.unshift({ text: 'Sr No', style: 'tableHeader' });
+
+                    for (var r = 1; r < tableNode.table.body.length; r++) {
+                        var row = tableNode.table.body[r];
+                        row.unshift({ text: String(r), alignment: 'center' });
+                    }
+
+                    tableNode.table.widths = ['5%', '12%', '15%', '15%', '10%', '10%', '9%', '9%', '8%'];
+
+                    for (var i = 1; i < tableNode.table.body.length; i++) {
+                        var row = tableNode.table.body[i];
+                        for (var j = 0; j < row.length; j++) {
+                            var cell = row[j];
+                            var txt = stripHtml(cell.text || cell);
+                            row[j] = { text: txt, fontSize: 8, margin: [2, 3, 2, 3], alignment: j === 3 ? 'left' : 'center' };
+                        }
+                    }
+
+                    tableNode.layout = {
+                        hLineWidth: () => 0.5,
+                        vLineWidth: () => 0.5,
+                        hLineColor: () => '#aaa',
+                        vLineColor: () => '#aaa',
+                        paddingLeft: () => 4,
+                        paddingRight: () => 4,
+                        paddingTop: () => 3,
+                        paddingBottom: () => 3
+                    };
+                },
+                action: function (e, dt, button, config) {
+                    var selected = $('.rowCheckbox:checked').length;
+                    var btnApi = dt.button(button);
+
+                    if (selected === 0) {
+                        toastr.warning("Please select at least one row before exporting!");
+                        btnApi.processing(false);
+                        return;
+                    }
+
+                    btnApi.processing(true);
+
+                    if (window.pdfMake && pdfMake.createPdf && !pdfMake._patchedForDT) {
+                        (function () {
+                            var origCreate = pdfMake.createPdf;
+                            pdfMake.createPdf = function (docDefinition) {
+                                var pdfDoc = origCreate.call(pdfMake, docDefinition);
+                                var origDownload = pdfDoc.download;
+                                pdfDoc.download = function (filename, cb) {
+                                    origDownload.call(pdfDoc, filename);
+                                    setTimeout(() => {
+                                        try { btnApi.processing(false); } catch (err) { }
+                                        if (typeof cb === 'function') cb();
+                                    }, 1000);
+                                };
+                                return pdfDoc;
+                            };
+                            pdfMake._patchedForDT = true;
+                        })();
+                    }
+
+                    if (!$.fn.dataTable.ext.buttons.pdfHtml5.__originalAction) {
+                        $.fn.dataTable.ext.buttons.pdfHtml5.__originalAction =
+                            $.fn.dataTable.ext.buttons.pdfHtml5.action;
+                    }
+
+                    $.fn.dataTable.ext.buttons.pdfHtml5.__originalAction.call(this, e, dt, button, config);
+                    setTimeout(() => { try { btnApi.processing(false); } catch (err) { } }, 3000);
+                }
+            },
+            {
+                extend: 'excelHtml5',
+                text: '<i class="bi bi-file-earmark-excel-fill text-success fs-5"></i>',
+                titleAttr: 'Export Excel',
+                filename: `Goods_Return_Report_${moment().format("YYYY-MM-DD_HH-mm-ss")}`,
+                exportOptions: {
+                    columns: ':visible',
+                    rows: function (idx, data, node) {
+                        return $(node).find('input.rowCheckbox').prop('checked');
+                    }
+                },
+                action: function (e, dt, button, config) {
+                    const selectedRows = dt.rows().nodes().to$().find('input.rowCheckbox:checked');
+                    const btnApi = dt.button(button);
+
+                    if (selectedRows.length === 0) {
+                        toastr.warning("Please select at least one row before exporting!");
+                        try { btnApi.processing(false); } catch (err) { }
+                        return;
+                    }
+
+                    try { btnApi.processing(true); } catch (err) { }
+
+                    const selectedData = [];
+                    let srNo = 1;
+
+                    selectedRows.each(function () {
+                        const tr = $(this).closest('tr');
+                        const rowData = dt.row(tr).data();
+                        if (!rowData) return;
+
+                        selectedData.push([
+                            srNo++,
+                            rowData.GoodsReturnCode || '',
+                            rowData.TransporterName || '',
+                            rowData.TransportContactNo || '',
+                            rowData.VehicleNo || '',
+                            rowData.VehicleTypeName || '',
+                            rowData.Reason || '',
+                            rowData.AddedDate
+                                ? new Date(rowData.AddedDate).toLocaleDateString("en-GB")
+                                : '',
+                            rowData.StatusName || ''
+                        ]);
+                    });
+
+                    const today = new Date();
+                    const formattedDate = String(today.getDate()).padStart(2, '0') + '/' +
+                        String(today.getMonth() + 1).padStart(2, '0') + '/' +
+                        today.getFullYear();
+
+                    const tempDt = $('<table>').DataTable({
+                        data: selectedData,
+                        columns: [
+                            { title: 'Sr.No' },
+                            { title: 'GR Code' },
+                            { title: 'Transporter Name' },
+                            { title: 'Transport Contact No' },
+                            { title: 'Vehicle No' },
+                            { title: 'Vehicle Type' },
+                            { title: 'Reason' },
+                            { title: 'Added Date' },
+                            { title: 'Status' },
+                        ],
+                        dom: 'Bfrtip',
+                        buttons: [{
+                            extend: 'excelHtml5',
+                            title: null,
+                            filename: `Goods_Return_Report_${moment().format("YYYY-MM-DD_HH-mm-ss")}`,
+                            customize: function (xlsx) {
+                                const sheet = xlsx.xl.worksheets['sheet1.xml'];
+                                const sheetData = $('sheetData', sheet);
+
+                                $('row', sheetData).each(function () {
+                                    const $row = $(this);
+                                    const r = parseInt($row.attr('r'), 10);
+                                    const newR = r + 3;
+                                    $row.attr('r', newR);
+                                    $row.find('c').each(function () {
+                                        const $c = $(this);
+                                        const cellRef = $c.attr('r');
+                                        if (!cellRef) return;
+                                        const col = cellRef.replace(/\d+$/, '');
+                                        const rowNum = parseInt(cellRef.match(/\d+$/)[0], 10);
+                                        $c.attr('r', col + (rowNum + 3));
+                                    });
+                                });
+
+                                const titleCell = `<row r="1"><c r="A1" t="inlineStr" s="51"><is><t>Goods Return Summary Report</t></is></c></row>`;
+                                const dateCell = `<row r="2"><c r="A2" t="inlineStr" s="51"><is><t>Generated Date: ${formattedDate}</t></is></c></row>`;
+                                const blankRow = `<row r="3"></row>`;
+
+                                // Add status filter info if applied
+                                let statusCell = '';
+                                if (selectedStatus) {
+                                    statusCell = `<row r="2"><c r="A2" t="inlineStr" s="51"><is><t>Filtered by Status: ${selectedStatus}</t></is></c></row>`;
+                                    dateCell = `<row r="3"><c r="A3" t="inlineStr" s="51"><is><t>Generated Date: ${formattedDate}</t></is></c></row>`;
+                                    blankRow = `<row r="4"></row>`;
+                                }
+
+                                sheetData.prepend(blankRow);
+                                sheetData.prepend(dateCell);
+                                if (selectedStatus) {
+                                    sheetData.prepend(statusCell);
+                                }
+                                sheetData.prepend(titleCell);
+
+                                const mergeRef1 = 'A1:I1';
+                                const mergeRef2 = selectedStatus ? 'A2:I2' : 'A2:I2';
+                                const mergeRef3 = selectedStatus ? 'A3:I3' : '';
+
+                                if ($('mergeCells', sheet).length === 0) {
+                                    let mergeXml = `<mergeCells count="${selectedStatus ? 3 : 2}"><mergeCell ref="${mergeRef1}"/><mergeCell ref="${mergeRef2}"/>`;
+                                    if (selectedStatus) {
+                                        mergeXml += `<mergeCell ref="${mergeRef3}"/>`;
+                                    }
+                                    mergeXml += `</mergeCells>`;
+                                    $('sheetData', sheet).after(mergeXml);
+                                } else {
+                                    $('mergeCells', sheet).append(`<mergeCell ref="${mergeRef1}"/>`);
+                                    $('mergeCells', sheet).append(`<mergeCell ref="${mergeRef2}"/>`);
+                                    if (selectedStatus) {
+                                        $('mergeCells', sheet).append(`<mergeCell ref="${mergeRef3}"/>`);
+                                    }
+                                    const currentCount = parseInt($('mergeCells', sheet).attr('count') || '0', 10);
+                                    $('mergeCells', sheet).attr('count', currentCount + (selectedStatus ? 3 : 2));
+                                }
+
+                                const styles = xlsx.xl['styles.xml'];
+                                const cellXfs = $('cellXfs', styles);
+                                if (cellXfs.find('xf[applyAlignment]').length === 0) {
+                                    cellXfs.append(`<xf xfId="0" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>`);
+                                    const count = parseInt(cellXfs.attr('count'), 10) || 0;
+                                    cellXfs.attr('count', count + 1);
+                                }
+
+                                if ($('cols', sheet).length === 0) {
+                                    let colsXml = '<cols>';
+                                    for (let i = 1; i <= 9; i++) {
+                                        colsXml += `<col min="${i}" max="${i}" width="20" customWidth="1"/>`;
+                                    }
+                                    colsXml += '</cols>';
+                                    $('sheetPr', sheet).after(colsXml);
+                                }
+                            }
+                        }],
+                        destroy: true,
+                        paging: false,
+                        searching: false,
+                        info: false
+                    });
+
+                    tempDt.button('.buttons-excel').trigger();
+                    setTimeout(() => { try { btnApi.processing(false); } catch (err) { } }, 800);
+                }
+            },
+            {
+                extend: 'csvHtml5',
+                text: '<i class="bi bi-filetype-csv text-success fs-5"></i>',
+                title: '',
+                exportOptions: {
+                    rows: function (idx, data, node) {
+                        return $(node).find('input.rowCheckbox').prop('checked');
+                    },
+                    columns: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+                    modifier: { search: 'applied', order: 'applied' },
+                    format: {
+                        body: (function () {
+                            let srCounter = 1;
+                            return function (data, rowIdx, colIdx, node) {
+                                if (colIdx === 1) return srCounter++;
+                                return $('<div>').html(data).text().trim() || '';
+                            };
+                        })()
+                    }
+                },
+                action: function (e, dt, button, config) {
+                    const $rows = dt.rows().nodes().to$();
+                    const selected = $rows.find('input.rowCheckbox:checked').length;
+                    const btnApi = dt.button(button);
+
+                    if (selected === 0) {
+                        toastr.warning("Please select at least one row before exporting!");
+                        try { btnApi.processing(false); } catch (err) { }
+                        return;
+                    }
+                    try { btnApi.processing(true); } catch (err) { }
+
+                    if (!$.fn.dataTable.ext.buttons.csvHtml5._orig) {
+                        $.fn.dataTable.ext.buttons.csvHtml5._orig = $.fn.dataTable.ext.buttons.csvHtml5.action;
+                    }
+                    const self = this;
+                    const modifiedAction = function (e, dt, button, config) {
+                        const originalDownload = $.fn.DataTable.fileSave;
+                        $.fn.DataTable.fileSave = function (content, fileName, options) {
+                            const result = originalDownload.call(this, content, fileName, options);
+                            setTimeout(() => {
+                                try {
+                                    btnApi.processing(false);
+                                } catch (err) {
+                                    console.log('Spinner stopped');
+                                }
+                            }, 500);
+
+                            return result;
+                        };
+
+                        try {
+                            $.fn.dataTable.ext.buttons.csvHtml5._orig.call(self, e, dt, button, config);
+                        } catch (error) {
+                            setTimeout(() => {
+                                try {
+                                    btnApi.processing(false);
+                                } catch (err) { }
+                            }, 500);
+                            throw error;
+                        } finally {
+                            setTimeout(() => {
+                                $.fn.DataTable.fileSave = originalDownload;
+                            }, 1000);
+                        }
+                    };
+                    modifiedAction.call(this, e, dt, button, config);
+                }
+            }
         ],
-        order:[[8,'asc']],
-        drawCallback:function(){
+        ajax: {
+            url: '@Url.Action("GetGoodsReturnSummaryPSM", "GRN")',
+            type: 'GET',
+            data: function (d) {
+                const requestData = {
+                    fromDate: fromDate || null,
+                    toDate: toDate || null,
+                };
+
+                // Add status filter to the request if a pie slice was clicked
+                if (selectedStatus) {
+                    requestData.statusFilter = selectedStatus;
+                }
+
+                console.log('Table request data:', requestData);
+                return requestData;
+            },
+            dataSrc: function (json) {
+                console.log('Table data received:', json);
+                // Filter data by status if selectedStatus is set
+                if (selectedStatus && json && json.data) {
+                    const filteredData = json.data.filter(item => item.StatusName === selectedStatus);
+                    console.log('Filtered table data by status:', selectedStatus, filteredData);
+                    return filteredData;
+                }
+                return json?.data || [];
+            }
+        },
+        columns: [
+            {
+                data: null,
+                orderable: false,
+                render: function(d) {
+                    return `<input type="checkbox" class="rowCheckbox" value="${d.GoodsReturnCode}" />`;
+                }
+            },
+            {
+                data: null,
+                render: function(d, t, r, meta) {
+                    return meta.row + 1;
+                }
+            },
+            { data: "GoodsReturnCode", className: 'text-center' },
+            { data: "TransporterName", className: 'text-center' },
+            { data: "TransportContactNo", className: 'text-center' },
+            { data: "VehicleNo", className: 'text-center' },
+            { data: "VehicleTypeName", className: 'text-center' },
+            { data: "Reason", className: 'text-center' },
+            {
+                data: "AddedDate",
+                className: 'text-center',
+                render: function (d, t, r) {
+                    if (!d) return "";
+
+                    if (t === "display" || t === "filter") {
+                        const datePart = d.substring(0, 10);
+                        const parts = datePart.split('-');
+                        return `${parts[2]}/${parts[1]}/${parts[0]}`;
+                    }
+                    if (t === "sort") {
+                        return new Date(d).getTime();
+                    }
+                    return d;
+                }
+            },
+            {
+                data: "StatusName",
+                className: 'text-center',
+                render: function(data) {
+                    if (data === "Assign") return `<span class="badge bg-primary fw-semibold">${data}</span>`;
+                    if (data === "Dispatch") return `<span class="badge bg-danger fw-semibold">${data}</span>`;
+                    return data ? `<span class="fw-semibold">${data}</span>` : "";
+                }
+            }
+        ],
+        ordering: false,
+        order: [[8, 'asc']],
+        drawCallback: function() {
             $("#selectAll").prop("checked", $(".rowCheckbox:checked").length === $(".rowCheckbox").length);
+
+            // Show current filter info
+            let filterInfo = '';
+            if (selectedStatus) {
+                filterInfo = ` | Filtered by: ${selectedStatus}`;
+            }
+            if (fromDate || toDate) {
+                const dateInfo = fromDate && toDate ? `${fromDate} to ${toDate}` : (fromDate || toDate);
+                filterInfo += ` | Date: ${dateInfo}`;
+            }
+
+            if (filterInfo) {
+                $('.dataTables_info').each(function() {
+                    const originalText = $(this).text();
+                    if (!originalText.includes('Filtered')) {
+                        $(this).text(originalText + filterInfo);
+                    }
+                });
+            }
         }
     });
 
     // Select All
-    $(document).on("change","#selectAll",function(){
+    $(document).on("change", "#selectAll", function() {
         $(".rowCheckbox").prop("checked", this.checked);
     });
-    $(document).on("change",".rowCheckbox",function(){
+
+    $(document).on("change", ".rowCheckbox", function() {
         $("#selectAll").prop("checked", $(".rowCheckbox:checked").length === $(".rowCheckbox").length);
     });
 }
 
 // -------------------- Ready --------------------
 $(document).ready(function () {
+    console.log('Document ready - initializing components');
+
+    // Initialize with null dates first
     initTable(null, null);
     loadChart(null, null);
 
     $(document).on("dateRangeChanged", function (e, fromDate, toDate) {
+        console.log('Date range changed:', fromDate, toDate);
+        // Reset status filter when date changes
+        selectedStatus = null;
         initTable(fromDate, toDate);
         loadChart(fromDate, toDate);
     });
