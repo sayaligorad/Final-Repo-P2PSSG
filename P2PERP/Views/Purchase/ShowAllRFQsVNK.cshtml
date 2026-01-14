@@ -158,7 +158,6 @@
         overflow: hidden;
     }
 
-    /*  Compact Table Row Size */
     .table td, .table th {
         padding: 0.35rem 0.5rem !important;
         font-size: 0.78rem;
@@ -182,36 +181,30 @@
         }
     }
 
-        /* Remove space above export buttons */
         .dt-toolbar {
             margin-top: 0 !important;
             margin-bottom: 0 !important;
             padding-top: 0 !important;
         }
 
-        /* If DataTables automatically adds margin to the top row */
         div.dt-buttons {
             margin-top: 0 !important;
             margin-bottom: 0 !important;
             padding-top: 0 !important;
         }
 
-        /* Reduce gap between datepicker and export buttons */
         .ms-3 {
-            margin-bottom: 0.1rem !important; /* or 0 if you want zero spacing */
+            margin-bottom: 0.1rem !important; 
         }
 
-        /* Add bottom margin below export buttons + search box */
         .dt-toolbar {
-            margin-bottom: 8px !important; /* space below the top toolbar */
+            margin-bottom: 8px !important; 
         }
 
-        /* For extra reliability in case DataTables overrides styles */
         div.dt-buttons {
             margin-bottom: 8px !important;
         }
 
-        /* Optional: adjust alignment spacing for search box if needed */
         .dataTables_filter {
             margin-bottom: 8px !important;
         }
@@ -293,16 +286,13 @@
             function formatDateOnly(dateValue) {
                 if (!dateValue) return "";
 
-                // Try parsing with moment if available
                 if (moment(dateValue, ["YYYY-MM-DD", "YYYY/MM/DD", "DD-MM-YYYY", "DD/MM/YYYY"], true).isValid()) {
                     return moment(dateValue).format("DD/MM/YYYY");
                 }
 
-                // Fallback: handle manually if not detected by moment
-                let datePart = dateValue.split(' ')[0].replace(/-/g, '/'); // normalize - and /
+                let datePart = dateValue.split(' ')[0].replace(/-/g, '/'); 
                 let parts = datePart.split('/');
                 if (parts.length === 3) {
-                    // Check if first part is year
                     if (parts[0].length === 4) {
                         return `${parts[2].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[0]}`;
                     } else {
@@ -487,7 +477,7 @@
 
                             // Count columns
                             var colCount = $('row:first c', sheet).length;
-                            if (colCount === 0) colCount = 6; // fallback if empty
+                            if (colCount === 0) colCount = 6; 
                             var lastCol = String.fromCharCode(64 + colCount);
 
                             // Shift all rows down by 2
@@ -656,6 +646,12 @@
                                     data-bs-toggle="tooltip" title="View Quotation">
                                     <i class="bi bi-eye-fill fs-5"></i>
                                 </a>`};
+
+                            if (!registerBtn && !viewBtn) {
+                                //return 'Closed';
+                                return '<span style="background:red;color:white;padding:3px 6px;border-radius:4px;">Closed</span>';
+
+                            }
 
                             return `<div class="d-flex justify-content-center align-items-center">${viewBtn}${registerBtn}</div>`;
                         }
