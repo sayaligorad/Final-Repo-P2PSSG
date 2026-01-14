@@ -76,14 +76,36 @@
             <div class="modal-body">
                 <div class="row mb-2">
                     <!-- Left Column -->
+                    <!--<div class="col-md-6">
+        <div class="mb-2">
+            <label class="form-label fw-bold">Item Code:</label>
+            <input type="text" id="modalItemCode" class="form-control bg-light text-muted" readonly>
+        </div>
+        <div class="mb-2">
+            <label class="form-label fw-bold">Item Name:</label>
+            <input type="text" id="modalItemName" class="form-control bg-light text-muted" readonly>
+        </div>
+    </div>
+                     Right Column
+                    <div class="col-md-6">
+            <div class="mb-2">
+                <label class="form-label fw-bold">Current Quantity:</label>
+                <input type="text" id="modalQuantity" class="form-control bg-light text-muted" readonly>
+            </div>
+            <div class="mb-2">
+                <label class="form-label fw-bold">Reorder Quantity:</label>
+                <input type="text" id="modalReorderQty" class="form-control bg-light text-muted" readonly>
+            </div>
+        </div>-->
+                    <!-- Left Column -->
                     <div class="col-md-6">
                         <div class="mb-2">
                             <label class="form-label fw-bold">Item Code:</label>
-                            <input type="text" id="modalItemCode" class="form-control bg-light text-muted" readonly>
+                            <label id="modalItemCode" class=" text-muted"></label>
                         </div>
                         <div class="mb-2">
                             <label class="form-label fw-bold">Item Name:</label>
-                            <input type="text" id="modalItemName" class="form-control bg-light text-muted" readonly>
+                            <label id="modalItemName" class=" text-muted"></label>
                         </div>
                     </div>
 
@@ -91,28 +113,31 @@
                     <div class="col-md-6">
                         <div class="mb-2">
                             <label class="form-label fw-bold">Current Quantity:</label>
-                            <input type="text" id="modalQuantity" class="form-control bg-light text-muted" readonly>
+                            <label id="modalQuantity" class="text-muted"></label>
                         </div>
                         <div class="mb-2">
                             <label class="form-label fw-bold">Reorder Quantity:</label>
-                            <input type="text" id="modalReorderQty" class="form-control bg-light text-muted" readonly>
+                            <label id="modalReorderQty" class="text-muted"></label>
                         </div>
                     </div>
                 </div>
+                   
 
-                <hr />
-                <h5>Bin Details</h5>
-                <table class="table table-sm table-bordered" id="binView">
-                    <thead class="table-dark text-center">
-                        <tr>
-                            <th>Sr.No.</th>
-                            <th>Bin Name</th>
-                            <th>Quantity</th>
-                        </tr>
-                    </thead>
-                    <tbody id="modalBinTable"></tbody>
-                </table>
-            </div>
+
+
+                    <hr />
+                    <h5>Bin Details</h5>
+                    <table class="table table-sm table-bordered" id="binView">
+                        <thead class="table-dark text-center">
+                            <tr>
+                                <th>Sr.No.</th>
+                                <th>Bin Name</th>
+                                <th>Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modalBinTable"></tbody>
+                    </table>
+                </div>
         </div>
     </div>
 </div>
@@ -433,7 +458,7 @@ $(document).ready(function () {
         $('.row-checkbox-current').prop('checked', isChecked).trigger('change');
     });
 
-    // ---- Modal Open ----
+    /*// ---- Modal Open ----
     $('#currentStockTable tbody').on('click', '.transfer-btn', function () {
         var rowData = currentStockTable.row($(this).closest('tr')).data();
 
@@ -444,6 +469,36 @@ $(document).ready(function () {
         $('#modalReorderQty').val(rowData.ReorderQuantity);
 
         // Fill Bin table with Sr.No. (unchanged)
+        let binList = rowData.BinName ? rowData.BinName.split(",") : [];
+        let binRows = "";
+        let srNo = 1;
+
+        binList.forEach(bin => {
+            let parts = bin.trim().match(/(.*)\((\d+)\)/);
+            if (parts) {
+                binRows += `<tr class="text-center">
+                          <td>${srNo++}</td>
+                          <td>${parts[1].trim()}</td>
+                          <td>${parts[2]}</td>
+                        </tr>`;
+            }
+        });
+
+        $('#modalBinTable').html(binRows);
+        $('#viewModal').modal('show');
+    });*/
+
+    // ---- Modal Open ----
+    $('#currentStockTable tbody').on('click', '.transfer-btn', function () {
+        var rowData = currentStockTable.row($(this).closest('tr')).data();
+
+        // ✅ Fill labels instead of input
+        $('#modalItemCode').text(rowData.ItemCode);
+        $('#modalItemName').text(rowData.ItemName);
+        $('#modalQuantity').text(rowData.CurrentQty);
+        $('#modalReorderQty').text(rowData.ReorderQuantity);
+
+        // ✅ Fill Bin table
         let binList = rowData.BinName ? rowData.BinName.split(",") : [];
         let binRows = "";
         let srNo = 1;
