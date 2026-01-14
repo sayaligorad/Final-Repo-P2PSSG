@@ -332,10 +332,10 @@ function initTable(fromDate, toDate, statusFilter = null) {
                         today.getFullYear();
                     $body.find('h1').after('<div style="text-align:center;font-style:italic;font-size:10pt;margin-bottom:12px;">Generated Date: ' + formattedDate + '</div>');
 
-                    // Add status filter info if applied
-                    if (selectedStatus) {
-                        $body.find('h1').after('<div style="text-align:center;font-style:italic;font-size:10pt;margin-bottom:8px;">Filtered by Status: ' + selectedStatus + '</div>');
-                    }
+                    //// Add status filter info if applied
+                    //if (selectedStatus) {
+                    //    $body.find('h1').after('<div style="text-align:center;font-style:italic;font-size:10pt;margin-bottom:8px;">Filtered by Status: ' + selectedStatus + '</div>');
+                    //}
 
                     var $table = $body.find('table');
                     $table.addClass('table table-bordered table-striped').css('width', '100%');
@@ -389,19 +389,19 @@ function initTable(fromDate, toDate, statusFilter = null) {
                     }
                 },
                 customize: function (doc) {
-                    // Add status filter info if applied
-                    if (selectedStatus) {
-                        doc.content.splice(1, 0, {
-                            text: `Filtered by Status: ${selectedStatus}`,
-                            alignment: 'center',
-                            margin: [0, 0, 0, 8],
-                            fontSize: 10,
-                            bold: true
-                        });
-                    }
+                    //// Add status filter info if applied
+                    //if (selectedStatus) {
+                    //    doc.content.splice(1, 0, {
+                    //        text: `Filtered by Status: ${selectedStatus}`,
+                    //        alignment: 'center',
+                    //        margin: [0, 0, 0, 8],
+                    //        fontSize: 10,
+                    //        bold: true
+                    //    });
+                    //}
 
                     doc.content.splice(selectedStatus ? 2 : 1, 0, {
-                        text: `Generated on: ${moment().format("DD-MM-YYYY HH:mm")}`,
+                        text: `Generated Date: ${moment().format("DD-MM-YYYY")}`,
                         alignment: 'center',
                         margin: [0, 0, 0, 12],
                         fontSize: 9,

@@ -715,7 +715,7 @@
                     extend: 'pdfHtml5',
                     text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
                     titleAttr: 'PDF',
-                    title: 'Total PO Items',
+                    title: 'Approved And Close Purchase Order Items',
                     orientation: 'landscape',
                     pageSize: 'A4',
                     exportOptions: {
@@ -729,16 +729,65 @@
                             }
                         }
                     },
+                    customize: function (doc) {
+                        doc.pageSize = 'A4';
+                        doc.pageOrientation = 'landscape';
+                        doc.defaultStyle.fontSize = 9;
+                        doc.styles.tableHeader.fontSize = 10;
+                        doc.styles.tableHeader.fillColor = '#343a40';
+                        doc.styles.tableHeader.color = 'white';
+                        doc.styles.tableHeader.bold = true;
+                        doc.styles.tableHeader.alignment = 'center';
+
+                        // Insert generated date
+                        doc.content.splice(1, 0, {
+                            text: `Generated Date: ${moment().format("DD/MM/YYYY")}`,
+                            alignment: 'center',
+                            margin: [0, 0, 0, 12],
+                            fontSize: 9,
+                            italics: true
+                        });
+
+                        // Find table and add Sr No as first column
+                        function findTableNodeIndex(doc) {
+                            for (var i = 0; i < doc.content.length; i++) {
+                                if (doc.content[i].table) return i;
+                            }
+                            return -1;
+                        }
+                        var tableNodeIndex = findTableNodeIndex(doc);
+                        if (tableNodeIndex < 0) return;
+                        var tableNode = doc.content[tableNodeIndex];
+                        if (!tableNode || !tableNode.table || !tableNode.table.body) return;
+                        tableNode.table.body[0].unshift({ text: 'Sr No', style: 'tableHeader' });
+                        for (var r = 1, cnt = 1; r < tableNode.table.body.length; r++, cnt++) {
+                            tableNode.table.body[r].unshift({ text: String(cnt), alignment: 'center' });
+                        }
+
+                        tableNode.table.widths = ['5%', '15%', '15%', '15%', '15%', '10%', '12%', '12%'];
+
+                        tableNode.layout = {
+                            hLineWidth: function () { return 0.5; },
+                            vLineWidth: function () { return 0.5; },
+                            hLineColor: function () { return '#aaa'; },
+                            vLineColor: function () { return '#aaa'; },
+                            paddingLeft: function () { return 4; },
+                            paddingRight: function () { return 4; },
+                            paddingTop: function () { return 3; },
+                            paddingBottom: function () { return 3; }
+                        };
+                    },
                     action: function (e, dt, button, config) {
-                        var selected = $('#poItemsTablePSM tbody .rowCheckbox1:checked').length;
+                        var selected = dt.rows().nodes().to$().find('input.rowCheckbox1:checked').length;
                         var btnApi = dt.button(button);
+
                         if (selected === 0) {
-                            toastr.warning("Please select at least one row before exporting!");
-                            try { btnApi.processing(false); } catch (e) { }
+                            showExportToast();
+                            try { btnApi.processing(false); } catch (err) { }
                             return;
                         }
-                        try { btnApi.processing(true); } catch (err) { }
 
+                        try { btnApi.processing(true); } catch (err) { }
                         if (window.pdfMake && pdfMake.createPdf && !pdfMake._patchedForDT) {
                             (function () {
                                 var origCreate = pdfMake.createPdf;
@@ -747,7 +796,7 @@
                                     var origDownload = pdfDoc.download;
                                     pdfDoc.download = function (filename, cb) {
                                         origDownload.call(pdfDoc, filename);
-                                        setTimeout(function () { try { btnApi.processing(false); } catch (e) { } }, 1000);
+                                        setTimeout(function () { try { btnApi.processing(false); } catch (err) { } }, 1000);
                                         if (typeof cb === 'function') cb();
                                     };
                                     return pdfDoc;
@@ -756,17 +805,13 @@
                             })();
                         }
 
+                        // call original
                         if (!$.fn.dataTable.ext.buttons.pdfHtml5._orig) {
                             $.fn.dataTable.ext.buttons.pdfHtml5._orig = $.fn.dataTable.ext.buttons.pdfHtml5.action;
                         }
                         $.fn.dataTable.ext.buttons.pdfHtml5._orig.call(this, e, dt, button, config);
 
                         setTimeout(function () { try { btnApi.processing(false); } catch (err) { } }, 2000);
-                    },
-                    customize: function (doc) {
-                        doc.pageSize = 'A4';
-                        doc.pageOrientation = 'landscape';
-                        doc.defaultStyle.fontSize = 9;
                     }
                 },
                 //Excel
