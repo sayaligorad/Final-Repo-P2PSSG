@@ -44,7 +44,7 @@
 
 <!-- GRN Details Modal -->
 <div class="modal fade" data-bs-backdrop="true" id="grnDetailsModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
         <div class="modal-content shadow-lg rounded-3">
             <div class="card-header bg-primary text-white d-flex justify-content-center align-items-center rounded-top p-1 position-relative">
                 <h3 id="grnModalTitle" class="modal-title fw-bold text-white mb-0 fs-5 w-100 text-center">View GRN</h3>
@@ -480,20 +480,12 @@ $(document).on("click", ".btnAssignQC", function () {
     });
 });
 
-    // Dispose previous tooltip if exists
     function initTooltips() {
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        tooltipTriggerList.forEach(function (el) {
-            if (el._tooltip) el._tooltip.dispose();
-            el._tooltip = new bootstrap.Tooltip(el, {
-                trigger: 'hover',
-                template: `
-                <div class="tooltip" role="tooltip">
-                    <div class="tooltip-arrow"></div>
-                    <div class="tooltip-inner" style="background-color:black; color:white;"></div>
-                </div>
-            `
-            });
+        $('[data-bs-toggle="tooltip"]').tooltip('dispose');
+
+        $('[data-bs-toggle="tooltip"]').tooltip({
+            trigger: 'hover',
+            container: 'body'
         });
     }
 
@@ -501,12 +493,9 @@ $(document).on("click", ".btnAssignQC", function () {
         initTooltips();
     });
 
-    initTooltips();
     $('#grnDetailsModal').on('show.bs.modal', function () {
-        $('.tooltip').remove(); 
-        $('[data-bs-toggle="tooltip"]').tooltip('hide'); 
+        $('.tooltip').remove();
     });
-
 
 });
 </script>
