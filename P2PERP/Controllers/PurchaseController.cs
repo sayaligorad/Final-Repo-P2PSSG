@@ -3030,9 +3030,10 @@ public async Task<ActionResult> RegisterQuotationVNK(string rfqCode, string prCo
                 using (MailMessage mail = new MailMessage())
                 {
                     //mail.From = new MailAddress("sandeshjatti5329@gmail.com", "Rahitech IT Solution");
-                    mail.From = new MailAddress("gstprocurmenterp@gmail.com", "Procurement System");
+                   // mail.From = new MailAddress("gstprocurmenterp@gmail.com", "Procurement System");
+                    mail.From = new MailAddress(WebConfigurationManager.AppSettings["MainEmail"], "Procurement System");
                     mail.To.Add(vendorEmail);
-                   // mail.To.Add("kumbharomkar765@gmail.com"); // Test email
+                   // mail.To.Add("kumbharomkar765@gmail.com"w); // Test email
                     mail.Subject = $"Purchase Order - {POCode}";
                     mail.Body = $"Dear {vendorName},\n\nPlease find attached the Purchase Order #{POCode}.\n\nThank you.\n\nRegards,\nYour Company";
                     mail.IsBodyHtml = false;
@@ -3042,7 +3043,8 @@ public async Task<ActionResult> RegisterQuotationVNK(string rfqCode, string prCo
 
                     using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
                     {
-                        smtp.Credentials = new NetworkCredential("gstprocurmenterp@gmail.com", "lhrlntigzidizmju");
+                       // smtp.Credentials = new NetworkCredential("gstprocurmenterp@gmail.com", "lhrlntigzidizmju");
+                        smtp.Credentials = new NetworkCredential(WebConfigurationManager.AppSettings["MainEmail"], WebConfigurationManager.AppSettings["AppPassword"]);
                         smtp.EnableSsl = true;
                         await smtp.SendMailAsync(mail);
                     }

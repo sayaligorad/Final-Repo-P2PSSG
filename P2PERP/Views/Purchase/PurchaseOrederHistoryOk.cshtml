@@ -133,7 +133,7 @@
 
                         <div class="d-flex justify-content-between align-items-center flex-wrap ps-0 mb-3">
                             <!-- ✅ Date Picker Column -->
-                            <div class="col-4 p-0">
+                            <div class="col-6 p-0">
                                 <div class="input-group">
                                     <span class="input-group-text bg-primary text-white">
                                         <i class="bi bi-calendar-event"></i>
@@ -142,7 +142,8 @@
                                 </div>
                             </div>
                             <!-- ✅ Status Filter (Right) -->
-                            <div class="d-flex align-items-center pe-0 ms-12 ps-7">
+                            @*<div class="d-flex align-items-center pe-0 ms-12 ps-7">*@
+                            <div class="d-none align-items-center pe-0 ms-12 ps-7">
                                 <label for="statusFilter" class="form-label fw-bold me-2 mb-0 ps-8">Filter by Status</label>
                                 <select id="statusFilter" class="form-select ps-8 pe-0" style="width: 180px;">
                                     <option value="">All</option>
@@ -534,11 +535,11 @@
                         if (!data) return "";
                         let colorClass = "";
                         switch (data.toLowerCase()) {
-                            case "pending": colorClass = "bg-warning text-dark"; break;
-                            case "open": colorClass = "bg-info text-dark"; break;
-                            case "approve": colorClass = "bg-success"; break;
-                            case "reject": colorClass = "bg-danger"; break;
-                            case "close": colorClass = "bg-secondary"; break;
+                            case "pending": colorClass = "bg-warning text-dark text-white"; break;
+                            case "open": colorClass = "bg-info text-dark text-white"; break;
+                            case "approve": colorClass = "bg-success text-dark text-white"; break;
+                            case "rejected": colorClass = "bg-danger text-dark text-white"; break;
+                            case "close": colorClass = "bg-danger text-dark text-white"; break;
                         }
                         return `<span class="badge ${colorClass}">${data}</span>`;
                     }
@@ -1086,10 +1087,20 @@
 
                             // ✅ Fill PO details
                             $('#poCode').val(po.POCode);
-                            $('#poAddedDate').val(po.AddedDate);
+                            //$('#poAddedDate').val(po.AddedDate);
+                            if (po.AddedDate) {
+                                console.log(po.AddedDate);
+                                $("#poAddedDate").val(moment(po.AddedDate, "YYYY-MM-DD").format("DD/MM/YYYY"));
+                            }
+
                             $('#shippingCharges').val(po.ShippingCharges);
                             $('#rejectedByName').val(po.ApprovedBy);
-                            $('#rejectedDate').val(po.ApprovedRejectedDate);
+                            //$('#rejectedDate').val(po.ApprovedRejectedDate);
+                            if (po.ApprovedRejectedDate) {
+                                console.log(po.ApprovedRejectedDate);
+                                $("#rejectedDate").val(moment(po.ApprovedRejectedDate, "YYYY-MM-DD").format("DD/MM/YYYY"));
+                            }
+
                             $('#rejectedNote').val(po.Note);
 
                             // ✅ Fill Vendor details
