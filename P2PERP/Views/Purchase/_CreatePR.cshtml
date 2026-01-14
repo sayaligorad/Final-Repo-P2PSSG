@@ -1,5 +1,68 @@
 ﻿@model P2PLibray.Purchase.Purchase
 
+<style>
+    #ItemTable thead th {
+        padding: 0.3rem 0.4rem !important;
+    }
+    .form-control, .form-select {
+        border-radius: 0.5rem;
+        border: 1px solid #ced4da;
+        transition: all 0.3s ease;
+    }
+
+        .form-control:focus, .form-select:focus {
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+            border-color: #86b7fe;
+        }
+
+    .btn {
+        border-radius: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .card {
+        border: none;
+    }
+
+    .table th {
+        border-top: none;
+        font-weight: 600;
+    }
+
+    .table-responsive {
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+
+    /*  Compact Table Row Size */
+    .table td, .table th {
+        padding: 0.35rem 0.5rem !important;
+        font-size: 0.78rem;
+        vertical-align: middle;
+    }
+
+    .btn-delete {
+        padding: 2px 6px !important;
+        font-size: 0.70rem !important;
+    }
+
+        .btn-delete i {
+            font-size: 0.75rem !important;
+        }
+
+
+    @@media (max-width: 768px) {
+        .form-control, .form-select, .btn, .table td, .table th {
+            font-size: 0.85rem;
+        }
+    }
+</style>
+
 <h3 class="text-center fw-bold text-primary">Create Purchase Requisition</h3>
 
 <div class="container mt-4">
@@ -10,60 +73,60 @@
         <div class="row g-3 mb-4">
             <!-- PR Code -->
             <div class="col-md-4">
-                <label for="PRcode" class="form-label">Purchase Requisition No:</label>
-                @Html.TextBoxFor(m => m.PRCode, new { @class = "form-control", @id = "PRcode", placeholder = "Auto-generated", @readonly = "readonly" })
+                <label for="PRcode" class="form-label form-label-sm fw-bold text-dark">Purchase Requisition No:</label>
+                @Html.TextBoxFor(m => m.PRCode, new { @class = "form-control form-control-sm  shadow-sm  bg-light", @id = "PRcode", placeholder = "Auto-generated", @readonly = "readonly" })
             </div>
 
             <!-- Industry Type -->
             <div class="col-md-4">
-                <label for="IndustryType" class="form-label">Category Type: <span class="text-danger">*</span></label>
-                <select id="IndustryType" class="form-select IndustryType">
+                <label for="IndustryType" class="form-label form-label-sm fw-bold text-dark">Category Type: <span class="text-danger">*</span></label>
+                <select id="IndustryType" class="form-select shadow-sm  form-select-sm IndustryType">
                     <option value="">Select Category Type</option>
                 </select>
             </div>
 
             <!-- Item Name -->
             <div class="col-md-4">
-                <label for="ItemName" class="form-label">Item Name: <span class="text-danger">*</span></label>
-                <select id="ItemName" class="form-select ItemName">
+                <label for="ItemName" class="form-label form-label-sm fw-bold text-dark">Item Name: <span class="text-danger">*</span></label>
+                <select id="ItemName" class="form-select form-select-sm  shadow-sm  ItemName">
                     <option value="">Select Item</option>
                 </select>
             </div>
 
             <!-- Item Code -->
             <div class="col-md-4">
-                <label for="ItemCode" class="form-label">Item Code:</label>
-                <input type="text" id="ItemCode" class="form-control ItemCode" readonly placeholder="Auto-filled" />
+                <label for="ItemCode" class="form-label form-label-sm fw-bold text-dark">Item Code:</label>
+                <input type="text" id="ItemCode" class="form-control form-control-sm shadow-sm  bg-light ItemCode" readonly placeholder="Auto-filled" />
             </div>
 
             <!-- Description -->
             <div class="col-md-4">
-                <label for="Description" class="form-label">Item Description:</label>
-                <textarea id="Description" class="form-control Description" rows="2" readonly></textarea>
+                <label for="Description" class="form-label form-label-sm fw-bold text-dark">Item Description:</label>
+                <textarea id="Description" class="form-control form-control-sm  shadow-sm bg-light Description" rows="2" readonly></textarea>
             </div>
 
             <!-- UOM -->
             <div class="col-md-4">
-                <label for="UOM" class="form-label">UOM:</label>
-                <input type="text" id="UOM" class="form-control" readonly placeholder="Auto-filled" />
+                <label for="UOM" class="form-label form-label-sm fw-bold text-dark">UOM:</label>
+                <input type="text" id="UOM" class="form-control  shadow-sm form-control-sm bg-light" readonly placeholder="Auto-filled" />
             </div>
 
             <!-- Unit Rate -->
             <div class="col-md-4">
-                <label for="UnitRate" class="form-label">Unit Rate:</label>
-                <input type="text" id="UnitRate" class="form-control UnitRate" readonly placeholder="Auto-filled" />
+                <label for="UnitRate" class="form-label form-label-sm fw-bold text-dark">Unit Rate:</label>
+                <input type="text" id="UnitRate" class="form-control shadow-sm  form-control-sm bg-light UnitRate" readonly placeholder="Auto-filled" />
             </div>
 
             <!-- Quantity -->
             <div class="col-md-4">
-                <label for="Qty" class="form-label">Required Quantity: <span class="text-danger">*</span></label>
-                <input type="number" id="Qty" class="form-control" min="1" placeholder="Enter quantity" autocomplete="off" />
+                <label for="Qty" class="form-label form-label-sm fw-bold text-dark">Required Quantity: <span class="text-danger">*</span></label>
+                <input type="number" id="Qty" class="form-control shadow-sm  form-control-sm" min="1" placeholder="Enter quantity" autocomplete="off" />
             </div>
 
             <!-- Priority -->
             <div class="col-md-4">
-                <label for="priority" class="form-label">Priority Name: <span class="text-danger">*</span></label>
-                <select id="priority" class="form-select priority">
+                <label for="priority" class="form-label form-label-sm fw-bold text-dark">Priority Name: <span class="text-danger">*</span></label>
+                <select id="priority" class="form-select form-select-sm shadow-sm  priority">
                     <option value="">Select Priority</option>
                 </select>
             </div>
@@ -71,15 +134,15 @@
 
         <!-- Required Date -->
         <div class="col-md-4 mb-3">
-            <label for="ToDate" class="form-label">Required Date: <span class="text-danger">*</span></label>
-            <input type="date" id="ToDate" class="form-control" />
+            <label for="ToDate" class="form-label form-label-sm fw-bold text-dark">Required Date: <span class="text-danger">*</span></label>
+            <input type="date" id="ToDate" class="form-control shadow-sm  form-control-sm" />
             <small id="ToDateDisplay" class="text-muted"></small>
         </div>
 
         <!-- Add Item Button -->
         <div class="mb-4 text-end">
-            <button type="button" id="AddItem" class="btn btn-success">
-                <i class="bi bi-plus-circle"></i> Add Item
+            <button type="button" id="AddItem" class="btn btn-AddItem btn-success square-pill d-inline-flex align-items-center px-2 py-1 shadow-Add Item" data-bs-toggle="tooltip" title="Add Item">
+                <i class="bi bi-plus-circle me-2"></i> Add Item
             </button>
         </div>
 
@@ -89,7 +152,7 @@
             <table class="table table-bordered table-hover" id="ItemTable">
                 <thead class="table-dark">
                     <tr>
-                        <th>SR No</th>
+                        <th>SR.No</th>
                         <th>Item Code</th>
                         <th>Item Name</th>
                         <th>UOM</th>
@@ -104,10 +167,16 @@
         </div>
 
         <!-- Buttons -->
-        <div class="text-end mb-4">
-            <button type="reset" class="btn btn-danger me-2"><i class="bi bi-x-circle"></i> Cancel</button>
-            <button type="submit" class="btn btn-success me-2"><i class="bi bi-check-circle"></i> Create PR</button>
-        </div>
+<div class="text-end mb-4">
+    <button type="submit" class="btn btn-CreatePR btn-success square-pill d-inline-flex align-items-center px-2 py-1 shadow-sm Create PR" data-bs-toggle="tooltip" title="Create PR">
+        <i class="bi bi-check-circle me-2"></i> Create PR
+    </button>
+
+    <button type="reset" class="btn btn-danger btn-Cancel square-pill d-inline-flex align-items-center px-2 py-1 shadow-Cancel" data-bs-toggle="tooltip" title="Cancel">
+        <i class="bi bi-x-circle me-2"></i> Cancel
+    </button>
+</div>
+            
     }
 </div>
 
@@ -195,7 +264,7 @@
                 $(this).addClass('is-invalid');
 
                 $(this).after(`
-            <div id="industryAlert" class="alert alert-danger mt-2 py-2" role="alert">
+            <div id="industryAlert" class="alert alert-danger shadow-sm mt-2 py-2" role="alert">
                  Please remove all added items before changing Category Type!
             </div>
         `);
@@ -317,7 +386,7 @@
                     <td>${description}</td>
                     <td>₹ ${unitRate}</td>
                     <td>${qty}</td>
-                    <td><button type='button' class='btn btn-danger btn-sm remove'><i class='bi bi-trash'></i></button></td>
+                    <td><button type='button' class='btn btn-danger btn-sm square-pill d-inline-flex align-items-center px-2 py-1  shadow-sm remove'><i class='bi bi-trash'></i></button></td>
                 </tr>`;
             $("#ItemTable tbody").append(row);
 
@@ -348,12 +417,13 @@
                 text: `Do you want to remove ${name}?`,
                 icon: "warning",
                 showCancelButton: true,
-                confirmButtonText: "Yes, remove it!",
-                cancelButtonText: "Cancel",
-                customClass: {
-                    confirmButton: 'btn btn-primary  me-2', 
-                    cancelButton: 'btn btn-danger'   
-                },
+                 confirmButtonText: '<i class="bi bi-check-circle me-1"></i> Yes, remove it!',
+    cancelButtonText: '<i class="bi bi-x-circle me-1"></i> Cancel',
+customClass: {
+    cancelButton: 'btn btn-danger  square-pill d-inline-flex align-items-center px-2 py-1 shadow-Cancel me-2'   ,
+    confirmButton: 'btn btn-success square-pill d-inline-flex align-items-center px-2 py-1 shadow-Yes, remove it! me-2'
+    
+},
                 buttonsStyling: false 
                 }).then((result) =>
                 {
@@ -417,21 +487,7 @@
             else $('#ToDate').removeAttr('max');
 
             $('#ToDate').val(minDate.toISOString().split('T')[0]);
-
-            // Display in DD/MM/YYYY
-            //const day = String(minDate.getDate()).padStart(2, '0');
-            //const month = String(minDate.getMonth() + 1).padStart(2, '0');
-            //const year = minDate.getFullYear();
-            //$('#ToDateDisplay').text(`Selected Date: ${day}/${month}/${year}`);
         });
-
-        // Show selected date in DD/MM/YYYY
-        //$('#ToDate').on('change', function () {
-        //    const [y, m, d] = this.value.split('-');
-        //    $('#ToDateDisplay').text(`Selected Date: ${d}/${m}/${y}`);
-        //});
-
-
         // ---------- Submit Form ----------
         $("#prForm").submit(function (e)
         {

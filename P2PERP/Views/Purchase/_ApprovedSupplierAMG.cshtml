@@ -24,7 +24,7 @@
 
 
 <div id="approvedSection">
-    <div class="container bg-white rounded m-2 shadow p-2">
+    <div>
         <h3 class="text-center text-primary">Approved Supplier Quotations</h3>
         <div class="justify-content-between align-items-center mb-4 flex-wrap ">
 
@@ -308,7 +308,7 @@
                                     // Optional: make the text bold
                                     $('row c[r^="A2"]', sheet).attr('s', '51');
                                 }
-                                ,
+                                , 
                                 exportOptions: {
                                     rows: function (idx, data, node) { return $(node).find('.row-check').prop('checked'); },
                                     columns: ':visible:not(:first-child):not(:last-child)',
@@ -394,12 +394,12 @@
                             { data: "TotalAmount", render: data => parseFloat(data || 0).toLocaleString('en-IN', { style: 'currency', currency: 'INR' }) },
                             {
                                 data: null, render: data => `
-        <button class="btn btn-sm btn-primary btn-view"
+        <button class="btn btn-sm btn-primary btn-view px-2 py-1"
         data-id="${data.RegisterQuotationCode}"
         data-bs-toggle="tooltip"
         data-bs-placement="top"
         title="View Details">
-    <i class="bi bi-eye-fill text-white" style="font-size:18px;"></i>
+    <i class="bi bi-eye-fill text-white fs-6" style="font-size:18px;"></i>
 </button>` }
                         ],
                         initComplete: function () {

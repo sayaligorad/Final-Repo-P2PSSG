@@ -1,4 +1,5 @@
-﻿@{
+﻿
+@{
     ViewBag.Title = "SupplierQuotationAMG";
 }
 <style>
@@ -7,7 +8,9 @@
         border: 1px solid ;
         margin-right: 5px;
     }
-
+    thead th {
+        white-space: nowrap !important;
+    }
 /*        .nav-pills .nav-link.active {
             background-color: #0d6efd !important;
             color: #fff !important;
@@ -25,132 +28,175 @@
         font-weight: bold;
     }
 
+    .tab-content {
+        background:none;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.05);
+    }
 
 
 </style>
 <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3" style="z-index : 1100;"></div>
 
 <!-- ✅ Nav-Pills -->
+<div class="main-cnt">
+    <div>
+    <div class="card  me-5 ms-5 p-5">
 
-<div class="tab-content mt-3">
+        <!-- Title inside main content -->
 
-    <ul class="nav nav-pills mb-3" id="quotationTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <a class="nav-link active"
-               id="pending-tab"
-               data-bs-toggle="pill"
-               href="#pendingTab"
-               data-url="@Url.Action("PendingSupplierAMG", "Purchase")"
-               role="tab">
-                Pending Quotations
-            </a>
-        </li>
-        <li class="nav-item" role="presentation">
-            <a class="nav-link"
-               id="approved-tab"
-               data-bs-toggle="pill"
-               href="#approvedTab"
-               data-url="@Url.Action("ApprovedSupplierAMG", "Purchase")"
-               role="tab">
-                Approved Quotations
-            </a>
-        </li>
-    </ul>
+        <!-- ✅ Move Tabs INSIDE this content -->
+        <ul class="nav nav-pills mb-4" id="quotationTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active"
+                   id="pending-tab"
+                   data-bs-toggle="pill"
+                   href="#pendingTab"
+                   data-url="@Url.Action("PendingSupplierAMG", "Purchase")"
+                   role="tab">
+                    Pending Quotations
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link"
+                   id="approved-tab"
+                   data-bs-toggle="pill"
+                   href="#approvedTab"
+                   data-url="@Url.Action("ApprovedSupplierAMG", "Purchase")"
+                   role="tab">
+                    Approved Quotations
+                </a>
+            </li>
+        </ul>
 
-    <div class="tab-pane fade show active" id="pendingTab" role="tabpanel"></div>
-    <div class="tab-pane fade" id="approvedTab" role="tabpanel"></div>
-</div>
+        <!-- Tab Content Area -->
+        <div class="tab-content  p-3 bg-white''">
+            <div class="tab-pane fade show active" id="pendingTab" role="tabpanel"></div>
+            <div class="tab-pane fade" id="approvedTab" role="tabpanel"></div>
+        </div>
 
-<!-- 🔽 Modal -->
-<div class="modal fade" id="quotationModal" tabindex="-1" aria-labelledby="quotationModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white justify-content-center">
-                <h5 class="modal-title text-center text-white w-100 fw-bold mb-3" id="quotationModalLabel">Quotation Details</h5>
-                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3 mb-3" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
+    </div>
 
-            <div class="modal-body">
-                <!-- Header Section -->
-                <div class="row mb-4">
-                    <div class="col-md-2">
-                        <label class="form-label fw-bold">RFQ Code</label>
-                        <div id="qRFQ" class="form-control-plaintext"></div>
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label fw-bold">Quotation Code</label>
-                        <div id="qCode" class="form-control-plaintext"></div>
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label fw-bold">Vendor</label>
-                        <div id="qVendor" class="form-control-plaintext"></div>
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label fw-bold">Company</label>
-                        <div id="qCompany" class="form-control-plaintext"></div>
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label fw-bold">Expected Delivery Date</label>
-                        <div id="qDate" class="form-control-plaintext"></div>
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label fw-bold">Vendor Delivery Date</label>
-                        <div id="qDelDate" class="form-control-plaintext"></div>
-                    </div>
+
+    <!-- 🔽 Modal -->
+    <div class="modal fade" id="quotationModal" tabindex="-1" aria-labelledby="quotationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-1">
+                    <h5 class="modal-title fw-bold text-white mb-0 fs-5" id="quotationModalLabel">Quotation Details</h5>
+                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
-                @*<div class="row mb-4">
-                    <div class="col-md-2">
-                        <label class="form-label fw-bold">Shipping Charges</label>
-                        <div id="qShip" class="form-control-plaintext"></div>
+                <div class="modal-body">
+                    <!-- Header Section -->
+                    <div class="row mb-4">
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">RFQ Code</label>
+                            <div id="qRFQ" class="form-control-plaintext"></div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Quotation Code</label>
+                            <div id="qCode" class="form-control-plaintext"></div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Vendor</label>
+                            <div id="qVendor" class="form-control-plaintext"></div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Company</label>
+                            <div id="qCompany" class="form-control-plaintext"></div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Expected Delivery Date</label>
+                            <div id="qDate" class="form-control-plaintext"></div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Vendor Delivery Date</label>
+                            <div id="qDelDate" class="form-control-plaintext"></div>
+                        </div>
                     </div>
-                    <div class="col-md-2">
-                        <label class="form-label fw-bold">Grand Total</label>
-                        <div id="qGrand" class="form-control-plaintext text-success fw-bold"></div>
-                    </div>
-                </div>*@
 
-                <!-- Items Section -->
-                <h6 class="fw-bold">Items</h6>
-                <table id="quotationItemsTable" class="table table-striped table-bordered w-100">
-                    <thead class="table-dark text-white text-center fw-bold">
-                        <tr>
-                            <th>SrNo</th>
-                            <th>Item Code</th>
-                            <th>Item Name</th>
-                            <th>Qty</th>
-                            <th>Rate</th>
-                            <th>Gross Amount</th>
-                            <th>Discount %</th>
-                            <th>Discount Amount</th>
-                            <th>Net Amount</th>
-                            <th>GST %</th>
-                            <th>Final Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                    <tfoot class="fw-bold">
-                        <tr>
-                            <td colspan="10" class="text-end">Total Amount:</td>
-                            <td id="qTotal" class="text-end text-primary"></td>
-                        </tr>
-                        <tr>
-                            <td colspan="10" class="text-end">Shipping Charges:</td>
-                            <td id="qShip" class="text-end text-secondary"></td>
-                        </tr>
-                        <tr>
-                            <td colspan="10" class="text-end">Grand Total:</td>
-                            <td id="qGrand" class="text-end text-success fs-6"></td>
-                        </tr>
-                    </tfoot>
-                </table>
+                    @*<div class="row mb-4">
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold">Shipping Charges</label>
+                                <div id="qShip" class="form-control-plaintext"></div>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold">Grand Total</label>
+                                <div id="qGrand" class="form-control-plaintext text-success fw-bold"></div>
+                            </div>
+                        </div>*@
+
+                    <!-- Items Section -->
+                    <h6 class="fw-bold">Items</h6>
+                    <table id="quotationItemsTable" class="table table-striped table-bordered w-100">
+                        <thead class="table-dark text-white text-center fw-bold">
+                            <tr>
+                                <th>SrNo</th>
+                                <th>Item Code</th>
+                                <th>Item Name</th>
+                                <th>Qty</th>
+                                <th>Rate</th>
+                                <th>Gross Amount</th>
+                                <th>Discount %</th>
+                                <th>Discount Amount</th>
+                                <th>Net Amount</th>
+                                <th>GST %</th>
+                                <th>Final Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                        <tfoot class="fw-bold">
+                            <tr>
+                                <td colspan="10" class="text-end">Total Amount:</td>
+                                <td id="qTotal" class="text-end text-primary"></td>
+                            </tr>
+                            <tr>
+                                <td colspan="10" class="text-end">Shipping Charges:</td>
+                                <td id="qShip" class="text-end text-secondary"></td>
+                            </tr>
+                            <tr>
+                                <td colspan="10" class="text-end">Grand Total:</td>
+                                <td id="qGrand" class="text-end text-success fs-6"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
+    </div>
 </div>
-
 <script>
     $(document).ready(function () {
+
+
+        $(".tab-content").removeClass("card border shadow-sm bg-light p-3");
+
+        // 🔹 Optional: also remove background or borders added by bootstrap
+        $(".tab-content").css({
+            "background": "none",
+            "border": "none",
+            "box-shadow": "none",
+            "padding": "0"
+        });
+
+        // 🔹 When content loads dynamically into tabs
+        $(document).on("DOMNodeInserted", ".tab-pane", function () {
+            // Remove nested cards inside tab panes
+            $(this).find(".card").each(function () {
+                // unwrap to remove the card container but keep inner content
+                $(this).replaceWith($(this).html());
+            });
+
+            // Remove any bootstrap borders or shadows from tables if needed
+            $(this).find(".table").removeClass("table-bordered card shadow-sm");
+        });
+
+
+
+
 
         // ✅ Load first tab immediately
         loadTabContent($("#quotationTabs a.active"), true);

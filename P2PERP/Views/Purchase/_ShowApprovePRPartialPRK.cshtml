@@ -15,6 +15,7 @@
                     <th>PR Code</th>
                     <th>Added Date</th>
                     <th>Approved Date</th>
+                    <th>REQUIRED DATE</th>
                     <th>Priority</th>
                 </tr>
             </thead>
@@ -53,6 +54,9 @@
         button.dt-button.processing:after {
             content: none !important;
         }
+    thead th {
+        white-space: nowrap !important;
+    }
 </style>
 
 <!-- JavaScript -->
@@ -110,6 +114,8 @@ const endDate = "@ViewBag.EndDate";
 
                 data.forEach(function (i, index) {
                     const addedDate = i.AddedDate ? moment(i.AddedDate).format('DD/MM/YYYY') : '';
+                    const expectedDate = i.ExpectedDate ? moment(i.ExpectedDate).format("DD/MM/YYYY") : "";
+
                     const approvedDate = i.ApprovedRejectedDate ? moment(i.ApprovedRejectedDate).format('DD/MM/YYYY') : '';
                     const priorityBadge = i.Priority
                         ? `<span class="${i.Priority.toLowerCase() === 'cold' ? 'badge bg-success' :
@@ -126,6 +132,7 @@ const endDate = "@ViewBag.EndDate";
                             <td>${i.PRCode}</td>
                             <td>${addedDate}</td>
                             <td>${approvedDate}</td>
+                            <td>${expectedDate}</td>
                             <td>${priorityBadge}</td>
                         </tr>
                     `);
@@ -274,8 +281,8 @@ const endDate = "@ViewBag.EndDate";
                                         vLineWidth: () => 0.5,
                                         hLineColor: () => '#dddddd',
                                         vLineColor: () => '#dddddd',
-                                        paddingLeft: () => 30,
-                                        paddingRight: () => 30,
+                                        paddingLeft: () => 20,
+                                        paddingRight: () => 20,
                                         paddingTop: () => 4,
                                         paddingBottom: () => 4
                                     };
@@ -453,7 +460,8 @@ const endDate = "@ViewBag.EndDate";
                         'Last 3 Months': [moment().subtract(3, 'months').startOf('day'), moment()],
                         'Last 1 Year': [moment().subtract(12, 'months').startOf('day'), moment()]
                     }
-                }, function (start, end) {
+                },
+                    function (start, end) {
                     $('#prDateFilter').val(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
                     $.fn.dataTable.ext.search.push(function (settings, data) {
                         if (settings.nTable.id !== 'approvedPrTable') return true;

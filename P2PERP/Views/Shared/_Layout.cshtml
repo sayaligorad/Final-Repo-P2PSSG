@@ -1,15 +1,56 @@
 ﻿<!doctype html>
 
+
 @{
-    Layout = null;
-    string currentAction = ViewContext.RouteData.Values["action"].ToString();
-    string currentController = ViewContext.RouteData.Values["controller"].ToString();
     string role = Session["RoleId"] != null ? Session["RoleId"].ToString() : "";
-    if (Session["StaffCode"] == null)
+
+    // Define role-based home page
+    string homeAction = "";
+    string homeController = "";
+
+    switch (role)
     {
-        Response.Redirect("~/Account/Logout");
+        case "2":
+        case "3":
+        case "4":
+            homeAction = "InventoryDashboard";
+            homeController = "Inventory";
+            break;
+
+        case "5":
+        case "6":
+        case "7":
+        case "8":
+        case "9":
+            homeAction = "UserDashboardPRK";
+            homeController = "Purchase";
+            break;
+
+        case "10":
+        case "11":
+        case "12":
+            homeAction = "GRNDashboardRHK";
+            homeController = "GRN";
+            break;
+
+        case "13":
+        case "14":
+        case "15":
+            homeAction = "QCheckDashboardNAM";
+            homeController = "Quality";
+            break;
+
+        default:
+            homeAction = "InventoryDashboard";
+            homeController = "Home";
+            break;
     }
+
+    // Current context
+    string currentController = ViewContext.RouteData.Values["controller"].ToString();
+    string currentAction = ViewContext.RouteData.Values["action"].ToString();
 }
+
 <html class=" layout-navbar-fixed layout-menu-fixed layout-compact "
       data-skin="default" data-bs-theme="light"
       data-assets-path="~/Content/assets/">
@@ -40,6 +81,7 @@
     <link rel="stylesheet" href="~/Content/jquery-ui.css" />
     <link rel="stylesheet" type="text/css" href="~/Content/daterangepicker.css" />
     <link rel="stylesheet" href="~/Content/toastr.min.css" />
+    <link href="~/Content/dataTables.bootstrap5.min.css" rel="stylesheet" />
 
     <!-- jQuery -->
     <script src="~/Scripts/jquery-3.7.1.min.js"></script>
@@ -53,10 +95,13 @@
     <script src="~/Scripts/vfs_fonts.js"></script>
     <script src="~/Scripts/buttons.html5.min.js"></script>
     <script src="~/Scripts/buttons.print.min.js"></script>
+    <script src="~/Scripts/dataTables.bootstrap5.min.js"></script>
 
     <!-- FixedHeader Extension -->
-    <script src="https://cdn.datatables.net/fixedheader/4.0.1/js/dataTables.fixedHeader.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/4.0.1/css/fixedHeader.dataTables.min.css" />
+    @*<script src="https://cdn.datatables.net/fixedheader/4.0.1/js/dataTables.fixedHeader.min.js"></script>*@
+    @*<link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/4.0.1/css/fixedHeader.dataTables.min.css" />*@
+    @*<script src="~/Scripts/dataTables.fixedHeader.min.js"></script>
+        <link href="~/Content/fixedHeader.dataTables.min.css" rel="stylesheet" />*@
 
     <!-- Validation -->
     <script src="~/Scripts/jquery.validate.min.js"></script>
@@ -87,19 +132,6 @@
     <!-- Email Sending JS -->
     <script src="~/Scripts/SendEmail.js"></script>
 
-    <!-- ✅ Modern DataTable + Buttons (Bootstrap 5) -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.2.2/css/buttons.bootstrap5.min.css">
-
-    <script src="https://cdn.datatables.net/2.1.8/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.2.2/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.2.2/js/buttons.bootstrap5.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.2.2/js/buttons.html5.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.2.2/js/buttons.print.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 
 
     <style>
@@ -135,7 +167,146 @@
             box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
         }
 
+        /* Export buttons container */
+        .dt-buttons {
+            display: flex;
+            gap: 0.6rem;
+            margin-bottom: 0.8rem;
+        }
 
+        /* Base button style */
+        .dt-button {
+            border: none !important;
+            color: #fff !important;
+            font-weight: 500;
+            border-radius: 10px !important;
+            padding: 8px 14px !important;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+            /* Hover effects */
+            .dt-button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(123, 78, 255, 0.3);
+            }
+
+        /* Specific button colors */
+        .buttons-print {
+            background: rgb(120, 129, 122, 0.30);
+        }
+
+        .buttons-pdf {
+            background: rgb(120, 129, 122, 0.30);
+        }
+
+        .buttons-excel {
+            background: rgb(120, 129, 122, 0.30);
+        }
+
+        .buttons-copy {
+            background: rgb(120, 129, 122, 0.30);
+        }
+
+        .buttons-csv {
+            background: rgb(120, 129, 122, 0.30);
+        }
+
+
+
+
+
+
+
+
+
+
+
+        table th {
+            border-top: none;
+            font-weight: 600;
+            white-space: nowrap; /* Prevents text wrapping */
+            text-overflow: ellipsis; /* Adds "..." if text is too long */
+            overflow: hidden; /* Hides overflow text */
+        }
+
+
+        /* Remove default stripe background */
+        table.dataTable.stripe tbody tr.odd,
+        table.dataTable.display tbody tr.odd,
+        table.dataTable tbody tr.odd {
+            background-color: #ffffff !important;
+        }
+
+        /* Even rows (ensure also white) */
+        table.dataTable.stripe tbody tr.even,
+        table.dataTable.display tbody tr.even,
+        table.dataTable tbody tr.even {
+            background-color: #ffffff !important;
+        }
+
+        /* Maintain hover highlight */
+        table.dataTable tbody tr:hover {
+            background-color: #f8f9fa !important;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        /* Table header remains dark */
+        table.dataTable thead th {
+            background-color: #212529 !important;
+            color: #ffffff !important;
+            text-align: center;
+        }
+
+        /* Optional: give entire table a clean white background */
+        table.dataTable {
+            background-color: #ffffff !important;
+            border-radius: 8px !important;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+
+        .table-responsive {
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        /*  Compact Table Row Size */
+        .table td, .table th {
+            padding: 0.35rem 0.5rem !important;
+            font-size: 0.78rem;
+            vertical-align: middle;
+        }
+
+        .btn-delete {
+            padding: 2px 6px !important;
+            font-size: 0.70rem !important;
+        }
+
+            .btn-delete i {
+                font-size: 0.75rem !important;
+            }
+
+
+        @@media (max-width: 768px) {
+            .form-control, .form-select, .btn, .table td, .table th {
+                font-size: 0.85rem;
+            }
+        }
+
+        button.dt-button.processing,
+        div.dt-button.processing {
+            pointer-events: auto !important;
+            opacity: 1 !important;
+            background: none !important;
+        }
+
+            button.dt-button.processing:after {
+                content: none !important;
+            }
     </style>
 
 
@@ -144,11 +315,11 @@
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5DDHKGP" height="0" width="0" style="display: none; visibility: hidden"></iframe></noscript>
 
     <!-- Layout wrapper -->
-    <div class="layout-wrapper layout-content-navbar  ">
+    <div class="layout-wrapper layout-content-navbar " style="background-color:#eeeded">
         <div class="layout-container">
 
             <!-- Menu -->
-            <aside id="layout-menu" class="layout-menu menu-vertical menu">
+            <aside id="layout-menu" class="layout-menu menu-vertical menu shadow-right card ">
                 <div class="app-brand demo ">
                     <a href="index.html" class="app-brand-link gap-xl-0 gap-2">
                         <span class="app-brand-logo demo me-1">
@@ -324,8 +495,8 @@
                     {
                         if (role == "2")
                         {
-                            <li class="menu-item @(currentAction == "Index" ? "active" : "")">
-                                <a href="@Url.Action("Index", "Inventory")" class="menu-link">
+                            <li class="menu-item @(currentAction == "InventoryDashboard" ? "active" : "")">
+                                <a href="@Url.Action("InventoryDashboard", "Inventory")" class="menu-link">
                                     <i class="menu-icon tf-icons bi bi-speedometer2"></i>
                                     <div class="fw-semibold">Inventory Dashboard</div>
                                 </a>
@@ -455,12 +626,12 @@
                                     <div class="fw-semibold">Reports</div>
                                 </a>
                                 <ul class="menu-sub">
-                                    <li class="menu-item @(currentAction == "CurrentStockReportAMG" ? "active" : "")">
-                                        <a href="@Url.Action("CurrentStockReportAMG", "Inventory")" class="menu-link">
-                                            <i class="menu-icon tf-icons bi bi-file-earmark-text"></i>
-                                            <div>Current Stock Reports</div>
-                                        </a>
-                                    </li>
+                                    @*<li class="menu-item @(currentAction == "CurrentStockReportAMG" ? "active" : "")">
+                                            <a href="@Url.Action("CurrentStockReportAMG", "Inventory")" class="menu-link">
+                                                <i class="menu-icon tf-icons bi bi-file-earmark-text"></i>
+                                                <div>Current Stock Reports</div>
+                                            </a>
+                                        </li>*@
                                     <li class="menu-item @(currentAction == "ReceivedMaterialReport" ? "active" : "")">
                                         <a href="@Url.Action("ReceivedMaterialReportAMG", "Inventory")" class="menu-link">
                                             <i class="menu-icon tf-icons bi bi-file-earmark-text"></i>
@@ -578,15 +749,32 @@
                         <a class="nav-item nav-link px-0 me-xl-6" href="javascript:void(0)">
                             <i class="icon-base ri ri-menu-line icon-md"></i>
                         </a>
+
                     </div>
                     <div class="navbar-nav-right d-flex align-items-center justify-content-end" id="navbar-collapse">
                         <!-- Search -->
                         <div class="navbar-nav align-items-center">
-                            <div class="nav-item navbar-search-wrapper mb-0">
-                                <a class="nav-item nav-link search-toggler px-0" href="javascript:void(0);">
-                                    <span class="d-inline-block text-body-secondary fw-normal" id="autocomplete"></span>
-                                </a>
-                            </div>
+                            <!-- Breadcrumbs -->
+                            <ol class="breadcrumb mb-0 mx-10">
+                                <li class="breadcrumb-item">
+                                    <a href="@Url.Action(homeAction, homeController)">
+                                        <i class="bi bi-house-door"></i> Home
+                                    </a>
+                                </li>
+
+                                @if (currentController != homeController)
+                                {
+                                    <li class="breadcrumb-item">
+                                        <a href="@Url.Action("Index", currentController)">
+                                            @currentController
+                                        </a>
+                                    </li>
+                                }
+
+                                <li class="breadcrumb-item active text-primary" aria-current="page">
+                                    @currentAction
+                                </li>
+                            </ol>
                         </div>
                         <!-- /Search -->
                         <ul class="navbar-nav flex-row align-items-center ms-md-auto">
@@ -741,8 +929,12 @@
                     </div>
                 </nav>
                 <!-- / Navbar -->
+                
+
+
                 <!-- Content wrapper -->
                 <div class="content-wrapper">
+
                     @RenderBody()
                     <!-- Footer -->
                     <footer class="content-footer footer bg-footer-theme">
@@ -753,15 +945,15 @@
                                     <script>
                                         document.write(new Date().getFullYear());
                                     </script>
-                                     made with ❤️ by <a href="https://rahitechit.com/" target="_blank" class="footer-link fw-medium">Rahitech</a>
+                                    made with ❤️ by <a href="https://rahitechit.com/" target="_blank" class="footer-link fw-medium">Rahitech</a>
                                 </div>
-                                <div class="d-none d-lg-inline-block">
+                                @*<div class="d-none d-lg-inline-block">
                                     <a href="https://themeselection.com/item/category/admin-templates/" target="_blank" class="footer-link me-4">Admin Templates</a>
                                     <a href="https://themeselection.com/license/" class="footer-link me-4" target="_blank">License</a>
                                     <a href="https://themeselection.com/item/category/bootstrap-templates/" target="_blank" class="footer-link me-4">Bootstrap Dashboard</a>
                                     <a href="https://demos.themeselection.com/materio-bootstrap-html-admin-template/documentation/" target="_blank" class="footer-link me-4">Documentation</a>
                                     <a href="https://themeselection.com/support/" target="_blank" class="footer-link d-none d-sm-inline-block">Support</a>
-                                </div>
+                                </div>*@
                             </div>
                         </div>
                     </footer>
@@ -882,11 +1074,11 @@
 
                 const modalHtml = `
                     <div class="modal fade" id="dynamicNotificationsModal" tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog modal-lg modal-dialog-scrollable">
-                            <div class="modal-content">
-                                <div class="modal-header bg-primary">
-                                    <h5 class="modal-title fw-semibold text-white text-center w-100 pb-4">All Notifications</h5>
-                                    <button type="button" class="btn btn-close btn-close-white position-absolute top-0 end-0 m-3 fs-4" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                            <div class="modal-content shadow-lg rounded-3">
+                                <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-1"">
+                                    <h5 class="modal-title fw-bold text-white mb-0 fs-5">All Notifications</h5>
+                                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
                                     <ul id="allNotificationsList" class="list-group list-group-flush"></ul>

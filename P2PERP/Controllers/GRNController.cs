@@ -1,17 +1,20 @@
-﻿using P2PLibray.Account;
+﻿using iTextSharp.text;
+using iTextSharp.text.pdf;
+using iTextSharp.text.pdf.draw;
+using P2PLibray.Account;
 using P2PLibray.GRN;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
+using System.IO;
 using System.Linq;
-using System.Net.Mail;
 using System.Net;
+using System.Net.Mail;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using System.IO;
 
 namespace P2PERP.Controllers
 {
@@ -1002,6 +1005,7 @@ namespace P2PERP.Controllers
                     GRNCode = dr["GRNCode"].ToString(),
                     ItemName = dr["ItemName"].ToString(),
                     Quantity = Convert.ToInt32(dr["Quantity"]),
+                    IsQuality = dr["ISQuality"].ToString(),
                 });
             }
 
@@ -1364,42 +1368,8 @@ namespace P2PERP.Controllers
 
 
 
-        // Loads the view GRN modal with header details
-        [HttpGet]
-        public async Task<ActionResult> ViewGRNSSG(string GRNCode)
-        {
-            try
-            {
-                GRN objGRN = new GRN { GRNCode = GRNCode };
-                var dsHeader = await bal.ViewGRNSSG(objGRN);
+       
 
-                if (dsHeader?.Tables.Count > 0 && dsHeader.Tables[0].Rows.Count > 0)
-                {
-                    var row = dsHeader.Tables[0].Rows[0];
-                    ViewBag.GRNCode = row["GRNCode"].ToString();
-                    ViewBag.POCode = row["POCode"].ToString();
-                    ViewBag.PODate = row["PODate"] != DBNull.Value
-                        ? Convert.ToDateTime(row["PODate"]).ToString("dd-MM-yyyy") : "";
-                    ViewBag.VendorName = row["VenderName"].ToString();
-                    ViewBag.InvoiceNo = row["InvoiceNo"].ToString();
-                    ViewBag.InvoiceDate = row["GRNDate"] != DBNull.Value
-                        ? Convert.ToDateTime(row["GRNDate"]).ToString("yyyy-MM-dd") : "";
-                    ViewBag.CompanyAddress = row["CompanyAddress"].ToString();
-                    ViewBag.BillingAddress = row["BillingAddress"].ToString();
-                    ViewBag.DiscountPercent = row.Table.Columns.Contains("DiscountPercent") && row["DiscountPercent"] != DBNull.Value
-                                                  ? Convert.ToDecimal(row["DiscountPercent"]) : 0;
-                    ViewBag.TotalAmount = row.Table.Columns.Contains("Amount") && row["Amount"] != DBNull.Value
-                                               ? Convert.ToDecimal(row["Amount"]) : 0;
-                }
-
-                ViewBag.Mode = "View";
-                return PartialView("_ViewGRNSSG");
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error fetching GRN header: " + ex.Message, ex);
-            }
-        }
 
         // Fetches GRN items for display in view
         [HttpGet]
@@ -1443,6 +1413,281 @@ namespace P2PERP.Controllers
                 return Json(new { success = false, message = ex.Message, items = new List<object>() }, JsonRequestBehavior.AllowGet);
             }
         }
+
+        // Loads the view GRN modal with header details
+        [HttpGet]
+        public async Task<ActionResult> ViewGRNSSG(string GRNCode)
+        {
+            try
+            {
+                GRN objGRN = new GRN { GRNCode = GRNCode };
+                var dsHeader = await bal.ViewGRNSSG(objGRN);
+
+                if (dsHeader?.Tables.Count > 0 && dsHeader.Tables[0].Rows.Count > 0)
+                {
+                    var row = dsHeader.Tables[0].Rows[0];
+
+                    ViewBag.GRNCode = row["GRNCode"].ToString();
+                    ViewBag.POCode = row["POCode"].ToString();
+
+                    ViewBag.PODate = row["PODate"] != DBNull.Value
+                        ? Convert.ToDateTime(row["PODate"]).ToString("dd-MM-yyyy") : "";
+                    ViewBag.GRNDate = row["GRNDate"] != DBNull.Value
+                        ? Convert.ToDateTime(row["GRNDate"]).ToString("dd-MM-yyyy") : "";
+                    ViewBag.InvoiceNo = row["InvoiceNo"].ToString();
+                    ViewBag.InvoiceDate = row["InvoiceDate"] != DBNull.Value
+                        ? Convert.ToDateTime(row["InvoiceDate"]).ToString("dd-MM-yyyy") : "";
+                    ViewBag.VendorName = row["VenderName"].ToString();
+                    ViewBag.CompanyAddress = row["CompanyAddress"].ToString();
+                    ViewBag.BillingAddress = row["BillingAddress"].ToString();
+                    ViewBag.ReceivedBy = row.Table.Columns.Contains("ReceivedBy") && row["ReceivedBy"] != DBNull.Value
+                        ? row["ReceivedBy"].ToString()
+                        : "";
+                    ViewBag.DiscountPercent = row.Table.Columns.Contains("DiscountPercent") && row["DiscountPercent"] != DBNull.Value
+                        ? Convert.ToDecimal(row["DiscountPercent"]) : 0;
+                    ViewBag.TotalAmount = row.Table.Columns.Contains("Amount") && row["Amount"] != DBNull.Value
+                        ? Convert.ToDecimal(row["Amount"]) : 0;
+                    ViewBag.ShippingCharges = row.Table.Columns.Contains("ShippingCharges") && row["ShippingCharges"] != DBNull.Value
+                        ? Convert.ToDecimal(row["ShippingCharges"]) : 0;
+                }
+
+                ViewBag.Mode = "View";
+                return PartialView("_ViewGRNSSG");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error fetching GRN header: " + ex.Message, ex);
+            }
+        }
+        [HttpGet]
+        public async Task<ActionResult> GenerateGRNPDF(string GRNCode)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(GRNCode))
+                    return new HttpStatusCodeResult(400, "GRNCode is required");
+
+                // === Fetch Data ===
+                GRN objGRN = new GRN { GRNCode = GRNCode };
+                var dsHeader = await bal.ViewGRNSSG(objGRN);
+                var dsItems = await bal.ViewGRNItemSSG(objGRN);
+
+                if (dsHeader?.Tables.Count == 0 || dsHeader.Tables[0].Rows.Count == 0)
+                    return new HttpStatusCodeResult(404, "GRN not found");
+
+                var row = dsHeader.Tables[0].Rows[0];
+
+                // === Header Data ===
+                string poNo = row["POCode"].ToString();
+                string grnNo = row["GRNCode"].ToString();
+                string vendor = row.Table.Columns.Contains("VenderName") ? row["VenderName"].ToString() : "";
+                string invoiceNo = row["InvoiceNo"].ToString();
+                string invoiceDate = row["InvoiceDate"] != DBNull.Value ? Convert.ToDateTime(row["InvoiceDate"]).ToString("dd-MM-yyyy") : "";
+                string grnDate = row["GRNDate"] != DBNull.Value ? Convert.ToDateTime(row["GRNDate"]).ToString("dd-MM-yyyy") : "";
+                string poDate = row["PODate"] != DBNull.Value ? Convert.ToDateTime(row["PODate"]).ToString("dd-MM-yyyy") : "";
+                string companyAddr = row["CompanyAddress"].ToString();
+                string billingAddr = row["BillingAddress"].ToString();
+                string receivedBy = row["ReceivedBy"].ToString();
+                string warehouseName = row.Table.Columns.Contains("WarehouseName") ? row["WarehouseName"].ToString() : "Main Warehouse";
+
+                // === Totals ===
+                decimal subtotal = 0, shipping = 0, grandTotal = 0;
+                if (dsItems?.Tables.Count > 0 && dsItems.Tables[0].Rows.Count > 0)
+                {
+                    foreach (DataRow dr in dsItems.Tables[0].Rows)
+                        subtotal += dr["Amount"] != DBNull.Value ? Convert.ToDecimal(dr["Amount"]) : 0;
+                }
+
+                shipping = row.Table.Columns.Contains("ShippingCharges") && row["ShippingCharges"] != DBNull.Value
+                           ? Convert.ToDecimal(row["ShippingCharges"]) : 0;
+
+                grandTotal = subtotal + shipping;
+
+                // === PDF Generation ===
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    Document doc = new Document(PageSize.A4, 36f, 36f, 20f, 36f);
+                    PdfWriter.GetInstance(doc, ms);
+                    doc.Open();
+
+                    // === Colors ===
+                    BaseColor softBlue = new BaseColor(232, 240, 254);
+                    BaseColor headerBlue = new BaseColor(44, 88, 180);
+                    BaseColor sectionBlue = new BaseColor(35, 76, 150);
+                    BaseColor borderGray = new BaseColor(210, 210, 210);
+                    BaseColor tableHeader = new BaseColor(52, 73, 94);
+
+                    // === Fonts ===
+                    Font titleFont = FontFactory.GetFont("Segoe UI", 15, Font.BOLD, headerBlue);
+                    Font labelFont = FontFactory.GetFont("Segoe UI", 9, Font.BOLD, BaseColor.BLACK);
+                    Font textFont = FontFactory.GetFont("Segoe UI", 9, BaseColor.BLACK);
+                    Font sectionFont = FontFactory.GetFont("Segoe UI", 10, Font.BOLD, sectionBlue);
+                    Font tableHeaderFont = FontFactory.GetFont("Segoe UI", 9, Font.BOLD, BaseColor.WHITE);
+
+                    // === Title ===
+                    Paragraph title = new Paragraph("GOODS RECEIPT NOTE (GRN)", titleFont)
+                    {
+                        Alignment = Element.ALIGN_CENTER,
+                        SpacingBefore = 0f,
+                        SpacingAfter = 2f
+                    };
+                    doc.Add(title);
+
+                    Paragraph grnNum = new Paragraph("GRN No: " + grnNo, FontFactory.GetFont("Segoe UI", 10, Font.BOLD, headerBlue))
+                    {
+                        Alignment = Element.ALIGN_CENTER,
+                        SpacingAfter = 10f
+                    };
+                    doc.Add(grnNum);
+
+                    // === PO DETAILS ===
+                    Paragraph poHeader = new Paragraph("PO DETAILS", sectionFont)
+                    {
+                        SpacingAfter = 3f
+                    };
+                    doc.Add(poHeader);
+
+                    PdfPTable poTbl = new PdfPTable(4) { WidthPercentage = 100, SpacingAfter = 10f };
+                    poTbl.SetWidths(new float[] { 1.2f, 2f, 1.2f, 2f });
+
+                    void AddPOCell(string label, string value)
+                    {
+                        poTbl.AddCell(new PdfPCell(new Phrase(label, labelFont))
+                        {
+                            BackgroundColor = softBlue,
+                            Padding = 4,
+                            BorderColor = borderGray
+                        });
+                        poTbl.AddCell(new PdfPCell(new Phrase(value, textFont))
+                        {
+                            Padding = 4,
+                            BorderColor = borderGray
+                        });
+                    }
+
+                    AddPOCell("PO No", poNo);
+                    AddPOCell("PO Date", poDate);
+                    AddPOCell("Company Address", companyAddr);
+                    AddPOCell("Billing Address", billingAddr);
+                    AddPOCell("Vendor Name", vendor);
+                    AddPOCell("", ""); // keeps table aligned
+                    doc.Add(poTbl);
+
+                    // === GRN DETAILS ===
+                    Paragraph grnHeader = new Paragraph("GRN DETAILS", sectionFont)
+                    {
+                        SpacingAfter = 3f
+                    };
+                    doc.Add(grnHeader);
+
+                    PdfPTable grnTbl = new PdfPTable(4) { WidthPercentage = 100, SpacingAfter = 10f };
+                    grnTbl.SetWidths(new float[] { 1.2f, 2f, 1.2f, 2f });
+
+                    void AddGRNCell(string label, string value)
+                    {
+                        grnTbl.AddCell(new PdfPCell(new Phrase(label, labelFont))
+                        {
+                            BackgroundColor = softBlue,
+                            Padding = 4,
+                            BorderColor = borderGray
+                        });
+                        grnTbl.AddCell(new PdfPCell(new Phrase(value, textFont))
+                        {
+                            Padding = 4,
+                            BorderColor = borderGray
+                        });
+                    }
+
+                    AddGRNCell("GRN No", grnNo);
+                    AddGRNCell("GRN Date", grnDate);
+                    AddGRNCell("Invoice No", invoiceNo);
+                    AddGRNCell("Invoice Date", invoiceDate);
+                    AddGRNCell("Received By", receivedBy);
+                    AddGRNCell("Warehouse", warehouseName);
+                    doc.Add(grnTbl);
+
+                    // === ITEM DETAILS ===
+                    Paragraph itemHeader = new Paragraph("GRN ITEM DETAILS", sectionFont)
+                    {
+                        SpacingAfter = 3f
+                    };
+                    doc.Add(itemHeader);
+
+                    PdfPTable itemTbl = new PdfPTable(8) { WidthPercentage = 100, SpacingAfter = 10f };
+                    itemTbl.SetWidths(new float[] { 0.7f, 2f, 2f, 1f, 1f, 1f, 1f, 1.2f });
+
+                    string[] headers = { "Sr.No", "Item Name", "Description", "PO Qty", "GRN Qty", "Rate", "Discount", "Amount" };
+                    foreach (string h in headers)
+                    {
+                        itemTbl.AddCell(new PdfPCell(new Phrase(h, tableHeaderFont))
+                        {
+                            BackgroundColor = tableHeader,
+                            HorizontalAlignment = Element.ALIGN_CENTER,
+                            Padding = 4,
+                            BorderColor = borderGray
+                        });
+                    }
+
+                    if (dsItems != null && dsItems.Tables[0].Rows.Count > 0)
+                    {
+                        int i = 1;
+                        foreach (DataRow dr in dsItems.Tables[0].Rows)
+                        {
+                            BaseColor bg = (i % 2 == 0) ? new BaseColor(248, 248, 248) : BaseColor.WHITE;
+                            string rate = dr["UnitRate"] != DBNull.Value ? "₹ " + Convert.ToDecimal(dr["UnitRate"]).ToString("N2") : "₹ 0.00";
+                            string discount = dr["Discount"] != DBNull.Value ? dr["Discount"].ToString() + " %" : "0 %";
+                            string amount = dr["Amount"] != DBNull.Value ? "₹ " + Convert.ToDecimal(dr["Amount"]).ToString("N2") : "₹ 0.00";
+
+                            itemTbl.AddCell(new PdfPCell(new Phrase(i.ToString(), textFont)) { BackgroundColor = bg, HorizontalAlignment = Element.ALIGN_CENTER, Padding = 4 });
+                            itemTbl.AddCell(new PdfPCell(new Phrase(dr["ItemName"].ToString(), textFont)) { BackgroundColor = bg, Padding = 4 });
+                            itemTbl.AddCell(new PdfPCell(new Phrase(dr["Description"].ToString(), textFont)) { BackgroundColor = bg, Padding = 4 });
+                            itemTbl.AddCell(new PdfPCell(new Phrase(dr["POQuantity"].ToString(), textFont)) { BackgroundColor = bg, HorizontalAlignment = Element.ALIGN_CENTER, Padding = 4 });
+                            itemTbl.AddCell(new PdfPCell(new Phrase(dr["GRNQuantity"].ToString(), textFont)) { BackgroundColor = bg, HorizontalAlignment = Element.ALIGN_CENTER, Padding = 4 });
+                            itemTbl.AddCell(new PdfPCell(new Phrase(rate, textFont)) { BackgroundColor = bg, HorizontalAlignment = Element.ALIGN_RIGHT, Padding = 4 });
+                            itemTbl.AddCell(new PdfPCell(new Phrase(discount, textFont)) { BackgroundColor = bg, HorizontalAlignment = Element.ALIGN_CENTER, Padding = 4 });
+                            itemTbl.AddCell(new PdfPCell(new Phrase(amount, textFont)) { BackgroundColor = bg, HorizontalAlignment = Element.ALIGN_RIGHT, Padding = 4 });
+                            i++;
+                        }
+                    }
+                    doc.Add(itemTbl);
+
+                    // === TOTALS ===
+                    PdfPTable totalTbl = new PdfPTable(2) { WidthPercentage = 40, HorizontalAlignment = Element.ALIGN_RIGHT };
+                    totalTbl.SetWidths(new float[] { 1f, 1f });
+
+                    void AddTotalRow(string label, decimal value, bool highlight = false)
+                    {
+                        totalTbl.AddCell(new PdfPCell(new Phrase(label, highlight ? labelFont : textFont))
+                        {
+                            BackgroundColor = highlight ? softBlue : BaseColor.WHITE,
+                            Padding = 5,
+                            BorderColor = borderGray
+                        });
+                        totalTbl.AddCell(new PdfPCell(new Phrase("₹ " + value.ToString("N2"), highlight ? labelFont : textFont))
+                        {
+                            BackgroundColor = highlight ? softBlue : BaseColor.WHITE,
+                            Padding = 5,
+                            BorderColor = borderGray,
+                            HorizontalAlignment = Element.ALIGN_RIGHT
+                        });
+                    }
+
+                    AddTotalRow("Subtotal", subtotal);
+                    AddTotalRow("Shipping Charges", shipping);
+                    AddTotalRow("Grand Total", grandTotal, highlight: true);
+
+                    doc.Add(totalTbl);
+                    doc.Close();
+
+                    return File(ms.ToArray(), "application/pdf");
+                }
+            }
+            catch (Exception ex)
+            {
+                return new HttpStatusCodeResult(500, "Error generating GRN PDF: " + ex.Message);
+            }
+        }
+
 
         // Fetch list of warehouses asynchronously
         [HttpGet]

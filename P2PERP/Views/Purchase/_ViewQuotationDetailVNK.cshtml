@@ -1,28 +1,55 @@
-﻿@{
+﻿<!--@{
     var rqCode = (string)ViewBag.RegisterQuotationCode ?? "";
 }
 
 <html>
 <head>
     <style>
+
+        thead th {
+            white-space: nowrap !important;
+        }
+
         #grid thead th {
             text-align: center !important;
             vertical-align: middle;
             font-weight: 600;
         }
 
+
+        #grid td.text-end {
+            text-align: center !important;
+        }
+
         #grid tbody td {
             font-size: 14px;
             vertical-align: middle;
+            text-align :center;
         }
 
-        #grid tfoot th, #grid tfoot td {
+
+
+        /* Compact and aligned footer rows */
+        #grid tfoot th,
+        #grid tfoot td {
             font-weight: 600;
-            font-size: 14px;
-            padding: 4px 6px;
-            line-height: 1.2;
+            font-size: 13px;
+            padding: 2px 6px; /* Reduced vertical padding */
+            line-height: 1; /* Tighter spacing */
             text-align: right;
+            vertical-align: middle;
+            white-space: nowrap; /* Prevent ₹ overlap */
         }
+
+        #grid tfoot tr {
+            height: 24px; /* Compact row height */
+        }
+
+
+
+
+
+
 
         #grid td.text-end {
             white-space: nowrap;
@@ -37,46 +64,42 @@
 
     <input type="hidden" id="rqCode" value="@rqCode" />
 
-    <div class="container mt-4">
-        <!-- Single Card wrapping everything -->
-        <div class="card shadow-sm rounded bg-white p-4">
-
-          
-
-            <!-- Header Details -->
-            <div class="row g-3 mb-4">
-                <div class="col-md-2">
-                    <label class="form-label">RFQ No</label>
-                    <input  id="RFQCode" class="form-control small text-muted border rounded p-2 bg-light mb-2 mt-2" readonly />
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Register Quotation Code</label>
-                    <input id="RegisterQuotationCode" class="form-control  small text-muted border rounded p-2 bg-light mb-2 mt-2" readonly />
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">VQ Date</label>
-                    <input id="SystemDate" class="form-control  small text-muted border rounded p-2 bg-light mb-2 mt-2" readonly />
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Vendor Name</label>
-                    <input id="VendorName" class="form-control  small text-muted border rounded p-2 bg-light mb-2 mt-2" readonly />
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Vendor Code</label>
-                    <input id="VendorCode" class="form-control  small text-muted border rounded p-2 bg-light mb-2 mt-2" readonly />
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Vendor Company</label>
-                    <input id="CompanyName" class="form-control  small text-muted border rounded p-2 bg-light mb-2 mt-2" readonly />
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Vendor Expected Delivery Date</label>
-                    <input id="VendorDeliveryDate" class="form-control  small text-muted border rounded p-2 bg-light mb-2 mt-2" readonly />
-                </div>
-            </div>
-
-            <!-- Items Table -->
-            <div class="table-responsive">
+    <div class="container mt-4">-->
+<!-- Single Card wrapping everything -->
+<!--<div class="card shadow-sm rounded bg-white p-4">-->
+<!-- Header Details -->
+<!--<div class="row g-3 mb-4">
+    <div class="col-md-2">
+        <label class="form-label fw-bold text-dark">RFQ No</label>
+        <input  id="RFQCode" class="form-control form-control-sm small text-muted border rounded p-2 bg-light mb-2 mt-2" readonly />
+    </div>
+    <div class="col-md-3">
+        <label class="form-label fw-bold text-dark">Register Quotation Code</label>
+        <input id="RegisterQuotationCode" class="form-control form-control-sm text-muted border rounded p-2 bg-light mb-2 mt-2" readonly />
+    </div>
+    <div class="col-md-3">
+        <label class="form-label fw-bold text-dark">VQ Date</label>
+        <input id="SystemDate" class="form-control form-control-sm text-muted border rounded p-2 bg-light mb-2 mt-2" readonly />
+    </div>
+    <div class="col-md-2">
+        <label class="form-label fw-bold text-dark">Vendor Name</label>
+        <input id="VendorName" class="form-control form-control-sm text-muted border rounded p-2 bg-light mb-2 mt-2" readonly />
+    </div>
+    <div class="col-md-2">
+        <label class="form-label fw-bold text-dark">Vendor Code</label>
+        <input id="VendorCode" class="form-control form-control-sm text-muted border rounded p-2 bg-light mb-2 mt-2" readonly />
+    </div>
+    <div class="col-md-3">
+        <label class="form-label fw-bold text-dark">Vendor Company</label>
+        <input id="CompanyName" class="form-control form-control-sm text-muted border rounded p-2 bg-light mb-2 mt-2" readonly />
+    </div>
+    <div class="col-md-3">
+        <label class="form-label fw-bold text-dark">Vendor Expected Delivery Date</label>
+        <input id="VendorDeliveryDate" class="form-control form-control-sm text-muted border rounded p-2 bg-light mb-2 mt-2" readonly />
+    </div>
+</div>-->
+<!-- Items Table -->
+<!--<div class="table-responsive">
                 <table class="table table-bordered table-hover m-0" id="grid">
                     <thead class="table-dark text-center">
                         <tr>
@@ -148,7 +171,7 @@
                     $("#ftShipping").text("₹ " + Number(h.ShippingCharges || 0).toFixed(2));
                 });
 
-           
+
             // Get RQItems By Code
             $.getJSON('/Purchase/GetRQItemsByCodeVNK', { rqCode: rqCode })
                 .done(function (rows) {
@@ -221,6 +244,335 @@
                 window.print();
             });
             })();
+
+
+
+
+
+        //Modal Hide show
+        $(document).on('hidden.bs.modal', '.modal', function () {
+            if ($('.modal.show').length) {
+                $('body').addClass('modal-open');
+            }
+        });
+
+    </script>
+
+</body>
+</html>-->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html>
+<head>
+    <style>
+
+        thead th {
+            white-space: nowrap !important;
+        }
+
+        #grid thead th {
+            text-align: center !important;
+            vertical-align: middle;
+            font-weight: 600;
+        }
+
+
+        #grid td.text-end {
+            text-align: center !important;
+        }
+
+        #grid tbody td {
+            font-size: 14px;
+            vertical-align: middle;
+            text-align: center;
+        }
+
+
+
+        /* Compact and aligned footer rows */
+        #grid tfoot th,
+        #grid tfoot td {
+            font-weight: 600;
+            font-size: 13px;
+            padding: 2px 6px; /* Reduced vertical padding */
+            line-height: 1; /* Tighter spacing */
+            text-align: right;
+            vertical-align: middle;
+            white-space: nowrap; /* Prevent ₹ overlap */
+        }
+
+        #grid tfoot tr {
+            height: 24px; /* Compact row height */
+        }
+
+
+
+
+        #grid td.text-end {
+            white-space: nowrap;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* ---------- Info Section Styling ---------- */
+        .row.mb-3 {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .col-md-6 {
+            flex: 1;
+            min-width: 350px;
+        }
+
+        .info-section {
+            background: #fdfdfd;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px 20px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+            height: 100%;
+        }
+
+
+            .info-section h5 {
+                font-weight: 600;
+                color: #004085;
+                border-bottom: 2px solid #dee2e6;
+                padding-bottom: 6px;
+                margin-bottom: 12px;
+            }
+
+        .info-field {
+            display: flex;
+            align-items: center;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+        }
+
+        .label-title {
+            font-weight: 600;
+            color: #222;
+            font-size: 14px;
+            width: 240px;
+        }
+
+        .label-value {
+            color: gray;
+            font-size: 14px;
+            font-weight: 500;
+            background: transparent;
+            border: none;
+            padding: 2px 0;
+            flex: 1;
+        }
+
+        /* Highlight Grand Total row */
+        #grid tfoot tr:last-child {
+            background-color: #f1f3f4 !important; /* subtle gray background */
+            font-weight: 700;
+            border-top: 2px solid #b0b0b0 !important;
+        }
+
+
+    </style>
+</head>
+<body>
+
+    <input type="hidden" id="rqCode" value="@rqCode" />
+
+    <div class="container mt-4">
+        <!-- Single Card wrapping everything -->
+        @*<div class="card shadow-sm rounded bg-white p-4">*@
+
+
+
+
+            <div class="row mb-3">
+                <!-- Left Info Section -->
+                <div class="col-md-6 info-section">
+                    <div class="info-field"><label class="label-title">RFQ No :</label><label id="RFQCode" class="label-value"></label></div>
+                    <div class="info-field"><label class="label-title">Register Quotation Code :</label><label id="RegisterQuotationCode" class="label-value"></label></div>
+                    <div class="info-field"><label class="label-title">VQ Date :</label><label id="SystemDate" class="label-value"></label></div>
+                    <div class="info-field"><label class="label-title">Vendor Name :</label><label id="VendorName" class="label-value" style="white-space: pre-line;"></label></div>
+                </div>
+
+                <!-- Right Info Section -->
+                <div class="col-md-6 info-section">
+                    <div class="info-field"><label class="label-title">Vendor Code :</label><label id="VendorCode" class="label-value"></label></div>
+                    <div class="info-field"><label class="label-title">Vendor Company :</label><label id="CompanyName" class="label-value"></label></div>
+                    <div class="info-field"><label class="label-title">Vendor Expected Delivery Date :</label><label id="VendorDeliveryDate" class="label-value"></label></div>
+                </div>
+            </div>
+
+            <!-- Items Table -->
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover m-0" id="grid">
+                    <thead class="table-dark text-center">
+                        <tr>
+                            <th>SRNO</th>
+                            <th>ITEM CODE</th>
+                            <th>ITEM NAME</th>
+                            <th>DESCRIPTION</th>
+                            <th>QTY</th>
+                            <th>UOM</th>
+                            <th>COST/UNIT</th>
+                            <th>Discount</th>
+                            <th>GST</th>
+                            <th>AMOUNT</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                    <tfoot class="text-end">
+                        <tr>
+                            <th colspan="9" class="text-end">SubTotal</th>
+                            <th id="ftSubTotal">₹ 0.00</th>
+                        </tr>
+                        <tr>
+                            <th colspan="9" class="text-end">Shipping Charges</th>
+                            <th id="ftShipping">₹ 0.00</th>
+                        </tr>
+                        <tr>
+                            <th colspan="9" class="text-end">GrandTotal</th>
+                            <th id="ftGrand">₹ 0.00</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+        </div>
+    
+   
+
+
+
+    <script>
+        (function () {
+            const rqCode = $("#rqCode").val();
+
+            function calcLine(qty, cpu, discPct, gstPct) {
+                qty = Number(qty || 0); cpu = Number(cpu || 0); discPct = Number(discPct || 0); gstPct = Number(gstPct || 0);
+                const base = qty * cpu;
+                const discAmt = base * (discPct / 100);
+                const taxable = base - discAmt;
+                const gstAmt = taxable * (gstPct / 100);
+                const lineTot = taxable + gstAmt;
+                return { lineTot };
+            }
+
+            const today = new Date();
+            $("#SystemDate").text(today.toLocaleDateString('en-GB'));
+
+            //Get RQHeader By Code
+            $.getJSON('/Purchase/GetRQHeaderByCodeVNK', { rqCode: rqCode })
+                .done(function (h) {
+                    if (!h) { alert("Header not found"); return; }
+                    $("#RegisterQuotationCode").text(h.RegisterQuotationCode || "");
+                    $("#RFQCode").text(h.RFQCode || "");
+                    $("#VendorName").text(h.VendorName || "");
+                    $("#VendorCode").text(h.VendorCode || "");
+                    $("#CompanyName").text(h.CompanyName || "");
+                    if (h.VendorDeliveryDateVK) {
+                        const d = new Date(h.VendorDeliveryDateVK);
+                        $("#VendorDeliveryDate").text(d.toLocaleDateString('en-GB'));
+                    }
+                    $("#ftShipping").text("₹ " + Number(h.ShippingCharges || 0).toFixed(2));
+                });
+
+
+            // Get RQItems By Code
+            $.getJSON('/Purchase/GetRQItemsByCodeVNK', { rqCode: rqCode })
+                .done(function (rows) {
+
+                    // ✅ Destroy existing DataTable before changing table content
+                    if ($.fn.DataTable.isDataTable('#grid')) {
+                        $('#grid').DataTable().clear().destroy();
+                    }
+
+                    const $tb = $("#grid tbody").empty();
+                    let subTotal = 0;
+
+                    (rows || []).forEach(function (r, idx) {
+                        const c = calcLine(r.Quantity, r.CostPerUnit, r.Discount, r.GST);
+                        subTotal += c.lineTot;
+                        $tb.append(`
+                    <tr>
+                        <td class="text-center">${idx + 1}</td>
+                        <td class="text-center">${r.ItemCode}</td>
+                        <td>${r.ItemName || ""}</td>
+                        <td class="text-center" title="${r.Description || ''}" data-bs-toggle="tooltip">${r.Description || ""}</td>
+                        <td class="text-end">${Number(r.Quantity || 0)}</td>
+                        <td class="text-center">${r.UOMName || ""}</td>
+                        <td class="text-end">₹ ${Number(r.CostPerUnit || 0).toFixed(2)}</td>
+                        <td class="text-end">${Number(r.Discount || 0).toFixed(2)}%</td>
+                        <td class="text-end">${Number(r.GST || 0).toFixed(2)}%</td>
+                        <td class="text-end">₹ ${c.lineTot.toFixed(2)}</td>
+                    </tr>
+                `);
+                    });
+
+                    // ✅ Update totals
+                    $("#ftSubTotal").text("₹ " + subTotal.toFixed(2));
+                    const shipping = Number($("#ftShipping").text().replace("₹", "").trim() || 0);
+                    $("#ftGrand").text("₹ " + (subTotal + shipping).toFixed(2));
+
+                    // ✅ Reinitialize DataTable AFTER adding rows
+                    $('#grid').DataTable({
+
+
+                        paging: true,
+                        searching: true,
+                        info: true,
+                        ordering: false,
+                        lengthChange: false,
+                        pageLength: 10,
+                        language: {
+                            info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                            infoEmpty: "No entries available",
+                            lengthMenu: "Show _MENU_ entries",
+                            paginate: { previous: "<", next: ">" }
+                        },
+
+                        dom: '<"d-flex justify-content-between align-items-center mb-2"<"d-flex"l><"d-flex justify-content-end"f>>t<"d-flex justify-content-between align-items-center mt-2"ip>',
+                        initComplete: function () {
+                            $('#grid_filter input').addClass("form-control ms-2").attr("placeholder", "Search...").css("height", "40px");
+                        }
+
+                    });
+
+                    // Re-enable tooltips
+                    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                    tooltipTriggerList.map(function (tooltipTriggerEl) {
+                        return new bootstrap.Tooltip(tooltipTriggerEl);
+                    });
+                });
+
+
+            $("#btnPrint").on("click", function () {
+                window.print();
+            });
+        })();
 
 
 

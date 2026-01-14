@@ -61,8 +61,8 @@
                             <td>@item.ItemDescription</td>
                             <td>@item.Qty</td>
                             <td>@item.UOM</td>
-                            <td>@item.UnitRate.ToString("N2")</td>
-                            <td>@item.Amount.ToString("N2")</td>
+                            <td>₹@item.UnitRate.ToString("N2")</td>
+                            <td>₹@item.Amount.ToString("N2")</td>
                         </tr>
                         sr++;
                     }
@@ -83,7 +83,7 @@
             <table class="table table-bordered">
                 <tbody>
                     @*<tr><th>Total:</th><td>@Model.Items.Sum(i => i.Amount).ToString("N2")</td></tr>*@
-                    <tr><th>Total Amount:</th><td>@Model.TotalAmount.ToString("N2")</td></tr>
+                    <tr><th>Total Amount:</th><td>₹@Model.TotalAmount.ToString("N2")</td></tr>
                 </tbody>
             </table>
         </div>

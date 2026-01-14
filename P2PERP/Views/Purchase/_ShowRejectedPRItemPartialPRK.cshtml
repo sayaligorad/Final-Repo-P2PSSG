@@ -1,102 +1,167 @@
-﻿@{
-    Layout = null; // No layout for partial view
+﻿
+
+@{
+    ViewBag.Title = "Rejected PR Items";
+    string prCode = ViewBag.PRCode ?? "";
 }
 
-<!-- Table Container -->
+<div class="container mt-3">
+    <!-- 🔹 PR Code Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <span class="badge bg-light text-black fs-6 px-3 py-2 shadow-sm">
+            PR Code: @prCode
 
-<div class="table-responsive">
-    <table id="rejectedPrTable" class="table table-bordered table-hover align-middle shadow-sm">
-        <thead class="table-dark text-center">
-            <tr>
-                <th>PR Code</th>
-                <th>Added Date</th>
-                <th>Approved/Rejected Date</th>
-                <th>Status</th>
-                <th>Priority</th>
-                <th>Description</th>
-            </tr>
-        </thead>
-        <tbody id="tbodyPartial" class="text-center">
-            <tr>
-                <td colspan="6" class="text-muted py-3">Loading...</td>
-            </tr>
-        </tbody>
-    </table>
+        </span>
+    </div>
+
+    <!-- PR Items Table -->
+    <div class="card shadow-sm border-0 rounded-3 mb-4">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table id="approvedPrItemsTable" class="table table-striped table-hover table-bordered align-middle mb-0">
+                    <thead class="table-dark text-center">
+                        <tr>
+                            <th>Sr No</th>
+                            <th>Item Name</th>
+                            <th>Required Quantity</th>
+                            <th>Unit Rate</th>
+                            <th>Expected Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="prItemBody" class="text-center">
+                        <tr>
+                            <td colspan="5" class="text-muted py-3">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- Style for table alignment -->
+<!-- ✅ Styles -->
 <style>
-    #rejectedPrTable thead th,
-    #rejectedPrTable tbody td {
-        text-align: center;
-        vertical-align: middle;
+    #approvedPrItemsTable thead th,
+    #approvedPrItemsTable tbody td {
+        text-align: center !important;
+        vertical-align: middle !important;
+    }
+
+    .badge {
+        font-size: 1rem;
+    }
+
+    button.dt-button.processing,
+    div.dt-button.processing {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        background: none !important;
+    }
+
+        button.dt-button.processing:after {
+            content: none !important;
+        }
+
+    thead th {
+        white-space: nowrap !important;
     }
 </style>
 
-<!-- Script -->
+<!-- ✅ Script -->
 <script>
     $(document).ready(function () {
-        const tableId = "#rejectedPrTable";
+        let prCode = '@prCode';
 
-        // Load rejected PRs
+        // 🔹 Toast wrapper
+        function showToast(message, type = "info") {
+            toastr.options = {
+                "closeButton": true,
+                "progressBar": true,
+                "positionClass": "toast-top-right",
+                "timeOut": "3000"
+            };
+            switch (type) {
+                case "success": toastr.success(message); break;
+                case "warning": toastr.warning(message); break;
+                case "danger": toastr.error(message); break;
+                default: toastr.info(message); break;
+            }
+        }
+
+        // 🔹 Load PR Items
         $.ajax({
-            url: '/Purchase/ShowRejectPRK',
+            url: '/Purchase/ShowRejectedPRItemsPRK',
             type: 'GET',
+            data: { prCode: prCode },
             success: function (data) {
-                const $tbody = $("#tbodyPartial");
+                let $tbody = $("#prItemBody");
                 $tbody.empty();
 
-                if (!data || data.length === 0) {
-                    $tbody.append('<tr><td colspan="6" class="text-center text-muted">No records found</td></tr>');
-                    return;
+                if (data && data.length > 0) {
+                    let srNo = 1;
+                    data.forEach(function (item) {
+                        let formattedDate = "";
+
+                        if (item.RequiredDateString) {
+                            // Split the date string manually and rebuild with slashes
+                            // Works for backend sending "YYYY-MM-DD"
+                            let parts = item.RequiredDateString.split('-');
+                            if (parts.length === 3) {
+                                formattedDate = parts[0] + '/' + parts[1] + '/' + parts[2]; // DD/MM/YYYY
+                            } else {
+                                formattedDate = item.RequiredDateString; // fallback
+                            }
+                        }
+
+                        $tbody.append(`
+                                        <tr>
+                                            <td>${srNo++}</td>
+                                            <td>${item.ItemName}</td>
+                                            <td>${item.RequiredQuantity}</td>
+                                            <td>₹ ${item.UnitRates}</td>
+                                            <td>${formattedDate}</td>
+                                        </tr>
+                                    `);
+                         });
+
+
+
+                    // ✅ DataTable with re-index
+                    let table = $('#approvedPrItemsTable').DataTable({
+                        paging: true,
+                        searching: true,
+                        ordering: false,
+                        responsive: true,
+                        lengthChange: false, // 🔹 Enable "entries per page"
+                        info: true,          // 🔹 Show table info (e.g., "Showing 1 to 10 of 50 entries")
+                        pageLength: 10,      // 🔹 Default entries per page
+                        dom: '<"row mb-2"<"col-sm-6"l><"col-sm-6 text-end"f>>' + // top: left = entries, right = search
+                            'rt' +
+                            '<"row mt-2"<"col-sm-6"i><"col-sm-6 text-end"p>>',   // bottom: left = info, right = pagination
+
+                        columnDefs: [
+                            { className: "text-center", targets: "_all" },
+                            { orderable: false, targets: 0 } // Sr No not sortable
+                        ]
+                    });
+
+
+                    table.on('order.dt search.dt draw.dt', function () {
+                        let i = 1;
+                        table.cells(null, 0, { search: 'applied', order: 'applied' })
+                             .every(function () { this.data(i++); });
+                    }).draw();
+
+                } else {
+                    $tbody.html('<tr><td colspan="5" class="text-center text-muted py-3">No records found</td></tr>');
+                    showToast("⚠ No items found for this PR", "warning");
                 }
-
-                data.forEach(function (i) {
-                    $tbody.append(`
-                        <tr>
-                            <td>${i.PRCode}</td>
-                            <td>${i.AddedDate}</td>
-                            <td>${i.ApprovedRejectedDate}</td>
-                            <td>${i.StatusName}</td>
-                            <td>${i.Priority}</td>
-                            <td>${i.Description}</td>
-                        </tr>
-                    `);
-                });
-
-                // Initialize or re-initialize DataTable
-                if ($.fn.DataTable.isDataTable(tableId)) {
-                    $(tableId).DataTable().destroy();
-                }
-
-                $(tableId).DataTable({
-                    paging: true,
-                    searching: true,
-                    ordering: true,
-                    responsive: true,
-                    lengthChange: false,
-                    info: false
-                });
             },
             error: function () {
-                $("#tbodyPartial").html('<tr><td colspan="6" class="text-danger text-center">Error loading records</td></tr>');
+                $("#prItemBody").html('<tr><td colspan="5" class="text-center text-danger py-3">Error loading items</td></tr>');
+                showToast("❌ Error loading PR items", "danger");
             }
-        });
-
-        // Optional: Load rejected PR item details into modal
-        $(document).on("click", ".btnActionPartial", function () {
-            let prCode = $(this).data("id");
-            $.ajax({
-                url: '/Purchase/ShowRejectedPRItemPRK',
-                type: 'GET',
-                data: { prCode: prCode },
-                success: function (partialView) {
-                    $("#prModalBody").html(partialView);
-                },
-                error: function () {
-                    alert("⚠ Error loading PR items");
-                }
-            });
         });
     });
 </script>
+

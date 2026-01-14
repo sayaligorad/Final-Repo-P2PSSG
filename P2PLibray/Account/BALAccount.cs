@@ -568,7 +568,7 @@ namespace P2PLibray.Account
                     id = rfq.IdCode,
                     title = $"Request For Quotation Is Added By {rfq.AddedBy}",
                     start = rfq.AddedDate.ToString("yyyy-MM-dd"),
-                    end = ((rfq.EndDate.Date.AddDays(1) - rfq.AddedDate.Date).TotalDays > 7 ? rfq.AddedDate.Date.AddDays(7) : rfq.EndDate.Date.AddDays(-2)).ToString("yyyy-MM-dd"),
+                    end = rfq.EndDate.ToString("yyyy-MM-dd"),
                     color = "#17a2b8",
                     extendedProps = new
                     {
@@ -678,7 +678,7 @@ namespace P2PLibray.Account
                 {
                     id = $"RQ-{rq.AddedDate:yyyyMMdd}",
                     title = $"{rq.Count} Quotation{(rq.Count != 1 ? "s" : "")} {(rq.Count != 1 ? "Are" : "Is")} Registerd By {rq.AddedBy}",
-                    start = rq.AddedDate.ToString("yyyy-MM-ddTHH:mm:ss"),
+                    start = rq.AddedDate.ToString("yyyy-MM-dd"),
                     color = "#6f42c1",
 
                     extendedProps = new
@@ -749,6 +749,7 @@ namespace P2PLibray.Account
                     podetails.ApprovedBy = dr["ApprovedBy"]?.ToString();
                     podetails.ShippingCharges = dr["ShippingCharges"] != DBNull.Value ? Convert.ToDecimal(dr["ShippingCharges"]) : 0;
                     podetails.AccountantName = dr["AccountantName"]?.ToString();
+                    podetails.Description = dr["Note"]?.ToString();
                 }
 
                 if (await dr.NextResultAsync())
@@ -816,6 +817,7 @@ namespace P2PLibray.Account
                         PODetails.ApprovedBy,
                         PODetails.AccountantName,
                         PODetails.ShippingCharges,
+                        PODetails.Description,
                         PODetails.Items,
                         TermConditions = PODetails.TermConditions ?? new List<string>()
                     }
@@ -1185,8 +1187,8 @@ namespace P2PLibray.Account
                 events.Add(new
                 {
                     id = $"QC-{qc.AddedDate:yyyyMMdd}",
-                    title = $"{qc.Count} Items Has {(qc.Status == "Confirmed" ? "Passed" : "Failed")} Quality Check",
-                    start = qc.AddedDate.ToString("yyyy-MM-ddTHH:mm:ss"),
+                    title = $"{qc.Count} Items Has {(qc.Status == "Confirmed" ? "Passed" : (qc.Status == "Non-Confirmed" ? "Failed" : "Pending"))} Quality Check",
+                    start = qc.AddedDate.ToString("yyyy-MM-dd"),
                     color = "#dc3545",
                     extendedProps = new
                     {
@@ -1300,7 +1302,7 @@ namespace P2PLibray.Account
                 {
                     id = $"RQ-{isr.AddedDate:yyyyMMdd}",
                     title = $"{isr.Count} Item Stock Refill Request{(isr.Count != 1 ? "s":"")} {(isr.Count != 1 ? "Are" : "Is")} Registerd By {isr.AddedBy}",
-                    start = isr.AddedDate.ToString("yyyy-MM-ddTHH:mm:ss"),
+                    start = isr.AddedDate.ToString("yyyy-MM-dd"),
                     color = "#6610f2",
                     extendedProps = new
                     {
@@ -1415,7 +1417,7 @@ namespace P2PLibray.Account
                 {
                     id = $"RQ-{jit.AddedDate:yyyyMMdd}",
                     title = $"{jit.Count} Just In Time Request{(jit.Count != 1 ? "s" : "")} {(jit.Count != 1 ? "Are" : "Is")} Registerd By {jit.AddedBy}",
-                    start = jit.AddedDate.ToString("yyyy-MM-ddTHH:mm:ss"),
+                    start = jit.AddedDate.ToString("yyyy-MM-dd"),
                     color = "#0d6efd",
                     extendedProps = new
                     {

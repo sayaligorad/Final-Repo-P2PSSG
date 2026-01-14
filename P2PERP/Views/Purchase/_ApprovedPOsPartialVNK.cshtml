@@ -1,4 +1,11 @@
 ﻿<style>
+    .container, .tab-content, .card {
+/*                border: none !important; 
+               box-shadow: none !important;*/
+    }
+
+
+
     button.dt-button.processing,
     div.dt-button.processing {
         pointer-events: auto !important;
@@ -9,13 +16,89 @@
         button.dt-button.processing:after {
             content: none !important;
         }
+
+    thead th {
+        white-space: nowrap !important;
+    }
+
+    .form-control, .form-select {
+        border-radius: 0.5rem;
+        border: 1px solid #ced4da;
+        transition: all 0.3s ease;
+    }
+
+    /*.form-control:focus, .form-select:focus {
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+            border-color: #86b7fe;
+        }*/
+
+    .btn {
+        border-radius: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    /*    .card {
+        border: none;
+    }*/
+
+    .table th {
+        border-top: none;
+        font-weight: 600;
+    }
+
+    .table-responsive {
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+
+    .table td, .table th {
+        padding: 0.35rem 0.5rem !important;
+        font-size: 0.78rem;
+        vertical-align: middle;
+    }
+
+    .btn-delete {
+        padding: 2px 6px !important;
+        font-size: 0.70rem !important;
+    }
+
+        .btn-delete i {
+            font-size: 0.75rem !important;
+        }
+
+
+    @@media (max-width: 768px) {
+        .form-control, .form-select, .btn, .table td, .table th {
+            font-size: 0.85rem;
+        }
+    }
+
+    .dt-toolbar {
+        margin-bottom: 2px !important; 
+    }
+
+    div.dt-buttons {
+        margin-bottom: 2px !important;
+    }
+
+    .dataTables_filter {
+        margin-bottom: 2px !important;
+    }
+   
+
+
 </style>
 
 
 <!-- Title -->
-<div class="text-center mb-3">
+<!--<div class="text-center mb-3">
     <h3 class="text-primary fw-bold">Approved Purchase Order</h3>
-</div>
+</div>-->
 
 <!-- Date Range Picker -->
 <div class="mb-3 d-flex align-items-center gap-2">
@@ -48,7 +131,13 @@
 
 
 <script>
+
+     function viewPO(poCode) {
+         window.open('/Purchase/ViewApprovedPOPDF?poCode=' + poCode, '_blank');
+ }
     $(function () {
+
+       
         let approvedTable;
 
         toastr.options = {
@@ -81,9 +170,36 @@
                     { data: 'AddedDateVK', className: 'text-center', render: d => d ? moment(d).format('DD/MM/YYYY') : '' },
                     { data: 'ApprovedRejectedDateVK', className: 'text-center', render: d => d ? moment(d).format('DD/MM/YYYY') : '' },
                     { data: 'CreatedBy', defaultContent: '', className: 'text-center' },
-                    { data: 'StatusName', className: 'text-center', render: d => `<span class="badge bg-success">${d || 'Unknown'}</span>` },
-                    { data: 'POCode', orderable: false, className: 'text-center', render: d => `<button class="btn btn-sm btn-square btn-view btn-primary" data-pocode="${d}" title="View"><i class="bi bi-eye-fill"></i></button>` }
+                    {
+                        data: 'StatusName',
+                        className: 'text-center',
+                        render: function (data, type, row) {
+                            let badgeClass = 'bg-secondary';
+
+                            if (data) {
+                                const status = data.toLowerCase();
+                                if (status === 'approved') badgeClass = 'bg-success';            
+                                else if (status === 'open') badgeClass = 'bg-warning text-dark'; 
+                                else if (status === 'close') badgeClass = 'bg-danger';         
+                            }
+
+                            return `<span class="badge ${badgeClass}">${data || 'Unknown'}</span>`;
+                        }
+                    },
+
+                    //{ data: 'StatusName', className: 'text-center', render: d => `<span class="badge bg-success">${d || 'Unknown'}</span>` },
+
+                //    { data: 'POCode', orderable: false, className: 'text-center', render: d => `<button class="btn btn-sm btn-square btn-view square-pill d-inline-flex align-items-center px-2 py-1 shadow btn-primary" data-pocode="${d}" title="View"><i class="bi bi-eye-fill "></i></button>` }
+
+                    {
+                        data: 'POCode',
+                        orderable: false,
+                        className: 'text-center',
+                        render: (d, type, row) => `<button class="btn btn-primary fs-5 square-pill d-inline-flex align-items-center px-2 py-1 shadow  btn-icon-square" onclick="viewPO('${row.POCode}')"> <i class="bi bi-eye-fill fs-5"></i></button>`
+                    }
+
                 ],
+
 
 
                 buttons: [
@@ -225,6 +341,9 @@
                                     $(this).attr('r', col + rowNum);
                                 });
                             });
+
+
+
 
                             // 🔹 Create Title & Date Rows
                             const titleRow = `

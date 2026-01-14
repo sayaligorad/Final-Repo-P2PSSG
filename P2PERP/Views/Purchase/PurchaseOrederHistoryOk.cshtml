@@ -14,25 +14,33 @@
             justify-content: end;
             margin-right: 20px;
         }
-/*        .dt-search {
-            display: none;
-        }*/
-
-        .daterangepicker-container {
-            border: 1px solid #ccc;
-            padding: 6px 10px;
+        /*.daterangepicker-container {
+            border: 1px solid #ccc !important;
             border-radius: 6px;
-            cursor: pointer;
-            display: inline-block;
-            min-width: 200px;
-            background: #fff;
+            overflow: hidden;*/ /* ensures the border applies cleanly around input-group */
+            /*background-color: #fff;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
+
+            .daterangepicker-container .form-control:focus {
+                box-shadow: none;
+            }
+
+            .daterangepicker-container .input-group-text {
+                background-color: #7357ff !important;*/ /* match your theme */
+                /*color: #fff !important;
+            }
+
+        #Purchasedatepicker {
+            cursor: pointer;
+        }
+
 
         #exportContainer .dt-buttons {
             display: flex;
-            justify-content: end; /* center align */
-            gap: 8px;
-        }
+            justify-content: end;*/ /* center align */
+            /*gap: 8px;
+        }*/
         .table-container {
             overflow-x: auto; /* enable horizontal scroll if needed */
             width: 100%; /* force to parent container width */
@@ -63,6 +71,23 @@
             width: 230px !important; /* or match your preferred width */
             min-width: 230px;
         }
+        .dt-search {
+            margin-bottom: 20px;
+            display: inline;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+            .dt-search label {
+                margin-top: 10px;
+            }
+        #exportContainer .dt-buttons {
+            display: flex;
+            gap: 8px;
+            /*            margin: 0;*/
+            margin-bottom: -40px;
+            z-index: 2;
+        }
 
     </style>
 </head>
@@ -73,31 +98,71 @@
          style="z-index: 2000;">
     </div>
 
-    <div class="container-fluid px-4">
-        <div class="card shadow-lg mb-4 ps-3 pe-3">
-            <h3 class="text-primary d-flex justify-content-center align-content-center">
+    <div class="container-fluid px-4 mt-3">
+        <div class="card shadow-lg ps-3 m-0 pe-3">
+            <h3 class="text-primary d-flex justify-content-center align-content-center m-0">
                 Purchase Order History
             </h3>
 
-            <div class="d-flex justify-content-between align-items-start mb-5 flex-wrap">
-                <!-- Left side -->
-                <div class="d-flex flex-column gap-3 expbtndate">
-                    <!-- Date Range Picker -->
-                    <div class="input-group shadow-sm rounded">
-                        <span class="input-group-text bg-primary text-white border-0">
-                            <i class="bi bi-calendar-date"></i>
-                        </span>
-                        <input type="text" id="Purchasedatepicker"
-                               class="form-control border-0 shadow-none"
-                               placeholder="Select date range" readonly style="height: 100%;" />
+            <!--<div class="d-flex justify-content-between align-items-start mb-5 flex-wrap">
+        <div class="d-flex flex-column gap-3 expbtndate">-->
+            <!-- Date Range Picker -->
+            <!--<div class="daterangepicker-container input-group">
+            <span class="input-group-text bg-primary text-white border-0 rounded-start">
+                <i class="bi bi-calendar-date"></i>
+            </span>
+            <input type="text"
+                   id="Purchasedatepicker"
+                   class="form-control border-0"
+                   placeholder="Select date range"
+                   readonly />
+        </div>-->
+            <!-- Export Buttons -->
+            <!--<div id="exportContainer" class="d-flex align-items-center gap-2"></div>
+        </div>-->
+            <!-- Right side -->
+            <!--<div id="searchContainer"></div>
+        </div>-->
+            <div class="tab-content p-0 ps-1 pe-1 mt-0" id="approval">
+
+                <!-- ✅ Toolbar -->
+                <div class="table-toolbar d-flex justify-content-between align-items-center flex-wrap mb-2 mt-4 px-3 pe-0">
+
+                    <!-- ✅ Left Section: Date Picker + Export Buttons -->
+                    <div class="row d-flex align-items-center flex-wrap gap-3 p-0 pe-0">
+
+                        <div class="d-flex justify-content-between align-items-center flex-wrap ps-0 mb-3">
+                            <!-- ✅ Date Picker Column -->
+                            <div class="col-6 p-0">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-primary text-white">
+                                        <i class="bi bi-calendar-event"></i>
+                                    </span>
+                                    <input type="text" id="Purchasedatepicker" class="form-control" placeholder="Select Date Range" readonly />
+                                </div>
+                            </div>
+                            <!-- ✅ Status Filter (Right) -->
+                            @*<div class="d-flex align-items-center pe-0 ms-12 ps-7">*@
+                            <div class="d-none align-items-center pe-0 ms-12 ps-7">
+                                <label for="statusFilter" class="form-label fw-bold me-2 mb-0 ps-8">Filter by Status</label>
+                                <select id="statusFilter" class="form-select ps-8 pe-0" style="width: 180px;">
+                                    <option value="">All</option>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Open">Open</option>
+                                    <option value="Approve">Approve</option>
+                                    <option value="Reject">Reject</option>
+                                    <option value="Close">Close</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- ✅ Export Buttons -->
+                        <div id="exportContainer" class="d-flex align-items-center gap-2 ps-0"></div>
                     </div>
 
-                    <!-- Export Buttons -->
-                    <div id="exportContainer" class="d-flex align-items-center gap-2"></div>
+                    <!-- ✅ Right Section: Search Box -->
+                    @*<div id="searchContainer" class="d-flex align-items-center mb-4"></div>*@
                 </div>
-
-                <!-- Right side -->
-                <div id="searchContainer"></div>
             </div>
 
 
@@ -124,6 +189,169 @@
                 </table>
             </div>
         </div>
+
+        <!-- Rejected PO Details Modal -->
+        <div class="modal fade" id="rejectedPOModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                <div class="modal-content shadow-lg rounded-3">
+
+                    <!-- Header -->
+                    <div class="modal-header bg-primary text-white d-flex justify-content-center align-items-center rounded-top p-2">
+                        <h5 class="modal-title text-white fw-bold mb-0 fs-5">Rejected Purchase Order Details</h5>
+                        <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2"
+                                data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="modal-body">
+                        <form class="row g-3">
+
+                            <!-- PO Details -->
+                            <h6 class="fw-bold text-primary mt-2">Purchase Order Details</h6>
+                            <div class="col-md-4">
+                                <label class="form-label form-label-sm fw-bold text-dark">PO Code</label>
+                                <input type="text" id="poCode" class="form-control form-control-sm shadow-sm" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label form-label-sm fw-bold text-dark">Added Date</label>
+                                <input type="text" id="poAddedDate" class="form-control form-control-sm shadow-sm" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label form-label-sm fw-bold text-dark">Shipping Charges</label>
+                                <input type="text" id="shippingCharges" class="form-control form-control-sm shadow-sm" readonly>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label form-label-sm fw-bold text-dark">Rejected By</label>
+                                <input type="text" id="rejectedByName" class="form-control form-control-sm shadow-sm" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label form-label-sm fw-bold text-dark">Rejected Date</label>
+                                <input type="text" id="rejectedDate" class="form-control form-control-sm shadow-sm" readonly>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label form-label-sm fw-bold text-dark">Rejection Note</label>
+                                <textarea id="rejectedNote" class="form-control form-control-sm shadow-sm" rows="2" readonly></textarea>
+                            </div>
+
+                            <hr class="mt-3">
+
+                            <!-- Vendor Details -->
+                            <h6 class="fw-bold text-primary mt-2">Vendor Details</h6>
+                            <div class="col-md-4">
+                                <label class="form-label form-label-sm fw-bold text-dark">Vendor Name</label>
+                                <input type="text" id="vendorName" class="form-control form-control-sm shadow-sm" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label form-label-sm fw-bold text-dark">Vendor Address</label>
+                                <input type="text" id="vendorAddress" class="form-control form-control-sm shadow-sm" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label form-label-sm fw-bold text-dark">Vendor Phone</label>
+                                <input type="text" id="vendorPhone" class="form-control form-control-sm shadow-sm" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label form-label-sm fw-bold text-dark">Vendor Email</label>
+                                <input type="text" id="vendorEmail" class="form-control form-control-sm shadow-sm" readonly>
+                            </div>
+                            <hr class="mt-3">
+
+                            <!-- Company Details (remove divthen show correct) -->
+                            <div class="d-none">
+                                <h6 class="fw-bold text-primary mt-2">Company Details</h6>
+                                <div class="col-md-4">
+                                    <label class="form-label form-label-sm fw-bold text-dark">Company Name</label>
+                                    <input type="text" id="companyName" class="form-control form-control-sm shadow-sm" readonly>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label form-label-sm fw-bold text-dark">Address</label>
+                                    <input type="text" id="companyAddress" class="form-control form-control-sm shadow-sm" readonly>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label form-label-sm fw-bold text-dark">Phone</label>
+                                    <input type="text" id="companyPhone" class="form-control form-control-sm shadow-sm" readonly>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label form-label-sm fw-bold text-dark">Email</label>
+                                    <input type="text" id="companyEmail" class="form-control form-control-sm shadow-sm" readonly>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label form-label-sm fw-bold text-dark">Website</label>
+                                    <input type="text" id="companyWebsite" class="form-control form-control-sm shadow-sm" readonly>
+                                </div>
+                            </div>
+
+
+
+                            <!-- Warehouse Details -->
+                            <h6 class="fw-bold text-primary mt-2">Ship To (Warehouse)</h6>
+                            <div class="col-md-4">
+                                <label class="form-label form-label-sm fw-bold text-dark">Warehouse Name</label>
+                                <input type="text" id="warehouseName" class="form-control form-control-sm shadow-sm" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label form-label-sm fw-bold text-dark">Warehouse Address</label>
+                                <input type="text" id="warehouseAddress" class="form-control form-control-sm shadow-sm" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label form-label-sm fw-bold text-dark">Warehouse Phone</label>
+                                <input type="text" id="warehousePhone" class="form-control form-control-sm shadow-sm" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label form-label-sm fw-bold text-dark">Warehouse Email</label>
+                                <input type="text" id="warehouseEmail" class="form-control form-control-sm shadow-sm" readonly>
+                            </div>
+                        </form>
+                        <hr class="mt-3">
+                        <!-- Rejected PO Items Table -->
+                        <div class="table-container  mt-4">
+                            <table class="table table-striped table-bordered text-center align-middle erp-table" id="tblRejectedPOItems">
+                                <thead class="table-dark text-center align-middle">
+                                    <tr>
+                                        <th>SRNO</th>
+                                        <th>Item Code</th>
+                                        <th>Item Name</th>
+                                        <th>Description</th>
+                                        <th>Quantity</th>
+                                        <th>UOM</th>
+                                        <th>Cost/Unit</th>
+                                        <th>Discount</th>
+                                        <th>GST</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="9" class="text-end">Sub Total</td>
+                                        <td id="subAmount" class="text-center"></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="9" class="text-end">Shipping Charges</td>
+                                        <td id="shippingTotal" class="text-center"></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="9" class="text-end fw-bold">Grand Total</td>
+                                        <td id="grandTotal" class="text-center fw-bold"></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="modal-footer py-2 d-flex justify-content-end">
+                        <button type="button" class="btn btn-sm btn-danger btn-sm px-3" data-bs-dismiss="modal">
+                            <i class="bi bi-x-circle me-1"></i> Close
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
     </div>
         <script>
         $(document).ready(function () {
@@ -271,7 +499,7 @@
                         return `<input type="checkbox" class="row-select" value="${row.QuotationID}">`;
                     }
                 },
-                { data: "SRNO", title: "Sr.No" },
+                { data: "SRNO", title: "Sr.No", className:"text-center"},
                 { data: "POCode", title: "PO NO" },
                 {
                     data: "AddedDateString", title: "Added Date",
@@ -299,20 +527,38 @@
                         return "₹ " + data;
                     }
                 },
-                { data: "StateName", title: "Status Name","visible": false},
+                //{ data: "StateName", title: "Status Name"},
+                {
+                    data: "StateName",
+                    title: "Status",
+                    render: function (data) {
+                        if (!data) return "";
+                        let colorClass = "";
+                        switch (data.toLowerCase()) {
+                            case "pending": colorClass = "bg-warning text-dark text-white"; break;
+                            case "open": colorClass = "bg-info text-dark text-white"; break;
+                            case "approve": colorClass = "bg-success text-dark text-white"; break;
+                            case "rejected": colorClass = "bg-danger text-dark text-white"; break;
+                            case "close": colorClass = "bg-danger text-dark text-white"; break;
+                        }
+                        return `<span class="badge ${colorClass}">${data}</span>`;
+                    }
+                },
                 {
                     data: null,
                     render: function (data, type, row) {
                         return `
-                            <button class="btn btn-sm btn-primary btn-view"
-                                    data-row='${JSON.stringify(row)}'
-                                    data-bs-toggle="tooltip"
-                                    data-bs-placement="top"
-                                    title="View PO">
-                                <i class="bi bi-eye-fill"></i>
-                            </button>`;
+                        <button type="button" 
+                                class="btn btn-primary btn-view square-pill d-inline-flex align-items-center px-2 py-1"
+                                data-row='${JSON.stringify(row)}'
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
+                                title="View PO">
+                            <i class="bi bi-eye-fill fs-6"></i>
+                        </button>`;
                     }
                 }
+
             ],
             paging: true,
             searching: true,
@@ -421,7 +667,7 @@
                 // PDF Export button
                 {
                     extend: 'pdfHtml5',
-                    text: '<i class="bi bi-file-earmark-pdf-fill text-danger fs-5"></i>',
+                    text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
                     titleAttr: 'PDF',
                     title: 'Purchase Order History List',
                     orientation: 'landscape',
@@ -480,7 +726,7 @@
                 // Excel Export button
                 {
                     extend: 'excelHtml5',
-                    text: '<i class="bi bi-file-earmark-excel-fill text-success fs-5"></i>',
+                    text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
                     titleAttr: 'Excel',
                     title: '',//Purchase Order History List
                     exportOptions: {
@@ -719,6 +965,7 @@
         // View PO button click handler
         $(document).on("click", ".btn-view", function () {
             let row = $(this).data("row");
+            console.log("PO deatils: ", row);
             // Open PDF in new tab
             window.open('/Purchase/GeneratePOPDF?POCode=' + row.POCode, '_blank');
         });
@@ -743,7 +990,7 @@
                     //'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
                 }
             }, function (start, end) {
-                // Update input field
+                // Update input field   
                 $('#Purchasedatepicker').val(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
 
                 // Filter DataTable rows based on selected date range
@@ -756,7 +1003,7 @@
                 $.fn.dataTable.ext.search.pop();
             });
 
-            // Clear date picker when cancelled
+            // Clear date picker when cancell
             $('#Purchasedatepicker').on('cancel.daterangepicker', function () {
                 $(this).val('');
                 tblPOHistory.draw();
@@ -770,7 +1017,10 @@
 
 
         // Handle Select All checkbox (duplicate - consider removing one)
-        $(document).on('change', '#selectAll', function () {
+            //$(document).on('change', '#selectAll', function () {
+            $(document).off("click", ".btn-view").on("click", ".btn-view", function (e) {
+                e.preventDefault();
+                e.stopPropagation(); // stop any parent click or duplicate handler
             var isChecked = $(this).is(':checked');
             $('.row-select').prop('checked', isChecked);
         });
@@ -782,6 +1032,15 @@
                 $('#selectAll').prop('checked', false);
             }
         });
+            // 🔹 Custom filter by Status
+            $('#statusFilter').on('change', function () {
+                var selectedStatus = $(this).val();
+
+                // Apply custom search to Status column
+                // Assuming your Status column is index 7 (check your column order!)
+                tblPOHistory.column(7).search(selectedStatus, true, false).draw();
+            });
+
 
         // View PO button click handler (duplicate - consider removing one)
         $(document).on("click", ".btn-view", function (e) {
@@ -799,10 +1058,165 @@
 
             // Your existing logic: open PDF
             let row = $(this).data("row");
-            window.open('/Purchase/GeneratePOPDF?POCode=' + row.POCode, '_blank');
+            if (row.StateName && row.StateName.trim().toLowerCase() === 'rejected') {
+                console.log("PO is Rejected");
+                
+                viewRejectedPODetails(row.POCode); 
+                return;
+            }
+            else {
+                window.open('/Purchase/GeneratePOPDF?POCode=' + row.POCode, '_blank');
+            }
         });
 
-    });
+            function viewRejectedPODetails(poCode) {
+                $.ajax({
+                    url: '/Purchase/GetRejectedPODetailsOK',
+                    type: 'GET',
+                    data: { poCode: poCode },
+                    success: function (data) {
+                        if (data) {
+                            const po = data.po;
+
+                            // ✅ Fill Company details
+                            $('#companyName').val(po.CompanyName);
+                            $('#companyAddress').val(po.CompanyAddress);
+                            $('#companyPhone').val(po.CompanyPhone);
+                            $('#companyEmail').val(po.CompanyEmail);
+                            $('#companyWebsite').val(po.Website);
+
+                            // ✅ Fill PO details
+                            $('#poCode').val(po.POCode);
+                            //$('#poAddedDate').val(po.AddedDate);
+                            if (po.AddedDate) {
+                                console.log(po.AddedDate);
+                                $("#poAddedDate").val(moment(po.AddedDate, "YYYY-MM-DD").format("DD/MM/YYYY"));
+                            }
+
+                            $('#shippingCharges').val(po.ShippingCharges);
+                            $('#rejectedByName').val(po.ApprovedBy);
+                            //$('#rejectedDate').val(po.ApprovedRejectedDate);
+                            if (po.ApprovedRejectedDate) {
+                                console.log(po.ApprovedRejectedDate);
+                                $("#rejectedDate").val(moment(po.ApprovedRejectedDate, "YYYY-MM-DD").format("DD/MM/YYYY"));
+                            }
+
+                            $('#rejectedNote').val(po.Note);
+
+                            // ✅ Fill Vendor details
+                            $('#vendorName').val(po.VendorName);
+                            $('#vendorAddress').val(po.VendorAddress);
+                            $('#vendorPhone').val(po.VendorPhone);
+                            $('#vendorEmail').val(po.VendorEmail);
+
+                            // ✅ Fill Warehouse details
+                            $('#warehouseName').val(po.WarehouseName);
+                            $('#warehouseAddress').val(po.WarehouseAddress);
+                            $('#warehousePhone').val(po.WarehousePhone);
+                            $('#warehouseEmail').val(po.WarehouseEmail);
+
+                            // ✅ Fill amount summary
+                            $('#subAmount').text('₹' +po.SubAmount);
+                            $('#shippingTotal').text('₹' +po.ShippingCharges);
+                            $('#grandTotal').text('₹' +po.GrandTotal);
+
+                            // ✅ Initialize / Refresh DataTable
+                            if ($.fn.DataTable.isDataTable('#tblRejectedPOItems')) {
+                                $('#tblRejectedPOItems').DataTable().clear().destroy();
+                            }
+
+                            // ✅ Initialize new DataTable
+                            $('#tblRejectedPOItems').DataTable({
+                                data: data.poItems,
+                                destroy: true,
+                                responsive: true,
+                                paging: false,
+                                searching: false,
+                                ordering: false,
+                                //scrollX: false,
+                                info: false,
+                                columns: [
+                                    { data: null, title: "Sr.No", render: (d, t, r, m) => m.row + 1 },
+                                    { data: "ItemCode", title: "Item Code" },
+                                    { data: "ItemName", title: "Item Name" },
+                                    {
+                                        data: "Description",
+                                        defaultContent: "",
+                                        render: function (data) {
+                                            const safeData = (data || "").replace(/"/g, '&quot;');
+                                            return `<span data-bs-toggle="tooltip" title="${safeData}">${data}</span>`;
+                                        }
+                                    },
+                                    { data: "Quantity", title: "Qty" },
+                                    { data: "UOM", title: "UOM" },
+                                    {
+                                        data: "CostPerUnit",
+                                        title:"CostPerUnit",
+                                        defaultContent: "",
+                                        render: function (data, type, row) {
+                                            if (type === 'display' || type === 'filter') {
+                                                return '₹' + parseFloat(data || 0).toFixed(2);
+                                            }
+                                            return data;
+                                        }
+                                    },
+                                    { data: "Discount", title: "Discount" },
+                                    { data: "GST", title: "GST" },
+                                    {
+                                        data: "Amount",
+                                        defaultContent: "",
+                                        render: function (data, type, row) {
+                                            if (type === 'display' || type === 'filter') {
+                                                return '₹' + parseFloat(data || 0).toFixed(2);
+                                            }
+                                            return data;
+                                        }
+                                    }
+                                ],
+                                drawCallback: function () {
+                                    $('#tblRejectedPOItems [data-bs-toggle="tooltip"]').each(function () {
+                                        const t = bootstrap.Tooltip.getInstance(this);
+                                        if (t) t.dispose();
+                                        new bootstrap.Tooltip(this, {
+                                            customClass: 'tooltip-dark',
+                                            trigger: 'hover focus'
+                                        });
+                                    });
+                                },
+                                columnDefs: [
+                                    { className: "text-center", targets: "_all" }
+                                ]
+                                //order: [],
+                                //dom: 'Bfrtip'
+                             
+                            });
+
+                            // ✅ Show modal
+                            $('#rejectedPOModal').modal('show');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error fetching rejected PO details:", error);
+                    }
+                });
+            }
+
+            });
+
+           
+
+            // Initialize Bootstrap tooltips
+            function initTooltips() {
+                const tooltipTriggerList = [].slice.call(
+                    document.querySelectorAll('[data-bs-toggle="tooltip"]')
+                );
+                tooltipTriggerList.map(function (tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl, {
+                        customClass: 'tooltip-dark',
+                        trigger: 'hover'
+                    });
+                });
+            }
 
     // Helper function to recalc SrNo for export across all pages
     function getExportSrNo(rowIdx, tbl) {

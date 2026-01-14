@@ -5,115 +5,115 @@
 
 <div class="container">
     <div class="card shadow-lg border-0 rounded-4 p-4">
-        <h4 class="mb-4 text-primary fw-bold text-center">Items Request Management</h4>
+        <h3 class="mb-1 text-primary text-center">Items Request Management</h3>
         <div class="row mb-3">
             <div class="row mb-3">
                 <div class="col-md-3">
-                    <label class="form-label fw-bold">
+                    <label class="form-label form-label-sm fw-bold">
                         Items Request: <span class="text-danger">*</span>
                     </label>
-                    <select id="ItemReqStatus" class="form-select"></select>
+                    <select id="ItemReqStatus" class="form-select form-select-sm"></select>
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label fw-bold">
+                <div class="col-md-3 mb-1">
+                    <label class="form-label form-label-sm fw-bold">
                         Select Plan: <span class="text-danger">*</span>
                     </label>
-                    <select id="planname" class="form-select" disabled style="max-height:100px !important; overflow-y:auto"></select>
-                </div>
-            </div>
-            </div>
-            <div class="mb-2">
-                <div class="d-flex justify-content-between align-items-center">
-                    <!-- Datepicker (Left) -->
-                    <div class="input-group" style="max-width: 340px;">
-                        <span class="input-group-text bg-primary text-white">
-                            <i class="bi bi-calendar-date"></i>
-                        </span>
-                        <input type="text" id="FirstreportrangePSM" class="form-control" readonly placeholder="Select Date" />
-                    </div>
-
-                    <!-- Button (Right) -->
-                    <button id="btnCreatePR" class="btn btn-success ms-2" data-bs-toggle="modal" data-bs-target="#createPRModal">
-                        <i class="bi bi-plus-circle"></i> Create PR
-                    </button>
-                </div>
-                <div class="table-responsive text-center mt-3">
-                    <table id="itemsTable" class="table table-bordered table-striped table-hover w-100 text-center align-middle">
-                        <thead class="table-dark text-center">
-                            <tr>
-                                <th><input type="checkbox" id="selectAll" /></th>
-                                <th>SR No</th>
-                                <th>Item Code</th>
-                                <th>Item Name</th>
-                                <th>Description</th>
-                                <th>UOM</th>
-                                <th class="text-center">Unit Rate</th>
-                                <th class="text-center">Quantity</th>
-                                <th class="text-center">Required Date</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-center"></tbody>
-                    </table>
+                    <select id="planname" class="form-select form-select-sm" disabled style="max-height:100px !important; overflow-y:auto"></select>
                 </div>
             </div>
         </div>
+        <div class="mb-1">
+            <div class="d-flex justify-content-between align-items-center">
+                <!-- Datepicker (Left) -->
+                <div class="input-group" style="max-width: 280px;">
+                    <span class="input-group-text bg-primary text-white">
+                        <i class="bi bi-calendar-date"></i>
+                    </span>
+                    <input type="text" id="FirstreportrangePSM" class="form-control" readonly placeholder="Select Date Range" />
+                </div>
 
-<!-- Create PR Modal -->
-<div class="modal fade" id="createPRModal" tabindex="-1" aria-labelledby="createPRModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white pe-3 d-flex align-items-center justify-content-between">
-                <h5 class="modal-title fw-semibold text-white text-center flex-grow-1 m-0" id="createPRModalLabel">
-                    <i class="bi bi-cart-plus me-2 text-white"></i>
-                    Create Purchase Requisition For Stock Requirement and MRP Items
-                </h5>
-                <button type="button" class="btn-close btn-close-white ms-2" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" id="btnCreatePR" class="btn btn-sm btn-success shadow-sm px-5">
+                    <i class="bi bi-plus-circle small me-2"></i> <span class="small">Create PR</span>
+                </button>
             </div>
-            <div class="modal-body">
-                <form id="prForm">
-                    @Html.AntiForgeryToken()
-                    <div class="row g-4 mb-3">
-                        <div class="col-md-3">
-                            <label class="form-label fw-bold">Purchase Requisition No:</label>
-                            <input type="text" id="PRcode" name="PRCode" class="form-control form-control bg-light text-dark border-secondary" readonly/>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label fw-bold">PR Required Date:<span class="text-danger">*</span></label>
-                            <input type="date" id="ToDate" name="RequiredDate" class="form-control" />
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label fw-bold">Priority:<span class="text-danger">*</span></label>
-                            <select id="priority" name="PriorityId" class="form-select"></select>
-                        </div>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-striped text-center" id="ItemTable">
-                            <thead class="table-dark text-center justify-content-center">
-                                <tr>
-                                    <th>SR No</th>
-                                    <th>Item Code</th>
-                                    <th>Item Name</th>
-                                    <th>Description</th>
-                                    <th>UOM</th>
-                                    <th>Unit Rate</th>
-                                    <th>Quantity</th>
-                                    <th>Required Date</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="modalTableBody"></tbody>
-                        </table>
-                    </div>
-                    <div class="d-flex justify-content-end mb-3">
-                        <button type="submit" class="btn btn-success px-5 me-2">
-                            <i class="bi bi-check-circle"></i> Save PR
-                        </button>
-                    </div>
-                </form>
+            <div class="table-responsive text-center mt-3">
+                <table id="itemsTable" class="table table-bordered table-striped table-hover w-100 text-center align-middle">
+                    <thead class="table-dark text-center">
+                        <tr>
+                            <th><input type="checkbox" id="selectAll" /></th>
+                            <th>SR No</th>
+                            <th>Item Code</th>
+                            <th>Item Name</th>
+                            <th>Description</th>
+                            <th>UOM</th>
+                            <th class="text-center">Unit Rate</th>
+                            <th class="text-center">Quantity</th>
+                            <th class="text-center">Required Date</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-center"></tbody>
+                </table>
             </div>
         </div>
     </div>
-  </div>
+
+    <!-- Create PR Modal -->
+    <div class="modal fade" id="createPRModal" tabindex="-1" aria-labelledby="createPRModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="card-header bg-primary text-white d-flex justify-content-center align-items-center rounded-top p-1">
+                    <h3 class="modal-title fw-bold text-white mb-0 fs-5" id="createPRModalLabel">
+                        Create Purchase Requisition For Stock Requirement and MRP Items
+                    </h3>
+                    <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-2 fs-5" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="prForm">
+                        @Html.AntiForgeryToken()
+                        <div class="row g-4 mb-3">
+                            <div class="col-md-3">
+                                <label class="form-label form-label-sm fw-bold">Purchase Requisition No:</label>
+                                <input type="text" id="PRcode" name="PRCode" class="form-control form-control-sm bg-light text-dark border-secondary" readonly />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label form-label-sm fw-bold">PR Required Date:<span class="text-danger">*</span></label>
+                                <input type="date" id="ToDate" name="RequiredDate" class="form-control form-control-sm" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label form-label-sm fw-bold">Priority:<span class="text-danger">*</span></label>
+                                <select id="priority" name="PriorityId" class="form-select form-select-sm "></select>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped text-center" id="ItemTable">
+                                <thead class="table-dark text-center justify-content-center">
+                                    <tr>
+                                        <th>SR No</th>
+                                        <th>Item Code</th>
+                                        <th>Item Name</th>
+                                        <th>Description</th>
+                                        <th>UOM</th>
+                                        <th>Unit Rate</th>
+                                        <th>Quantity</th>
+                                        <th>Required Date</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="modalTableBody"></tbody>
+                            </table>
+                        </div>
+                        <div class="d-flex justify-content-end mb-3">
+                            <button type="submit" class="btn btn-sm btn-success shadow-sm px-5">
+                                <span class="small">
+                                    <i class="bi bi-check-circle small me-2"></i> Save PR
+                                    </span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <style>
     .dropdown-container {
@@ -126,12 +126,63 @@
     #planname[size="5"] {
         overflow-y: auto;
     }
+
     .limited-dropdown {
         max-height: calc(1.5em * 5); /* 5 rows + padding */
         overflow-y: auto;
     }
-    .limited-dropdown option {
-        padding: 5px;
+
+        .limited-dropdown option {
+            padding: 5px;
+        }
+
+    /* ✅ TABLE — compact layout */
+    table.dataTable td,
+    table.dataTable th,
+    .modal table td,
+    .modal table th {
+        padding: 0.35rem 0.5rem !important;
+        font-size: 0.78rem !important;
+        vertical-align: middle !important;
+    }
+
+    /* ✅ DELETE BTN (modal + table) */
+    .btn-delete {
+        padding: 2px 6px !important;
+        font-size: 0.75rem !important;
+        line-height: 1 !important;
+    }
+
+        .btn-delete i {
+            font-size: inherit !important;
+        }
+
+    /* ✅ VIEW PO BUTTON — small square */
+    .btnViewPO {
+        padding: 0 !important;
+        font-size: 0.70rem !important;
+        width: 28px !important;
+        height: 28px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+        .btnViewPO i {
+            font-size: inherit !important;
+        }
+
+    /* ✅ Square utility class — applied globally */
+    .square-btn {
+        width: 28px !important;
+        height: 28px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0 !important;
+    }
+    td, th {
+        text-align: center !important;
     }
 </style>
 
@@ -160,11 +211,11 @@
         var $btnCreatePR = $('#btnCreatePR');
 
         if (checkedCount > 0) {
-            $btnCreatePR.css('pointer-events', 'auto'); 
-            $btnCreatePR.css('opacity', '1');           
+            $btnCreatePR.css('pointer-events', 'auto');
+            $btnCreatePR.css('opacity', '1');
         } else {
-            $btnCreatePR.css('pointer-events', 'none'); 
-            $btnCreatePR.css('opacity', '1');          
+            $btnCreatePR.css('pointer-events', 'none');
+            $btnCreatePR.css('opacity', '1');
         }
         $btnCreatePR.removeClass('btn-secondary').addClass('btn-success');
     }
@@ -201,7 +252,7 @@
                         return meta.row + 1 + meta.settings._iDisplayStart;
                     },
                     orderable: false,
-                    width: "3%",
+                    width: "5%",
                     className: "text-center align-middle"
                 },
                 { data: "ItemCode", className: "text-center align-middle" },
@@ -917,8 +968,8 @@
                         ${rowData.RequiredDate ? new Date(rowData.RequiredDate).toLocaleDateString('en-GB') : ''}
                         </td>
                         <td class="text-center">
-                            <button type="button" class="btn btn-danger btn-sm btn-delete" data-itemcode="${rowData.ItemCode}">
-                                <i class="bi bi-trash"></i>
+                            <button type="button" class="btn btn-danger square-pill square-btn btn-delete fs-5 btn-delete" data-itemcode="${rowData.ItemCode}">
+                                <i class="bi bi-trash fs-5"></i>
                             </button>
                         </td>
                     </tr>`;

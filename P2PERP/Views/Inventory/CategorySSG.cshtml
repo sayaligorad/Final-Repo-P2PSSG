@@ -1,30 +1,36 @@
-﻿@{ 
+﻿@{
     ViewBag.Title = "Item Master";
 }
 
+<div class="card m-5">
 
-<!-- Small Tabs -->
-<ul class="nav nav-pills ps-3 m-3" id="inventoryTabs" role="tablist">
-    <li class="nav-item">
-        <button class="nav-link active small-tab" data-bs-toggle="tab" data-bs-target="#itemmaster" type="button">
-            Item Master
-        </button>
-    </li>
-    <li class="nav-item">
-        <button class="nav-link small-tab" data-bs-toggle="tab" data-bs-target="#itemcategory" type="button">
-            Item Category
-        </button>
-    </li>
-</ul>
+    <!-- Titles -->
+    <h4 id="mainTitle" class="w-100 text-center text-primary fw-bolder mt-5 ">Item Master List</h4>
+    <h4 id="subTitle" class="text-primary fw-bolder text-center flex-grow-1 mt-5 m-0">Category List</h4>
 
-<!-- Tab Content -->
-<div class="tab-content ">
-    <div class="tab-pane fade show active" id="itemmaster" role="tabpanel">
-        @Html.Partial("_ItemMasterOJ")
-    </div>
+    <!-- Small Tabs -->
+    <ul class="nav nav-pills ps-3 m-3" id="inventoryTabs" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active small-tab" data-bs-toggle="tab" data-bs-target="#itemmaster" type="button">
+                Item Master
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link small-tab" data-bs-toggle="tab" data-bs-target="#itemcategory" type="button">
+                Item Category
+            </button>
+        </li>
+    </ul>
 
-    <div class="tab-pane fade" id="itemcategory" role="tabpanel">
-        @Html.Partial("_CategoryListSSG")
+    <!-- Tab Content -->
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="itemmaster" role="tabpanel">
+            @Html.Partial("_ItemMasterOJ")
+        </div>
+
+        <div class="tab-pane fade" id="itemcategory" role="tabpanel">
+            @Html.Partial("_CategoryListSSG")
+        </div>
     </div>
 </div>
 
@@ -34,7 +40,32 @@
         box-shadow: none !important;
         background: transparent !important;
     }
+
     .content-wrapper {
         justify-content: start !important;
     }
 </style>
+
+<script>
+    // Show or hide titles based on selected tab
+    document.querySelectorAll('#inventoryTabs button').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const mainTitle = document.getElementById('mainTitle');
+            const subTitle = document.getElementById('subTitle');
+
+            if (this.dataset.bsTarget === '#itemmaster') {
+                mainTitle.style.display = 'block';
+                subTitle.style.display = 'none';
+            } else if (this.dataset.bsTarget === '#itemcategory') {
+                mainTitle.style.display = 'none';
+                subTitle.style.display = 'block';
+            }
+        });
+    });
+
+    // Default state (Item Master tab active)
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('mainTitle').style.display = 'block';
+        document.getElementById('subTitle').style.display = 'none';
+    });
+</script>

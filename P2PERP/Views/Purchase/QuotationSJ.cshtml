@@ -41,7 +41,6 @@
         display: flex;
         align-items: center;
         justify-content: center;
-     
     }
 
     /* Do NOT touch .input-group borders or box-shadow */
@@ -125,7 +124,7 @@
         box-shadow: none !important;
     }
 
-  
+
 
     /* Checkboxes: keep blue when checked, no green validation */
     .was-validated .form-check-input:valid:checked,
@@ -133,26 +132,30 @@
         background-color: #0d6efd !important; /* blue */
         border-color: #0d6efd !important;
     }
-
-
 </style>
 
 
-<div id="pageContent" class="main-content">
-    <div class="container mt-5">
-        <div class="row mb-2">
-            <div class="col-6 d-flex gap-2">
-                <button id="btnAllPR" class="btn btn-primary w-100 active text-nowrap">All Approved PR</button>
-                <button id="btnAllRFQ" class="btn btn-light w-100 text-nowrap">All RFQ</button>
-            </div>
+<div id="pageContent" class="card ms-5 me-5 mt-5 p-4 shadow-sm">
+
+    <div class="mt-4">
+
+        <!-- 🔹 Header (Centered) -->
+        <div class="text-center mb-4">
+            <h3 id="pageHeader" class="text-primary fw-bold mb-0">All Approved PR</h3>
         </div>
 
+        <!-- 🔹 Tabs (Buttons Below Header, Left-Aligned) -->
+        <div class="row mb-4 justify-content-start">
+            <div class="col-md-4 d-flex gap-2 justify-content-center">
+                <button id="btnAllPR" class="btn btn-primary btn-sm flex-fill w-100 active text-nowrap">All Approved PR</button>
+                <button id="btnAllRFQ" class="btn btn-light btn-sm flex-fill w-100 text-nowrap">All RFQ</button>
+            </div>
 
+        </div>
 
-        <!-- PR List -->
-        <div id="quotationList" class="card mt-3">
-            <div class="card-body">
-                <h3 class="text-center text-primary">All Approved PR</h3>
+        <!-- 🔹 PR List -->
+        <div id="quotationList">
+            <div>
                 <div class="row mb-3">
                     <div class="col-md-4">
                         <div class="input-group">
@@ -166,16 +169,15 @@
                                    readonly />
                         </div>
                     </div>
-
                 </div>
 
-                <div class="table-responsive">
-                    <table id="tblRecent" class="table table-striped table-bordered">
-                        <thead class="table-dark">
+                <div>
+                    <table id="tblRecent" class="table table-striped table-bordered align-middle">
+                        <thead class="table-dark text-center">
                             <tr>
                                 <th><input type="checkbox" id="selectAllPR"></th>
                                 <th>Sr.NO.</th>
-                                <th>PRCode</th>
+                                <th>PR Code</th>
                                 <th>Required Date</th>
                                 <th>Added Date</th>
                                 <th>Added By</th>
@@ -183,16 +185,15 @@
                                 <th>Action</th>
                             </tr>
                         </thead>
-
                         <tbody></tbody>
                     </table>
                 </div>
             </div>
         </div>
-        <!-- RFQ Table (hidden initially) -->
-        <div id="rfqList" class="card mt-3" style="display:none;">
-            <div class="card-body">
-                <h3 class="text-center text-primary">All RFQs</h3>
+
+        <!-- 🔹 RFQ Table (hidden initially) -->
+        <div id="rfqList" style="display:none;">
+            <div>
                 <div class="row mb-3">
                     <div class="col-md-4">
                         <div class="input-group">
@@ -202,97 +203,93 @@
                             <input type="text" id="rfqDateRange" class="form-control dtpicker" placeholder="Select Date Range" readonly />
                         </div>
                     </div>
-
-
                 </div>
 
-                <div class="table-responsive">
-                    <table id="tblRFQ" class="table table-bordered table-striped">
-                        <thead class="table-dark">
+                <div>
+                    <table id="tblRFQ" class="table table-bordered table-striped align-middle">
+                        <thead class="table-dark text-center">
                             <tr>
-                                <th class="text-center">Sr.No.</th>
-                                <th class="text-center">PR Code</th>
-                                <th class="text-center">RFQ Code</th>
-                                <th class="text-center">Required Date</th>
-                                <th class="text-center">Description</th>
-                                <th class="text-center">Status</th>
-                                <th class="text-center">Action</th>
+                                <th>Sr.No.</th>
+                                <th>PR Code</th>
+                                <th>RFQ Code</th>
+                                <th>Required Date</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
-
                 </div>
             </div>
         </div>
 
-        <div id="vendorContainer" class="card mt-3" style="display:none;">
-            <div class="card-body">
+        <!-- 🔹 Vendor Container -->
+        <div id="vendorContainer" style="display:none;">
+            <div>
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div>
-                        <h5 class="text-primary">Send RFQ to Vendors</h5>
+                        <h5 class="text-primary mb-0">Send RFQ to Vendors</h5>
                     </div>
 
                     <div class="d-flex align-items-center gap-3">
                         <div>
-                            <select id="industryFilter" class="form-select form-select-sm">
+                            <select id="industryFilter" class="form-select form-select-sm shadow-sm text-dark">
                                 <option value="">--Select Industry Type--</option>
                             </select>
                         </div>
-                        <button type="button" class="btn btn-primary" id="btnAddVendor">Add Vendor</button>
-                        <button id="btnBackToDetails" class="btn btn-secondary">Back</button>
+                        <button type="button" class="btn btn-sm btn-primary" id="btnAddVendor"><i class="bi bi-plus-circle me-2"></i>Add Vendor</button>
+                        <button id="btnBackToDetails" class="btn btn-sm btn-secondary"><i class="bi bi-arrow-left"></i>Back</button>
                     </div>
                 </div>
-
 
                 <!-- Autofilled fields -->
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label class="form-label">PR Code</label>
-                        <input type="text" id="vendorPRCode" class="form-control bg-light" readonly />
+                        <input type="text" id="vendorPRCode" class="form-control form-control-sm bg-light text-dark shadow-sm" readonly />
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">RFQ Code</label>
-                        <input type="text" id="vendorRFQCode" class="form-control bg-light" readonly />
+                        <input type="text" id="vendorRFQCode" class="form-control form-control-sm bg-light text-dark shadow-sm" readonly />
                     </div>
                 </div>
-                <table id="vendorsTable" class="table table-striped table-bordered">
-                    <thead class="table-dark">
+
+                <table id="vendorsTable" class="table table-striped table-bordered align-middle">
+                    <thead class="table-dark text-center">
                         <tr>
-                            <th class="text-center"><input type="checkbox" id="selectAllVendors" /></th>
-                            <th class="text-center">Sr.No.</th>
-                            <th class="text-center">Vendor Name</th>
-                            <th class="text-center">Company Name</th>
-                            <th class="text-center">Phone</th>
-                            <th class="text-center">Email</th>
-                            <th class="text-center">Address</th>
+                            <th><input type="checkbox" id="selectAllVendors" /></th>
+                            <th>Sr.No.</th>
+                            <th>Vendor Name</th>
+                            <th>Company Name</th>
+                            <th>Phone</th>
+                            <th>Email</th>
+                            <th>Address</th>
                         </tr>
                     </thead>
                     <tbody id="tblVendors"></tbody>
                 </table>
 
-
-
                 <div class="text-end mt-3">
-                    <button id="btnSendToSelected" class="btn btn-success">Send RFQ to Selected Vendors</button>
+                    <button id="btnSendToSelected" class="btn btn-sm btn-success">Send RFQ</button>
                 </div>
             </div>
         </div>
-
     </div>
 </div>
+
 
 <!-- PR Modal -->
 <div class="modal fade" data-bs-backdrop="true" id="rfqModal" tabindex="-1" aria-labelledby="rfqModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
+        <div class="modal-content shadow-lg rounded-3">
 
             <!-- Modal Header -->
-            <div class="modal-header bg-primary text-white align-items-center">
-                <h5 class="modal-title mb-0 text-white text-center flex-grow-1" id="rfqDetailsTitle">
+            <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-1">
+                <h5 class="modal-title fw-bold text-white mb-0 fs-5" id="rfqDetailsTitle">
                     Purchase Requisition
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
             <div class="modal-body">
@@ -302,49 +299,51 @@
                     <div class="card shadow-sm">
                         <div class="card-body">
 
-                            <!-- Hidden Extra Fieldsr -->
+                            <!-- Hidden Extra Fields -->
                             <div id="rfqExtraFields" class="d-none mb-4">
                                 <div class="row mb-3">
                                     <div class="col-md-3">
-                                        <label class="form-label fw-bold">RFQ NO</label>
-                                        <input type="text" id="RfqCodeInput" class="form-control bg-light" name="RFQCode" readonly />
+                                        <label class="form-label form-label-sm fw-bold text-dark">RFQ NO</label>
+                                        <input type="text" id="RfqCodeInput" class="form-control form-control-sm  text-dark shadow-sm bg-light" name="RFQCode" readonly />
                                     </div>
                                     <div class="col-md-3">
-                                        <label class="form-label fw-bold">
+                                        <label class="form-label form-label-sm fw-bold text-dark">
                                             Contact Person <span style="color:red;">*</span>
                                         </label>
-                                        <select class="form-select" id="ContactPerson" name="ContactPerson" required></select>
+                                        <select class="form-control form-control-sm  text-dark shadow-sm form-select" id="ContactPerson" name="ContactPerson" required></select>
                                         <div class="invalid-feedback">Contact person is required.</div>
                                     </div>
                                     <div class="col-md-3">
-                                        <label class="form-label fw-bold">Contact No</label>
-                                        <input id="ContactNo" type="text" class="form-control" name="ContactNo" readonly required />
+                                        <label class="form-label form-label-sm fw-bold text-dark">Contact No</label>
+                                        <input id="ContactNo" type="text" class="form-control form-control-sm  text-dark shadow-sm" name="ContactNo" readonly required />
                                         <div class="invalid-feedback">Contact number is required.</div>
                                     </div>
                                     <div class="col-md-3">
-                                        <label class="form-label fw-bold">Email</label>
-                                        <input id="ContactEmail" type="email" class="form-control" name="Email" readonly required />
+                                        <label class="form-label form-label-sm fw-bold text-dark">Email</label>
+                                        <input id="ContactEmail" type="email" class="form-control form-control-sm  text-dark shadow-sm" name="Email" readonly required />
                                         <div class="invalid-feedback">Valid email is required.</div>
                                     </div>
                                 </div>
 
                                 <div class="row mb-3">
                                     <div class="col-md-3">
-                                        <label class="form-label fw-bold">Warehouse <span style="color:red;">*</span></label>
-                                        <select id="Warehouse" name="Warehouse" class="form-select" required></select>
+                                        <label class="form-label form-label-sm fw-bold text-dark">Warehouse <span style="color:red;">*</span></label>
+                                        <select id="Warehouse" name="Warehouse" class="form-control form-control-sm  text-dark shadow-sm form-select" required></select>
                                         <div class="invalid-feedback">Warehouse is required.</div>
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label fw-bold">Delivery Address</label>
-                                        <textarea id="DeliveryAddress" class="form-control" name="DeliveryAddress" rows="3" readonly required></textarea>
+                                        <label class="form-label form-label-sm fw-bold text-dark">Delivery Address</label>
+                                        <textarea id="DeliveryAddress" class="form-control form-control-sm  text-dark shadow-sm" name="DeliveryAddress" rows="3" readonly required></textarea>
                                         <div class="invalid-feedback">Delivery address is required.</div>
                                     </div>
                                 </div>
 
                                 <div class="row mb-3">
                                     <div class="col-md-6">
-                                        <label class="form-label fw-bold">Note</label>
-                                        <textarea class="form-control" name="Note" rows="3"></textarea>
+                                        <label class="form-label form-label-sm fw-bold text-dark">Note</label>
+                                        <textarea class="form-control form-control-sm  text-dark shadow-sm" name="Note" rows="3"></textarea>
+                                        <div class="invalid-feedback">Note is required.</div>
+
                                     </div>
                                 </div>
                             </div>
@@ -352,12 +351,12 @@
                             <!-- Always Visible Section -->
                             <div class="row mb-3">
                                 <div class="col-md-3">
-                                    <label class="form-label fw-bold">Purchase Requisition No.</label>
-                                    <input type="text" id="PRCodeInput" class="form-control bg-light " name="PRCode" readonly />
+                                    <label class="form-label form-label-sm fw-bold text-dark">Purchase Requisition No.</label>
+                                    <input type="text" id="PRCodeInput" class="form-control form-control-sm  text-dark shadow-sm bg-light " name="PRCode" readonly />
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="form-label fw-bold">Expected Date</label>
-                                    <input type="text" id="ExpectedDate" class="form-control bg-light " readonly placeholder="DD/MM/YYYY" />
+                                    <label class="form-label form-label-sm fw-bold text-dark">Expected Date</label>
+                                    <input type="text" id="ExpectedDate" class="form-control form-control-sm  text-dark shadow-sm bg-light " readonly placeholder="DD/MM/YYYY" />
                                 </div>
                             </div>
 
@@ -384,8 +383,8 @@
 
             <!-- Modal Footer -->
             <div class="modal-footer">
-                <button type="submit" id="btnCreateRFQ" class="btn btn-success">Create RFQ</button>
-                <button type="submit" id="btnSubmitRFQ" form="rfqForm" class="btn btn-success d-none">Submit</button>
+                <button type="submit" id="btnCreateRFQ" class="btn btn-sm btn-success"><i class="bi bi-plus-circle me-2"></i>Create RFQ</button>
+                <button type="submit" id="btnSubmitRFQ" form="rfqForm" class="btn btn-sm btn-success d-none">Submit</button>
             </div>
 
         </div>
@@ -416,42 +415,50 @@
                         <!-- RFQ Information Section -->
                         <div class="row mb-3">
                             <div class="col-md-4">
-                                <label class="form-label fw-bold">PR Code:</label>
-                                <input type="text" class="form-control bg-light" id="rfqPRCode" readonly />
+                                <label class="form-label form-label-sm fw-bold text-dark">PR Code:</label>
+                                <input type="text" class="form-control form-control-sm  text-dark shadow-sm bg-light" id="rfqPRCode" readonly />
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label fw-bold">Required Date:</label>
-                                <input type="text" class="form-control bg-light" id="rfqRequiredDate" readonly />
+                                <label class="form-label form-label-sm fw-bold text-dark">Required Date:</label>
+                                <input type="text" class="form-control form-control-sm  text-dark shadow-sm bg-light" id="rfqRequiredDate" readonly />
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label fw-bold">Delivery Address:</label>
-                                <input type="text" class="form-control bg-light" id="rfqDeliveryAddress" readonly />
+                                <label class="form-label form-label-sm fw-bold text-dark">Delivery Address:</label>
+                                <input type="text" class="form-control form-control-sm  text-dark shadow-sm bg-light" id="rfqDeliveryAddress" readonly />
                             </div>
 
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-md-4">
-                                <label class="form-label fw-bold">Contact Person:</label>
-                                <input type="text" class="form-control bg-light" id="rfqContactPerson" readonly />
+                                <label class="form-label form-label-sm fw-bold text-dark">Contact Person:</label>
+                                <input type="text" class="form-control form-control-sm  text-dark shadow-sm bg-light" id="rfqContactPerson" readonly />
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label fw-bold">Contact No:</label>
-                                <input type="text" class="form-control bg-light" id="rfqContactNo" readonly />
+                                <label class="form-label form-label-sm fw-bold text-dark">Contact No:</label>
+                                <input type="text" class="form-control form-control-sm  text-dark shadow-sm bg-light" id="rfqContactNo" readonly />
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label fw-bold">Email:</label>
-                                <input type="text" class="form-control bg-light" id="rfqEmail" readonly />
+                                <label class="form-label form-label-sm fw-bold text-dark">Email:</label>
+                                <input type="text" class="form-control form-control-sm  text-dark shadow-sm bg-light" id="rfqEmail" readonly />
                             </div>
                         </div>
 
-                        
 
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <label class="form-label fw-bold">Note:</label>
-                                <textarea class="form-control bg-light" id="rfqNote" rows="2" readonly></textarea>
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <label class="form-label form-label-sm fw-bold text-dark">Note:</label>
+                                <textarea class="form-control form-control-sm  text-dark shadow-sm bg-light" id="rfqNote" rows="2" readonly></textarea>
                             </div>
+                            <div class="col-md-3" id="ExDate">
+                                <label class="form-label form-label-sm fw-bold text-dark">
+                                    Expected Date: <span class="text-danger">*</span>
+                                </label>
+                                <input type="date" id="ToDate" placeholder="DD-MM-YYYY" class="form-control form-control-sm  text-dark shadow-sm" />
+                                <div class="invalid-feedback">Expected Date is required.</div>
+                                <small id="ToDateDisplay" class="text-muted"></small>
+                            </div>
+
                         </div>
 
                         <!-- RFQ Items Table -->
@@ -504,44 +511,44 @@
                         <div class="row">
                             <!-- Full Name -->
                             <div class="col-md-6 mb-3">
-                                <label for="fullName" class="form-label">Full Name<span style="color:red;">*</span></label>
+                                <label class="form-label form-label-sm fw-bold text-dark">Full Name<span style="color:red;">*</span></label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="fullName" name="VendorName" placeholder="Enter full name" required>
+                                    <input type="text" class="form-control form-control-sm  text-dark shadow-sm" id="fullName" name="VendorName" placeholder="Enter full name" required>
                                     <div class="invalid-feedback">Full Name is required.</div>
                                 </div>
                             </div>
 
                             <!-- Mobile -->
                             <div class="col-md-6 mb-3">
-                                <label for="mobile" class="form-label">Mobile Number<span style="color:red;">*</span></label>
+                                <label class="form-label form-label-sm fw-bold text-dark">Mobile Number<span style="color:red;">*</span></label>
                                 <div class="input-group">
-                                    <input type="tel" class="form-control" id="mobile" name="MobileNo" placeholder="Enter mobile number" required>
+                                    <input type="tel" class="form-control form-control-sm  text-dark shadow-sm" id="mobile" name="MobileNo" placeholder="Enter mobile number" required>
                                     <div class="invalid-feedback">Mobile Number is required.</div>
                                 </div>
                             </div>
 
                             <!-- Alternate Mobile -->
                             <div class="col-md-6 mb-3">
-                                <label for="altMobile" class="form-label">Alternate Mobile</label>
+                                <label class="form-label form-label-sm fw-bold text-dark">Alternate Mobile</label>
                                 <div class="input-group">
-                                    <input type="tel" class="form-control" id="altMobile" name="AlternateNo" placeholder="Enter alternate number">
+                                    <input type="tel" class="form-control form-control-sm  text-dark shadow-sm" id="altMobile" name="AlternateNo" placeholder="Enter alternate number">
                                 </div>
                             </div>
 
                             <!-- Personal Email -->
                             <div class="col-md-6 mb-3">
-                                <label for="personalEmail" class="form-label">Personal Email<span style="color:red;">*</span></label>
+                                <label class="form-label form-label-sm fw-bold text-dark">Personal Email<span style="color:red;">*</span></label>
                                 <div class="input-group">
-                                    <input type="email" class="form-control" id="personalEmail" name="Email" placeholder="Enter email address" required>
+                                    <input type="email" class="form-control form-control-sm  text-dark shadow-sm" id="personalEmail" name="Email" placeholder="Enter email address" required>
                                     <div class="invalid-feedback">Valid email is required.</div>
                                 </div>
                             </div>
 
                             <!-- Address -->
                             <div class="col-12 mb-3">
-                                <label for="address" class="form-label">Address<span style="color:red;">*</span></label>
+                                <label class="form-label form-label-sm fw-bold text-dark">Address<span style="color:red;">*</span></label>
                                 <div class="input-group">
-                                    <textarea class="form-control" id="address" name="Address" placeholder="Enter address" rows="2" required></textarea>
+                                    <textarea class="form-control form-control-sm  text-dark shadow-sm" id="address" name="Address" placeholder="Enter address" rows="2" required></textarea>
                                     <div class="invalid-feedback">Address is required.</div>
                                 </div>
                             </div>
@@ -554,77 +561,77 @@
                         <div class="row">
                             <!-- Company Email -->
                             <div class="col-md-6 mb-3">
-                                <label for="CompanyEmail" class="form-label">Company Email<span style="color:red;">*</span></label>
+                                <label class="form-label form-label-sm fw-bold text-dark">Company Email<span style="color:red;">*</span></label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="CompanyEmail" name="CompanyEmail" placeholder="Enter company email" required>
+                                    <input type="text" class="form-control form-control-sm  text-dark shadow-sm" id="CompanyEmail" name="CompanyEmail" placeholder="Enter company email" required>
                                     <div class="invalid-feedback">Company email is required.</div>
                                 </div>
                             </div>
 
                             <!-- Company Mobile -->
                             <div class="col-md-6 mb-3">
-                                <label for="CompanyMobileNo" class="form-label">Company Mobile Number<span style="color:red;">*</span></label>
+                                <label class="form-label form-label-sm fw-bold text-dark">Company Mobile Number<span style="color:red;">*</span></label>
                                 <div class="input-group">
-                                    <input type="tel" class="form-control" name="CompanyMobileNo" id="CompanyMobileNo" placeholder="Enter mobile number" required>
+                                    <input type="tel" class="form-control form-control-sm  text-dark shadow-sm" name="CompanyMobileNo" id="CompanyMobileNo" placeholder="Enter mobile number" required>
                                     <div class="invalid-feedback">Mobile Number is required.</div>
                                 </div>
                             </div>
 
                             <!-- Alternate Mobile -->
                             <div class="col-md-6 mb-3">
-                                <label for="CompanyAlternateNo" class="form-label">Company Alternate Mobile</label>
+                                <label class="form-label form-label-sm fw-bold text-dark">Company Alternate Mobile</label>
                                 <div class="input-group">
-                                    <input type="tel" class="form-control" id="CompanyAlternateNo" name="CompanyAlternateNo" placeholder="Enter alternate mobile number">
+                                    <input type="tel" class="form-control form-control-sm  text-dark shadow-sm" id="CompanyAlternateNo" name="CompanyAlternateNo" placeholder="Enter alternate mobile number">
                                 </div>
                             </div>
 
                             <!-- Company Name -->
                             <div class="col-md-6 mb-3">
-                                <label for="companyName" class="form-label">Company Name<span style="color:red;">*</span></label>
+                                <label class="form-label form-label-sm fw-bold text-dark">Company Name<span style="color:red;">*</span></label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="companyName" name="CompanyName" placeholder="Enter company name" required>
+                                    <input type="text" class="form-control form-control-sm  text-dark shadow-sm" id="companyName" name="CompanyName" placeholder="Enter company name" required>
                                     <div class="invalid-feedback">Company Name is required.</div>
                                 </div>
                             </div>
 
                             <!-- Company Address -->
                             <div class="col-12 mb-3">
-                                <label for="companyAddress" class="form-label">Company Address<span style="color:red;">*</span></label>
+                                <label class="form-label form-label-sm fw-bold text-dark">Company Address<span style="color:red;">*</span></label>
                                 <div class="input-group">
-                                    <textarea class="form-control" name="CompanyAddress" id="companyAddress" placeholder="Enter company address" rows="2" required></textarea>
+                                    <textarea class="form-control form-control-sm  text-dark shadow-sm" name="CompanyAddress" id="companyAddress" placeholder="Enter company address" rows="2" required></textarea>
                                     <div class="invalid-feedback">Company Address is required.</div>
                                 </div>
                             </div>
 
                             <!-- Industry / Country / State / City -->
                             <div class="col-md-4 mb-3">
-                                <label for="industryType" class="form-label">Industry Type<span style="color:red;">*</span></label>
+                                <label class="form-label form-label-sm fw-bold text-dark">Industry Type<span style="color:red;">*</span></label>
                                 <div class="input-group">
-                                    <select class="form-select" id="industryType" name="IndustryTypeId" required></select>
+                                    <select class="form-control form-control-sm  text-dark shadow-sm form-select" id="industryType" name="IndustryTypeId" required></select>
                                     <div class="invalid-feedback">Industry Type is required.</div>
                                 </div>
                             </div>
 
                             <div class="col-md-4 mb-3">
-                                <label for="country" class="form-label">Country<span style="color:red;">*</span></label>
+                                <label class="form-label form-label-sm fw-bold text-dark">Country<span style="color:red;">*</span></label>
                                 <div class="input-group">
-                                    <select class="form-select" id="country" required></select>
+                                    <select class="form-control form-control-sm  text-dark shadow-sm form-select" id="country" required></select>
                                     <div class="invalid-feedback">Country is required.</div>
                                 </div>
                             </div>
 
                             <div class="col-md-4 mb-3">
-                                <label for="state" class="form-label">State<span style="color:red;">*</span></label>
+                                <label class="form-label form-label-sm fw-bold text-dark">State<span style="color:red;">*</span></label>
                                 <div class="input-group">
-                                    <select class="form-select" id="state" required></select>
+                                    <select class="form-control form-control-sm  text-dark shadow-sm form-select" id="state" required></select>
                                     <div class="invalid-feedback">State is required.</div>
                                 </div>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="city" class="form-label">City<span style="color:red;">*</span></label>
+                                <label class="form-label form-label-sm fw-bold text-dark">City<span style="color:red;">*</span></label>
                                 <div class="input-group">
-                                    <select class="form-select" id="city" name="CityId" required></select>
+                                    <select class="form-control form-control-sm  text-dark shadow-sm form-select" id="city" name="CityId" required></select>
                                     <div class="invalid-feedback">City is required.</div>
                                 </div>
                             </div>
@@ -637,45 +644,45 @@
                         <div class="row">
                             <!-- Bank Name -->
                             <div class="col-md-6 mb-3">
-                                <label for="bankName" class="form-label">Bank Name<span style="color:red;">*</span></label>
+                                <label class="form-label form-label-sm fw-bold text-dark">Bank Name<span style="color:red;">*</span></label>
                                 <div class="input-group">
-                                    <select class="form-select" id="bankName" required></select>
+                                    <select class="form-control form-control-sm  text-dark shadow-sm form-select" id="bankName" required></select>
                                     <div class="invalid-feedback">Please select a bank.</div>
                                 </div>
                             </div>
 
                             <!-- Branch -->
                             <div class="col-md-6 mb-3">
-                                <label for="branchName" class="form-label">Branch<span style="color:red;">*</span></label>
+                                <label class="form-label form-label-sm fw-bold text-dark">Branch<span style="color:red;">*</span></label>
                                 <div class="input-group">
-                                    <select class="form-select" id="branchName" name="BranchId" required></select>
+                                    <select class="form-control form-control-sm  text-dark shadow-sm form-select" id="branchName" name="BranchId" required></select>
                                     <div class="invalid-feedback">Please select a branch.</div>
                                 </div>
                             </div>
 
                             <!-- Account Number -->
                             <div class="col-md-6 mb-3">
-                                <label for="accountNumber" class="form-label">Account Number<span style="color:red;">*</span></label>
+                                <label class="form-label form-label-sm fw-bold text-dark">Account Number<span style="color:red;">*</span></label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" name="AccountNumber" id="accountNumber" placeholder="Enter account number" required>
+                                    <input type="text" class="form-control form-control-sm  text-dark shadow-sm" name="AccountNumber" id="accountNumber" placeholder="Enter account number" required>
                                     <div class="invalid-feedback">Account Number is required.</div>
                                 </div>
                             </div>
 
                             <!-- IFSC -->
                             <div class="col-md-6 mb-3">
-                                <label for="ifsc" class="form-label">IFSC Code<span style="color:red;">*</span></label>
+                                <label class="form-label form-label-sm fw-bold text-dark">IFSC Code<span style="color:red;">*</span></label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" name="IFSCCode" id="ifsc" placeholder="Enter IFSC code" required>
+                                    <input type="text" class="form-control form-control-sm  text-dark shadow-sm" name="IFSCCode" id="ifsc" placeholder="Enter IFSC code" required>
                                     <div class="invalid-feedback">IFSC is required.</div>
                                 </div>
                             </div>
 
                             <!-- Swift -->
                             <div class="col-md-6 mb-3">
-                                <label for="swift" class="form-label">Swift Code<span style="color:red;">*</span></label>
+                                <label class="form-label form-label-sm fw-bold text-dark">Swift Code<span style="color:red;">*</span></label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="swift" name="SwiftCode" placeholder="Enter Swift code" required>
+                                    <input type="text" class="form-control form-control-sm  text-dark shadow-sm" id="swift" name="SwiftCode" placeholder="Enter Swift code" required>
                                     <div class="invalid-feedback">Swift Code is required.</div>
                                 </div>
                             </div>
@@ -684,8 +691,8 @@
 
                     <!-- Buttons -->
                     <div class="d-flex justify-content-end gap-2 mt-3">
-                        <button type="button" class="btn btn-lg btn-danger" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-lg btn-success">Save</button>
+                        <button type="button" class="btn btn-sm btn-danger" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-sm btn-success">Save</button>
                     </div>
                 </form>
             </div>
@@ -700,6 +707,7 @@
 
 
 <script>
+    let expdate;
     $(document).ready(function () {
         (() => {
             'use strict';
@@ -847,6 +855,58 @@
             $("input.row-select:checked").prop("checked", false);
         });
 
+        $("#btnAllPR").click(function () {
+            $("#btnAllPR").addClass("btn-primary active").removeClass("btn-light");
+            $("#btnAllRFQ").removeClass("btn-primary active").addClass("btn-light");
+            $("#quotationList").show();
+            $("#rfqList").hide();
+            $("#pageHeader").text("All Approved PR");
+        });
+
+        $("#btnAllRFQ").click(function () {
+            $("#btnAllRFQ").addClass("btn-primary active").removeClass("btn-light");
+            $("#btnAllPR").removeClass("btn-primary active").addClass("btn-light");
+            $("#rfqList").show();
+            $("#quotationList").hide();
+            $("#pageHeader").text("All RFQs");
+        });
+        // --- Existing tab logic ---
+        $("#btnAllPR").click(function () {
+            $("#btnAllPR").addClass("btn-primary active").removeClass("btn-light");
+            $("#btnAllRFQ").removeClass("btn-primary active").addClass("btn-light");
+            $("#quotationList").show();
+            $("#rfqList").hide();
+            $("#vendorContainer").hide();
+            $("#pageHeader").text("All Approved PR").show();
+            $(".row.mb-4.justify-content-start").show(); // show tabs again
+        });
+
+        $("#btnAllRFQ").click(function () {
+            $("#btnAllRFQ").addClass("btn-primary active").removeClass("btn-light");
+            $("#btnAllPR").removeClass("btn-primary active").addClass("btn-light");
+            $("#rfqList").show();
+            $("#quotationList").hide();
+            $("#vendorContainer").hide();
+            $("#pageHeader").text("All RFQs").show();
+            $(".row.mb-4.justify-content-start").show(); // show tabs again
+        });
+
+        // --- When opening vendor container ---
+        $(document).on("click", "#btnSendRFQ", function () {
+
+            // 🔹 Hide main header & tabs
+            $("#pageHeader").hide();
+            $(".row.mb-4.justify-content-start").hide();
+        });
+
+        // --- When returning from vendor container ---
+        $("#btnBackToDetails").click(function () {
+            $("#vendorContainer").hide();
+            $("#rfqList").show(); // or show quotationList if you want to return to PR view
+            $("#pageHeader").text("All RFQs").show();
+            $(".row.mb-4.justify-content-start").show(); // show the tab buttons again
+        });
+
 
         let PRTable;
         let startDate = null;
@@ -865,8 +925,9 @@
         function showExportToast() {
             toastr.warning("Please select at least one row before exporting.", "Warning");
         }
-
+        ///////////////////
         // Load PR List
+        ////////////////////
         function loadPRList() {
             $.ajax({
                 url: "/Purchase/GETQUATIONLISTSJ",
@@ -1411,7 +1472,7 @@
             }
 
             console.log("Form Data:", formData);
-        
+
 
 
             $.ajax({
@@ -1541,7 +1602,7 @@
                             <th>Sr.No.</th>
                             <th>PR Code</th>
                             <th>RFQ Code</th>
-                            <th>Required Date</th>
+                            <th>Expected Date</th>
                             <th>Description</th>
                             <th>Status</th>
                             <th>Action</th>
@@ -1561,9 +1622,15 @@
                                 <td>${item.RFQCode ?? ""}</td>
 
 
-                        <td>${moment(item.RequiredDate, 'DD-MM-YYYY').isValid()
-                                ? moment(item.RequiredDate, 'DD-MM-YYYY').format('DD/MM/YYYY')
-                                : moment(item.RequiredDate).format('DD/MM/YYYY')}</td>
+                        <td>${item.RequiredDate
+                                    ? (
+                                        moment(item.RequiredDate, 'DD-MM-YYYY').isValid()
+                                            ? moment(item.RequiredDate, 'DD-MM-YYYY').format('DD/MM/YYYY')
+                                            : moment(item.RequiredDate).format('DD/MM/YYYY')
+                                      )
+                                    : '-'
+                            }</td>
+
 
                                 <td>
                                     <span data-bs-toggle="tooltip" data-bs-placement="top" title="${desc}">
@@ -1943,13 +2010,38 @@
                     }
 
                     if (header.RequiredDate) {
-                        const m = moment(header.RequiredDate, "DD-MM-YYYY HH:mm:ss", true);
+                        // Try parsing with strict format first
+                        let m = moment(header.RequiredDate, "DD-MM-YYYY HH:mm:ss", true);
+
+                        // If that fails, fall back to auto-detection
+                        if (!m.isValid()) {
+                            m = moment(header.RequiredDate);
+                        }
+
+                        // Now, if valid, use it
                         if (m.isValid()) {
-                            $("#rfqRequiredDate").val(m.format("DD/MM/YYYY"));
+                            const formattedRequiredDate = m.format("DD/MM/YYYY");
+                            $("#rfqRequiredDate").val(formattedRequiredDate);
+
+                            // Calculate date limits for Expected Date
+                            const today = moment();
+                            const maxAllowed = m.clone().subtract(2, "days");
+
+                            // Apply min/max limits for date picker
+                            $("#ToDate").attr("min", today.format("YYYY-MM-DD"));
+                            $("#ToDate").attr("max", maxAllowed.format("YYYY-MM-DD"));
                         } else {
-                            console.warn("Invalid date format:", header.RequiredDate);
+                            console.warn("⚠️ Invalid date format in RequiredDate:", header.RequiredDate);
                         }
                     }
+
+
+                    // Inside your success callback, after setting ToDate range:
+                    $("#ToDate").off("change").on("change", function () {
+                        const expectedDate = $(this).val();
+                        $("#rfqDetailsModal").data("expectedDate", expectedDate);
+                    });
+
 
                     $("#rfqCreatedBy").val(header.CreatedBy || "");
                     $("#rfqContactPerson").val(header.ContactPerson || "");
@@ -2011,11 +2103,51 @@
 
                     $("#rfqDetailsTitle1").text("RFQ Details – " + (header.RFQCode || header.rfqCode || ""));
 
-                    if (actionType === "send") {
+                    /*if (actionType === "send") {
                         $("#btnSendRFQ").show();
+                        $("#ExDate").show();
                     } else {
                         $("#btnSendRFQ").hide();
+                        $("#ExDate").hide();
+                    }*/
+
+                    if (actionType === "send") {
+                        $("#btnSendRFQ").show();
+                        $("#ExDate").show();
+
+                        // Rebuild inputs from labels if any labels exist (to restore form)
+                        $("#rfqDetailsModal .form-control-plaintext").each(function () {
+                            const val = $(this).text();
+                            const input = $("<input>")
+                                .addClass("form-control form-control-sm text-dark shadow-sm bg-light")
+                                .val(val);
+                            $(this).replaceWith(input);
+                        });
                     }
+
+                    else if (actionType === "view") {
+                        $("#btnSendRFQ").hide();
+                        $("#ExDate").hide();
+
+                        // Loop through inputs and textareas and replace with labels
+                        $("#rfqDetailsModal input, #rfqDetailsModal textarea").each(function () {
+                            const val = $(this).val() || "-";
+
+                            // Only replace editable ones, skip hidden/date fields etc.
+                            if (!$(this).attr("type") || $(this).attr("type") === "text" || $(this).is("textarea")) {
+                                // Create a label element with same styling
+                                const label = $("<label>")
+                                    .addClass("form-control-plaintext text-dark")
+                                    .text(val);
+
+                                // Replace the input/textarea with label
+                                $(this).replaceWith(label);
+                            }
+                        });
+                    }
+
+                    
+
 
                     var modal = new bootstrap.Modal(document.getElementById("rfqDetailsModal"));
                     modal.show();
@@ -2024,6 +2156,7 @@
 
 
         });
+
 
         // ==============================
         // Back to RFQ List
@@ -2111,6 +2244,25 @@
 
 
         $(document).on("click", "#btnSendRFQ", function () {
+
+                const rfqCode = $("#rfqDetailsModal").data("rfqCode");
+                const expectedDate = $("#rfqDetailsModal").data("expectedDate");
+                expdate=$("#rfqDetailsModal").data("expectedDate");
+
+                 // Reset previous validation
+                    $("#rfqDetailsModal").on("hidden.bs.modal", function () {
+                        $("#ToDate").removeClass("is-invalid").val("");
+                        $("#ToDateDisplay").text(""); // clear helper text if you use it
+                    });
+
+                    if (!expectedDate) {
+                        $("#ToDate").addClass("is-invalid"); // 🔴 show validation message
+                        return;
+                    }
+
+                // Optionally, show it in console for debugging
+                console.log("Sending RFQ:", rfqCode, "Expected Date:", expectedDate);
+
 
             $("#vendorContainer").show();
             $("#rfqDetailsModal").modal("hide");
@@ -2205,7 +2357,7 @@
                         paging: true,
                        searching: true,
                        ordering: false,
-                        pageLength: 5,
+                        pageLength: 10,
                         lengthMenu: [5, 10, 25, 50],
                         order: [],
                         columnDefs: [
@@ -2525,6 +2677,7 @@
                 data: JSON.stringify({
                     rfqCode: $("#vendorRFQCode").val(),
                     PRCode: $("#vendorPRCode").val(),
+                    ExpectedDate:expdate,
                     vendors: selectedVendors
                 }),
                 contentType: "application/json",

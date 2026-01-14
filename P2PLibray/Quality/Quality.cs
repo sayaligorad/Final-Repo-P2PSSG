@@ -85,7 +85,8 @@ namespace P2PLibray.Quality
         public string VenderName { get; set; }
         public string AddDate { get; set; }
         public string QualityCheckDate { get; set; }
-        public string Reason { get; set; }
+        public string QCFailedDate { get; set; }
+		public string Reason { get; set; }
     }
 
     // Detailed failed item info

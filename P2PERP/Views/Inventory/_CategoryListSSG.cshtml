@@ -7,9 +7,8 @@
     }
 </style>
 <!-- Category List Card -->
-<div class="table-responsive card shadow p-3 bg-white rounded">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="text-primary fw-bolder text-center flex-grow-1 m-0">Category List</h4>
+<div >
+    <div class="d-flex justify-content-end align-items-center mb-3">
         <div class="d-flex gap-2">
             <button class="btn btn-success btn-sm" id="btnAddCategory">
                 <i class="bi bi-plus-circle me-2"></i> Add Category
@@ -34,14 +33,15 @@
 </div>
 
 <!-- Create/Edit Category Modal -->
-<div class="modal fade" id="categoryModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+
+<div class="modal fade" id="categoryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content shadow-lg rounded-3">
-            <div class="card-header bg-primary text-white d-flex justify-content-center align-items-center rounded-top p-1 position-relative">
-                <h3 id="categoryModalTitle" class="modal-title fw-bold text-white mb-0 fs-5 w-100 text-center">
-                    Create / Edit Category
-                </h3>
-                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
+            <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-1">
+                <!-- Modal title -->
+                <h5 class="modal-title m-0 flex-grow-1 text-white text-center fs-5" id="categoryModalTitle">Create / Edit Category</h5>
+                <!-- Close button -->
+                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="categoryModalBody">
                 <p class="text-center py-3">Loading...</p>
@@ -61,6 +61,12 @@
         button.dt-button.processing:after {
             content: none !important;
         }
+
+    table th {
+        white-space: nowrap; /* Prevents text wrapping */
+        text-overflow: ellipsis; /* Adds "..." if text is too long */
+        overflow: hidden; /* Hides overflow text */
+    } 
 </style>
 
 <script>

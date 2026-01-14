@@ -86,9 +86,9 @@
                                 <td>@item.FinalOutcomePOCode</td>
                                 <td>
                                     <button id="btnview" type="button"
-                                            class="btn btn-sm btn-primary view-vendors"
+                                            class="btn btn-sm btn-primary view-vendors rounded-2"
                                             data-rfqcode="@item.RFQCode">
-                                        <i class="bi bi-eye"></i>
+                                        <i class="bi bi-eye fs-6"></i>
                                     </button>
 
                                 </td>
@@ -106,18 +106,33 @@
 
 @*Modal View*@
 
+<div class="modal fade" id="rfqVendorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content shadow-lg rounded-3">
+            <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-1">
+                <!-- Modal title -->
+                <h5 class="modal-title fw-bold text-white mb-0 fs-5">RFQ Vendor Responses</h5>
+                <!-- Close button -->
+                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
 
-<div class="modal fade" data-bs-backdrop="true" id="rfqVendorModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <div class="w-100 text-center">
-                    <h5 class="modal-title text-white mb-3">RFQ Vendor Responses</h5>
-                </div>
-                <button type="button" class="btn-close btn-close-white mb-2" data-bs-dismiss="modal"></button>
+            <div class="mb-0 ms-5 mt-5" >
+                <h6 class="fw-bold">
+                    RFQ: <span id="lblRFQCode" class="text-primary"></span>
+                </h6>
             </div>
 
             <div class="modal-body">
+
+                <style>
+                    th {
+                        white-space: nowrap; /* Keep text in one line */
+                    }
+
+                    .table-wider th {
+                        min-width: 150px; /* Adjust width as needed */
+                    }
+                </style>
                 <table id="rfqVendorTable" class="table table-striped table-bordered w-100">
                     <thead class="table-dark">
                         <tr>
@@ -275,7 +290,6 @@
                     extend: 'print',
                     title: '', // remove default title
                     text: '<i class="bi bi-printer-fill text-dark fs-5"></i>',
-                    className: 'btn bg-muted btn-outline-dark border-2 fw-bold',
 
                     exportOptions: {
                         columns: [1, 2, 3, 4, 5, 6, 7, 8, 9], // include Sr.No, exclude checkbox & action
@@ -376,7 +390,8 @@
                     extend: 'pdfHtml5',
                     title: 'RFQ List',
                     text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
-                    className: 'btn bg-muted btn-outline-dark border-2 fw-bold',
+
+
                     orientation: 'landscape',
                     pageSize: 'A4',
 
@@ -523,7 +538,7 @@
                     extend: 'excelHtml5',
                     title: 'RFQ List',
                     text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
-                    messageTop: 'Generated Date: ' + moment().format('DD/MM/YYYY') ,
+                    messageTop: 'Generated Date: ' + moment().format('DD/MM/YYYY'),
 
                     exportOptions: {
                         rows: function (idx, data, node) {
@@ -583,6 +598,7 @@
                     extend: 'csvHtml5',
                     title: 'RFQ List',
                     text: '<i class="bi bi-filetype-csv text-success fs-5"></i>',
+
                     exportOptions: {
                         rows: function (idx, data, node) {
                             return $(node).find('input.rowCheckbox').prop('checked');
@@ -732,7 +748,7 @@
         function buildChart(rfqCodes, invitedData, respondedData, totalRFQs) {
             rfqChart = Highcharts.chart('rfqBarChart', {
                 chart: { type: 'column' },
-                title: { text: 'Vendors Invited vs Vendors Responded per RFQ' },
+                title: { text: null },
                 subtitle: {
                     text: '<span style="font-size:32px; font-weight:bold;">Total RFQs: ' + totalRFQs + '</span>',
                     align: 'left', verticalAlign: 'top', x: 10, y: 20, useHTML: true
@@ -823,6 +839,10 @@
         $(document).on('click', '.view-vendors', function () {
             var rfqCode = $(this).data('rfqcode');
 
+            // 🟦 Show RFQ Code at top of modal
+            $('#lblRFQCode').text(rfqCode);
+
+
             $.ajax({
                 url: '/Purchase/GetRFQVendorResponses',
                 type: 'GET',
@@ -839,16 +859,28 @@
                             $table.find('thead th').removeClass('sorting sorting_asc sorting_desc');
                         }
 
-                        // 🔹 Add new rows
+                        // 🔹 Add new rows with status color
                         $.each(res.data, function (i, item) {
+                            let statusBadge = `
+        <span class="${item.StatusName === 'Approved' ? 'badge bg-success' :
+                                item.StatusName === 'Pending' ? 'badge bg-warning' :
+                                    item.StatusName === 'Escalated' ? 'badge bg-primary' :
+                                        item.StatusName === 'Rejected' ? 'badge bg-danger' :
+                                            'badge bg-secondary'
+                                }">
+            ${item.StatusName}
+        </span>
+                            `;
+                            
+
                             $tbody.append(`
                         <tr>
                             <td>${i + 1}</td>
                             <td>${item.RegisterQuotationCode}</td>
                             <td>${item.VendorName}</td>
                             <td>${item.DaysToReceiveQuotation}</td>
-                            <td>${item.DaysToApproveQuotation}</td>
-                            <td>${item.StatusName}</td> <!-- New column -->
+                            <td>${item.DaysToApproveQuotation ?? ''}</td>
+                            <td class="text-center">${statusBadge}</td>
                         </tr>
                     `);
                         });
@@ -877,6 +909,9 @@
                 }
             });
         });
+
+
+
 
     });
 </script>

@@ -8,66 +8,54 @@
     }
 </style>
     <!-- 🔹 PO & GRN Information -->
-    <div class="border rounded-3 p-3 mb-3 bg-light-subtle">
-        <h6 class="fw-bold text-dark mb-2">PO & GRN Information</h6>
+<div class="border rounded-3 p-4 mb-3 bg-light-subtle">
+    <h5 class="fw-bold text-dark mb-3">PO & GRN Information</h5>
 
-        <div class="row g-3">
-            <div class="col-md-4">
-                <label class="form-label form-label-sm fw-bold text-dark">PONO:</label>
-                <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light" id="txtPONumberUnique" value="@ViewBag.POCode" readonly>
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label form-label-sm fw-bold text-dark">PODATE:</label>
-                <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light"
-                       id="txtPODateUnique" value="@Convert.ToDateTime(ViewBag.PODate).ToString("dd\\/MM\\/yyyy")" readonly>
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label form-label-sm fw-bold text-dark">VENDOR NAME:</label>
-                <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light"
-                       id="txtVendorNameUnique" value="@ViewBag.VendorName" readonly>
-            </div>
+    <div class="row mb-2">
+        <div class="col-md-4">
+            <label class="fw-bold text-dark d-block mb-1">PONO:</label>
+            <span class="text-secondary">@ViewBag.POCode</span>
         </div>
-
-        <div class="row g-3 mt-1">
-            <div class="col-md-4">
-                <label class="form-label form-label-sm fw-bold text-dark">GRN NO:</label>
-                <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light"
-                       id="txtGRNNumberUnique" value="@ViewBag.GRNCode" readonly>
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label form-label-sm fw-bold text-dark">INVOICE NO:</label>
-                <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light"
-                       id="txtInvoiceNumberUnique" value="@ViewBag.InvoiceNo" readonly>
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label form-label-sm fw-bold text-dark">INVOICE DATE:</label>
-                <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light"
-                       id="txtInvoiceDateUnique" value="@Convert.ToDateTime(ViewBag.InvoiceDate).ToString("dd\\/MM\\/yyyy")" readonly>
-            </div>
+        <div class="col-md-4">
+            <label class="fw-bold text-dark d-block mb-1">PODATE:</label>
+            <span class="text-secondary">@Convert.ToDateTime(ViewBag.PODate).ToString("dd-MM-yyyy")</span>
         </div>
-
-        <div class="row g-3 mt-1">
-            <div class="col-md-6">
-                <label class="form-label form-label-sm fw-bold text-dark">COMPANY ADDRESS:</label>
-                <textarea class="form-control form-control-sm text-dark shadow-sm bg-light"
-                          rows="2" id="txtCompanyAddressUnique" readonly>@ViewBag.CompanyAddress</textarea>
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label form-label-sm fw-bold text-dark">BILLING ADDRESS:</label>
-                <textarea class="form-control form-control-sm text-dark shadow-sm bg-light"
-                          rows="2" id="txtBillingAddressUnique" readonly>@ViewBag.BillingAddress</textarea>
-            </div>
+        <div class="col-md-4">
+            <label class="fw-bold text-dark d-block mb-1">VENDOR NAME:</label>
+            <span class="text-secondary">@ViewBag.VendorName</span>
         </div>
     </div>
 
+    <div class="row mb-2">
+        <div class="col-md-4">
+            <label class="fw-bold text-dark d-block mb-1">GRN NO:</label>
+            <span class="text-secondary">@ViewBag.GRNCode</span>
+        </div>
+        <div class="col-md-4">
+            <label class="fw-bold text-dark d-block mb-1">INVOICE NO:</label>
+            <span class="text-secondary">@ViewBag.InvoiceNo</span>
+        </div>
+        <div class="col-md-4">
+            <label class="fw-bold text-dark d-block mb-1">INVOICE DATE:</label>
+            <span class="text-secondary">@Convert.ToDateTime(ViewBag.InvoiceDate).ToString("dd-MM-yyyy")</span>
+        </div>
+    </div>
+
+    <div class="row mb-1">
+        <div class="col-md-4">
+            <label class="fw-bold text-dark d-block mb-1">COMPANY ADDRESS:</label>
+            <span class="text-secondary">@ViewBag.CompanyAddress</span>
+        </div>
+        <div class="col-md-4">
+            <label class="fw-bold text-dark d-block mb-1">BILLING ADDRESS:</label>
+            <span class="text-secondary">@ViewBag.BillingAddress</span>
+        </div>
+    </div>
+</div>
+
     <!-- 🔹 GRN Items Section -->
     <div class="border rounded-3 p-3 bg-light-subtle">
-        <h4 class="mb-3 pt-2 pb-0 text-center fw-bold text-bold">GRN Items</h4>
+        <h4 class="mb-3 pt-2 pb-0 fw-bold text-bold">GRN Items</h4>
             <table class="table table-bordered table-striped text-center align-middle mb-0" id="tblGRNItemsUnique">
                 <thead class="table-dark">
                     <tr>

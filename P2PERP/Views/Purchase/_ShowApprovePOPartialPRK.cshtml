@@ -54,6 +54,9 @@
         button.dt-button.processing:after {
             content: none !important;
         }
+    thead th {
+        white-space: nowrap !important;
+    }
 </style>
 
 <!-- ✅ JavaScript -->
@@ -134,6 +137,7 @@ const endDate = "@ViewBag.EndDate";
                                 <td>₹${i.TotalAmount.toLocaleString('en-IN')}</td>
                                 <td>${i.FullName}</td>
                                 <td>${i.Address}</td>
+
 
                             </tr>
                         `);

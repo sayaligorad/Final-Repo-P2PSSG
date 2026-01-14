@@ -9,22 +9,22 @@
             <div class="col-md-3">
                 <label class="form-label fw-bold">GR No</label>
                 @Html.HiddenFor(m => m.GRNo)
-                <div class="form-control bg-light">@Model.GRNo</div>
+                <div class="form-control-sm bg-light">@Model.GRNo</div>
             </div>
             <div class="col-md-3">
                 <label class="form-label fw-bold">GRN Code</label>
                 @Html.HiddenFor(m => m.GRNCode)
-                <div class="form-control bg-light">@Model.GRNCode</div>
+                <div class="form-control-sm bg-light">@Model.GRNCode</div>
             </div>
             <div class="col-md-3">
                 <label class="form-label fw-bold">PO Code</label>
                 @Html.HiddenFor(m => m.POCode)
-                <div class="form-control bg-light">@Model.POCode</div>
+                <div class="form-control-sm bg-light">@Model.POCode</div>
             </div>
             <div class="col-md-3">
                 <label class="form-label fw-bold">Vendor</label>
                 @Html.HiddenFor(m => m.VendorName)
-                <div class="form-control bg-light">@Model.VendorName</div>
+                <div class="form-control-sm bg-light">@Model.VendorName</div>
             </div>
         </div>
 
@@ -32,7 +32,7 @@
         <div class="row g-3 mb-4">
             <div class="col-md-6">
                 <label class="form-label fw-bold">Reason For GoodReturn<span class="text-danger">*</span></label>
-                @Html.TextBoxFor(m => m.ReasonForGoodReturn, new { @class = "form-control reason-return", placeholder = "Enter Reason For GoodReturn" })
+                @Html.TextBoxFor(m => m.ReasonForGoodReturn, new { @class = "form-control form-control-sm reason-return", placeholder = "Enter Reason For GoodReturn" })
                 <span class="text-danger error-msg"></span>
             </div>
         </div>
@@ -42,6 +42,7 @@
             <table id="CreateGoods" class="table table-bordered table-hover align-middle shadow-sm">
                 <thead class="table-primary text-center table-dark">
                     <tr>
+                        <th>Sr. No</th>
                         <th>Item Name</th>
                         <th>Ordered Qty</th>
                         <th>UOM</th>
@@ -58,13 +59,17 @@
                     {
                         for (int i = 0; i < Model.Items.Count; i++)
                         {
+
+                          
+                            
                             <tr>
+                                <td>@(i + 1)</td>  <!-- Sr. No auto-filled by DataTable -->
                                 @Html.HiddenFor(m => m.Items[i].FailedQCCode)
                                 <td>@Html.HiddenFor(m => m.Items[i].ItemName) @Model.Items[i].ItemName</td>
                                 <td>@Html.DisplayFor(m => m.Items[i].Qty)</td>
                                 <td>@Html.HiddenFor(m => m.Items[i].UOM) @Model.Items[i].UOM</td>
-                                <td>@Html.DisplayFor(m => m.Items[i].UnitRate)</td>
-                                <td>@Html.DisplayFor(m => m.Items[i].Amount)</td>
+                                <td style="white-space: nowrap;">₹ @Html.DisplayFor(m => m.Items[i].UnitRate)</td>
+                                <td class="rupee-inline">₹@String.Format("{0:N2}", Model.Items[i].Amount)</td>
                                 <td>@Html.DisplayFor(m => m.Items[i].Reason)</td>
                                 <td>@Html.DisplayFor(m => m.Items[i].SampleTestFailed)</td>
                                 <td>@Html.DisplayFor(m => m.Items[i].SampleQualityChecked)</td>
@@ -86,7 +91,7 @@
         <!-- Footer Buttons -->
         <div class="d-flex justify-content-end gap-2">
           
-            <button type="submit" class="btn btn-success px-4">
+            <button type="submit" class="btn btn-sm btn-success px-4">
                 <i class="bi bi-check-circle"></i> Save Goods Return
             </button>
         </div>
@@ -107,9 +112,12 @@
             responsive: true,
             columnDefs: [
                 { targets: "_all", className: "text-center align-middle" }
-            ]
+            ],
+          
         });
 
+
+        
         $(document).ready(function () {
 
     // -------- Validation Function --------

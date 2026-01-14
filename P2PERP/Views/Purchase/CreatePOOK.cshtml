@@ -35,32 +35,6 @@
                  padding-left: 10px;
              }
 
-             .form-label {
-                 font-weight: 500;
-                 margin-bottom: 8px;
-             }
-
-             /* ==========================
-        Form Controls
-        ========================== */
-             .form-control,
-             .form-select {
-                 border-radius: 8px;
-                 border: 1px solid #ddd;
-                 box-shadow: none !important;
-                 outline: none !important;
-                 transition: none !important;
-                 background-color: #fff;
-             }
-
-                 /* Focus: light-sky blue border */
-                 .form-control:focus,
-                 .form-select:focus {
-                     border-color: #ddd !important;
-                     box-shadow: none !important;
-                     outline: none !important;
-                 }
-
                  /* Invalid fields: red border */
                  .form-control.is-invalid,
                  .form-select.is-invalid {
@@ -109,31 +83,16 @@
              /* ==========================
         Tables
         ========================== */
-             .table thead {
-                 background: #000;
-                 color: #fff;
-             }
 
-             .table tbody tr td {
-                 font-size: 0.9rem;
-             }
-
-             #tblItems tbody td,
-             #tblItems thead th,
-             #tblItems tfoot td {
-                 padding: 0.3rem 0.5rem;
-                 font-size: 0.85rem;
-                 vertical-align: middle;
-             }
-
-             #tblItems tbody tr {
-                 line-height: 1.2;
-             }
-
-             .table-sm th,
-             .table-sm td {
-                 padding: 0.25rem 0.5rem;
-             }
+        table-responsive {
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        table th {
+            white-space: nowrap; /* Prevents text wrapping */
+            text-overflow: ellipsis; /* Adds "..." if text is too long */
+            overflow: hidden; /* Hides overflow text */
+        }
 
              .totals {
                  text-align: right;
@@ -145,17 +104,6 @@
              }
 
              /* ==========================
-        Buttons
-        ========================== */
-             .btn-cancel {
-                 background: #dc3545;
-                 color: #fff;
-                 border-radius: 10px;
-                 padding: 8px 20px;
-                 font-weight: 500;
-             }
-
-             /* ==========================
         Tooltip (Dark)
         ========================== */
              .tooltip-dark .tooltip-inner {
@@ -163,9 +111,10 @@
                  color: #fff;
              }
 
-             .tooltip-dark .tooltip-arrow::before {
-                 border-top-color: #000 !important;
-             }
+        .tooltip-dark .tooltip-arrow::before {
+            /*                 border-top-color: #000 !important;*/
+            display: none;
+        }
 
              /* ==========================
         Terms & Conditions (Checkbox)
@@ -223,79 +172,78 @@
     </div>
 
     <div class="container">
-        <form class="po-form needs-validation" novalidate>
-            <h3 class="text-center text-primary mb-4">Purchase Order</h3>
-
+        <form class="po-form needs-validation pt-0" novalidate>
+            <h3 class="text-center text-primary mb-4 pt-0 mt-0">Purchase Order</h3>
             <!-- Hidden fields -->
             <input type="hidden" id="TotalAmount" name="TotalAmount" />
 
             <!-- General Details -->
-            <h5 class="section-title">General Details</h5>
+            <h5 class="section-title text-dark">General Details</h5>
             <div class="row g-3">
                 <div class="col-md-4">
-                    <label for="QuotationNo" class="form-label">Quotation Number</label>
-                    <input type="text" class="form-control form-control-sm bg-light" id="QuotationNo" name="RegisterQuotationCode" readonly>
+                    <label for="QuotationNo" class="form-label form-label-sm fw-bold text-dark">Quotation Number</label>
+                    <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light" id="QuotationNo" name="RegisterQuotationCode" readonly>
                 </div>
                 <div class="col-md-4">
-                    <label for="QuotationDate" class="form-label">Quotation Date</label>
-                    <input type="text" class="form-control form-control-sm bg-light" name="QuotationDate" id="QuotationDate" readonly>
+                    <label for="QuotationDate" class="form-label form-label-sm fw-bold text-dark">Quotation Date</label>
+                    <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light" name="QuotationDate" id="QuotationDate" readonly>
                 </div>
                 <div class="col-md-4">
-                    <label for="ApprovedBy" class="form-label">Approved By</label>
-                    <input type="text" class="form-control form-control-sm bg-light" name="ApprovedRejectedBy" id="ApprovedBy" readonly>
+                    <label for="ApprovedBy" class="form-label form-label-sm fw-bold text-dark">Approved By</label>
+                    <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light" name="ApprovedRejectedBy" id="ApprovedBy" readonly>
                 </div>
                 <div class="col-md-4">
-                    <label for="ApprovedDate" class="form-label">Approved Date</label>
-                    <input type="text" class="form-control form-control-sm bg-light" name="ApprovedRejectedDate" id="ApprovedDate" readonly>
+                    <label for="ApprovedDate" class="form-label form-label-sm fw-bold text-dark">Approved Date</label>
+                    <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light" name="ApprovedRejectedDate" id="ApprovedDate" readonly>
                 </div>
-                <div class="col-md-4">
-                    <label for="ddlAccountant" class="form-label">
+                <div class="mb-3 col-md-4">
+                    <label for="ddlAccountant" class="form-label form-label-sm fw-bold text-dark">
                         Accountant Email <span class="text-danger">*</span>
                     </label>
-                    <select class="form-select" name="Usercode" id="ddlAccountant" required>
+                    <select id="ddlAccountant" name="Usercode" class="form-select form-select-sm shadow-sm" required>
                         <option value="">Select Accountant Email</option>
-                        <!-- Options will be dynamically populated via AJAX -->
+                        @*<option value="a@example.com">a@example.com</option>*@
                     </select>
-                    <div class="invalid-feedback">
-                        Please select an accountant email.
-                    </div>
+                    <div class="invalid-feedback">Please select an accountant email.</div>
                 </div>
+
+
             </div>
 
             <!-- Vendor Details -->
             <h5 class="section-title mt-4">Vendor Details</h5>
             <div class="row g-3">
                 <div class="col-md-4">
-                    <label for="VendorName" class="form-label">Vendor Name</label>
-                    <input type="text" class="form-control form-control-sm bg-light" id="VendorName" name="VendorName" readonly>
+                    <label for="VendorName" class="form-label form-label-sm fw-bold text-dark">Vendor Name</label>
+                    <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light" id="VendorName" name="VendorName" readonly>
                 </div>
                 <div class="col-md-4">
-                    <label for="CompanyName" class="form-label">Company Name</label>
-                    <input type="text" class="form-control form-control-sm bg-light" id="CompanyName" name="CompanyName" readonly>
+                    <label for="CompanyName" class="form-label form-label-sm fw-bold text-dark">Company Name</label>
+                    <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light" id="CompanyName" name="CompanyName" readonly>
                 </div>
                 <div class="col-md-4">
-                    <label for="CompanyAddress" class="form-label">Company Address</label>
-                    <input type="text" class="form-control form-control-sm bg-light" id="CompanyAddress" name="CompanyAddress" readonly>
+                    <label for="CompanyAddress" class="form-label form-label-sm fw-bold text-dark">Company Address</label>
+                    <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light" id="CompanyAddress" name="CompanyAddress" readonly>
                 </div>
                 <div class="col-md-4">
-                    <label for="VendorContactNumber" class="form-label">Vendor Contact Number</label>
-                    <input type="tel" class="form-control form-control-sm bg-light" id="VendorContactNumber" name="MobileNo" readonly>
+                    <label for="VendorContactNumber" class="form-label form-label-sm fw-bold text-dark">Vendor Contact Number</label>
+                    <input type="tel" class="form-control form-control-sm text-dark shadow-sm bg-light" id="VendorContactNumber" name="MobileNo" readonly>
                 </div>
                 <div class="col-md-4">
-                    <label for="VendorEmail" class="form-label">Vendor Email</label>
-                    <input type="email" class="form-control form-control-sm bg-light" id="VendorEmail" name="Email" readonly>
+                    <label for="VendorEmail" class="form-label form-label-sm fw-bold text-dark">Vendor Email</label>
+                    <input type="email" class="form-control form-control-sm text-dark shadow-sm bg-light" id="VendorEmail" name="Email" readonly>
                 </div>
                 <div class="col-md-4">
-                    <label for="VendorAccountNumber" class="form-label">Vendor Account Number</label>
-                    <input type="text" class="form-control form-control-sm bg-light" id="VendorAccountNumber" name="AccountNumber" readonly>
+                    <label for="VendorAccountNumber" class="form-label form-label-sm fw-bold text-dark">Vendor Account Number</label>
+                    <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light" id="VendorAccountNumber" name="AccountNumber" readonly>
                 </div>
                 <div class="col-md-4">
-                    <label for="IFSCcode" class="form-label">IFSC Code</label>
-                    <input type="text" class="form-control form-control-sm bg-light" id="IFSCcode" name="IFSCcode" readonly>
+                    <label for="IFSCcode" class="form-label form-label-sm fw-bold text-dark">IFSC Code</label>
+                    <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light" id="IFSCcode" name="IFSCcode" readonly>
                 </div>
                 <div class="col-md-4">
-                    <label for="SwiftCode" class="form-label">Swift Code</label>
-                    <input type="text" class="form-control form-control-sm bg-light" id="SwiftCode" name="SwiftCode" readonly>
+                    <label for="SwiftCode" class="form-label form-label-sm fw-bold text-dark">Swift Code</label>
+                    <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light" id="SwiftCode" name="SwiftCode" readonly>
                 </div>
             </div>
 
@@ -303,10 +251,10 @@
             <h5 class="section-title mt-4">Company Details</h5>
             <div class="row g-3">
                 <div class="col-md-6">
-                    <label for="BillingAddress" class="form-label">
+                    <label for="BillingAddress" class="form-label form-label-sm fw-bold text-dark">
                         Billing Address <span class="text-danger">*</span>
                     </label>
-                    <textarea class="form-control form-control-sm bg-light"
+                    <textarea class="form-control form-control-sm text-dark shadow-sm bg-light"
                               id="BillingAddress"
                               name="BillingAddress"
                               placeholder="Enter billing address"
@@ -318,8 +266,8 @@
                 </div>
 
                 <div class="col-md-6">
-                    <label for="DeliveryAddress" class="form-label">Delivery Address</label>
-                    <textarea class="form-control form-control-sm bg-light" id="DeliveryAddress" name="DeliveryAddress" readonly></textarea>
+                    <label for="DeliveryAddress" class="form-label form-label-sm fw-bold text-dark">Delivery Address</label>
+                    <textarea class="form-control form-control-sm text-dark shadow-sm bg-light" id="DeliveryAddress" name="DeliveryAddress" readonly></textarea>
                 </div>
             </div>
 
@@ -336,16 +284,19 @@
             <h5 class="section-title mt-4">Item Details</h5>
             <!-- Items Table -->
             <div class="table-responsive mt-4">
-                <button type="button" class="btn btn-primary d-flex justify-content-end me-3 ms-auto" id="btnRestoreItem">Restore Items</button>
+                <button type="button" class="btn btn-sm btn-primary d-flex align-items-center justify-content-end me-3 ms-auto" id="btnRestoreItem">
+                    <i class="bi bi-arrow-counterclockwise me-2"></i>Restore Items
+                </button>
+
                 <table class="table table-bordered table-striped text-center" id="tblItems">
-                    <thead class="table-dark">
+                    <thead class="table-dark text-center">
                         <tr>
                             <th>SRNo</th>
                             <th>Item Code</th>
                             <th class="d-none">RegisterQuotationItemCode</th>
                             <th>Item Name</th>
                             <th class="d-none">ItemCode</th>
-                            <th>Description</th>
+                            <th class="text-center">Description</th>
                             <th>Quantity</th>
                             <th>UOM</th>
                             <th>Unit Rate</th>
@@ -377,48 +328,62 @@
 
             <!-- Action Buttons -->
             <div class="text-end mt-4">
-                <button type="submit" class="btn btn-success">
-                    <i class="bi bi-check2-circle me-2"></i>Create PO
-                </button>
-                <button type="button" class="btn btn-danger" onclick="window.location.href='SelectedQuotationListShowOK'">
+                <button type="button" class="btn btn-sm btn-danger" onclick="window.location.href='SelectedQuotationListShowOK'">
                     <i class="bi bi-x-circle me-2"></i>Cancel
+                </button>
+                <button type="submit" class="btn btn-sm btn-success">
+                    <i class="bi bi-check2-circle me-2"></i>Create PO
                 </button>
             </div>
         </form>
     </div>
-
     <!-- Restore Modal -->
-    <div class="modal fade" id="restoreModal" tabindex="-1" aria-labelledby="restoreModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white text-center">
-                    <h5 class="d-flex justify-content-center text-center ms-auto text-white" id="restoreModalLabel">Restore Removed Item</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal fade" id="restoreModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+            <div class="modal-content shadow-lg rounded-3">
+                <!-- Header -->
+                <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-2">
+                    <h5 class="modal-title fw-bold text-white mb-0 fs-5">
+                        Restore Removed Item
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2"
+                            data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+
+                <!-- Body -->
+                <div class="modal-body px-4">
                     <div class="mb-3">
-                        <label for="ddlRemovedItems" class="form-label">Select Removed Item</label>
-                        <select id="ddlRemovedItems" class="form-select">
+                        <label for="ddlRemovedItems" class="form-label form-label-sm fw-bold text-dark">
+                            Select Removed Item<span class="text-danger">*</span>
+                        </label>
+                        <select id="ddlRemovedItems" class="form-select form-select-sm shadow-sm">
                             <option value="">Select Item</option>
                         </select>
                     </div>
+
+
                     <div id="restoreDetails" style="display:none;">
-                        <div class="mb-2">
-                            <label class="form-label">Quantity</label>
-                            <input type="number" id="restoreQty" class="form-control" min="1">
+                        <div class="mb-3">
+                            <label class="form-label form-label-sm fw-bold text-dark">Quantity</label>
+                            <input type="number" id="restoreQty" class="form-control form-control-sm text-dark shadow-sm" min="1">
                         </div>
-                        <div class="mb-2">
-                            <label class="form-label">Description</label>
-                            <input type="text" id="restoreDesc" class="form-control">
+                        <div class="mb-3">
+                            <label class="form-label form-label-sm fw-bold text-dark">Description</label>
+                            <input type="text" id="restoreDesc" class="form-control form-control-sm text-dark shadow-sm">
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" id="btnAddBack" class="btn btn-success">Add Back</button>
+
+                <!-- Footer -->
+                <div class="modal-footer bg-light rounded-bottom p-2 d-flex justify-content-end">
+                    <button type="button" id="btnAddBack" class="btn btn-sm btn-success px-4">
+                        <i class="bi bi-arrow-clockwise me-1"></i> Add Back
+                    </button>
                 </div>
             </div>
         </div>
     </div>
+
 
     <script>
         let removedItems = [];
@@ -465,6 +430,16 @@
                     const termsChecked = document.querySelectorAll('#termsList input[type=checkbox]:checked').length > 0;
                     const termsFeedback = document.getElementById('termsFeedback');
 
+                    // ✅ Accountant Email validation
+                    const ddlAccountant = document.getElementById('ddlAccountant');
+                    if (ddlAccountant) {
+                        if (ddlAccountant.value.trim() === "") {
+                            ddlAccountant.setCustomValidity('Please select an accountant email.');
+                        } else {
+                            ddlAccountant.setCustomValidity(''); // clear error if selected
+                        }
+                    }
+
                     // ✅ Billing address validation
                     const billingAddress = document.getElementById('BillingAddress');
                     if (billingAddress.value.trim().length < 10) {
@@ -495,6 +470,7 @@
             });
         })()
 
+
         // ====================================================
         // ✅ Document Ready - Fetch PO Details and Initialize Page
         // ====================================================
@@ -519,7 +495,7 @@
                 console.log("ℹ️ Shown btnRestoreItem for normal mode");
             }
             if (mode === "JIT") {
-                
+
                 // $("#btnRestoreItem").hide(); // hide
                 $("#btnRestoreItem").css("display", "none !important");
                 // CallJITPOMethod();
@@ -534,7 +510,7 @@
                      data: JSON.stringify({
                          itemCode: firstItem.ItemCode,
                          stockRequirementId: firstItem.StockReqirementId
-                     }),    
+                     }),
                     contentType: "application/json; charset=utf-8",
                      success: function (response) {
                         console.log(response);
@@ -622,7 +598,7 @@
                                     }
                                 },
                                 { data: "Quantity", className: "text-center"},
-                                { data: "UOM",className: "text-center" },
+                                { data: "UOM", className: "text-center" },
                                 { data: "CostPerUnit", render: data => '₹' + parseFloat(data).toFixed(2) },
                                 {
                                     data: "Discount",
@@ -634,7 +610,20 @@
                                 },
                                 { data: "GST",className: "text-center"},
                                 { data: "Amount",className: "text-center", render: data => '₹' + parseFloat(data).toFixed(2) },
-                                { data: null, orderable: false, searchable: false, render: () => '<a href="#" class="remove-link">Remove</a>' },
+                                {
+                                    data: null,
+                                    orderable: false,
+                                    searchable: false,
+                                    className: "text-center",
+                                    render: () => `
+                                    <a href="#" class="remove-link btn btn-danger btn-sm d-inline-flex align-items-center justify-content-center p-1 rounded-circle" title="Delete">
+                                        <i class="bi bi-trash-fill text-white"></i>
+                                    </a>
+                                `
+                                }
+                            ],
+                            columnDefs: [
+                                { className: "text-center", targets: "_all" }  // 👈 Centers all columns
                             ],
                             paging: true,
                             searching: false,
@@ -677,7 +666,7 @@
                         alert("Failed to create JIT PO.");
                     }
                  });
-               
+
             } else {
                 //$("#btnRestoreItem").toggle();
                 $.ajax({
@@ -770,7 +759,21 @@
                             { data: "Discount" },
                             { data: "GST" },
                             { data: "Amount", render: data => '₹' + parseFloat(data).toFixed(2) },
-                            { data: null, orderable: false, searchable: false, render: () => '<a href="#" class="remove-link">Remove</a>' }
+                            {
+                                data: null,
+                                orderable: false,
+                                searchable: false,
+                                className: "text-center",
+                                render: () => `
+                                    <a href="#" class="remove-link btn btn-danger btn-sm d-inline-flex align-items-center justify-content-center p-1 rounded-circle" title="Delete">
+                                        <i class="bi bi-trash-fill text-white"></i>
+                                    </a>
+                                `
+                            }
+
+                        ],
+                        columnDefs: [
+                            { className: "text-center", targets: "_all" }  // 👈 Centers all columns
                         ],
                         paging: true,
                       //  searching: true,
@@ -1077,7 +1080,7 @@
         }
 
         // ====================================================
-        // ✅ End of Script
+        // ✅ End of Scripted
         // ====================================================
     </script>
 </body>

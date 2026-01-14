@@ -1,4 +1,4 @@
-﻿@{
+﻿<!--@{
 
     var poCode = ViewBag.POCode?.ToString() ?? "";
 }
@@ -27,6 +27,26 @@
         #termsCondition li {
             padding: 2px 0;
         }
+
+        thead th {
+            white-space: nowrap !important;
+        }
+
+        /* ✅ Center all table headers and body data */
+        #poItemsTable thead th,
+        #poItemsTable tbody td {
+            text-align: center !important;
+            vertical-align: middle;
+        }
+
+        /* ✅ Keep footer totals right-aligned */
+        #poItemsTable tfoot th,
+        #poItemsTable tfoot td {
+            text-align: right !important;
+            vertical-align: middle;
+        }
+
+
     </style>
 </head>
 
@@ -34,66 +54,68 @@
 
     <input type="hidden" id="PONCode" value="@poCode" />
 
-  
+
 
         <div class="card-body">
             <!-- PO & Vendor Info -->
-            <div class="row mb-3">
-                <!-- Left -->
-                <div class="col-md-6">
-                    <h6 class="fw-bold mb-3">Invoice To</h6>
-                    <div class="mb-2">
-                        <label class="form-label">PO No</label>
-                        <input id="po_no" class="form-control form-control-sm  small text-muted border rounded p-2 bg-light mb-2 mt-2" readonly />
-                    </div>
-                    <div class="mb-2">
-                        <label class="form-label">PO Date</label>
-                        <input id="po_date" class="form-control form-control-sm  small text-muted border rounded p-2 bg-light mb-2 mt-2" readonly />
-                    </div>
-                    <div class="mb-2">
-                        <label class="form-label">Company Name</label>
-                        <input id="companyName" class="form-control form-control-sm  small text-muted border rounded p-2 bg-light mb-2 mt-2" readonly />
-                    </div>
-                    <div class="mb-2">
-                        <label class="form-label">Delivery Address</label>
-                        <textarea id="deliveryAddress" class="form-control form-control-sm  small text-muted border rounded p-2 bg-light mb-2 mt-2" rows="3" readonly></textarea>
-                    </div>
-                    <div class="mb-2">
-                        <label class="form-label">Terms & Conditions</label>
-                        <div id="termsCondition" class="small text-muted border rounded p-2 bg-light"></div>
-                    </div>
-                </div>
+<!--<div class="row mb-3">-->
+<!-- Left -->
+<!--<div class="col-md-6">
+    <h6 class="fw-bold mb-3">Invoice To</h6>
+    <div class="mb-2">
+        <label class="form-label fw-bold text-dark">PO No</label>-->
+@*<input id="po_no" class="form-control form-control-sm  small text-muted border rounded p-2 bg-light mb-2 mt-2" readonly />*@
+@*<label id="po_no" class="px-2 py-1 d-block text-muted"></label>
 
-                <!-- Right -->
-                <div class="col-md-6">
-                    <h6 class="fw-bold mb-3">Vendor Details</h6>
-                    <div class="mb-2 row">
-                        <label class="col-sm-4 col-form-label col-form-label-sm">Vendor Name</label>
-                        <div class="col-sm-8">
-                            <input id="vendorName" class="form-control form-control-sm  small text-muted border rounded p-2 bg-light mb-2 mt-2" readonly />
+
                         </div>
-                    </div>
-                    <div class="mb-2 row">
-                        <label class="col-sm-4 col-form-label col-form-label-sm">Vendor Company</label>
-                        <div class="col-sm-8">
-                            <input id="vendorCompany" class="form-control form-control-sm  small text-muted border rounded p-2 bg-light mb-2 mt-2" readonly />
-                        </div>
-                    </div>
-                    <div class="mb-2 row">
-                        <label class="col-sm-4 col-form-label col-form-label-sm">Vendor Contact</label>
-                        <div class="col-sm-8">
-                            <input id="vendorContact" class="form-control form-control-sm  small text-muted border rounded p-2 bg-light mb-2 mt-2" readonly />
-                        </div>
-                    </div>
-                    <div class="mb-2">
-                        <label class="form-label">Vendor Address</label>
-                        <textarea id="vendorAddress" class="form-control form-control-sm  small text-muted border rounded p-2 bg-light mb-2 mt-2" rows="3" readonly></textarea>
-                    </div>
-                </div>
+    <div class="mb-2">
+        <label class="form-label fw-bold text-dark">PO Date</label>
+        <input id="po_date" class="form-control form-control-sm  small text-muted border rounded p-2 bg-light mb-2 mt-2" readonly />
+    </div>
+    <div class="mb-2">
+        <label class="form-label fw-bold text-dark">Company Name</label>
+        <input id="companyName" class="form-control form-control-sm  small text-muted border rounded p-2 bg-light mb-2 mt-2" readonly />
+    </div>
+    <div class="mb-2">
+        <label class="form-label fw-bold text-dark">Delivery Address</label>
+        <textarea id="deliveryAddress" class="form-control form-control-sm  small text-muted border rounded p-2 bg-light mb-2 mt-2" rows="3" readonly></textarea>
+    </div>
+    <div class="mb-2">
+        <label class="form-label fw-bold text-dark">Terms & Conditions</label>
+        <div id="termsCondition" class="small text-muted border rounded p-2 bg-light"></div>
+    </div>
+                    </div>-->*@
+
+<!-- Right -->
+<!--<div class="col-md-6">
+        <h6 class="fw-bold mb-3">Vendor Details</h6>
+        <div class="mb-2 row">
+            <label class="form-label fw-bold text-dark">Vendor Name</label>
+            <div class="col-sm-8">
+                <input id="vendorName" class="form-control form-control-sm  small text-muted border rounded p-2 bg-light mb-2 mt-2" readonly />
             </div>
-
-            <!-- Item Details Table -->
-            <div class="table-responsive">
+        </div>
+        <div class="mb-2 row">
+            <label class="form-label fw-bold text-dark">Vendor Company</label>
+            <div class="col-sm-8">
+                <input id="vendorCompany" class="form-control form-control-sm  small text-muted border rounded p-2 bg-light mb-2 mt-2" readonly />
+            </div>
+        </div>
+        <div class="mb-2 row">
+            <label class="form-label fw-bold text-dark">Vendor Contact</label>
+            <div class="col-sm-8">
+                <input id="vendorContact" class="form-control form-control-sm  small text-muted border rounded p-2 bg-light mb-2 mt-2" readonly />
+            </div>
+        </div>
+        <div class="mb-2">
+            <label class="form-label fw-bold text-dark">Vendor Address</label>
+            <textarea id="vendorAddress" class="form-control form-control-sm  small text-muted border rounded p-2 bg-light mb-2 mt-2" rows="3" readonly></textarea>
+        </div>
+    </div>
+</div>-->
+<!-- Item Details Table -->
+<!--<div class="table-responsive">
                 <table id="poItemsTable" class="table table-bordered table-sm align-middle m-0" style="width:100%">
                     <thead class="table-dark">
                         <tr class="text-center">
@@ -127,7 +149,7 @@
                 </table>
             </div>
         </div>
-    
+
 
 
 
@@ -149,7 +171,8 @@
             // Load PO Header
             $.get('/Purchase/GetPOHeaderByCodeVNK', { POCode: POCode }, function (h) {
                 if (!h) return;
-                $("#po_no").val(h.POCode || '');
+                //$("#po_no").val(h.POCode || '');
+                $("#po_no").text(h.POCode || '');
                 // Format PO Date to dd/MM/yyyy
                 let formattedDate = '';
                 if (h.AddedDateVK) {
@@ -196,7 +219,7 @@
 
             // Load PO Items
             $.get('/Purchase/GetPOItemsByCodeVNK', { POCode: POCode }, function (rows) {
-                           
+
                 const $tb = $("#poItemsTable tbody").empty();
                 if (!rows || rows.length === 0) {
                     $tb.append('<tr><td colspan="10" class="text-center text-muted">No items found</td></tr>');
@@ -249,7 +272,7 @@
                 });
             });
 
-           
+
 
             // Print
             $("#btnPrint").on("click", function () {
@@ -258,4 +281,332 @@
         });
     </script>
 </body>
+</html>-->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html>
+<head>
+    <style>
+        /* ---------- Footer Borders ---------- */
+        #poItemsTable tfoot tr.subtotal-row th,
+        #poItemsTable tfoot tr.transport-row th,
+        #poItemsTable tfoot tr.grandtotal-row th {
+            border-bottom: 1px solid #d3d3d3 !important; /* light grey */
+        }
+
+        #poItemsTable tfoot tr.grandtotal-row th {
+            background-color: #f1f3f4 !important; /* subtle gray background */
+            font-weight: 700;
+        }
+        #poItemsTable tfoot tr.subtotal-row th,
+        #poItemsTable tfoot tr.transport-row th {
+            background-color: white !important; /* subtle gray background */
+            font-weight: 700;
+        }
+
+
+        #poItemsTable tbody td {
+            font-size: 14px;
+        }
+
+    #poItemsTable tfoot th,
+    #poItemsTable tfoot td {
+    padding: 2px 8px;
+    font-size: 13px;
+    line-height: 1.2;
+    }
+
+    #termsCondition ul {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 0;
+    }
+
+    #termsCondition li {
+    padding: 2px 0;
+    }
+
+    thead th {
+    white-space: nowrap !important;
+    }
+
+    /* ✅ Center table headers & body cells */
+    #poItemsTable thead th,
+    #poItemsTable tbody td {
+    text-align: center !important;
+    vertical-align: middle;
+    }
+
+    /* ✅ Right-align footer totals */
+    #poItemsTable tfoot th,
+    #poItemsTable tfoot td {
+    text-align: right !important;
+    vertical-align: middle;
+    }
+
+    /* ---------- Info Section Styling ---------- */
+    .row.mb-3 {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    }
+
+    .col-md-6 {
+    flex: 1;
+    min-width: 350px;
+    }
+
+    .info-section {
+    background: #fdfdfd;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px 20px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    height: 100%;
+    }
+
+    .info-section h5 {
+    font-weight: 600;
+    color: #004085;
+    border-bottom: 2px solid #dee2e6;
+    padding-bottom: 6px;
+    margin-bottom: 12px;
+    }
+
+    .info-field {
+    display: flex;
+    align-items: center;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+    }
+
+    .label-title {
+    font-weight: 600;
+    color: #222;
+    font-size: 14px;
+    width: 130px;
+    }
+
+    .label-value {
+    color: gray;
+    font-size: 14px;
+    font-weight: 500;
+    background: transparent;
+    border: none;
+    padding: 2px 0;
+    flex: 1;
+    }
+
+    #termsCondition ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+    }
+
+    #termsCondition li {
+    padding: 4px 0;
+    color: gray;
+    line-height: 1.4;
+    }
+
+    #termsCondition li strong {
+    color: #000;
+    margin-right: 4px;
+    }
+
+    .card-body {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    }
+
+       
+
+    </style>
+</head>
+
+<body>
+    <input type="hidden" id="PONCode" value="@poCode" />
+
+    <div class="card-body">
+        <!-- PO & Vendor Info -->
+        <div class="row mb-3">
+            <!-- Left Section -->
+            <div class="col-md-6 info-section">
+                <h5>Invoice To</h5>
+                <div class="info-field"><label class="label-title">PO No :</label><label id="po_no" class="label-value"></label></div>
+                <div class="info-field"><label class="label-title">PO Date :</label><label id="po_date" class="label-value"></label></div>
+                <div class="info-field"><label class="label-title">Company Name :</label><label id="companyName" class="label-value"></label></div>
+                <div class="info-field"><label class="label-title">Delivery Address :</label><label id="deliveryAddress" class="label-value" style="white-space: pre-line;"></label></div>
+                <div class="info-field"><label class="label-title">Terms & Conditions :</label><label id="termsCondition" class="label-value"></label></div>
+            </div>
+
+            <!-- Right Section -->
+            <div class="col-md-6 info-section">
+                <h5>Vendor Details</h5>
+                <div class="info-field"><label class="label-title">Vendor Name :</label><label id="vendorName" class="label-value"></label></div>
+                <div class="info-field"><label class="label-title">Vendor Company :</label><label id="vendorCompany" class="label-value"></label></div>
+                <div class="info-field"><label class="label-title">Vendor Contact :</label><label id="vendorContact" class="label-value"></label></div>
+                <div class="info-field"><label class="label-title">Vendor Address :</label><label id="vendorAddress" class="label-value" style="white-space: pre-line;"></label></div>
+            </div>
+        </div>
+
+        <!-- Item Details Table -->
+        <div class="table-responsive">
+            <table id="poItemsTable" class="table table-bordered table-sm align-middle m-0" style="width:100%">
+                <thead class="table-dark">
+                    <tr class="text-center">
+                        <th>SR NO</th>
+                        <th>ITEM CODE</th>
+                        <th>ITEM NAME</th>
+                        <th>ITEM DESCRIPTION</th>
+                        <th>QTY</th>
+                        <th>UOM</th>
+                        <th>UNIT RATE</th>
+                        <th>DISCOUNT</th>
+                        <th>GST</th>
+                        <th class="text-end">AMOUNT</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+                <tfoot class="table-light">
+                    <tr class="subtotal-row">
+                        <th colspan="9" class="text-end">Subtotal</th>
+                        <th id="ftSubtotal" class="text-end">₹0.00</th>
+                    </tr>
+                    <tr class="transport-row">
+                        <th colspan="9" class="text-end">Transportation / Shipping</th>
+                        <th id="ftShipping" class="text-end">₹0.00</th>
+                    </tr>
+                    <tr class="grandtotal-row">
+                        <th colspan="9" class="text-end">Grand Total</th>
+                        <th id="ftGrandTotal" class="text-end">₹0.00</th>
+                    </tr>
+                </tfoot>
+
+            </table>
+        </div>
+    </div>
+
+    <script>
+        $(function () {
+            const POCode = $("#PONCode").val();
+
+            function round2(n) { return Number((n || 0).toFixed(2)); }
+            function calcLine(qty, unit, discPct, gstPct) {
+                qty = Number(qty || 0); unit = Number(unit || 0); discPct = Number(discPct || 0); gstPct = Number(gstPct || 0);
+                const base = qty * unit;
+                const discAmt = base * (discPct / 100);
+                const taxable = base - discAmt;
+                const gstAmt = taxable * (gstPct / 100);
+                const lineTotal = taxable + gstAmt;
+                return { lineTotal: round2(lineTotal) };
+            }
+
+            // Load PO Header
+            $.get('/Purchase/GetPOHeaderByCodeVNK', { POCode: POCode }, function (h) {
+                if (!h) return;
+                $("#po_no").text(h.POCode || '');
+                let formattedDate = '';
+                if (h.AddedDateVK) {
+                    let dateObj;
+                    if (typeof h.AddedDateVK === 'string' && h.AddedDateVK.includes('/Date')) {
+                        const timestamp = parseInt(h.AddedDateVK.replace(/\/Date\((\d+)\)\//, '$1'));
+                        dateObj = new Date(timestamp);
+                    } else {
+                        dateObj = new Date(h.AddedDateVK);
+                    }
+                    const day = String(dateObj.getDate()).padStart(2, '0');
+                    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                    const year = dateObj.getFullYear();
+                    formattedDate = `${day}/${month}/${year}`;
+                }
+                $("#po_date").text(formattedDate || '');
+                $("#companyName").text(h.InvoiceToCompanyName || '');
+                $("#deliveryAddress").text(h.DeliveryAddress || '');
+
+                if (h.TermConditionName) {
+                    const termsArray = h.TermConditionName.split(',').map(t => t.trim()).filter(t => t);
+                    let ulHtml = '<ul>';
+                    termsArray.forEach((term, i) => { ulHtml += `<li><strong>${i + 1}.</strong> ${term}</li>`; });
+                    ulHtml += '</ul>';
+                    $("#termsCondition").html(ulHtml);
+                } else {
+                    $("#termsCondition").html('<em>No terms and conditions available</em>');
+                }
+
+                $("#vendorName").text(h.VendorName || '');
+                $("#vendorCompany").text(h.VendorCompanyName || '');
+                $("#vendorContact").text(h.VendorContact || '');
+                $("#vendorAddress").text(h.VendorAddress || '');
+            });
+
+            // Load PO Items with DataTable
+            $.get('/Purchase/GetPOItemsByCodeVNK', { POCode: POCode }, function (rows) {
+                const $tb = $("#poItemsTable tbody").empty();
+                if (!rows || rows.length === 0) {
+                    $tb.append('<tr><td colspan="10" class="text-center text-muted">No items found</td></tr>');
+                    return;
+                }
+
+                let subtotal = 0;
+                rows.forEach(function (r, idx) {
+                    const shipping = Number(r.ShippingCharges || 0);
+                    $("#ftShipping").text("₹" + shipping.toFixed(2));
+                    const c = calcLine(r.Quantity, r.CostPerUnit, r.Discount, r.GSTPct);
+                    subtotal += c.lineTotal;
+
+                    $tb.append(`
+                            <tr>
+                                <td class="text-center">${idx + 1}</td>
+                                <td>${r.ItemCode || ''}</td>
+                                <td>${r.ItemName || ''}</td>
+                                <td title="${r.Description || ''}">${r.Description || ''}</td>
+                                <td class="text-end">${Number(r.Quantity || 0)}</td>
+                                <td>${r.UOMName || ''}</td>
+                                <td class="text-end">₹${Number(r.CostPerUnit || 0).toFixed(2)}</td>
+                                <td class="text-end">${Number(r.Discount || 0).toFixed(2)}%</td>
+                                <td class="text-end">${Number(r.GSTPct || 0).toFixed(2)}%</td>
+                                <td class="text-end">₹${c.lineTotal.toFixed(2)}</td>
+                            </tr>
+                        `);
+                });
+
+                $("#ftSubtotal").text("₹" + subtotal.toFixed(2));
+                const shippingcharges = Number($("#ftShipping").text().replace("₹", "").trim()) || 0;
+                $("#ftGrandTotal").text("₹" + (subtotal + shippingcharges).toFixed(2));
+
+                // ✅ Apply same DataTable setup as old code
+                if ($.fn.DataTable.isDataTable('#poItemsTable')) {
+                    $('#poItemsTable').DataTable().clear().destroy();
+                }
+
+                $('#poItemsTable').DataTable({
+                    paging: true,
+                    pageLength: 10,
+                    ordering: false,
+                    searching: true,
+                    responsive: true,
+                    lengthChange: false,
+                    info: true
+                });
+            });
+        });
+    </script>
+</body>
 </html>
+

@@ -19,6 +19,7 @@ namespace P2PLibray.Inventory
         {
             public int Bin { get; set; }
             public int WareHouse { get; set; }
+            public int Section { get; set; }
             public int Rack { get; set; }
         }
 

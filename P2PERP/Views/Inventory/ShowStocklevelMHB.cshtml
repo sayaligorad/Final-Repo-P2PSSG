@@ -37,14 +37,14 @@
 </div>
 <!-- 📦 Raise Order Modal -->
 <div class="modal fade" id="raiseOrderModal" tabindex="-1" aria-labelledby="raiseOrderLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content shadow-lg rounded-3">
             <!-- 🟢 Modal Header -->
-            <div class="modal-header bg-primary ">
-                <h5 class="modal-title text-white w-100 text-center mb-3" id="raiseOrderLabel">
+            <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-1">
+                <h5 class="modal-title fw-bold text-white mb-0 fs-5" id="raiseOrderLabel">
                     Raise Order
                 </h5>
-                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3 mb-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
             <!-- 🟢 Modal Body -->
@@ -215,7 +215,7 @@
                         <td>${item.CurrentItems}</td>
                         <td><span class="status-badge ${statusClass}">${item.StockStatus}</span></td>
                         <td>
-                           <button class="btnAction d-flex align-items-center justify-content-center gap-2"
+                           <button class="btnAction d-flex align-items-center justify-content-center gap-2 "
                                     data-id="${item.ItemCode}"
                                     ${item.StockStatus === "Order Raised" ? "disabled" : ""}
                                       ${item.StockStatus === "Available" ? "disabled" : ""}
@@ -225,7 +225,7 @@
                         : item.StockStatus === 'Available'
                             ? 'Stock already available'
                             : 'Raise order'}">
-                                <i class="bi bi-cart-plus"></i>
+                                <i class="bi bi-cart-plus "></i>
                             </button>
 
                         </td>

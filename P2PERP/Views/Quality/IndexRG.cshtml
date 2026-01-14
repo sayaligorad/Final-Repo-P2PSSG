@@ -9,7 +9,9 @@
     <style>
         #mainCard {
             box-shadow: none;
+
         }
+
     </style>
 </head>
 <body class="bg-light">
@@ -17,21 +19,21 @@
 
     <div class="container mt-5">
 
+
         <!-- 🔹 Entire Page wrapped in one card -->
         <div class="card shadow-lg rounded-3 border-0">
 
-            <!-- Card Header -->
-            <div class="card-header white-header text-center">
-                <h3 class="mb-0 mt-50  fw-bolder  ">Check Quality</h3>
-            </div>
-
             <!-- Card Body -->
-            <div class="card-body">
+            <div>
+                <!-- Header (Centered) -->
+                <h3 class="w-100 mb-0 fw-bolder text-center text-primary">
+                    Check Quality
+                </h3>
 
                 <!-- Task Section -->
-                <div id="taskSection" class="mt-4" style="display:none;">
+                <div id="taskSection"  style="display:none;">
                     <!-- Nav Pills -->
-                    <ul class="nav nav-pills mb-3" id="taskTabs" role="tablist">
+                    <ul class="nav nav-pills ms-3" id="taskTabs" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active fw-medium"
                                     id="new-task-tab"
@@ -63,7 +65,7 @@
                     <!-- Tab Content -->
                     <div class="tab-content mt-3" id="taskTabsContent">
                         <div class="tab-pane fade show active" id="newTaskTab" role="tabpanel">
-                            <div id="newTaskContent" class="p-3">Loading...</div>
+                            <div id="newTaskContent" class="p-2">Loading...</div>
                         </div>
                         <div class="tab-pane fade" id="completedTaskTab" role="tabpanel">
                             <div id="completedTaskContent" class="p-3">Loading...</div>

@@ -2,6 +2,71 @@
 
 
 <style>
+
+    #ViewItems2 thead th {
+        padding: 0.3rem 0.4rem !important;
+    }
+
+    #ItemTableUpdate2 thead th {
+        padding: 0.10rem 0.11rem !important;
+    }
+     .form-control, .form-select {
+     border-radius: 0.5rem;
+     border: 1px solid #ced4da;
+     transition: all 0.3s ease;
+ }
+
+     .form-control:focus, .form-select:focus {
+         box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+         border-color: #86b7fe;
+     }
+
+ .btn {
+     border-radius: 0.5rem;
+     transition: all 0.3s ease;
+ }
+
+     .btn:hover {
+         transform: translateY(-2px);
+         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+     }
+
+ .card {
+     border: none;
+ }
+
+ .table th {
+     border-top: none;
+     font-weight: 600;
+ }
+
+ .table-responsive {
+     border-radius: 0.5rem;
+     overflow: hidden;
+ }
+
+ /*  Compact Table Row Size */
+ .table td, .table th {
+     padding: 0.35rem 0.5rem !important;
+     font-size: 0.78rem;
+     vertical-align: middle;
+ }
+
+ .btn-delete {
+     padding: 2px 6px !important;
+     font-size: 0.70rem !important;
+ }
+
+     .btn-delete i {
+         font-size: 0.75rem !important;
+     }
+
+
+ @@media (max-width: 768px) {
+     .form-control, .form-select, .btn, .table td, .table th {
+         font-size: 0.85rem;
+     }
+ }
     button.dt-button.processing,
     div.dt-button.processing {
         pointer-events: auto !important;
@@ -20,12 +85,12 @@
 
         <!-- Date Filters -->
         <div class="mb-3 d-flex gap-2">
-            <div class="input-group" style="max-width: 280px;">
+            <div class="input-group" style="max-width: 230px;">
                 <span class="input-group-text bg-primary text-white">
                     <i class="bi bi-calendar-date"></i> <!-- Calendar Icon -->
                 </span>
                 <!-- Date Range Input -->
-                <input type="text" id="Rejectedrange2" placeholder="Select date Range" class="form-control" readonly />
+                <input type="text" id="Rejectedrange2" placeholder="Select date Range" class="form-control form-control-sm  shadow-sm text-dark" readonly />
             </div>
         </div>
 
@@ -53,8 +118,8 @@
         <div class="modal-content">
 
             <!-- Modal Header -->
-            <div class="modal-header bg-primary text-white d-flex justify-content-center position-relative p-0">
-                <h3 class="modal-title m-0 fw-bold text-white flex-grow-1 text-center py-3">Purchase Requisition Details</h3>
+            <div class="card-header bg-primary text-white d-flex justify-content-center align-items-center rounded-top p-1">
+                <h3 class="modal-title fw-bold text-white mb-0 fs-5"> Requisition Details</h3>
                 <button type="button" class="btn btn-close btn-close-white position-absolute top-0 end-0 m-3 fs-4" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
@@ -69,29 +134,34 @@
                         <div class="card-body p-3">
 
                             <!-- Requisition Info Section -->
-                            <div class="container mb-4 fw-bold fs-5">
-                                <div class="row text-center mb-3">
-                                    <div class="col">
-                                        <label class="form-label fw-bold fs-5 me-2 mb-0">PR CODE :</label>
-                                        <div id="PRCODE2" class="fw-semibold text-primary"></div>
-                                    </div>
-                                    <div class="col">
-                                        <label class="form-label fw-bold fs-5 me-2 mb-0">Required Date :</label>
-                                        <div id="RequiredDate2" class="fw-semibold text-success"></div>
-                                    </div>
-                                </div>
+                            <div class="container mb-3 fw-bold fs-6">
+                                <div class="row g-2 text-center">
 
-                                <div class="row text-center">
                                     <div class="col">
-                                        <label class="form-label fw-bold fs-5 me-2 mb-0">Created By :</label>
-                                        <div id="FullName2" class="fw-semibold text-dark"></div>
+                                        <label class="fw-bold text-dark">PR CODE :</label><br />
+                                        <span id="PRCODE2"></span>
                                     </div>
+
                                     <div class="col">
-                                        <label class="form-label fw-bold fs-5 me-2 mb-0">Status :</label>
-                                        <div id="Status2" class="fw-semibold"></div>
+                                        <label class="fw-bold text-dark">Required Date :</label><br />
+                                        <span id="RequiredDate2"></span>
                                     </div>
+
+                                    <div class="col">
+                                        <label class="fw-bold text-dark">Created By :</label><br />
+                                        <span id="FullName2"></span>
+                                    </div>
+
+                                    <div class="col">
+                                        <label class="fw-bold text-dark">Status :</label><br />
+                                        <span id="Status2"></span>
+                                    </div>
+
+
                                 </div>
                             </div>
+
+
 
                             <!-- Divider -->
                             <hr class="my-3">
@@ -130,9 +200,9 @@
 <div class="modal fade" id="updatependingModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
-            <div class="modal-header bg-primary text-white d-flex justify-content-center position-relative p-0">
-                <h4 class="modal-title m-0 text-white fw-bold flex-grow-1 text-center py-3">Update Purchase Requisition</h4>
-                <button type="button" class="btn btn-close btn-close-white position-absolute top-0 end-0 m-3 fs-4" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="card-header bg-primary text-white d-flex justify-content-center align-items-center rounded-top p-1">
+                <h3 class="modal-title fw-bold text-white mb-0 fs-5">Update Purchase Requisition</h3>
+                    <button type="button" class="btn btn-close btn-close-white position-absolute top-0 end-0 m-3 fs-4" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <!-- Requisition Info -->
@@ -142,31 +212,33 @@
                     <div class="card-body p-3">
 
                         <!-- Requisition Info Section -->
-                        <div class="container mb-4 fw-bold fs-5">
+                        <div class="container mb-3 fw-bold fs-6">
+                            <div class="row g-2 text-center">
 
-                            <div class="row text-center mb-3">
                                 <div class="col">
-                                    <label class="form-label fw-bold fs-5 me-2 mb-0">PR CODE :</label>
-                                    <div id="PRCODEUpdate2" class="fw-semibold text-primary"></div>
+                                    <label class="fw-bold text-dark">PR CODE :</label><br />
+                                    <span id="PRCODEUpdate2"></span>
                                 </div>
+
                                 <div class="col">
-                                    <label class="form-label fw-bold fs-5 me-2 mb-0">Required Date :</label>
-                                    <div id="RequiredDateUpdate2" class="fw-semibold text-success"></div>
+                                    <label class="fw-bold text-dark">Required Date :</label><br />
+                                    <span id="RequiredDateUpdate2"></span>
                                 </div>
+
+                                <div class="col">
+                                    <label class="fw-bold text-dark">Created By :</label><br />
+                                    <span id="FullNameUpdate2"></span>
+                                </div>
+
+                                <div class="col">
+                                    <label class="fw-bold text-dark">Status :</label><br />
+                                    <span id="StatusUpdate2"></span>
+                                </div>
+
+
                             </div>
-
-                            <div class="row text-center">
-                                <div class="col">
-                                    <label class="form-label fw-bold fs-5 me-2 mb-0">Created By :</label>
-                                    <div id="FullNameUpdate2" class="fw-semibold text-dark"></div>
-                                </div>
-                                <div class="col">
-                                    <label class="form-label fw-bold fs-5 me-2 mb-0">Status :</label>
-                                    <div id="StatusUpdate2" class="fw-semibold"></div>
-                                </div>
-                            </div>
-
                         </div>
+
 
                         <!-- Divider -->
                         <hr class="my-3">
@@ -194,8 +266,8 @@
                             </div>
                         </div>
                         <div class="text-center mt-4">
-                            <button id="btnSaveAllUpdates2" class="btn btn-success px-4 fw-bold">
-                                <i class="bi bi-save-fill me-2"></i>Save All Changes
+                            <button type="button" id="btnSaveAllUpdates2" class="btn btn-success btn-btnSaveAllUpdates2 square-pill d-inline-flex align-items-center px-2 py-1 shadow-sm Save All Changes" data-bs-toggle="tooltip" title="Save All Changes">
+                                <i class="bi bi-check-circle-fill me-2"></i>Save All Changes
                             </button>
                         </div>
                     </div>
@@ -313,50 +385,42 @@
                         return '<span class="badge bg-success">' + data + '</span>';
                     }
                 },
-                {   // Action Buttons
+                {
                     data: null,
                     title: "Action",
-                    className: 'no-export',
+                    className: "no-export text-center",
                     orderable: false,
                     render: function (data, type, row) {
+
+                        let html = `<div class="d-flex gap-1 justify-content-center">`;
+
+                        // Update Button (Only for Pending status)
                         if (row.Status === "Pending") {
-                            // Show both Update and View buttons inline
-                            return `
-<div class="d-flex gap-1">
-    <button class="btn btn-sm btn-secondary update-btn2"
-            data-id="${row.PRCode}"
-            data-bs-toggle="modal"
-             data-bs-toggle="tooltip"
-            data-bs-target="#updatependingModal"
-            title="Update PR">
-        <i class="bi bi-pencil"></i>
-    </button>
-    <button class="btn btn-sm btn-primary view-btn2"
-            data-id="${row.PRCode}"
-            data-bs-toggle="modal"
-             data-bs-toggle="tooltip"
-            data-bs-target="#pendingModal"
-            title="View PR">
-        <i class="bi bi-eye"></i>
-    </button>
-</div>`;
-                        } else if (row.Status === "Approved" || row.Status === "Rejected") {
-                            // Show only View button
-                            return `
-<button class="btn btn-sm btn-primary view-btn2"
+                            html += `
+<button class="btn btn-sm btn-secondary update-btn2 square-pill d-inline-flex align-items-center px-2 py-1 shadow-Update"
         data-id="${row.PRCode}"
         data-bs-toggle="modal"
-         data-bs-toggle="tooltip"
-        data-bs-target="#pendingModal"
-        title="View PR">
+        data-bs-target="#updatependingModal"
+        data-bs-title="Update PR"
+        title="Update PR">
+    <i class="bi bi-pencil"></i>
+</button>`;
+                        }
+
+                        // View Button (Always second)
+                        html += `
+<button class="btn btn-sm btn-primary view-btn2 square-pill d-inline-flex align-items-center px-2 py-1 shadow-View"
+        data-id="${row.PRCode}"
+        data-bs-title="View PR"
+        data-bs-toggle="modal"
+        data-bs-target="#pendingModal">
     <i class="bi bi-eye"></i>
 </button>`;
-                        } else {
-                            return ''; // Optional: no buttons for other statuses
-                        }
+
+                        html += `</div>`;
+                        return html;
                     }
                 }
-
             ],
             columnDefs: [
                 { className: "text-center", targets: "_all" }
@@ -698,26 +762,47 @@
         });
 
 
-        // Initialize tooltips globally
         function initTooltips() {
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
+            const selector = '[data-bs-title]';  // Tooltip only when data-bs-title exists
+            const elements = document.querySelectorAll(selector);
+
+            elements.forEach(el => {
+                // Remove previous tooltip instance
+                const existing = bootstrap.Tooltip.getInstance(el);
+                if (existing) existing.dispose();
+
+                // Initialize only when data-bs-title present
+                if (el.getAttribute('data-bs-title')?.trim() !== "") {
+                    new bootstrap.Tooltip(el, { container: 'body', trigger: 'hover' });
+                }
             });
         }
 
-        // Initialize on first load
+        // Initialize on load
         initTooltips();
 
-        // Re-initialize after DataTable draw (for dynamic rows)
-        $('#TablePending').on('draw.dt', function () {
-            initTooltips();
+        // Re-init after DataTable draw
+        $('#TablePending').on('draw.dt', initTooltips);
+
+        // Re-init inside modals
+        $('#pendingModal, #updatependingModal').on('shown.bs.modal', initTooltips);
+
+        // ✅ Dispose tooltip when clicking View/Update Button
+        $(document).on("click", ".view-btn2, .update-btn2", function () {
+
+            const tip = bootstrap.Tooltip.getInstance(this);
+            if (tip) {
+                tip.dispose();
+            }
+
+            // In case tooltip was on icon
+            const icon = this.querySelector('i');
+            const iconTip = bootstrap.Tooltip.getInstance(icon);
+            if (iconTip) {
+                iconTip.dispose();
+            }
         });
 
-        // Re-initialize in modals (like Update or View)
-        $('#updatependingModal, #pendingModal').on('shown.bs.modal', function () {
-            initTooltips();
-        });
 
 
         //  Date Range Filter (Applied on column 5)
@@ -824,23 +909,6 @@
                     $("#RequiredDate2").text(formattedDate);
                     $("#FullName2").text(response.data.FullName);
                     $("#Status2").text(response.data.Status);
-
-                    let statusText = response.data.Status;
-                    let statusDiv = $("#Status2");
-                    statusDiv.removeClass("text-success text-danger text-warning text-dark"); // old classes remove
-                    statusDiv.text(statusText);
-
-                    if (statusText === "Approved") {
-                        statusDiv.addClass("text-success");
-                    }
-                    else if (statusText === "Rejected") {
-                        statusDiv.addClass("text-danger");
-                    }
-                    else if (statusText === "Pending") {
-                        statusDiv.addClass("text-warning");
-                    }
-
-                    console.log(response.data);
                 }
             },
             error: function (xhr, status, error) {
@@ -857,7 +925,7 @@
             responsive: true,
             paging: true,
             searching: true,
-            ordering: true,
+            ordering: false,
             info: true,
             lengthChange: true,
             pageLength: 10,
@@ -892,7 +960,7 @@
                             let shortText = cellData.length > 25 ? cellData.substring(0, 25) + "..." : cellData;
                             $(td)
                                 .text(shortText)
-                                .attr("title", cellData)
+                                .attr("data-bs-title", cellData)
                                 .attr("data-bs-toggle", "tooltip")
                                 .attr("data-bs-placement", "top");
                         }
@@ -934,7 +1002,31 @@
                     text: '<i class="bi bi-printer-fill text-dark fs-5"></i>',
                     title: '',
                     customize: function (win) {
-                        // Info (DetailsPartialSP values)
+
+                        // Add Custom CSS inside print window - Most Important Fix
+                        $(win.document.head).append(`
+                <style>
+                    table.dataTable {
+                        border-collapse: collapse !important;
+                        width: 100% !important;
+                    }
+                    table.dataTable th {
+                        background-color: #212529 !important;
+                        color: white !important;
+                        font-weight: bold !important;
+                        text-align: center !important;
+                        border: 1px solid black !important;
+                        padding: 6px !important;
+                    }
+                    table.dataTable td {
+                        border: 1px solid black !important;
+                        padding: 6px !important;
+                        font-size: 11pt !important;
+                    }
+                </style>
+            `);
+
+                        // Fetch PR Details (using text(). Correct!)
                         let prCode = $("#PRCODE2").text();
                         let reqDate = $("#RequiredDate2").text();
                         let fullName = $("#FullName2").text();
@@ -942,51 +1034,32 @@
 
                         // Custom Header HTML
                         let headerHtml = `
-        <h3 style="text-align:center; margin-bottom:5px;">Purchase Requisition Details</h3>
-        <div style="text-align:center; margin-bottom:10px; font-size:11pt; font-style:italic;">
-            Generated Date: ${moment().format("DD/MM/YYYY")}
-        </div>
-        <table style="width:100%; margin-bottom:15px; border-collapse: collapse;" border="0">
-            <tr>
-                <td><b>PR CODE :</b> ${prCode}</td>
-                <td><b>Required Date :</b> ${reqDate}</td>
-            </tr>
-            <tr>
-                <td><b>Created By :</b> ${fullName}</td>
-                <td><b>Status :</b> ${status}</td>
-            </tr>
-        </table>
-    `;
+<h3 style="text-align:center; margin-bottom:5px;">Purchase Requisition Details</h3>
+<div style="text-align:center; margin-bottom:10px; font-size:11pt; font-style:italic;">
+    Generated Date: ${moment().format("DD/MM/YYYY")}
+</div>
+<table style="width:100%; margin-bottom:15px; border-collapse: collapse;" border="0">
+    <tr>
+        <td><b>PR CODE :</b> ${prCode}</td>
+        <td><b>Required Date :</b> ${reqDate}</td>
+    </tr>
+    <tr>
+        <td><b>Created By :</b> ${fullName}</td>
+        <td><b>Status :</b> ${status}</td>
+    </tr>
+</table>
+`;
 
-                        // Prepend header
+                        // Add header to print page
                         $(win.document.body).prepend(headerHtml);
 
-                        // DataTable formatting
-                        let table = $(win.document.body).find('table.dataTable');
-
-                        // Force table borders
-                        table.css('border-collapse', 'collapse');
-                        table.find('thead th, tbody td').each(function () {
-                            $(this).css({
-                                'border': '1px solid #000',
-                                'padding': '5px',
-                                'border-collapse': 'collapse'
-                            });
-                        });
-
-                        // Style header
-                        table.find('thead').css({
-                            'background-color': '#343a40',
-                            'color': '#fff'
-                        });
-
-                        // Optional: center-align first column (SR.NO)
-                        table.find('tbody tr').each(function (i) {
-                            $(this).find('td:first').css('text-align', 'center');
-                        });
+                        // Center align first column (SR.No)
+                        $(win.document.body).find('table.dataTable tbody tr td:first-child')
+                            .css('text-align', 'center');
                     }
                 }
             ],
+
             language: {
                 lengthMenu: ""
             }
@@ -1013,11 +1086,6 @@
                     $("#FullNameUpdate2").text(response.data.FullName);
                     $("#StatusUpdate2").text(response.data.Status);
 
-                    let statusDiv = $("#StatusUpdate2");
-                    statusDiv.removeClass("text-success text-danger text-warning text-dark");
-                    if (response.data.Status === "Approved") statusDiv.addClass("text-success");
-                    else if (response.data.Status === "Rejected") statusDiv.addClass("text-danger");
-                    else if (response.data.Status === "Pending") statusDiv.addClass("text-warning");
                 }
             }
         });
@@ -1054,7 +1122,7 @@
                             let shortText = cellData.length > 25 ? cellData.substring(0, 25) + "..." : cellData;
                             $(td)
                                 .text(shortText)
-                                .attr("title", cellData)
+                                .attr("data-bs-title", cellData)
                                 .attr("data-bs-toggle", "tooltip")
                                 .attr("data-bs-placement", "top");
                         }
@@ -1062,7 +1130,7 @@
                 },
                 {
                     data: "RequiredQuantity",
-                    render: (data) => `<input type="number" class="form-control qty-input text-center" value="${data}" min="1" />`
+                    render: (data) => `<input type="number" class="form-control form-control-sm  text-dark shadow-sm qty-input text-center" value="${data}" min="1" />`
                 },
                 {
                     data: "UnitRate",
@@ -1077,6 +1145,7 @@
             paging: false,
             searching: false,
             info: false,
+            ordering: false,
             destroy: true
         });
 
@@ -1113,11 +1182,11 @@
             text: "Do you want to save all updated quantities?",
             icon: "question",
             showCancelButton: true,
-            confirmButtonText: "Yes, Save",
-            cancelButtonText: "Cancel",
+            confirmButtonText: '<i class="bi bi-check-circle me-1"></i>Yes, Save it!',
+            cancelButtonText: '<i class="bi bi-x-circle me-1"></i> Cancel',
             customClass: {
-                confirmButton: 'btn btn-success mx-2', 
-                cancelButton: 'btn btn-danger mx-2'     
+                cancelButton: 'btn btn-danger  square-pill d-inline-flex align-items-center px-2 py-1 shadow-Cancel me-2',
+                confirmButton: 'btn btn-success square-pill d-inline-flex align-items-center px-2 py-1 shadow-Yes, Save it! me-2'
             },
             buttonsStyling: false 
         }).then((result) => {

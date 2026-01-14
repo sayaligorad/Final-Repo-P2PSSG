@@ -5,10 +5,12 @@
     button {
         display: none;
     }
-
+    #RG {
+        padding-top: 0 !important;
+    }
 
     .btnback {
-        margin-top: -200px;
+        margin-top: -120px;
         align-content: end;
         align-items: end;
         text-align: end;
@@ -16,29 +18,34 @@
         text-align: end;
         margin-left: 90%;
     }
+    thead th {
+        white-space: nowrap !important;
+    }
+
+
 </style>
 <input type="hidden" value="@ViewBag.GRN" name="GRNCode" id="GRNCode" />
 
 <!-- Toast container -->
 <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100;"></div>
-<button type="button"
-        class="btn btn-primary btn-sm btnback"
-        onclick="location.href='/Quality/IndexRG'">
-    <i class="bi bi-arrow-left"></i> Back
-</button>
+
 <!-- 🔹 Single Card Wrapper -->
-<div class="card shadow-lg rounded-3 border-0">
-    <div class="card-body">
+<div class="rounded-3 border-0">
+    <div  id="RG">
 
         <!-- GRN Info -->
         <div class="d-flex align-items-center mb-3 mt-4">
             <!-- Date Picker -->
-            <div class="mt-2" id="dtp">
-                <div class="input-group" style="height: 40px; max-width: 280px;">
-                    <span class="input-group-text bg-primary text-white"><i class="bi bi-calendar-date"></i></span>
-                    <input type="text" id="grnlistdatepicker1" class="form-control"
+            <div class="mb-3 d-flex gap-2" id="dtp">
+                <div class="input-group" style=" max-width: 230px;">
+                    <span class="input-group-text bg-primary text-white">
+                    <i class="bi bi-calendar-date"></i>
+                    </span>
+                    <input type="text" id="grnlistdatepicker1" class="form-control form-control-sm shadow-sm"
                            placeholder="Select date range" readonly />
+
                 </div>
+
             </div>
             @*<label for="grnno" class="fw-semibold me-2 mb-0">GRN No:</label>*@
             <input type="hidden" id="grnno" value="@ViewBag.GRN" name="GRNCode" class="form-control w-auto bg-light" readonly />
@@ -71,11 +78,11 @@
 </div>
 
 <style>
-
+/*
     .card-header {
         background-color: white !important;
         color: black !important;
-    }
+    }*/
 
     button.dt-button.processing,
     div.dt-button.processing {
@@ -346,7 +353,7 @@
                                         return;
                                     }
                                     $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, button, config);
-                                    dt.processing(false); //  force remove buffering spinner
+                                    dt.processing(false);
                                 },
                                 exportOptions: {
                                     rows: function (idx, data, node) {
@@ -371,9 +378,12 @@
                                 },
                                 title: 'GRN List',
                                 filename: function () {
-                                    return 'GRN_List_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+                                    return 'CompletedTask_List_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
                                 },
                                 customize: function (doc) {
+                                    // 🔹 General styles
+                                    doc.defaultStyle.fontSize = 9;
+                                    doc.styles.tableHeader.fontSize = 10;
                                     doc.styles.title = {
                                         fontSize: 16,
                                         bold: true,
@@ -381,60 +391,76 @@
                                         color: 'black'
                                     };
 
-                                    // Add "Generated on" date
+                                    // 🔹 Landscape layout to fit all columns
+                                    doc.pageOrientation = 'landscape';
+                                    doc.pageSize = 'A4';
+                                    doc.pageMargins = [20, 50, 20, 30];
+
+                                    // 🔹 Add generated date
                                     doc.content.splice(1, 0, {
                                         text: 'Generated on: ' + new Date().toLocaleDateString(),
-                                        fontSize: 12,
+                                        fontSize: 11,
                                         italics: true,
                                         alignment: 'center',
                                         margin: [0, 0, 0, 10]
                                     });
 
-                                    //  Find the table and apply layout to its parent
-                                    for (var i = 0; i < doc.content.length; i++) {
+                                    // 🔹 Ensure proper table formatting
+                                    for (let i = 0; i < doc.content.length; i++) {
                                         if (doc.content[i].table) {
-                                            var table = doc.content[i].table;
+                                            let table = doc.content[i].table;
 
-                                            //  Header styling
-                                            table.body[0].forEach(function (cell) {
-                                                cell.fillColor = 'black';
+                                            // Header style
+                                            table.body[0].forEach(cell => {
+                                                cell.fillColor = '#000000';
                                                 cell.color = 'white';
-                                                cell.bold = true;
                                                 cell.alignment = 'center';
+                                                cell.bold = true;
                                             });
 
-                                            //  Center all body cells + zebra striping
-                                            for (var row = 1; row < table.body.length; row++) {
-                                                table.body[row].forEach(function (cell) {
-                                                    if (cell.text) cell.alignment = 'center';
+                                            // Body style + zebra striping
+                                            for (let r = 1; r < table.body.length; r++) {
+                                                table.body[r].forEach(cell => {
+                                                    cell.alignment = 'center';
+                                                    if (r % 2 === 0) cell.fillColor = '#f2f2f2';
                                                 });
-                                                if (row % 2 === 0) {
-                                                    table.body[row].forEach(function (cell) {
-                                                        cell.fillColor = '#f2f2f2';
-                                                    });
-                                                }
                                             }
 
-                                            //  Assign layout with visible borders
+                                            // Borders and padding
                                             doc.content[i].layout = {
-                                                hLineWidth: function (i, node) { return 0.8; },
-                                                vLineWidth: function (i, node) { return 0.8; },
-                                                hLineColor: function (i, node) { return '#000000'; },
-                                                vLineColor: function (i, node) { return '#000000'; },
-                                                paddingLeft: function (i, node) { return 6; },
-                                                paddingRight: function (i, node) { return 6; },
-                                                paddingTop: function (i, node) { return 4; },
-                                                paddingBottom: function (i, node) { return 4; }
+                                                hLineWidth: () => 0.5,
+                                                vLineWidth: () => 0.5,
+                                                hLineColor: () => '#000000',
+                                                vLineColor: () => '#000000',
+                                                paddingLeft: () => 4,
+                                                paddingRight: () => 4,
+                                                paddingTop: () => 3,
+                                                paddingBottom: () => 3
                                             };
 
-                                            //  Even column widths
-                                            var colCount = table.body[0].length;
-                                            table.widths = new Array(colCount).fill('*');
+                                            // 🔹 Fit columns evenly + allow wrapping
+                                            const colCount = table.body[0].length;
+                                            table.widths = Array(colCount).fill('*');
+                                            doc.styles.tableBodyEven = { alignment: 'center' };
+                                            doc.styles.tableBodyOdd = { alignment: 'center' };
                                         }
-
                                     }
-                                },
+
+                                    // 🔹 Auto shrink text that’s too long
+                                    doc.content.forEach(function (content) {
+                                        if (content.table) {
+                                            content.table.body.forEach(function (row) {
+                                                row.forEach(function (cell) {
+                                                    if (typeof cell.text === 'string' && cell.text.length > 30) {
+                                                        cell.fontSize = 8; // shrink long text
+                                                    }
+                                                });
+                                            });
+                                        }
+                                    });
+                                }
                             },
+
                             //export excel code
 
                             {
@@ -615,7 +641,7 @@
                                 },
                                 title: null, // disable default single-line title
                                 filename: function () {
-                                    return 'GRN_List_' + new Date().toISOString().slice(0, 10); // date only
+                                    return 'CompletedTask_List_' + new Date().toISOString().slice(0, 10); // date only
                                 },
                                 customize: function (xlsx) {
                                     var sheet = xlsx.xl.worksheets['sheet1.xml'];
@@ -654,6 +680,14 @@
             $('#selectAllCompleted').on('click', function () {
                 var checked = this.checked;
                 $('#completedTaskTable .row-select').prop('checked', checked);
+            });
+            // When any individual checkbox is clicked, update the Select All checkbox
+            $('#completedTaskTable').on('change', '.row-select', function () {
+                var total = $('.row-select').length;
+                var checked = $('.row-select:checked').length;
+
+                // If all rows checked → check Select All, otherwise uncheck it
+                $('#selectAllCompleted').prop('checked', total === checked);
             });
 
 
@@ -714,7 +748,7 @@
 
                 // Add new filter
                 $.fn.dataTable.ext.search.push(function (settings, data) {
-                    var dateStr = data[7]; // ✅ Assigned Date column index
+                    var dateStr = data[9]; // ✅ Assigned Date column index
                     if (!dateStr) return false;
 
                     var assignedDate = moment(dateStr, ['DD/MM/YYYY', 'DD-MM-YYYY', 'YYYY-MM-DD']);

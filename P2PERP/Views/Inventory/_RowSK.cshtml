@@ -2,7 +2,7 @@
     <div class="flex-grow-1 text-center">
         <h4 class="mb-0 h3 text-primary">Row List</h4>
     </div>
-    <button class="btn btn-success" id="btnAddrow">
+    <button class="btn btn-sm btn-success" id="btnAddrow">
         <i class="bi bi-plus-circle"></i> Add Row
     </button>
 </div>
@@ -18,6 +18,7 @@
         button.dt-button.processing:after {
             content: none !important;
         }
+
     .text-red {
         color: red;
     }
@@ -46,227 +47,264 @@
 </div>
 
 <!-- Add Row Modal -->
+
 <div class="modal fade" id="addRowModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white position-relative py-2">
-                <h5 class="modal-title h5 text-white text-center mb-1 w-100" id="addRowModalTitle" style="line-height: 1.2;">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content shadow-lg rounded-3">
+
+            <!-- Header -->
+            <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-1">
+                <h5 class="modal-title fw-bold text-white mb-0 fs-5" id="addRowModalTitle">
                     Add Row
                 </h5>
-                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3"
+                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2 btn-sm"
                         data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+
+            <!-- Body -->
             <div class="modal-body">
                 <form id="addRowForm" class="row g-3">
+
+                    <!-- Row Code -->
                     <div class="col-md-6">
-                        <label for="addRowCode">Row Code</label>
-                        <div class="form-floating form-floating-outline">
-                            <input type="text" class="form-control bg-gray" id="addRowCode" name="RowCode" required readonly>
-                        </div>
+                        <label for="addRowCode" class="form-label fw-bold text-dark">
+                            Row Code
+                        </label>
+                        <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light"
+                               id="addRowCode" name="RowCode" placeholder="Row Code" required readonly>
                     </div>
 
+                    <!-- Row Name -->
                     <div class="col-md-6">
-                        <label for="addRowName">Row Name <span class="text-red">*</span></label>
-                        <div class="form-floating form-floating-outline">
-                            <input type="text" class="form-control" id="addRowName" name="RowName">
-                        </div>
+                        <label for="addRowName" class="form-label fw-bold text-dark">
+                            Row Name <span class="text-red">*</span>
+                        </label>
+                        <input type="text" class="form-control form-control-sm text-dark shadow-sm"
+                               id="addRowName" name="RowName" placeholder="Enter Row Name">
                         <span id="addRowNameError" class="text-danger"></span>
                     </div>
 
+                    <!-- Warehouse -->
                     <div class="col-md-6">
-                        <label for="addWarehouseDropdown">Warehouse <span class="text-red">*</span></label>
-                        <div class="form-floating form-floating-outline">
-                            <select class="form-select" id="addWarehouseDropdown" name="WarehouseId">
-                                <option value="">-- Select Warehouse --</option>
-                            </select>
-                        </div>
+                        <label for="addWarehouseDropdown" class="form-label fw-bold text-dark">
+                            Warehouse <span class="text-red">*</span>
+                        </label>
+                        <select class="form-select form-select-sm shadow-sm"
+                                id="addWarehouseDropdown" name="WarehouseId">
+                            <option value="">-- Select Warehouse --</option>
+                        </select>
                         <span id="addRowWhError" class="text-danger"></span>
                     </div>
 
+                    <!-- Section -->
                     <div class="col-md-6">
-                        <label for="addSectionDropdown">Section <span class="text-red">*</span></label>
-                        <div class="form-floating form-floating-outline">
-                            <select class="form-select" id="addSectionDropdown" name="SectionId">
-                                <option value="">-- Select Section --</option>
-                            </select>
-                        </div>
+                        <label for="addSectionDropdown" class="form-label fw-bold text-dark">
+                            Section <span class="text-red">*</span>
+                        </label>
+                        <select class="form-select form-select-sm shadow-sm"
+                                id="addSectionDropdown" name="SectionId">
+                            <option value="">-- Select Section --</option>
+                        </select>
                         <span id="addRowSectionError" class="text-danger"></span>
                     </div>
 
+                    <!-- Rack -->
                     <div class="col-md-6">
-                        <label for="addRackDropdown">Rack <span class="text-red">*</span></label>
-                        <div class="form-floating form-floating-outline">
-                            <select class="form-select" id="addRackDropdown" name="RackId">
-                                <option value="">-- Select Rack --</option>
-                            </select>
-                        </div>
+                        <label for="addRackDropdown" class="form-label fw-bold text-dark">
+                            Rack <span class="text-red">*</span>
+                        </label>
+                        <select class="form-select form-select-sm shadow-sm"
+                                id="addRackDropdown" name="RackId">
+                            <option value="">-- Select Rack --</option>
+                        </select>
                         <span id="addRowRackError" class="text-danger"></span>
                     </div>
 
+                    <!-- Description -->
                     <div class="col-12">
-                        <label for="addDescriptionForRow">Description</label>
-                        <div class="form-floating form-floating-outline">
-                            <textarea class="form-control" id="addDescriptionForRow" name="Description" rows="3"></textarea>
-                        </div>
+                        <label for="addDescriptionForRow" class="form-label fw-bold text-dark">
+                            Description
+                        </label>
+                        <textarea class="form-control form-control-sm text-dark shadow-sm"
+                                  id="addDescriptionForRow" name="Description"
+                                  rows="3" placeholder="Enter Description "></textarea>
                     </div>
+
                 </form>
             </div>
-            <div class="modal-footer">
-                <button type="submit" form="addRowForm" class="btn btn-success px-4" id="saveRow">
-                    <i class="bi bi-check-circle me-2 text-white"></i>Save
+
+            <!-- Footer -->
+            <div class="modal-footer justify-content-center">
+                <button type="submit" form="addRowForm" class="btn btn-sm btn-success px-4" id="saveRow">
+                    <i class="bi bi-check-circle me-2 text-white"></i> Save
                 </button>
             </div>
+
         </div>
     </div>
 </div>
 
+
 <!-- Edit Row Modal -->
 <div class="modal fade" id="editRowModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white position-relative py-2">
-                <h5 class="modal-title h5 text-white text-center mb-1 w-100" id="updateRowModalTitle" style="line-height: 1.2;">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content shadow-lg rounded-3">
+
+            <!-- Header -->
+            <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-1">
+                <h5 class="modal-title fw-bold text-white mb-0 fs-5" id="updateRowModalTitle">
                     Update Row
                 </h5>
-                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3"
+                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2 btn-sm"
                         data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+
+            <!-- Body -->
             <div class="modal-body">
                 <form id="editRowForm" class="row g-3">
                     <input type="hidden" id="editRowId" name="RowId" />
 
+                    <!-- Row Code -->
                     <div class="col-md-6">
-                        <label for="editRowCode">Row Code</label>
-                        <div class="form-floating form-floating-outline">
-                            <input type="text" class="form-control bg-gray" id="editRowCode" name="RowCode" required readonly>
-                        </div>
+                        <label for="editRowCode" class="form-label fw-bold text-dark">
+                            Row Code
+                        </label>
+                        <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light"
+                               id="editRowCode" name="RowCode" required readonly>
                     </div>
 
+                    <!-- Row Name -->
                     <div class="col-md-6">
-                        <label for="editRowName">Row Name <span class="text-red">*</span></label>
-                        <div class="form-floating form-floating-outline">
-                            <input type="text" class="form-control" id="editRowName" name="RowName" required>
-                        </div>
+                        <label for="editRowName" class="form-label fw-bold text-dark">
+                            Row Name <span class="text-red">*</span>
+                        </label>
+                        <input type="text" class="form-control form-control-sm text-dark shadow-sm "
+                               id="editRowName" name="RowName" required placeholder="Enter Row Name">
                         <small class="text-danger" id="editRowNameError"></small>
                     </div>
 
+                    <!-- Warehouse -->
                     <div class="col-md-6">
-                        <label for="editWarehouseNameForRow">Warehouse</label>
-                        <div class="form-floating form-floating-outline">
-                            <input type="text" class="form-control bg-gray" id="editWarehouseNameForRow" readonly>
-                            <input type="hidden" id="editWarehouseCode" name="WarehouseCode">
-                        </div>
+                        <label for="editWarehouseNameForRow" class="form-label fw-bold text-dark">
+                            Warehouse
+                        </label>
+                        <input type="text" class="form-control form-control-sm bg-light shadow-sm text-dark"
+                               id="editWarehouseNameForRow" readonly>
+                        <input type="hidden" id="editWarehouseCode" name="WarehouseCode">
                     </div>
 
+                    <!-- Section -->
                     <div class="col-md-6">
-                        <label for="editSectionNameForRow">Section</label>
-                        <div class="form-floating form-floating-outline">
-                            <input type="text" class="form-control bg-gray" id="editSectionNameForRow" readonly>
-                            <input type="hidden" id="editSectionCode" name="SectionCode">
-                        </div>
+                        <label for="editSectionNameForRow" class="form-label fw-bold text-dark">
+                            Section
+                        </label>
+                        <input type="text" class="form-control form-control-sm bg-light shadow-sm text-dark"
+                               id="editSectionNameForRow" readonly>
+                        <input type="hidden" id="editSectionCode" name="SectionCode">
                     </div>
 
+                    <!-- Rack -->
                     <div class="col-md-6">
-                        <label for="editRackNameForRow">Rack</label>
-                        <div class="form-floating form-floating-outline">
-                            <input type="text" class="form-control bg-gray" id="editRackNameForRow" readonly>
-                            <input type="hidden" id="editRackCode" name="RackCode">
-                        </div>
+                        <label for="editRackNameForRow" class="form-label fw-bold text-dark">
+                            Rack
+                        </label>
+                        <input type="text" class="form-control form-control-sm bg-light shadow-sm text-dark"
+                               id="editRackNameForRow" readonly>
+                        <input type="hidden" id="editRackCode" name="RackCode">
                     </div>
 
+                    <!-- Description -->
                     <div class="col-12">
-                        <label for="editRowDescription">Description</label>
-                        <div class="form-floating form-floating-outline">
-                            <textarea class="form-control" id="editRowDescription" name="Description" rows="3"></textarea>
-                        </div>
+                        <label for="editRowDescription" class="form-label fw-bold text-dark">
+                            Description
+                        </label>
+                        <textarea class="form-control form-control-sm text-dark shadow-sm"
+                                  id="editRowDescription" name="Description" rows="3"
+                                  placeholder="Enter updated description"></textarea>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <button type="submit" form="editRowForm" class="btn btn-success px-4" id="updateRow">
-                    <i class="bi bi-check-circle me-2 text-white"></i>Update
+
+            <!-- Footer -->
+            <div class="modal-footer justify-content-center">
+                <button type="submit" form="editRowForm" class="btn btn-sm btn-success px-4" id="updateRow">
+                    <i class="bi bi-check-circle me-2 text-white"></i> Update
                 </button>
             </div>
+
         </div>
     </div>
 </div>
+
 
 <!-- View Row Modal -->
 <div class="modal fade" id="viewRowModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white position-relative py-2">
-                <h5 class="modal-title h5 text-white text-center mb-1 w-100" id="rowDetailsModalTitle" style="line-height: 1.2;">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content shadow-lg rounded-3">
+
+            <!-- Header -->
+            <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-1">
+                <h5 class="modal-title fw-bold text-white mb-0 fs-5" id="rowDetailsModalTitle">
                     Row Details
                 </h5>
-                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3"
+                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2 btn-sm"
                         data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
+            <!-- Body -->
             <div class="modal-body">
-                <form class="row g-3">
+                <div class="row g-3">
+                    <!-- Row Code -->
                     <div class="col-md-6">
-                        <label for="vRowCode">Row Code</label>
-                        <div class="form-floating form-floating-outline">
-                            <input type="text" class="form-control" id="vRowCode" readonly>
-                        </div>
+                        <label class="form-label fw-bold text-dark">Row Code</label>
+                        <div class="text-dark" id="vRowCode">-</div>
                     </div>
 
+                    <!-- Row Name -->
                     <div class="col-md-6">
-                        <label for="vRowName">Row Name</label>
-                        <div class="form-floating form-floating-outline">
-                            <input type="text" class="form-control" id="vRowName" readonly>
-                        </div>
+                        <label class="form-label fw-bold text-dark">Row Name</label>
+                        <div class="text-dark" id="vRowName">-</div>
                     </div>
 
+                    <!-- Warehouse -->
                     <div class="col-md-6">
-                        <label for="vWarehouseName">Warehouse Name</label>
-                        <div class="form-floating form-floating-outline">
-                            <input type="text" class="form-control" id="vWarehouseName" readonly>
-                        </div>
+                        <label class="form-label fw-bold text-dark">Warehouse Name</label>
+                        <div class="text-dark" id="vWarehouseName">-</div>
                     </div>
 
+                    <!-- Section -->
                     <div class="col-md-6">
-                        <label for="vSectionName">Section Name</label>
-                        <div class="form-floating form-floating-outline">
-                            <input type="text" class="form-control" id="vSectionName" readonly>
-                        </div>
+                        <label class="form-label fw-bold text-dark">Section Name</label>
+                        <div class="text-dark" id="vSectionName">-</div>
                     </div>
 
+                    <!-- Rack -->
                     <div class="col-md-6">
-                        <label for="vRackName">Rack Name</label>
-                        <div class="form-floating form-floating-outline">
-                            <input type="text" class="form-control" id="vRackName" readonly>
-                        </div>
+                        <label class="form-label fw-bold text-dark">Rack Name</label>
+                        <div class="text-dark" id="vRackName">-</div>
                     </div>
 
+                    <!-- Description -->
                     <div class="col-12">
-                        <label for="vDescription">Description</label>
-                        <div class="form-floating form-floating-outline">
-                            <textarea class="form-control" id="vDescription" rows="2" readonly></textarea>
-                        </div>
+                        <label class="form-label fw-bold text-dark">Description</label>
+                        <div class="text-dark" id="vDescription">-</div>
+                    </div>
+
+                    <!-- Added Info -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-dark">Added Date</label>
+                        <div class="text-dark" id="vAddedDate">-</div>
                     </div>
 
                     <div class="col-md-6">
-                        <label for="vAddedDate">Added Date</label>
-                        <div class="form-floating form-floating-outline">
-                            <input type="text" class="form-control" id="vAddedDate" readonly>
-                        </div>
+                        <label class="form-label fw-bold text-dark">Added By</label>
+                        <div class="text-dark" id="vAddedBy">-</div>
                     </div>
-
-                    <div class="col-md-6">
-                        <label for="vAddedBy">Added By</label>
-                        <div class="form-floating form-floating-outline">
-                            <input type="text" class="form-control" id="vAddedBy" readonly>
-                        </div>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
-
 <script>
     $(document).ready(function () {
         // ================= CONFIGURATION & CONSTANTS =================
@@ -1003,14 +1041,14 @@
         function viewRow(id) {
             $.get(CONFIG.urls.getRowById, { rowId: id }, function (res) {
                 if (res) {
-                    $("#vRowCode").val(res.RowCode || '');
-                    $("#vRowName").val(res.RowName || '');
-                    $("#vRackName").val(res.RackName || '');
-                    $("#vSectionName").val(res.SectionName || '');
-                    $("#vWarehouseName").val(res.WarehouseName || '');
-                    $("#vDescription").val(res.Description || "-");
-                    $("#vAddedBy").val(res.AddedBy || '');
-                    $("#vAddedDate").val(utils.formatDate(res.AddedDate) || "N/A");
+                    $("#vRowCode").text(res.RowCode || '-');
+                    $("#vRowName").text(res.RowName || '-');
+                    $("#vRackName").text(res.RackName || '-');
+                    $("#vSectionName").text(res.SectionName || '-');
+                    $("#vWarehouseName").text(res.WarehouseName || '-');
+                    $("#vDescription").text(res.Description || "-");
+                    $("#vAddedBy").text(res.AddedBy || '-');
+                    $("#vAddedDate").text(utils.formatDate(res.AddedDate) || "N/A");
                     $(CONFIG.selectors.viewModal).modal("show");
                 } else {
                     utils.handleError("Row details not found");

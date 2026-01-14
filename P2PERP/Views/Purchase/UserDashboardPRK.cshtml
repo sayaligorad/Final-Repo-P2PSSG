@@ -7,37 +7,55 @@
 <head>
 
 <style>
-        .card-small {
-    height: 110px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, color 0.3s ease;
-    transform: translateY(0);
-    border-radius: 0.5rem;
-    overflow: hidden;
-    will-change: transform;
-        }
-
-         .card-small:hover {
-             transform: translateY(-5px) scale(1.03);
-             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-             z-index: 10;
-            
-         }
-
-    /* Animate icon on hover */
-    .card-small:hover i {
-        animation: bounce 0.6s;
+    .materio-card {
+        background: #FFFFFF;
+        position: relative;
+        border-radius: 12px;
+        transition: all 0.3s ease-in-out;
     }
 
-    /* Optional text glow on hover */
-    .card-small:hover h5,
-    .card-small:hover p {
-        text-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
+    .card-bottom-line {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 1px;
+        width: 100%;
+        border-radius: 0 0 12px 12px !important;
+        filter: brightness(1.35); /* ✅ lighter initially */
+        transition: filter .3s ease;
     }
 
-    /* Card body animation (background transition) */
-    .card-small .card-body {
-        transition: background-color 0.3s ease, color 0.3s ease;
+    .materio-card:hover .card-bottom-line {
+        filter: brightness(0.85); /* ✅ darker */
     }
+
+    .materio-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+    }
+
+    .materio-card h3 {
+        font-size: 24px;
+    }
+
+    .icon-box {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+    }
+
+    /* Title font size */
+    .materio-card h3 {
+        font-size: 24px;
+    }
+
+
+     bottom colored strip 
+    .card-bottom-line {
+        height: 4px;
+        width: 100%;
+    }
+
 
         .modal-backdrop {
             display: none !important;
@@ -70,59 +88,73 @@
 
                 <!-- Cards section -->
                 <div class="row g-3 mb-4">
+
                     @{
                         var cards = new[] {
-                                new { Id = "approvedPrCard", Bg = "linear-gradient(135deg, #6ee7b7, #34d399)", Title = "Approved Purchase Requisition", DarkText = true },
-                                new { Id = "pendingPrCard", Bg = "linear-gradient(135deg, #fde68a, #facc15)", Title = "Pending Purchase Requisition", DarkText = true },
-                                new { Id = "requestedRfqCard", Bg = "linear-gradient(135deg, #93c5fd, #60a5fa)", Title = "Requested Request for Quotation", DarkText = true },
-                                new { Id = "pendingRfqCard", Bg = "linear-gradient(135deg, #fcd34d, #fbbf24)", Title = "Pending Request for Quotation", DarkText = true },
-                                new { Id = "approvedRcCard", Bg = "linear-gradient(135deg, #86efac, #4ade80)", Title = "Approved Register Quotation", DarkText = true },
-                                new { Id = "pendingRcCard", Bg = "linear-gradient(135deg, #fdba74, #fb923c)", Title = "Pending Register Quotation", DarkText = true },
-                                new { Id = "approvedPoCard", Bg = "linear-gradient(135deg, #c4b5fd, #a78bfa)", Title = "Approved Purchase Order", DarkText = true },
-                                new { Id = "pendingPoCard", Bg = "linear-gradient(135deg, #f9a8d4, #f472b6)", Title = "Pending Purchase Order", DarkText = true }
-                            };
+            new { Id="approvedPrCard", Icon="bi-check2-circle", Count=0, Title="Approved Purchase Requisition", Bg="#4CAF50", Bg20="rgba(76,175,80,0.15)" },
+            new { Id="pendingPrCard", Icon="bi-hourglass", Count=0, Title="Pending Purchase Requisition", Bg="#FF5722", Bg20="rgba(255,87,34,0.15)" },
+            new { Id="requestedRfqCard", Icon="bi-check2-circle", Count=0, Title="Requested RFQ", Bg="#03A9F4", Bg20="rgba(3,169,244,0.15)" },
+            new { Id="pendingRfqCard", Icon="bi-hourglass", Count=0, Title="Pending RFQ", Bg="#FFC107", Bg20="rgba(255,193,7,0.20)" },
+            new { Id="approvedRcCard", Icon="bi-check2-circle", Count=0, Title="Approved Register Quotation", Bg="#009688", Bg20="rgba(0,150,136,0.15)" },
+            new { Id="pendingRcCard", Icon="bi-hourglass", Count=0, Title="Pending Register Quotation", Bg="#9C27B0", Bg20="rgba(156,39,176,0.18)" },
+            new { Id="approvedPoCard", Icon="bi-check2-circle", Count=0, Title="Approved Purchase Order", Bg="#673AB7", Bg20="rgba(103,58,183,0.18)" },
+            new { Id="pendingPoCard", Icon="bi-hourglass", Count=0, Title="Pending Purchase Order", Bg="#E91E63", Bg20="rgba(233,30,99,0.18)" }
+        };
                     }
 
-                    <div class="row g-3 mb-4">
-                        @foreach (var card in cards)
-                        {
-                            var textColor = card.DarkText ? "#1f2937" : "white"; // black for light tones, white for darker tones
+                    @foreach (var card in cards)
+                    {
+                        <div class="col-sm-6 col-lg-3">
+                            <div id="@card.Id"
+                                 class="card materio-card h-100 shadow-sm border-0 text-start position-relative p-3"
+                                 style="cursor:pointer; overflow:hidden;">
 
-                            <div class="col-md-3">
-                                <div class="card shadow-md border-0 card-small position-relative d-flex flex-column rounded-3 overflow-hidden"
-                                     id="@card.Id"
-                                     style="cursor:pointer; transition: transform 0.2s, box-shadow 0.2s;">
+                                <!-- Icon + Count -->
+                                <div class="d-flex align-items-start">
 
-                                    <div class="card-body text-center d-flex flex-column justify-content-center align-items-center"
-                                         style="background:@card.Bg; color:@textColor; flex:1; padding:2rem 1rem;">
-
-                                        <!-- Icon in circle -->
-                                        <div class="icon-circle d-flex align-items-center justify-content-center position-absolute"
-                                             style="top: 12px; right: 12px; background: rgba(255,255,255,0.3); border-radius:50%; width:40px; height:40px;">
-                                            <i class="bi @(card.Title.Contains("Approved") ? "bi-check-circle-fill" : "bi-hourglass-split") fs-5"
-                                               style="color:@textColor;"></i>
-                                        </div>
-
-                                        <!-- Count -->
-                                        <h5 class="fw-bold mb-1 fs-2 flex-grow-1 d-flex align-items-center justify-content-center">0</h5>
-                                        <p class="fw-semibold fs-6 mb-0 mt-auto">@card.Title</p>
+                                    <!-- Icon -->
+                                    <div class="icon-box d-flex justify-content-center align-items-center"
+                                         style="background:@card.Bg20;">
+                                        <i class="bi @card.Icon fs-5" style="color:@card.Bg;"></i>
                                     </div>
+
+                                    <!-- Count -->
+                                    <h3 class="mb-0 ms-3 fw-bold" style="color:@card.Bg" id="@card.Id-count">
+                                        @card.Count
+                                    </h3>
                                 </div>
+
+                                <!-- Title -->
+                                <div class="mt-2">
+                                    <h6 class="mb-0 fw-semibold">@card.Title</h6>
+                                </div>
+
+                                <!-- ✅ Bottom color line -->
+                                <div class="card-bottom-line" style="background:@card.Bg"></div>
+
                             </div>
-                        }
-                    </div>
+                        </div>
+                    }
                 </div>
 
-                
+
 
 
 
                 <!-- Charts section -->
                 <div class="row g-4 mb-4">
-                    <div class="col-12">
+                    <div class="col-12 col-lg-6">
                         <div class="card shadow-sm">
                             <div class="card-body">
                                 <div id="barChart" style="height: 400px;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-lg-6">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <div id="barChart2" style="height: 400px;"></div>
                             </div>
                         </div>
                     </div>
@@ -153,10 +185,10 @@
     <!-- Modal -->
     <div class="modal fade" id="dashboardModal" tabindex="-1">
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white justify-content-center">
-                    <h5 class="modal-title fw-bold mb-4 text-white" id="dashboardModalLabel">Details</h5>
-                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
+            <div class="modal-content rounded-3">
+                <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-1">
+                    <h5 class="modal-title fw-bold text-white mb-0 fs-5" id="dashboardModalLabel">Details</h5>
+                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" id="dashboardModalBody"></div>
             </div>
@@ -236,29 +268,116 @@
                 startDate: selectedStartDate,
                 endDate: selectedEndDate
             }, function (data) {
-                $("#approvedPrCard h5").text(data.ApprovedPR);
-                $("#pendingPrCard h5").text(data.PendingPR);
-                $("#requestedRfqCard h5").text(data.RequestedRFQ);
-                $("#pendingRfqCard h5").text(data.PendingRFQ);
-                $("#approvedRcCard h5").text(data.ApprovedRC);
-                $("#pendingRcCard h5").text(data.PendingRC);
-                $("#approvedPoCard h5").text(data.ApprovedPO);
-                $("#pendingPoCard h5").text(data.PendingPO);
+                $("#approvedPrCard h3").text(data.ApprovedPR);
+                $("#pendingPrCard h3").text(data.PendingPR);
+                $("#requestedRfqCard h3").text(data.RequestedRFQ);
+                $("#pendingRfqCard h3").text(data.PendingRFQ);
+                $("#approvedRcCard h3").text(data.ApprovedRC);
+                $("#pendingRcCard h3").text(data.PendingRC);
+                $("#approvedPoCard h3").text(data.ApprovedPO);
+                $("#pendingPoCard h3").text(data.PendingPO);
+               
 
-                Highcharts.chart('barChart', {
+
+
+                        Highcharts.chart('barChart', {
+                            chart: { type: 'column' },
+                            title: {
+                                useHTML: true,
+                                text: `
+                    <span style="color:#28a745; font-size:14px; font-weight:600; font-family:Segoe UI, Roboto, sans-serif;">
+                        <i class="bi bi-bar-chart-fill me-1"></i> <!-- Bootstrap icon for status -->
+                        PR, RFQ, RQ & PO Status (${displayStartDate} to ${displayEndDate})
+                    </span>
+                `
+                            },
+                            xAxis: { categories: ['PR', 'RFQ', 'RQ', 'PO'] },
+                            yAxis: { min: 0, title: { text: 'Count' } },
+                            plotOptions: {
+                                column: {
+                                    borderRadius: 5,
+                                    dataLabels: {
+                                        enabled: true,
+                                        style: { fontWeight: 'bold', color: '#000', textOutline: 'none' }
+                                    }
+                                }
+                            },
+                            series: [
+                                {
+                                    name: 'Approved / Requested',
+                                    data: [data.ApprovedPR, data.RequestedRFQ, data.ApprovedRC, data.ApprovedPO],
+                                    color: {
+                                        linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+                                        stops: [
+                                            [0, '#16a34a'], // top (lighter green)
+                                            [1, '#0d6d2d']  // bottom (darker green)
+                                        ]
+                                    }
+                                },
+                                {
+                                    name: 'Pending',
+                                    data: [data.PendingPR, data.PendingRFQ, data.PendingRC, data.PendingPO],
+                                    color: {
+                                        linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+                                        stops: [
+                                            [0, '#facc15'], // top (lighter yellow)
+                                            [1, '#d97706']  // bottom (darker golden)
+                                        ]
+                                    }
+                                }
+                            ],
+                            tooltip: { shared: true },
+                            credits: { enabled: false }
+                        });
+
+                /////////////////////////////////////////////////////////////////
+
+                Highcharts.chart('barChart2', {
                     chart: { type: 'column' },
+
                     title: {
                         useHTML: true,
                         text: `
             <span style="color:#28a745; font-size:14px; font-weight:600; font-family:Segoe UI, Roboto, sans-serif;">
-                <i class="bi bi-bar-chart-fill me-1"></i> <!-- Bootstrap icon for status -->
-                PR, RFQ, RQ & PO Status (${displayStartDate} to ${displayEndDate})
+                <i class="bi bi-bar-chart-fill me-1"></i>
+                Total PR,PO vs Rejected (${displayStartDate} to ${displayEndDate})
             </span>
         `
                     },
-                    xAxis: { categories: ['PR', 'RFQ', 'RQ', 'PO'] },
+
+                    xAxis: { categories: ['PR', 'PO'] },
                     yAxis: { min: 0, title: { text: 'Count' } },
+
                     plotOptions: {
+                        series: {
+                            cursor: 'pointer',
+                            point: {
+                                events: {
+                                    click: function () {
+
+                                        const cat = this.category;              // PR / PO
+                                        const seriesName = this.series.name;    // Total / Rejected
+
+                                        console.log("CLICK => ", cat, seriesName);
+
+                                        if (cat === "PR" && seriesName === "Total") {
+                                            loadPartial("All Purchase Requisition", "/Purchase/ShowAllPRPartialPRK");
+                                        }
+                                        else if (cat === "PO" && seriesName === "Total") {
+                                            loadPartial("All Purchase Orders", "/Purchase/ShowAllPOPartialPRK");
+                                        }
+                                        else if (cat === "PR" && seriesName === "Rejected") {
+                                            loadPartial("Rejected Purchase Requisition", "/Purchase/ShowRejectedPRPartialPRK");
+                                        }
+                                        else if (cat === "PO" && seriesName === "Rejected") {
+                                            loadPartial("Rejected Purchase Orders", "/Purchase/ShowRejectedOPartialPRK");
+                                        }
+                                    }
+                                }
+                            }
+
+                        },
+
                         column: {
                             borderRadius: 5,
                             dataLabels: {
@@ -267,35 +386,40 @@
                             }
                         }
                     },
+
                     series: [
                         {
-                            name: 'Approved / Requested',
-                            data: [data.ApprovedPR, data.RequestedRFQ, data.ApprovedRC, data.ApprovedPO],
+                            name: 'Total',
+                            data: [data.AllPR, data.AllPO],
                             color: {
-                                linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+                                linearGradient: { x1: 0, y1: 0 },
                                 stops: [
-                                    [0, '#16a34a'], // top (lighter green)
-                                    [1, '#0d6d2d']  // bottom (darker green)
+                                    [0, '#16a34a'],
+                                    [1, '#0d6d2d']
                                 ]
                             }
                         },
                         {
-                            name: 'Pending',
-                            data: [data.PendingPR, data.PendingRFQ, data.PendingRC, data.PendingPO],
+                            name: 'Rejected',
+                            data: [data.Rejected, data.RejectedPO],
                             color: {
-                                linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+                                linearGradient: { x1: 0, y1: 0 },
                                 stops: [
-                                    [0, '#facc15'], // top (lighter yellow)
-                                    [1, '#d97706']  // bottom (darker golden)
+                                    [0, '#ef4444'],
+                                    [1, '#b91c1c']
                                 ]
                             }
                         }
                     ],
+
                     tooltip: { shared: true },
                     credits: { enabled: false }
                 });
 
-            });
+
+
+                    });
+                
 
             loadTrendData(selectedStartDate, selectedEndDate, displayStartDate, displayEndDate);
         }
@@ -370,7 +494,8 @@
 
             // Modal loader (unchanged)
             const modal = new bootstrap.Modal(document.getElementById("dashboardModal"));
-            function loadPartial(title, url) {
+
+            window.loadPartial = function (title, url) {
                 const $modal = $("#dashboardModal");
                 const $modalBody = $("#dashboardModalBody");
 

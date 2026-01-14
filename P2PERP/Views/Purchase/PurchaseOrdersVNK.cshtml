@@ -2,52 +2,98 @@
     ViewBag.Title = "Purchase OrdersVNK";
 }
 
+
 <div class="main-content">
-    <div class="container mt-4 shadow-sm rounded bg-white p-3">
-        <!-- Nav Pills -->
-        <ul class="nav nav-pills mb-3" id="poTabs" role="tablist">
-            <li class="nav-item me-2">
-                <a class="nav-link active" id="pending-tab" data-bs-toggle="tab" href="#pending" role="tab">
-                    <i class="bi bi-hourglass-split"></i> Pending Purchase Order
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="approved-tab" data-bs-toggle="tab" href="#approved" role="tab">
-                    <i class="bi bi-check2-circle"></i> Approved Purchase Order
-                </a>
-            </li>
-        </ul>
+   
+    <div>
+        <div class="card p-3 m-5">
+            <!-- Headings -->
+            <h3 id="PendingPO" class="text-primary text-center fw-bolder">Pending Purchase Order</h3>
+            <h3 id="ApprovedPO" class="text-primary text-center fw-bolder" style="display:none;">Approved Purchase Order</h3>
+            <h3 id="RejectedPO" class="text-primary text-center fw-bolder" style="display:none;">Rejected Purchase Order</h3>
 
-        <!-- Tab Content -->
-        <div class="tab-content mt-3">
-            <div class="tab-pane fade show active" id="pending" role="tabpanel">
-                <div id="pendingContainer"></div>
+
+            <!-- Nav Pills -->
+            <ul class="nav nav-pills mb-3 ms-4" id="poTabs" role="tablist">
+
+
+                <li class="nav-item me-2">
+                    <a class="nav-link active" id="pending-tab" data-bs-toggle="tab" href="#pending" role="tab">
+                        <i class="bi bi-hourglass-split"></i> Pending Purchase Orders
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="approved-tab" data-bs-toggle="tab" href="#approved" role="tab">
+                        <i class="bi bi-check2-circle"></i> Approved/Rejected Purchase Orders
+                    </a>
+                </li>
+
+             
+
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content mt-3">
+                <div class="tab-pane fade show active" id="pending" role="tabpanel">
+                    <div id="pendingContainer"></div>
+
+                </div>
+
+                <div class="tab-pane fade" id="approved" role="tabpanel">
+                    <div id="approvedContainer"></div>
+
+                </div>
+             
             </div>
+        </div>
+    </div>
 
-            <div class="tab-pane fade" id="approved" role="tabpanel">
-                <div id="approvedContainer"></div>
+    <!-- Shared Modal -->
+    <div class="modal fade" id="NewModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="card-header bg-primary text-white d-flex justify-content-center align-items-center rounded-top p-1">
+                    <h5 class="modal-title fw-bold text-white mb-0 fs-5">Purchase Order Details</h5>
+                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="NewModalBody">
+                    <!-- Partial view content will load here -->
+                </div>
             </div>
         </div>
     </div>
 </div>
+<style>
+   
+    .nav-pills ~ .tab-content {
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+    }
 
-<!-- Shared Modal -->
-<div class="modal fade" id="NewModal" tabindex="-1">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white justify-content-center">
-                <h5 class="modal-title fw-bold mb-4 text-white">Purchase Order Details</h5>
-                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body" id="NewModalBody">
-                <!-- Partial view content will load here -->
-            </div>
-        </div>
-    </div>
-</div>
-
+    .content-wrapper {
+        justify-content: start !important;
+    }
+</style>
 <script>
     $(function () {
+        // When any tab is shown
+        // Detect tab switch correctly
+        $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var target = $(e.target).attr('href'); // Get active tab id
+
+            if (target === '#pending') {
+                $("#PendingPO").show();
+                $("#ApprovedPO, #RejectedPO").hide();
+            }
+            else if (target === '#approved') {
+                $("#ApprovedPO").show();
+                $("#PendingPO, #RejectedPO").hide();
+            }
+          
+        });
+
+
         // Load Pending partial
         $("#pendingContainer").load('/Purchase/PendingPOsPartialNAM');
 
@@ -57,5 +103,7 @@
                 $("#approvedContainer").load('/Purchase/ApprovedPOsPartialVNK');
             }
         });
+
+      
     });
 </script>

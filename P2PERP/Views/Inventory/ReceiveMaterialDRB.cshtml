@@ -2,18 +2,31 @@
     ViewBag.Title = "Receive Material";
 }
 
-<div class="container">
-    <div class="card p-4">
-        <h3 class="text-center text-primary">Receive Material</h3>
 
-        <!-- Date Filters -->
-        <div class="mb-3 d-flex gap-2">
-            <div class="input-group" style="max-width: 280px;">
+<style>
+    /* ✅ Compact row height for ReturnGoods table */
+    #ReturnGoods.table td,
+    #ReturnGoods.table th {
+        padding: 0.35rem 0.50rem !important;
+        font-size: 0.80rem !important;
+        vertical-align: middle;
+    }
+
+</style>
+
+<div class="container pt-2">
+    <div class="card p-4">
+
+        <div class="d-flex gap-50">
+            <!-- Date Filters -->
+            <div class="input-group input-group-sm mb-5" style="max-width: 230px;">
                 <span class="input-group-text bg-primary text-white">
                     <i class="bi bi-calendar-date"></i>
                 </span>
-                <input type="text" id="Rejectedrange" class="form-control" placeholder="Select date range" readonly />
+                <input type="text" id="Rejectedrange" class="form-control shadow-sm" placeholder="Select date range" readonly />
             </div>
+
+            <h3 class="text-center text-primary" style="margin-left:140px;">Receive Material</h3>
 
         </div>
 
@@ -122,7 +135,7 @@
                 // ==== Print ====
                 {
                     extend: 'print',
-                    text: '<i class="bi bi-printer-fill fs-5"></i>',
+                    text: '<i class="bi bi-printer-fill text-dark fs-5"></i>',
                     title: 'GRN Details',
                     exportOptions: {
                         rows: function (idx, data, node) {
@@ -179,7 +192,7 @@
             </style>
         `);
 
-                        // ========== Add Title & Date ==========
+                        // ========== Add sqTitle & Date ==========
                         $body.find('h1').after(
                             `<div style="text-align:center;font-style:italic;font-size:10pt;margin-bottom:12px;">
                 Generated Date: ${moment().format("DD/MM/YYYY")}
@@ -494,8 +507,8 @@
                     searchable: false,
                     render: function (data, type, row) {
                         return `
-            <button type="button" class="btn btn-success btn-InStock square-pill d-inline-flex align-items-center px-2 py-1 shadow-InStock" data-bs-toggle="tooltip" title="In Stock">
-                <i class="bi bi-box-seam fs-6"></i>
+            <button type="button" class="btn btn-success btn-sm btn-InStock square-pill d-inline-flex align-items-center px-2 py-1 shadow-InStock" data-bs-toggle="tooltip" title="In Stock">
+                <i class="bi bi-box-seam "></i>
             </button>`;
                     }
                 }

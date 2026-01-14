@@ -2,7 +2,7 @@
     <div class="flex-grow-1 text-center">
         <h4 class="mb-0 h3 text-primary">Section List</h4>
     </div>
-    <button class="btn btn-success" id="btnAddSection">
+    <button class="btn btn-sm btn-success" id="btnAddSection">
         <i class="bi bi-plus-circle"></i> Add Section
     </button>
 </div>
@@ -18,9 +18,10 @@
         button.dt-button.processing:after {
             content: none !important;
         }
-        .text-red{
-            color:red;
-        }
+
+    .text-red {
+        color: red;
+    }
 </style>
 
 <div class="table-responsive">
@@ -43,173 +44,177 @@
 </div>
 
 <!-- Add Section Modal -->
-<div class="modal fade" id="addSectionModal" tabindex="-1" aria-labelledby="addSectionModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white position-relative py-2">
-                <h5 class="modal-title h5 text-white text-center mb-1 w-100" id="sectionModalTitle" style="line-height: 1.2;">
-                    Add New Section
+<div class="modal fade" id="addSectionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content shadow-lg rounded-3">
+            <!-- Header -->
+            <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-1">
+                <h5 class="modal-title fw-bold text-white mb-0 fs-5" id="sectionModalTitle">
+                    Add Section
                 </h5>
-                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3"
+                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2"
                         data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+
+            <!-- Body -->
             <div class="modal-body">
-                <form id="addSectionForm">
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="SectionCodeSk">Section Code <span class="text-red">*</span></label>
-                            <div class="form-floating form-floating-outline mb-3">
-                                <input type="text" id="SectionCodeSk" name="SectionCode" class="form-control bg-gray" required readonly>
+                <form id="addSectionForm" class="row g-3">
+                    <div class="col-md-6">
+                        <label for="SectionCode" class="form-label fw-bold text-dark">
+                            Section Code
+                            <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light"
+                               id="SectionCodeSk" name="SectionCode" placeholder="Section Code" readonly>
+                    </div>
 
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div>
-                                <label for="SectionName">Section Name <span class="text-red">*</span></label>
-                                <div class="form-floating form-floating-outline mb-1">
-                                    <input type="text" name="SectionName" class="form-control">
+                    <div class="col-md-6">
+                        <label for="SectionName" class="form-label fw-bold text-dark">
+                            Section Name
+                            <span class="text-red">*</span>
+                        </label>
+                        <input type="text" class="form-control form-control-sm text-dark shadow-sm"
+                               id="SectionName" name="SectionName" placeholder="Enter Section Name">
+                        <span id="SectionNameError" class="text-danger d-none"></span>
+                    </div>
 
-                                </div>
-                            </div>
-                            <span id="SectionNameError" class="text-danger"></span>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="WarehouseCodes">Warehouse <span class="text-red">*</span></label>
-                                <div class="form-floating form-floating-outline mb-3">
-                                    <select id="WarehouseCodes" name="WarehouseCode" class="form-select">
-                                        <option value="">-- Select Warehouse --</option>
-                                    </select>
+                    <div class="col-md-6">
+                        <label for="WarehouseCode" class="form-label fw-bold text-dark">
+                            Warehouse
+                            <span class="text-red">*</span>
+                        </label>
+                        <select class="form-select form-select-sm shadow-sm" id="WarehouseCodes" name="WarehouseCode">
+                            <option value="">-- Select Warehouse --</option>
+                        </select>
+                        <span id="addSectionWhError" class="text-danger d-none"></span>
+                    </div>
 
-                                </div>
-                                <span id="addSectionWhError" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="Description">Description</label>
-                                <div class="form-floating form-floating-outline mb-3">
-                                    <textarea name="Descriptionk" class="form-control" style="height: 80px;"></textarea>
-
-                                </div>
-                            </div>
+                    <div class="col-md-6">
+                        <label for="Description" class="form-label fw-bold text-dark">Description <span class="text-red">*</span></label>
+                        <div class="form-floating form-floating-outline mb-3">
+                            <textarea id="Description" name="Descriptionk" class="form-control form-control-sm text-dark shadow-sm" placeholder="Enter at least 5 words"></textarea>
                         </div>
-                        <div class="d-flex justify-content-end gap-2 mt-4">
-                            <button type="submit" class="btn btn-success px-4">
-                                <i class="bi bi-check-circle me-2 text-white"></i>Save
-                            </button>
-                        </div>
+                        <span id="DescriptionError" class="text-danger d-none"></span>
                     </div>
                 </form>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer justify-content-center">
+                <button type="submit" form="addSectionForm" class="btn btn-sm btn-success px-4">
+                    <i class="bi bi-check-circle me-2 text-white"></i> Save
+                </button>
             </div>
         </div>
     </div>
 </div>
+
 
 <!-- Edit Section Modal -->
 <div class="modal fade" id="editSectionModal" tabindex="-1" aria-labelledby="editSectionModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white position-relative py-2">
-                <h5 class="modal-title h5 text-white text-center mb-1 w-100" id="editSectionModalTitle" style="line-height: 1.2;">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content shadow-lg rounded-3">
+            <!-- Header -->
+            <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-1">
+                <h5 class="modal-title fw-bold text-white mb-0 fs-5" id="editSectionModalTitle">
                     Edit Section
                 </h5>
-                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3"
+                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2"
                         data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+
+            <!-- Body -->
             <div class="modal-body">
-                <form id="editSectionForm">
+                <form id="editSectionForm" class="row g-3">
                     <input type="hidden" name="SectionId" id="EditSectionId" />
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="EditSectionCode">Section Code</label>
-                            <div class="form-floating form-floating-outline mb-3">
-                                <input type="text" id="EditSectionCode" name="SectionCode" class="form-control bg-gray" readonly>
 
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="EditSectionName">Section Name  <span class="text-red">*</span></label>
-                            <div class="form-floating form-floating-outline mb-3">
-                                <input type="text" id="EditSectionName" name="SectionName" class="form-control" required>
-
-                            </div>
-                            <div id="EditSectionNameError" class="text-danger" style="font-size: 0.9rem;"></div>
-                        </div>
+                    <div class="col-md-6">
+                        <label for="EditSectionCode" class="form-label fw-bold text-dark">Section Code</label>
+                        <input type="text" id="EditSectionCode" name="SectionCode"
+                               class="form-control form-control-sm text-dark shadow-sm bg-light" readonly>
                     </div>
-                    <div class="row mb-3">
-                        <div class="col-md-6" >
-                            <label for="EditWarehouseCode">Warehouse <span class="text-red">*</span></label>
-                            <div class="form-floating form-floating-outline mb-3" readonly>
-                                <select id="EditWarehouseCode" name="WarehouseCode" class="form-select" required ></select>
 
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="EditDescription">Description</label>
-                            <div class="form-floating form-floating-outline mb-3">
-                                <textarea id="EditDescription" name="Description" class="form-control" style="height: 80px;"></textarea>
-
-                            </div>
-                        </div>
+                    <div class="col-md-6">
+                        <label for="EditSectionName" class="form-label fw-bold text-dark">
+                            Section Name <span class="text-red">*</span>
+                        </label>
+                        <input type="text" id="EditSectionName" name="SectionName"
+                               class="form-control form-control-sm text-dark shadow-sm ">
+                        <div id="EditSectionNameError" class="text-danger" style="font-size: 0.9rem;"></div>
                     </div>
-                    <div class="d-flex justify-content-end gap-2 mt-4">
-                        <button type="submit" class="btn btn-success px-4">
-                            <i class="bi bi-check-circle me-2 text-white"></i>Update
-                        </button>
+
+                    <div class="col-md-6">
+                        <label for="EditWarehouseCode" class="form-label fw-bold text-dark">
+                            Warehouse <span class="text-red">*</span>
+                        </label>
+                        <select id="EditWarehouseCode" name="WarehouseCode"
+                                class="form-select form-select-sm shadow-sm" required></select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="EditDescription" class="form-label fw-bold text-dark">
+                            Description <span class="text-red">*</span>
+                        </label>
+                        <textarea id="EditDescription" name="Description"
+                                  class="form-control form-control-sm text-dark shadow-sm "
+                                  rows="3" placeholder="Enter at least 5 words"></textarea>
+                        <span id="EditDescriptionError" class="text-danger d-none"></span>
                     </div>
                 </form>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer justify-content-center">
+                <button type="submit" form="editSectionForm" class="btn btn-sm btn-success px-4">
+                    <i class="bi bi-check-circle me-2 text-white"></i> Update
+                </button>
             </div>
         </div>
     </div>
 </div>
+
 
 <!-- View Section Modal -->
 <div class="modal fade" id="viewSectionModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white position-relative py-2">
-                <h5 class="modal-title h5 text-white text-center mb-1 w-100" id="sectionDetailsModalTitle" style="line-height: 1.2;">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content shadow-lg rounded-3">
+
+            <!-- Header -->
+            <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-1">
+                <h5 class="modal-title fw-bold text-white mb-0 fs-5" id="sectionDetailsModalTitle">
                     Section Details
                 </h5>
-                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3"
+                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2"
                         data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+
+            <!-- Body -->
             <div class="modal-body">
-                <form class="row g-3">
+                <div class="row g-3">
                     <div class="col-md-6">
-                        <label for="ViewSectionCode">Section Code</label>
-                        <div class="form-floating form-floating-outline mb-3">
-                            <input type="text" class="form-control" id="ViewSectionCode" readonly>
-
-                        </div>
+                        <label class="form-label fw-bold text-dark">Section Code</label>
+                        <div class="text-dark" id="ViewSectionCode">-</div>
                     </div>
+
                     <div class="col-md-6">
-                        <label for="ViewSectionName">Section Name</label>
-                        <div class="form-floating form-floating-outline mb-3">
-                            <input type="text" class="form-control" id="ViewSectionName" readonly>
-
-                        </div>
+                        <label class="form-label fw-bold text-dark">Section Name</label>
+                        <div class="text-dark" id="ViewSectionName">-</div>
                     </div>
-                    <div class="col-12">
-                        <label for="ViewWarehouseName">Warehouse</label>
-                        <div class="form-floating form-floating-outline mb-3">
-                            <input type="text" class="form-control" id="ViewWarehouseName" readonly>
 
-                        </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-dark">Warehouse</label>
+                        <div class="text-dark" id="ViewWarehouseName">-</div>
                     </div>
-                    <div class="col-12">
-                        <label for="ViewDescription">Description</label>
-                        <div class="form-floating form-floating-outline mb-3">
-                            <textarea class="form-control" id="ViewDescription" rows="3" readonly></textarea>
 
-                        </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-dark">Description</label>
+                        <div class="text-dark" id="ViewDescription">-</div>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
-
 <script>
     $(document).ready(function () {
         // ================= CONFIGURATION & CONSTANTS =================
@@ -239,12 +244,30 @@
 
         // ================= UTILITY FUNCTIONS =================
         const utils = {
-            // Tooltip initialization
+            // Tooltip initialization - IMPROVED VERSION
             initTooltips: function() {
-                const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-                tooltipTriggerList.map(function(tooltipTriggerEl) {
-                    return new bootstrap.Tooltip(tooltipTriggerEl, { trigger: 'hover' });
-                });
+                try {
+                    // Destroy all existing tooltips first
+                    const tooltipElements = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+                    tooltipElements.forEach(element => {
+                        const tooltipInstance = bootstrap.Tooltip.getInstance(element);
+                        if (tooltipInstance) {
+                            tooltipInstance.dispose();
+                        }
+                    });
+
+                    // Initialize new tooltips
+                    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                    tooltipTriggerList.forEach(function(tooltipTriggerEl) {
+                        new bootstrap.Tooltip(tooltipTriggerEl, {
+                            trigger: 'hover',
+                            boundary: 'viewport',
+                            container: 'body'
+                        });
+                    });
+                } catch (error) {
+                    console.log('Tooltip initialization error:', error);
+                }
             },
 
             // Validation helpers
@@ -277,8 +300,9 @@
         };
 
         // ================= VALIDATION FUNCTIONS =================
+        // ================= VALIDATION FUNCTIONS =================
         const validators = {
-            sectionForm: function(formSelector) {
+            sectionForm: function (formSelector) {
                 let isValid = true;
                 const $form = $(formSelector);
 
@@ -292,29 +316,73 @@
                         value: $form.find("#WarehouseCodes").val(),
                         required: true,
                         errorId: 'addSectionWhError'
+                    },
+                    Description: {
+                        value: $form.find("#Description").val().trim(),
+                        required: true,
+                        minWords: 5,
+                        errorId: 'DescriptionError',
+                        message: 'Description is required.',
+                        minWordsMessage: 'Description must contain at least 5 words.'
                     }
                 };
 
                 Object.keys(fields).forEach(field => {
                     const config = fields[field];
                     if (!config.value) {
-                        const fieldName = field === 'SectionName' ? 'Section Name' : 'Warehouse';
+                        const fieldName = field === 'SectionName' ? 'Section Name' :
+                            field === 'WarehouseCodes' ? 'Warehouse' : 'Description';
                         utils.showFieldError(field, config.errorId, `${fieldName} is required.`);
                         isValid = false;
+                    } else if (config.minWords) {
+                        const wordCount = config.value.split(/\s+/).filter(word => word.length > 0).length;
+                        if (wordCount < config.minWords) {
+                            utils.showFieldError(field, config.errorId, config.minWordsMessage);
+                            isValid = false;
+                        } else {
+                            utils.clearFieldError(field, config.errorId);
+                        }
+                    } else {
+                        utils.clearFieldError(field, config.errorId);
                     }
                 });
 
                 return isValid;
             },
 
-            editSectionForm: function() {
+            editSectionForm: function () {
+                let isValid = true;
+
+                // Section Name validation
                 const nameValue = $('#EditSectionName').val().trim();
                 if (!nameValue) {
                     $('#EditSectionName').addClass('is-invalid');
                     $('#EditSectionNameError').text('Section Name is required').removeClass('d-none');
-                    return false;
+                    isValid = false;
+                } else {
+                    $('#EditSectionName').removeClass('is-invalid');
+                    $('#EditSectionNameError').text('').addClass('d-none');
                 }
-                return true;
+
+                // Description validation
+                const descValue = $('#EditDescription').val().trim();
+                if (!descValue) {
+                    $('#EditDescription').addClass('is-invalid');
+                    $('#EditDescriptionError').text('Description is required').removeClass('d-none');
+                    isValid = false;
+                } else {
+                    const wordCount = descValue.split(/\s+/).filter(word => word.length > 0).length;
+                    if (wordCount < 5) {
+                        $('#EditDescription').addClass('is-invalid');
+                        $('#EditDescriptionError').text('Description must contain at least 5 words').removeClass('d-none');
+                        isValid = false;
+                    } else {
+                        $('#EditDescription').removeClass('is-invalid');
+                        $('#EditDescriptionError').text('').addClass('d-none');
+                    }
+                }
+
+                return isValid;
             }
         };
 
@@ -654,24 +722,53 @@
             });
 
             // Live validation
-            $(document).on("input change", "[name='SectionName'], #WarehouseCodes", function() {
+            $(document).on("input change", "[name='SectionName'], #WarehouseCodes, #Description, #EditDescription", function () {
                 const id = $(this).attr("id") || $(this).attr("name");
-                if ($(this).val().trim()) {
-                    const errorMap = { SectionName: "SectionNameError", WarehouseCodes: "addSectionWhError" };
-                    if (errorMap[id]) utils.clearFieldError(id, errorMap[id]);
+                const value = $(this).val().trim();
+
+                if (value) {
+                    const errorMap = {
+                        SectionName: "SectionNameError",
+                        WarehouseCodes: "addSectionWhError",
+                        Description: "DescriptionError",
+                        EditDescription: "EditDescriptionError"
+                    };
+
+                    if (errorMap[id]) {
+                        // For description fields, check word count
+                        if (id === 'Description' || id === 'EditDescription') {
+                            const wordCount = value.split(/\s+/).filter(word => word.length > 0).length;
+                            if (wordCount >= 5) {
+                                utils.clearFieldError(id, errorMap[id]);
+                            }
+                        } else {
+                            utils.clearFieldError(id, errorMap[id]);
+                        }
+                    }
                 }
             });
 
-            // Modal cleanup
+            // Modal cleanup with TOOLTIP REFRESH
             $(CONFIG.selectors.addModal).on("hidden.bs.modal", function() {
                 $(CONFIG.selectors.addForm)[0].reset();
                 utils.clearAllErrors(CONFIG.selectors.addForm);
+                setTimeout(utils.initTooltips, 300); // Refresh tooltips after modal close
             });
 
             $(CONFIG.selectors.editModal).on("hidden.bs.modal", function() {
                 $(CONFIG.selectors.editForm)[0].reset();
                 utils.clearAllErrors(CONFIG.selectors.editForm);
                 $('.is-invalid').removeClass('is-invalid');
+                setTimeout(utils.initTooltips, 300); // Refresh tooltips after modal close
+            });
+
+            $(CONFIG.selectors.viewModal).on("hidden.bs.modal", function() {
+                setTimeout(utils.initTooltips, 300); // Refresh tooltips after modal close
+            });
+
+            // Refresh tooltips on table updates
+            $(document).on('draw.dt', function() {
+                setTimeout(utils.initTooltips, 200);
             });
         }
 
@@ -785,41 +882,75 @@
         }
 
         function handleEditSectionError(res) {
+            // Clear previous errors first
+            utils.clearFieldError("SectionName", "EditSectionNameError");
+            utils.clearFieldError("Description", "EditDescriptionError");
+
+            // Check if it's a field-specific error
             if (res.field === "SectionName") {
                 const $input = $(`[name=${res.field}]`);
                 $input.addClass("is-invalid");
-                $("#EditSectionNameError").html(res.message);
+                $("#EditSectionNameError").html(res.message).removeClass("d-none");
 
                 $input.focus();
                 $('html, body').animate({ scrollTop: $input.offset().top - 100 }, 300);
 
-                $input.on("input", function() {
+                $input.on("input", function () {
                     $(this).removeClass("is-invalid");
-                    $("#EditSectionNameError").html("");
+                    $("#EditSectionNameError").html("").addClass("d-none");
+                });
+            } else if (res.field === "Description") {
+                const $input = $("#EditDescription");
+                $input.addClass("is-invalid");
+                $("#EditDescriptionError").html(res.message).removeClass("d-none");
+
+                $input.focus();
+                $('html, body').animate({ scrollTop: $input.offset().top - 100 }, 300);
+
+                $input.on("input", function () {
+                    $(this).removeClass("is-invalid");
+                    $("#EditDescriptionError").html("").addClass("d-none");
+                });
+            }
+            // Handle "already exists" error
+            else if (res.message && (res.message.toLowerCase().includes("already exist") ||
+                res.message.toLowerCase().includes("duplicate") ||
+                res.message.toLowerCase().includes("exists"))) {
+                // Show error on SectionName field for "already exists"
+                const $input = $("#EditSectionName");
+                $input.addClass("is-invalid");
+                $("#EditSectionNameError").html("Section Name already exists.").removeClass("d-none");
+
+                $input.focus();
+                $('html, body').animate({ scrollTop: $input.offset().top - 100 }, 300);
+
+                $input.on("input", function () {
+                    $(this).removeClass("is-invalid");
+                    $("#EditSectionNameError").html("").addClass("d-none");
                 });
             } else {
+                // General error
                 utils.handleError(res.message);
             }
         }
 
         function viewSection(id) {
-            $.get(CONFIG.urls.getSectionById, { id }, function(res) {
+            $.get(CONFIG.urls.getSectionById, { id }, function (res) {
                 if (res.success) {
-                    $("#ViewSectionCode").val(res.data.SectionCode);
-                    $("#ViewSectionName").val(res.data.SectionName);
-                    $("#ViewDescription").val(res.data.Description);
-                    $("#ViewWarehouseName").val(res.data.WarehouseName);
+                    $("#ViewSectionCode").text(res.data.SectionCode || "-");
+                    $("#ViewSectionName").text(res.data.SectionName || "-");
+                    $("#ViewDescription").text(res.data.Description || "-");
+                    $("#ViewWarehouseName").text(res.data.WarehouseName || "-");
                     $(CONFIG.selectors.viewModal).modal("show");
                 } else {
                     utils.handleError(res.message);
                 }
             }).fail(() => utils.handleError("Error loading section details."));
         }
-
         function deleteSection(sectionId) {
             Swal.fire({
                 title: 'Are you sure?',
-                text: "You won't be able to revert this!",
+                text: "You Delete Section!",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#0d6efd',
@@ -853,6 +984,11 @@
             initializeDataTable();
             setupEventHandlers();
             setTimeout(utils.initTooltips, 500);
+
+            // Additional tooltip refresh on window focus
+            $(window).on('focus', function() {
+                setTimeout(utils.initTooltips, 100);
+            });
         }
 
         // Start the application

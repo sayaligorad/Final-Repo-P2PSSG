@@ -378,8 +378,8 @@
 
             <!-- Item Dropdown -->
             <div class="col-md-6">
-                <label for="itemName" class="form-label">Item Name <span class="required-star">*</span></label>
-                <select id="itemName" class="form-select">
+                <label for="itemName" class="form-label form-label-sm fw-bold text-dark">Item Name <span class="required-star">*</span></label>
+                <select id="itemName" class="form-select form-select-sm item-select shadow-sm">
                     <option value="">-- Select Item --</option>
                 </select>
                 <small id="itemError" class="text-danger d-none"></small>
@@ -387,45 +387,45 @@
 
             <!-- Plan Name -->
             <div class="col-md-6">
-                <label for="planName" class="form-label">Plan Name <span class="required-star">*</span></label>
-                <input type="text" id="planName" class="form-control" />
+                <label for="planName" class="form-label form-label-sm fw-bold text-dark">Plan Name <span class="required-star">*</span></label>
+                <input type="text" id="planName" class="form-control form-control-sm  text-dark shadow-sm" />
                 <small id="planError" class="text-danger d-none"></small>
             </div>
 
             <!-- Year -->
             <div class="col-md-2">
-                <label for="year" class="form-label">Year</label>
-                <input type="text" id="year" class="form-control bg-light" readonly />
+                <label for="year" class="form-label form-label-sm fw-bold text-dark">Year</label>
+                <input type="text" id="year" class="form-control bg-light form-control-sm  text-dark shadow-sm" readonly />
             </div>
 
             <!-- Item Code -->
             <div class="col-md-5">
-                <label for="itemCode" class="form-label">Item Code</label>
-                <input type="text" id="itemCode" class="form-control bg-light" readonly />
+                <label for="itemCode" class="form-label form-label-sm fw-bold text-dark">Item Code</label>
+                <input type="text" id="itemCode" class="form-control bg-light form-control-sm  text-dark shadow-sm" readonly />
             </div>
 
             <!-- UOM -->
             <div class="col-md-5">
-                <label for="uom" class="form-label">UOM</label>
-                <input type="text" id="uom" class="form-control bg-light" readonly />
+                <label for="uom" class="form-label form-label-sm fw-bold text-dark">UOM</label>
+                <input type="text" id="uom" class="form-control bg-light form-control-sm  text-dark shadow-sm" readonly />
             </div>
 
             <!-- Quantity -->
             <div class="col-md-6">
-                <label for="quantity" class="form-label">Quantity <span class="required-star">*</span></label>
-                <input type="number" id="quantity" class="form-control" />
+                <label for="quantity" class="form-label form-label-sm fw-bold text-dark">Quantity <span class="required-star">*</span></label>
+                <input type="number" id="quantity" class="form-control form-control-sm  text-dark shadow-sm" />
                 <small id="qtyError" class="text-danger d-none"></small>
             </div>
 
             <!-- Description -->
             <div class="col-md-6">
-                <label for="description" class="form-label">Description</label>
-                <textarea id="description" class="form-control bg-light" readonly></textarea>
+                <label for="description" class="form-label form-label-sm fw-bold text-dark">Description</label>
+                <textarea id="description" class="form-control bg-light form-control-sm  text-dark shadow-sm" readonly></textarea>
             </div>
 
             <!-- Add Button -->
             <div class="col-md-12 text-end">
-                <button type="button" id="btnAdd" class="btn btn-success mt-2">
+                <button type="button" id="btnAdd" class="btn btn-success mt-2 btn-sm ">
                     <i class="bi bi-plus-circle me-2"></i> Add Item
                 </button>
             </div>
@@ -433,7 +433,7 @@
             <hr />
 
             <!-- Table -->
-            <div class="table-responsive mt-4">
+            <div class="table-responsive mt-2">
                 <table id="itemsTable" class="table table-striped table-bordered text-center align-middle">
                     <thead class="table-dark text-center">
                         <tr>
@@ -451,21 +451,21 @@
             </div>
 
             <!-- Dates -->
-            <div class="row mt-3">
+            <div class="row ">
                 <div class="col-md-3">
-                    <label>From Date <span class="required-star">*</span></label>
-                    <input type="date" id="fromDate" class="form-control" />
+                    <label class="form-label form-label-sm fw-bold text-dark">From Date <span class="required-star">*</span></label>
+                    <input type="date" id="fromDate" class="form-control form-control-sm  text-dark shadow-sm" />
                     <small id="fromDateError" class="text-danger d-none"></small>
                 </div>
-                <div class="col-md-3">
-                    <label>To Date <span class="required-star">*</span></label>
-                    <input type="date" id="toDate" class="form-control" />
+                <div class="col-md-3 mb-2">
+                    <label class="form-label form-label-sm fw-bold text-dark">To Date <span class="required-star">*</span></label>
+                    <input type="date" id="toDate" class="form-control form-control-sm  text-dark shadow-sm" />
                     <small id="toDateError" class="text-danger d-none"></small>
                 </div>
             </div>
 
-            <div class="text-center mt-4">
-                <button type="submit" class="btn btn-success">Send for Approval</button>
+            <div class="text-center mb-4">
+                <button type="submit" class="btn btn-success btn-sm ">Send for Approval</button>
             </div>
         </div>
     </form>
@@ -504,6 +504,9 @@
     #itemsTable th, #itemsTable td {
         text-align: center;
         vertical-align: middle;
+    }
+   textarea {
+        height: 40px;
     }
 </style>
 
@@ -711,7 +714,7 @@
                 item.ItemName, item.ItemCode, item.Quantity, item.UOM,
                 `<span data-bs-toggle="tooltip" title="${item.Description}">${item.Description}</span>`,
                 item.RequestType,
-                `<button class="btn btn-sm btn-square btn-remove bg-danger" title="Remove"><i class="bi bi-trash text-white"></i></button>`
+                `<button class="btn btn-sm btn-square btn-remove bg-danger" title="Remove" style="width: 32px; height: 32px;"><i class="bi bi-trash text-white"></i></button>`
             ]);
         });
         table.draw();

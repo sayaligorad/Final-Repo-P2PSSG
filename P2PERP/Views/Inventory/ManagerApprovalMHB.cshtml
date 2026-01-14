@@ -42,25 +42,25 @@
     <!-- ✅ Plan Details Modal -->
     <div class="modal fade" id="planDetailsModal" tabindex="-1" aria-labelledby="planDetailsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-primary text-white mb-4">
-                    <h5 class="modal-title text-center w-100 text-white mb-4"> Plan Details</h5>
-                    <button type="button" class="btn-close btn-close-white mb-4" onclick="closePlanModal()" aria-label="Close"></button>
+            <div class="modal-content shadow-lg rounded-3">
+                <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-1">
+                    <h5 class="modal-title text-center w-100 text-white  mb-0 fs-5 "> Plan Details</h5>
+                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2 " onclick="closePlanModal()" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
 
                     <div class="row mb-3">
                         <div class="col-md-4">
-                            <label class="fw-bold">Plan Name:</label>
-                            <div id="modalPlanName" class="text-muted form-control bg-light"></div>
+                            <label class="form-label form-label-sm fw-bold text-dark">Plan Name:</label>
+                            <div id="modalPlanName" class=" form-control bg-light form-control-sm  text-dark shadow-sm"></div>
                         </div>
                         <div class="col-md-4">
-                            <label class="fw-bold">MRP Code:</label>
-                            <div id="modalPlanCode" class="text-muted form-control bg-light"></div>
+                            <label class="form-label form-label-sm fw-bold text-dark">MRP Code:</label>
+                            <div id="modalPlanCode" class=" form-control bg-light form-control-sm  text-dark shadow-sm"></div>
                         </div>
                         <div class="col-md-4">
-                            <label class="fw-bold">Year:</label>
-                            <div id="modalPlanyear" class="text-muted form-control bg-light"></div>
+                            <label class="form-label form-label-sm fw-bold text-dark">Year:</label>
+                            <div id="modalPlanyear" class=" form-control bg-light form-control-sm  text-dark shadow-sm"></div>
                         </div>
                     </div>
 
@@ -83,18 +83,18 @@
 
                     <div class="row mb-3 text-center">
                         <div class="col-md-6">
-                            <label class="fw-bold">From Date:</label>
+                            <label class="form-label form-label-sm fw-bold text-dark">From Date:</label>
                             <div id="modalfromdate" class="text-muted"></div>
                         </div>
                         <div class="col-md-6">
-                            <label class="fw-bold">To Date:</label>
+                            <label class="form-label form-label-sm fw-bold text-dark">To Date:</label>
                             <div id="modaltodate" class="text-muted"></div>
                         </div>
                     </div>
 
                     <div class="text-center mt-4 ">
-                        <button id="rejectBtn" class="btn btn-danger px-4"> Reject</button>
-                        <button id="approveBtn" class="btn btn-success px-4 me-3">Approve</button>
+                        <button id="rejectBtn" class="btn btn-danger px-4 btn-sm"> Reject</button>
+                        <button id="approveBtn" class="btn btn-success px-4 me-3 btn-sm">Approve</button>
                     </div>
                 </div>
             </div>
@@ -104,18 +104,18 @@
     </div>
     <!-- ✅ Reject Reason Modal -->
     <div class="modal fade" id="rejectReasonModal" tabindex="-1" aria-labelledby="rejectReasonModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content shadow">
-                <div class="modal-header bg-danger justify-content-center">
-                    <h5 class="modal-title text-white text-center w-100">Reason for Rejection</h5>
-                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
+        <div class="modal-dialog ">
+            <div class="modal-content shadow-lg rounded-3">
+                <div class="modal-header bg-danger d-flex justify-content-center align-items-center rounded-top p-1 ">
+                    <h5 class="modal-title fw-bold text-white mb-0 fs-5">Reason for Rejection</h5>
+                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2" data-bs-dismiss="modal"></button>
                 </div>
 
                 <div class="modal-body">
                     <textarea id="rejectReasonText" class="form-control" rows="4" placeholder="Enter reason for rejection..."></textarea>
                 </div>
                 <div class="modal-footer">
-                    <button id="submitRejectBtn" class="btn btn-danger">Submit</button>
+                    <button id="submitRejectBtn" class="btn btn-danger btn-sm">Submit</button>
                     @*<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>*@
                 </div>
             </div>
@@ -125,62 +125,62 @@
     @*edit plan modal*@
     <div class="modal fade" id="editPlanModal" tabindex="-1" aria-labelledby="editPlanModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title text-center w-100 text-white mb-3" id="editPlanModalLabel"> Edit Plan</h5>
+            <div class="modal-content shadow-lg rounded-3">
+                <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-1">
+                    <h5 class="modal-title fw-bold text-white mb-0 fs-5" id="editPlanModalLabel"> Edit Plan</h5>
 
-                    <button type="button" class="btn-close btn-close-white mb-3" onclick="closeEditModal()" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2" onclick="closeEditModal()" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
 
                     <!-- Plan Metadata -->
                     <div class="row mb-3">
                         <div class="col-md-4">
-                            <label>Year:</label>
-                            <input type="text" class="form-control bg-light" id="editYear" readonly />
+                            <label class="form-label form-label-sm fw-bold text-dark" >Year:</label>
+                            <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light" id="editYear" readonly />
                         </div>
                         <div class="col-md-4">
-                            <label>Plan Name:</label>
-                            <input type="text" class="form-control bg-light" id="editPlanName" readonly />
+                            <label class="form-label form-label-sm fw-bold text-dark">Plan Name:</label>
+                            <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light" id="editPlanName" readonly />
                         </div>
                         <div class="col-md-4">
-                            <label>Plan Code:</label>
-                            <input type="text" class="form-control bg-light" id="editMRPCode" readonly />
+                            <label class="form-label form-label-sm fw-bold text-dark">Plan Code:</label>
+                            <input type="text" class="form-control  form-control-sm text-dark shadow-sm bg-light" id="editMRPCode" readonly />
                         </div>
                     </div>
 
                     <!-- Item Form -->
                     <div class="row mb-3">
                         <div class="col-md-3">
-                            <label>Item Name:<span class="required-star">*</span></label>
-                            <select class="form-control" id="editItemName">
+                            <label class="form-label fw-bold text-dark">Item Name:<span class="required-star">*</span></label>
+                            <select class="form-control form-select-sm item-select shadow-sm " id="editItemName">
                                 <option value="">Select Item</option>
                             </select>
                         </div>
                         <div class="col-md-2">
-                            <label>Item Code:</label>
-                            <input type="text" class="form-control bg-light" id="editItemCode" readonly />
+                            <label class="form-label fw-bold text-dark">Item Code:</label>
+                            <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light" id="editItemCode" readonly />
                         </div>
                         <div class="col-md-2">
-                            <label>Quantity:<span class="required-star">*</span></label>
-                            <input type="number" class="form-control " id="editQuantity" />
+                            <label class="form-label fw-bold text-dark">Quantity:<span class="required-star">*</span></label>
+                            <input type="number" class="form-control form-control-sm text-dark shadow-sm " id="editQuantity" />
                         </div>
                         <div class="col-md-2">
-                            <label>UOM:</label>
-                            <input type="text" class="form-control bg-light" id="editUOM" readonly />
+                            <label class="form-label fw-bold text-dark">UOM:</label>
+                            <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light" id="editUOM" readonly />
                         </div>
                         <div class="col-md-2">
-                            <label>Request Type:</label>
-                            <input type="text" class="form-control bg-light" id="editRequestType" readonly />
+                            <label class="form-label fw-bold text-dark">Request Type:</label>
+                            <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light" id="editRequestType" readonly />
                         </div>
                         <div class="col-md-1 d-flex align-items-end">
-                            <button class="btn btn-success w-100" onclick="addItemToEditTable()"><i class="bi bi-plus-circle me-2"></i>Add</button>
+                            <button class="btn btn-success w-100 btn-sm mb-2" onclick="addItemToEditTable()"><i class="bi bi-plus-circle me-2"></i>Add</button>
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-12">
-                            <label>Description:</label>
-                            <input type="text" class="form-control bg-light" id="editItemDescription" readonly />
+                            <label class="form-label fw-bold text-dark">Description:</label>
+                            <input type="text" class="form-control  form-control-sm text-dark shadow-sm bg-light" id="editItemDescription" readonly />
                         </div>
                     </div>
                     
@@ -205,17 +205,17 @@
                     <!-- Date Range -->
                     <div class="row mb-3 ">
                         <div class="col-md-6">
-                            <label>From Date:<span class="required-star">*</span></label>
-                            <input type="date" class="form-control" id="editFromDate"  min="@DateTime.Now.ToString("yyyy-MM-dd")"/>
+                            <label class="form-label fw-bold text-dark">From Date:<span class="required-star">*</span></label>
+                            <input type="date" class="form-control form-control-sm text-dark shadow-sm" id="editFromDate"  min="@DateTime.Now.ToString("yyyy-MM-dd")"/>
                         </div>
                         <div class="col-md-6">
-                            <label>To Date:<span class="required-star">*</span></label>
-                            <input type="date" class="form-control" id="editToDate"  min="@DateTime.Now.ToString("yyyy-MM-dd")"/>
+                            <label class="form-label fw-bold text-dark" >To Date:<span class="required-star">*</span></label>
+                            <input type="date" class="form-control form-control-sm text-dark shadow-sm" id="editToDate"  min="@DateTime.Now.ToString("yyyy-MM-dd")"/>
                         </div>
                     </div>
 
                     <div class="text-center">
-                        <button type="button" class="btn btn-success px-4" id="sendForApprovalBtn">
+                        <button type="button" class="btn btn-success px-4 btn-sm" id="sendForApprovalBtn">
                             Save Changes
                         </button>
                     </div>
@@ -1161,7 +1161,7 @@
                       <td data-bs-toggle="tooltip" data-bs-placement="top" title="${item.Description}">${item.Description}</td>
                         <td>${item.RequestType}</td>
                       <td>
-                            <button class="btn btn-outline-danger btn-sm d-flex bg-danger align-items-center justify-content-center p-0"
+                            <button class="btn btn-outline-danger btn-sm d-flex  bg-danger align-items-center justify-content-center p-0"
                                     style="width: 32px; height: 32px;"
                                     data-bs-toggle="tooltip" data-bs-placement="top" title="Remove"
                                     onclick="$(this).closest('tr').remove()">

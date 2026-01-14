@@ -1,289 +1,235 @@
-﻿
+﻿@{
+    ViewBag.Title = "Inventory Dashboard";
+}
+
+<!-- ========================== CSS ========================== -->
 <style>
-    /* Hover animation for cards */
+    /* ========== Page Layout & Animations ========== */
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: #f6f9fc;
+    }
+
     .hover-shadow {
-        transition: all 0.3s ease-in-out;
+        transition: all 0.35s ease-in-out;
     }
 
         .hover-shadow:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
-        }
-    /* Gradient helpers */
-    .bg-gradient-primary {
-        /*        background: linear-gradient(45deg, #4e73df, #224abe) !important;*/
-    }
-
-    .bg-gradient-success {
-        /*        background: linear-gradient(45deg, #1cc88a, #13855c) !important;*/
-    }
-
-    .bg-gradient-warning {
-        /*        background: linear-gradient(45deg, #f6c23e, #dda20a) !important;*/
-    }
-
-    .modal-backdrop.show {
-        --bs-backdrop-bg: #000; /* backdrop color */
-        --bs-backdrop-opacity: 0.7; /* backdrop opacity */
-    }
-
-    /* Chart Cards — Soft Materio Look */
-    .chart-card {
-        background: #ffffff;
-        border-radius: 1rem !important;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-        transition: all 0.3s ease-in-out;
-    }
-
-        .chart-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
         }
 
-    /* Chart Container */
-    .chart-container {
-        height: 350px;
-        background: linear-gradient(145deg, #f9fafb, #ffffff);
-        border-radius: 1rem;
-        padding: 10px;
-        box-shadow: inset 0 0 20px rgba(240, 240, 255, 0.4);
+    .bottom-border {
+        height: 4px;
+        width: 100%;
+        position: absolute;
+        bottom: 0;
+        left: 0;
     }
 
-    /* Highcharts Light Theme */
-    .highcharts-background {
-        fill: #ffffff !important;
+    /* Gradient Border Variants */
+    .card-border-shadow-primary {
+        border-left: 5px solid #4e73df !important;
     }
 
-    .highcharts-title {
-        fill: #333 !important;
-        font-weight: 600;
+    .card-border-shadow-success {
+        border-left: 5px solid #1cc88a !important;
     }
 
-    .highcharts-axis-labels text {
-        fill: #666 !important;
-        font-size: 12px !important;
-        font-weight: 500;
+    .card-border-shadow-warning {
+        border-left: 5px solid #f6c23e !important;
     }
 
-    .highcharts-grid-line {
-        stroke: rgba(200, 200, 200, 0.2) !important;
+    .card-border-shadow-info {
+        border-left: 5px solid #36b9cc !important;
     }
 
-    .highcharts-tooltip-box {
-        fill: #fff !important;
-        stroke: #ddd !important;
-        filter: drop-shadow(0px 3px 5px rgba(0, 0, 0, 0.05));
+    /* Avatar icons */
+    .avatar {
+        height: 45px;
+        width: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.05);
     }
 
-    /* Soft column bar look */
+    /* Toast Styling */
+    #toastContainer {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 1080;
+    }
+
+    /* Draggable Floating Button */
+    #dateFilterBtn {
+        transition: transform 0.3s ease;
+    }
+
+        #dateFilterBtn:hover {
+            transform: rotate(10deg) scale(1.05);
+        }
+
+    /* Highcharts Gradient Glow */
     .highcharts-point {
-        rx: 6px !important;
-        ry: 6px !important;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
     }
 
-    /* Line chart smooth curve */
-    .highcharts-series path {
-        stroke-width: 3 !important;
-        filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.05));
+    /* Modal custom */
+    .modal-content {
+        border-radius: 1rem;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
     }
 
-    /* Doughnut center label */
-    .highcharts-data-label text {
-        font-weight: 600;
-        fill: #444 !important;
+    .modal-header {
+        border-top-left-radius: 1rem;
+        border-top-right-radius: 1rem;
     }
 
-    /* Card titles */
-    .card-body h6 i {
-        opacity: 0.85;
+    /* Chart containers */
+    .chart-container {
+        height: 320px;
+        background: linear-gradient(135deg, #ffffff, #f9fafb);
+        border-radius: 1rem;
+        box-shadow: inset 0 0 20px rgba(240, 240, 255, 0.3);
+        transition: all 0.3s ease;
     }
 
+        .chart-container:hover {
+            transform: scale(1.01);
+        }
 
+    /* Table Enhancements */
+    #chartDataTable th {
+        text-align: center;
+        background: #212529 !important;
+        color: #fff;
+    }
+
+    #chartDataTable td {
+        text-align: center;
+    }
 </style>
 <div class="container-xxl flex-grow-1 container-p-y">
 
-    <!-- Floating Button -->
+    <!-- Floating Draggable Date Filter -->
     <button id="dateFilterBtn"
             class="btn btn-primary btn-lg rounded-circle shadow-lg position-fixed d-flex align-items-center justify-content-center ripple"
             style="top: 90px; right: 20px; width: 65px; height: 65px; z-index: 1050;">
         <i class="bi bi-calendar-date fs-3"></i>
     </button>
-
-    <!-- Hidden input just to trigger daterangepicker -->
     <input type="text" id="reportrange" style="display:none;" />
 
-    <!-- Stats Cards -->
-    <div class="py-4">
-        <!-- Warehouse / Rack / Bin / Section Cards -->
-        <div class="row g-6">
+    <!-- ====== Statistics Cards ====== -->
+    <div class="pb-4">
+        <div class="row g-4">
 
-            <!-- Warehouse -->
             <div class="col-sm-6 col-lg-3">
-                <div class="card card-border-shadow-primary h-100 border-0 position-relative overflow-hidden">
+                <div class="card card-border-shadow-primary hover-shadow position-relative">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2">
-                            <div class="avatar me-4">
-                                <span class="avatar-initial rounded bg-label-primary">
-                                    <i class="ri ri-building-4-line icon-24px"></i>
-                                </span>
+                            <div class="avatar bg-label-primary me-3">
+                                <i class="ri ri-building-4-line text-primary fs-5"></i>
                             </div>
-                            <h4 class="mb-0 fw-bold text-primary" id="WareHouse">25</h4>
+                            <h4 id="WareHouse" class="mb-0 fw-bold text-primary">0</h4>
                         </div>
-                        <h6 class="mb-0 fw-normal">Warehouses</h6>
-                        <p class="mb-0">
-                            <span class="text-success fw-medium">+12.5%</span>
-                            <small class="text-body-secondary">than last week</small>
-                        </p>
+                        <h6 class="text-muted">Warehouses</h6>
                     </div>
                     <div class="bottom-border bg-primary"></div>
                 </div>
             </div>
 
-            <!-- Rack -->
             <div class="col-sm-6 col-lg-3">
-                <div class="card card-border-shadow-success h-100 border-0 position-relative overflow-hidden">
+                <div class="card card-border-shadow-success hover-shadow position-relative">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2">
-                            <div class="avatar me-4">
-                                <span class="avatar-initial rounded bg-label-success">
-                                    <i class="ri ri-layout-column-line icon-24px"></i>
-                                </span>
+                            <div class="avatar bg-label-success me-3">
+                                <i class="ri ri-layout-column-line text-success fs-5"></i>
                             </div>
-                            <h4 class="mb-0 fw-bold text-success" id="Rack">120</h4>
+                            <h4 id="Rack" class="mb-0 fw-bold text-success">0</h4>
                         </div>
-                        <h6 class="mb-0 fw-normal">Racks</h6>
-                        <p class="mb-0">
-                            <span class="text-success fw-medium">+5.4%</span>
-                            <small class="text-body-secondary">than last week</small>
-                        </p>
+                        <h6 class="text-muted">Racks</h6>
                     </div>
                     <div class="bottom-border bg-success"></div>
                 </div>
             </div>
 
-            <!-- Bin -->
             <div class="col-sm-6 col-lg-3">
-                <div class="card card-border-shadow-warning h-100 border-0 position-relative overflow-hidden">
+                <div class="card card-border-shadow-warning hover-shadow position-relative">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2">
-                            <div class="avatar me-4">
-                                <span class="avatar-initial rounded bg-label-warning">
-                                    <i class="ri ri-box-3-line icon-24px"></i>
-                                </span>
+                            <div class="avatar bg-label-warning me-3">
+                                <i class="ri ri-box-3-line text-warning fs-5"></i>
                             </div>
-                            <h4 class="mb-0 fw-bold text-warning" id="Bins">2,450</h4>
+                            <h4 id="Bins" class="mb-0 fw-bold text-warning">0</h4>
                         </div>
-                        <h6 class="mb-0 fw-normal">Bins</h6>
-                        <p class="mb-0">
-                            <span class="text-danger fw-medium">-1.2%</span>
-                            <small class="text-body-secondary">than last week</small>
-                        </p>
+                        <h6 class="text-muted">Bins</h6>
                     </div>
                     <div class="bottom-border bg-warning"></div>
                 </div>
             </div>
 
-            <!-- Section -->
             <div class="col-sm-6 col-lg-3">
-                <div class="card card-border-shadow-info h-100 border-0 position-relative overflow-hidden">
+                <div class="card card-border-shadow-info hover-shadow position-relative">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2">
-                            <div class="avatar me-4">
-                                <span class="avatar-initial rounded bg-label-info">
-                                    <i class="ri ri-grid-line icon-24px"></i>
-                                </span>
+                            <div class="avatar bg-label-info me-3">
+                                <i class="ri ri-grid-line text-info fs-5"></i>
                             </div>
-                            <h4 class="mb-0 fw-bold text-info" id="Sections">56</h4>
+                            <h4 id="Section" class="mb-0 fw-bold text-info">0</h4>
                         </div>
-                        <h6 class="mb-0 fw-normal">Sections</h6>
-                        <p class="mb-0">
-                            <span class="text-success fw-medium">+3.1%</span>
-                            <small class="text-body-secondary">than last week</small>
-                        </p>
+                        <h6 class="text-muted">Sections</h6>
                     </div>
                     <div class="bottom-border bg-info"></div>
                 </div>
             </div>
-
         </div>
     </div>
 
-    <!-- Charts -->
-    <!-- Charts Section -->
+    <!-- ====== Charts Section ====== -->
     <div class="row g-4">
 
-        <!-- Inventory Stocks -->
         <div class="col-lg-6">
-            <div class="card shadow-sm border-0 rounded-4 p-3" style="background: #fff; box-shadow: 0 5px 25px rgba(0,0,0,0.05);">
-                    <h6 class="fw-bold mb-3 text-success">
-                        <i class="bi bi-bar-chart-fill me-2"></i>Inventory Stocks
-                    </h6>
-                    <div id="inventoryStocks" style="height: 300px; min-width: 280px;"></div>
+            <div class="card p-3 shadow-sm rounded-4">
+                <h6 class="fw-bold mb-3 text-success"><i class="bi bi-bar-chart-fill me-2"></i>Inventory Stocks</h6>
+                <div id="inventoryStocks" class="chart-container"></div>
             </div>
         </div>
 
-        <!-- Inventory Breakdown -->
         <div class="col-lg-6">
-            <div class="card shadow-sm border-0 rounded-4 p-3"
-                 style="background: #fff; box-shadow: 0 5px 25px rgba(0,0,0,0.05);">
-                <h6 class="fw-bold mb-3 text-warning">
-                    <i class="bi bi-pie-chart-fill me-2"></i>Inventory Breakdown
-                </h6>
-                <div id="inventoryBreakdown" style="height: 300px; min-width: 280px;"></div>
+            <div class="card p-3 shadow-sm rounded-4">
+                <h6 class="fw-bold mb-3 text-warning"><i class="bi bi-pie-chart-fill me-2"></i>Inventory Breakdown</h6>
+                <div id="inventoryBreakdown" class="chart-container"></div>
             </div>
-
         </div>
 
-        <!-- Issue in House -->
         <div class="col-lg-12">
-            <div class="card shadow-sm border-0 rounded-4 p-3" style="background: #fff; box-shadow: 0 5px 25px rgba(0,0,0,0.05);">
-               
-                    <h6 class="fw-bold mb-3 text-danger">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Issue in House
-                    </h6>
-                    <div id="issueHouse" style="height: 300px; min-width: 280px;"></div>
-             
+            <div class="card p-3 shadow-sm rounded-4">
+                <h6 class="fw-bold mb-3 text-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>Issue in House</h6>
+                <div id="issueHouse" class="chart-container"></div>
             </div>
         </div>
-
     </div>
-
 </div>
 
-
-
-<!-- Modal -->
-<div class="modal" id="chartModal" tabindex="-1" aria-labelledby="chartModalLabel" aria-hidden="true">
+<!-- ===== Modal ===== -->
+<div class="modal fade" id="chartModal" tabindex="-1" aria-labelledby="chartModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
-
-            <!-- Header -->
-            <div class="modal-header bg-primary text-white d-flex justify-content-center position-relative p-0">
-                <h5 class="modal-title m-0 flex-grow-1 text-center text-white py-3" id="chartModalLabel"></h5>
-                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3"
-                        data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header bg-primary text-white align-content-center" >
+                <h5 id="chartModalLabel" class="modal-title w-100 text-center text-white">Details</h5>
+                <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-
-            <!-- Body -->
             <div class="modal-body">
-                <table id="chartDataTable" class="table table-striped table-bordered" style="width:100%">
-                    <thead>
-                        <tr>
-                            <th>Item Name</th>
-                            <th>Item Code</th>
-                            <th>BinCode</th>
-                            <th>ItemsCounts</th>
-                            <th>Added Date</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+                <table id="chartDataTable" class="table table-striped table-bordered w-100"></table>
             </div>
         </div>
     </div>
 </div>
 
-
+<div id="toastContainer"></div>
 
 
 <script>
@@ -560,7 +506,7 @@
                     }
                 }
             );
-        }  else if (chartType === "IssueHouse") {
+        } else if (chartType === "IssueHouse") {
             columns.push(
                 { data: "ItemName", title: "Item Name" },
                 //{ data: "BinCode", title: "Bin" },
@@ -771,13 +717,13 @@
                         }
                     }
                 },
-                // EXCELn  
+                // EXCELn
                 // EXCEL EXPORT BUTTON
                 {
                     extend: 'excelHtml5',
                     text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
                     title: null,
-                    filename:'Inventory Report',
+                    filename: 'Inventory Report',
                     exportOptions: {
                         rows: function (idx, data, node) {
                             return $(node).find('.row-select').prop('checked');
@@ -999,6 +945,7 @@
     });
 
     // === Inventory Stocks - Modern Bar Chart ===
+    // === Inventory Stocks - Modern Bar Chart ===
     const inventoryChart = Highcharts.chart('inventoryStocks', {
         chart: {
             type: 'bar',
@@ -1017,6 +964,14 @@
         title: false,
         xAxis: {
             categories: ['Total Item', 'Low In Stock', 'Most In Stock'],
+            title: {
+                text: 'Inventory Status',
+                style: {
+                    color: '#444',
+                    fontWeight: '600',
+                    fontSize: '13px'
+                }
+            },
             labels: {
                 style: {
                     color: '#555',
@@ -1027,7 +982,14 @@
         },
         yAxis: {
             min: 0,
-            title: { text: null },
+            title: {
+                text: 'Number of Items',
+                style: {
+                    color: '#444',
+                    fontWeight: '600',
+                    fontSize: '13px'
+                }
+            },
             gridLineColor: 'rgba(0,0,0,0.05)'
         },
         legend: { enabled: false },
@@ -1072,8 +1034,8 @@
                     color: {
                         linearGradient: { x1: 0, y1: 0, x2: 1, y2: 1 },
                         stops: [
-                            [0, '#36D1DC'],   // Aqua Blue
-                            [1, '#5B86E5']    // Ocean Blue
+                            [0, '#36D1DC'],
+                            [1, '#5B86E5']
                         ]
                     }
                 },
@@ -1082,8 +1044,8 @@
                     color: {
                         linearGradient: { x1: 0, y1: 0, x2: 1, y2: 1 },
                         stops: [
-                            [0, '#F7971E'],   // Sunset Orange
-                            [1, '#FFD200']    // Warm Yellow
+                            [0, '#F7971E'],
+                            [1, '#FFD200']
                         ]
                     }
                 },
@@ -1092,8 +1054,8 @@
                     color: {
                         linearGradient: { x1: 0, y1: 0, x2: 1, y2: 1 },
                         stops: [
-                            [0, '#56ab2f'],   // Fresh Green
-                            [1, '#a8e063']    // Lime Green
+                            [0, '#56ab2f'],
+                            [1, '#a8e063']
                         ]
                     }
                 }
@@ -1101,7 +1063,7 @@
         }]
     });
 
-    
+
     // === Inventory Breakdown - Beautiful Pastel Doughnut Pie ===
     const inventoryBreakdownChart = Highcharts.chart('inventoryBreakdown', {
         chart: {
@@ -1366,15 +1328,17 @@
         var bin = $("#Bins");
         var Rack = $("#Rack");
         var WareHouse = $("#WareHouse");
+        var Section = $("#Section");
 
         bin.text(data.Bin);
         Rack.text(data.Rack);
         WareHouse.text(data.WareHouse);
+        Section.text(data.Section);
 
     });
 
 
-  
+
 
 </script>
 

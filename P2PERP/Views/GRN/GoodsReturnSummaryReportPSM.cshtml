@@ -2,41 +2,57 @@
     ViewBag.Title = "Goods Return Report";
 }
 
+<style>
+    /* Compact table */
+    .dataTable td, .dataTable th {
+        padding: 0.35rem 0.5rem !important;
+        font-size: 0.78rem !important;
+        vertical-align: middle;
+
+
+    }
+
+    td, th {
+        text-align: center !important;
+    }
+
+</style>
+
 <div class="container">
     <div class="card shadow-lg border-0 rounded-4 p-4">
         <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
-            <div class="mb-2">
+            <div class="mb-1">
                 <div class="input-group" style="max-width: 280px;">
                     <span class="input-group-text bg-primary text-white">
                         <i class="bi bi-calendar-date"></i>
                     </span>
-                    <input type="text" id="SecondreportrangePSM" class="form-control" readonly placeholder="Select Date" />
+                    <input type="text" id="SecondreportrangePSM" class="form-control" readonly placeholder="Select Date Range" />
                 </div>
             </div>
             <div class="flex-grow-1 text-center">
-                <h4 class="text-primary fw-bold mb-0">
-                    <i class="bi bi-pie-chart-fill me-2"></i> Goods Return Report
-                </h4>
+                <h3 class="text-primary mb-0">
+                    Goods Return Report
+                </h3>
             </div>
-            <div class="mb-2" style="width:280px;"></div>
+            <div class="mb-1" style="width:280px;"></div>
         </div>
 
         <!-- Chart -->
         <div class="position-relative border rounded-3 p-3 shadow-sm mb-4">
-            <div id="GoodsReturnChartsPSM" style="height:400px;"></div>
+            <div class="w-80" id="GoodsReturnChartsPSM" style="height:350px;"></div>
         </div>
 
         <!-- DataTable -->
-        <h5 class="text-primary fw-bold text-center mb-3">Goods Return Detailed Records</h5>
+        <h3 class="text-primary text-center mb-3">Goods Return Records</h3>
         <div class="table-responsive">
             <table id="GoodsReturntablePSM" class="table table-striped text-center table-bordered w-100">
                 <thead class="table-dark text-center">
                     <tr>
                         <th><input type="checkbox" id="selectAll" /></th>
                         <th class="text-center">SR.No</th>
-                        <th class="text-center">Goods Return Code</th>
+                        <th class="text-center">GR.Code</th>
                         <th class="text-center">Transporter Name</th>
-                        <th class="text-center">Transport Contact No</th>
+                        <th class="text-center">Contact No</th>
                         <th class="text-center">Vehicle No</th>
                         <th class="text-center">Vehicle Type</th>
                         <th class="text-center">Reason</th>
@@ -181,19 +197,15 @@ async function loadChart(fromDate, toDate) {
                 }
             },
             title: {
-                text: 'Goods Return Summary',
-                align: 'center',
-                style: {
-                    fontSize: '16px',
-                    fontWeight: 'bold'
-                }
+                text: null,
             },
             subtitle: {
                 text: `Total: ${totalCount} Returns`,
                 align: 'center',
                 style: {
-                    fontSize: '12px',
-                    color: '#666'
+                    fontSize: '16px',
+                    color: '#666',
+                    fontWeight: 'bold'
                 }
             },
             tooltip: {
@@ -320,10 +332,10 @@ function initTable(fromDate, toDate, statusFilter = null) {
                         today.getFullYear();
                     $body.find('h1').after('<div style="text-align:center;font-style:italic;font-size:10pt;margin-bottom:12px;">Generated Date: ' + formattedDate + '</div>');
 
-                    // Add status filter info if applied
-                    if (selectedStatus) {
-                        $body.find('h1').after('<div style="text-align:center;font-style:italic;font-size:10pt;margin-bottom:8px;">Filtered by Status: ' + selectedStatus + '</div>');
-                    }
+                    //// Add status filter info if applied
+                    //if (selectedStatus) {
+                    //    $body.find('h1').after('<div style="text-align:center;font-style:italic;font-size:10pt;margin-bottom:8px;">Filtered by Status: ' + selectedStatus + '</div>');
+                    //}
 
                     var $table = $body.find('table');
                     $table.addClass('table table-bordered table-striped').css('width', '100%');
@@ -377,19 +389,19 @@ function initTable(fromDate, toDate, statusFilter = null) {
                     }
                 },
                 customize: function (doc) {
-                    // Add status filter info if applied
-                    if (selectedStatus) {
-                        doc.content.splice(1, 0, {
-                            text: `Filtered by Status: ${selectedStatus}`,
-                            alignment: 'center',
-                            margin: [0, 0, 0, 8],
-                            fontSize: 10,
-                            bold: true
-                        });
-                    }
+                    //// Add status filter info if applied
+                    //if (selectedStatus) {
+                    //    doc.content.splice(1, 0, {
+                    //        text: `Filtered by Status: ${selectedStatus}`,
+                    //        alignment: 'center',
+                    //        margin: [0, 0, 0, 8],
+                    //        fontSize: 10,
+                    //        bold: true
+                    //    });
+                    //}
 
                     doc.content.splice(selectedStatus ? 2 : 1, 0, {
-                        text: `Generated on: ${moment().format("DD-MM-YYYY HH:mm")}`,
+                        text: `Generated Date: ${moment().format("DD-MM-YYYY")}`,
                         alignment: 'center',
                         margin: [0, 0, 0, 12],
                         fontSize: 9,

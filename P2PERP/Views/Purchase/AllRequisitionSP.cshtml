@@ -2,53 +2,129 @@
     ViewBag.Title = "All Requisitions";
 }
 
+<style>
+    .form-control, .form-select {
+        border-radius: 0.5rem;
+        border: 1px solid #ced4da;
+        transition: all 0.3s ease;
+    }
+
+        .form-control:focus, .form-select:focus {
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+            border-color: #86b7fe;
+        }
+
+    .btn {
+        border-radius: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .card {
+        border: none;
+    }
+
+    .table th {
+        border-top: none;
+        font-weight: 600;
+    }
+
+    .table-responsive {
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+
+    /*  Compact Table Row Size */
+    .table td, .table th {
+        padding: 0.35rem 0.5rem !important;
+        font-size: 0.78rem;
+        vertical-align: middle;
+    }
+
+    .btn-delete {
+        padding: 2px 6px !important;
+        font-size: 0.70rem !important;
+    }
+
+        .btn-delete i {
+            font-size: 0.75rem !important;
+        }
+
+
+    @@media (max-width: 768px) {
+        .form-control, .form-select, .btn, .table td, .table th {
+            font-size: 0.85rem;
+        }
+    }
+</style>
 <div class="container mt-3">
 
-    <!-- Navigation Tabs -->
-    <ul class="nav nav-pills nav-justified small-tabs" id="stockTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active py-1 px-2 fs-6" data-bs-toggle="tab" data-bs-target="#current" type="button" role="tab">
-                <i class="bi bi-list-ul me-1"></i> All PR
-            </button>
-        </li>
+    <div class="card shadow-sm">
+        <div class="card-header p-0">
+            <!-- Navigation Tabs -->
+            <ul class="nav nav-pills nav-justified small-tabs" id="stockTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#current" type="button" role="tab">
+                        <i class="bi bi-list-ul me-1"></i> All PR
+                    </button>
+                </li>
 
-        <li class="nav-item" role="presentation">
-            <button class="nav-link py-1 px-2 fs-6" data-bs-toggle="tab" data-bs-target="#createpr" type="button" role="tab">
-                <i class="bi bi-plus-circle me-1"></i> Create New PR
-            </button>
-        </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link " data-bs-toggle="tab" data-bs-target="#createpr" type="button" role="tab">
+                        <i class="bi bi-plus-circle me-1"></i> Create New PR
+                    </button>
+                </li>
 
-        <li class="nav-item" role="presentation">
-            <button class="nav-link py-1 px-2 fs-6" data-bs-toggle="tab" data-bs-target="#pendingpr" type="button" role="tab">
-                <i class="bi bi-hourglass-split me-1"></i> Pending PR
-            </button>
-        </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link " data-bs-toggle="tab" data-bs-target="#pendingpr" type="button" role="tab">
+                        <i class="bi bi-hourglass-split me-1"></i> Pending PR
+                    </button>
+                </li>
 
-        <li class="nav-item" role="presentation">
-            <button class="nav-link py-1 px-2 fs-6" data-bs-toggle="tab" data-bs-target="#approvedpr" type="button" role="tab">
-                <i class="bi bi-check-circle me-1"></i> Approved PR
-            </button>
-        </li>
-    </ul>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#approvedpr" type="button" role="tab">
+                        <i class="bi bi-check-circle me-1"></i> Approved PR
+                    </button>
+                </li>
 
-    <!-- Tab Content -->
-    <div class="tab-content mt-3">
-        <div class="tab-pane fade show active" id="current" role="tabpanel">
-            @Html.Partial("_AllPRSP")
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#rejectpr" type="button" role="tab">
+                        <i class="bi bi-check-circle me-1"></i> Rejected PR
+                    </button>
+                </li>
+            </ul>
         </div>
 
-        <div class="tab-pane fade" id="createpr" role="tabpanel">
-            @Html.Partial("_CreatePR")
-        </div>
+        <div class="card-body">
+            <!-- Tab Content -->
+            <div class="tab-content mt-2">
+                <div class="tab-pane fade show active" id="current" role="tabpanel">
+                    @Html.Partial("_AllPRSP")
+                </div>
 
-        <div class="tab-pane fade" id="pendingpr" role="tabpanel">
-            @Html.Partial("_PendingPRSP")
-        </div>
+                <div class="tab-pane fade" id="createpr" role="tabpanel">
+                    @Html.Partial("_CreatePR")
+                </div>
 
-        <div class="tab-pane fade" id="approvedpr" role="tabpanel">
-            @Html.Partial("_ApprovedPRSP")
+                <div class="tab-pane fade" id="pendingpr" role="tabpanel">
+                    @Html.Partial("_PendingPRSP")
+                </div>
+
+                <div class="tab-pane fade" id="approvedpr" role="tabpanel">
+                    @Html.Partial("_ApprovedPRSP")
+                </div>
+
+                <div class="tab-pane fade" id="rejectpr" role="tabpanel">
+                    @Html.Partial("_Rejectpr")
+                </div>
+            </div>
         </div>
     </div>
+
 </div>
 
 <!-- Make tabs small without changing Bootstrap colors -->

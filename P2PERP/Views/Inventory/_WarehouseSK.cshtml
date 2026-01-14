@@ -2,23 +2,22 @@
     <div class="flex-grow-1 text-center">
         <h4 class="mb-0 h3 text-primary">Warehouse List</h4>
     </div>
-    <button class="btn btn-success" id="btnAddWarehouse">
+    <button class="btn btn-sm btn-success" id="btnAddWarehouse">
         <i class="bi bi-plus-circle"></i> Add Warehouse
     </button>
 </div>
 
 <style>
-    button.dt-button.processing,
+    .button.dt-button.processing,
     div.dt-button.processing {
         pointer-events: auto !important;
         opacity: 1 !important;
         background: none !important;
     }
 
-        button.dt-button.processing:after {
-            content: none !important;
-        }
-
+    button.dt-button.processing:after {
+        content: none !important;
+    }
 
     /* Fix double border for input-group-merge */
     .input-group-merge .form-control,
@@ -54,9 +53,27 @@
         button.dt-button.processing:after {
             content: none !important;
         }
+
     .text-red {
         color: red;
     }
+
+    /* Style for view modal labels */
+    .form-control-plaintext.bg-light {
+        min-height: 38px;
+        display: flex;
+        align-items: center;
+        word-break: break-word;
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+        padding: 0.375rem 0.75rem;
+    }
+
+        .form-control-plaintext.bg-light:empty::before {
+            content: "-";
+            color: #6c757d;
+            font-style: italic;
+        }
 </style>
 
 <div class="table-responsive">
@@ -84,98 +101,86 @@
 </div>
 
 <!-- Add/Edit Warehouse Modal -->
+
 <div class="modal fade" id="addWarehouseModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white position-relative py-2">
-                <h5 class="modal-title h5 text-white text-center mb-1 w-100" id="warehouseModalTitle" style="line-height: 1.2;">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content shadow-lg rounded-3">
+            <!-- Header -->
+            <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-1">
+                <h5 class="modal-title fw-bold text-white mb-0 fs-5" id="warehouseModalTitle">
                     Add Warehouse
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+
+            <!-- Body -->
             <div class="modal-body">
                 <form id="addWarehouseForm" class="row g-3">
                     <div class="col-md-6">
-                        <label for="WarehouseCode">Warehouse Code <span class="text-red">*</span></label>
-                        <div class="form-floating form-floating-outline  mb-3">
-                            <input type="text" class="form-control bg-gray " id="WarehouseCode" name="WarehouseCode" readonly>
-
-                        </div>
+                        <label for="WarehouseCode" class="form-label fw-bold text-dark">Warehouse Code <span class="text-red">*</span></label>
+                        <input type="text" class="form-control form-control-sm text-dark shadow-sm bg-light" id="WarehouseCode" placeholder="Warehouse Code" name="WarehouseCode" readonly>
                     </div>
-                    <div class="col-md-6">
-                        <label for="WarehouseName">Warehouse Name <span class="text-red">*</span></label>
-                        <div class="form-floating form-floating-outline mb-3">
-                            <input type="text" class="form-control" id="WarehouseName" name="WarehouseName">
 
-                        </div>
+                    <div class="col-md-6">
+                        <label for="WarehouseName" class="form-label fw-bold text-dark">Warehouse Name <span class="text-red">*</span></label>
+                        <input type="text" class="form-control form-control-sm text-dark shadow-sm" placeholder="Enter Warehouse Name" id="WarehouseName" name="WarehouseName">
                         <span id="WarehouseNameError" class="text-danger d-none"></span>
                     </div>
-                    <div class="col-12">
-                        <label for="Address">Address <span class="text-red">*</span></label>
-                        <div class="form-floating form-floating-outline mb-3">
-                            <input type="text" class="form-control" id="Address" name="Address">
 
-                        </div>
+                    <div class="col-12">
+                        <label for="Address" class="form-label fw-bold text-dark">Address <span class="text-red">*</span></label>
+                        <input type="text" class="form-control form-control-sm text-dark shadow-sm" placeholder="Enter Warehouse Address" id="Address" name="Address">
                         <span id="WarehouseAddressError" class="text-danger d-none"></span>
                     </div>
-                    <div class="col-md-4">
-                        <label for="CountryId">Country <span class="text-red">*</span></label>
-                        <div class="form-floating form-floating-outline mb-3">
-                            <select class="form-select h-auto" id="CountryId" name="CountryCode">
-                                <option value="">-- Select Country --</option>
-                            </select>
 
-                        </div>
+                    <div class="col-md-4">
+                        <label for="CountryId" class="form-label fw-bold text-dark">Country <span class="text-red">*</span></label>
+                        <select class="form-select form-select-sm shadow-sm" id="CountryId" name="CountryCode">
+                            <option value="">-- Select Country --</option>
+                        </select>
                         <span id="WarehouseCountryError" class="text-danger d-none"></span>
                     </div>
-                    <div class="col-md-4">
-                        <label for="StateId">State <span class="text-red">*</span></label>
-                        <div class="form-floating form-floating-outline mb-3">
-                            <select class="form-select" id="StateId" name="StateCode">
-                                <option value="">-- Select State --</option>
-                            </select>
 
-                        </div>
+                    <div class="col-md-4">
+                        <label for="StateId" class="form-label fw-bold text-dark">State <span class="text-red">*</span></label>
+                        <select class="form-select form-select-sm shadow-sm" id="StateId" name="StateCode">
+                            <option value="">-- Select State --</option>
+                        </select>
                         <span id="WarehouseStateError" class="text-danger d-none"></span>
                     </div>
-                    <div class="col-md-4">
-                        <label for="CityId">City <span class="text-red">*</span></label>
-                        <div class="form-floating form-floating-outline mb-3">
-                            <select class="form-select" id="CityId" name="CityId">
-                                <option value="">-- Select City --</option>
-                            </select>
 
-                        </div>
+                    <div class="col-md-4">
+                        <label for="CityId" class="form-label fw-bold text-dark">City <span class="text-red">*</span></label>
+                        <select class="form-select form-select-sm shadow-sm" id="CityId" name="CityId">
+                            <option value="">-- Select City --</option>
+                        </select>
                         <span id="WarehouseCityError" class="text-danger d-none"></span>
                     </div>
-                    <div class="col-md-6">
-                        <label for="Phone">Phone <span class="text-red">*</span></label>
-                        <div class="form-floating form-floating-outline mb-3">
-                            <input type="number" class="form-control" id="Phone" name="Phone" pattern="[0-9]{10}" placeholder="Enter 10-digit phone">
 
-                        </div>
+                    <div class="col-md-6">
+                        <label for="Phone" class="form-label fw-bold text-dark">Phone <span class="text-red">*</span></label>
+                        <input type="number" class="form-control form-control-sm text-dark shadow-sm" id="Phone" name="Phone" placeholder="Enter 10-digit phone">
                         <span id="WarehousePhoneError" class="text-danger d-none"></span>
                     </div>
-                    <div class="col-md-6">
-                        <label for="Email">Email <span class="text-red">*</span></label>
-                        <div class="form-floating form-floating-outline mb-3">
-                            <input type="email" class="form-control" id="Email" name="Email">
 
-                        </div>
+                    <div class="col-md-6">
+                        <label for="Email" class="form-label fw-bold text-dark">Email <span class="text-red">*</span></label>
+                        <input type="email" class="form-control form-control-sm text-dark shadow-sm" id="Email" name="Email" placeholder="Enter Email">
                         <span id="WarehouseEmailError" class="text-danger d-none"></span>
                     </div>
-                    <div class="col-12">
-                        <label for="Description">Description</label>
-                        <div class="form-floating form-floating-outline mb-3">
-                            <textarea class="form-control" id="Description" name="Description" rows="3"></textarea>
 
-                        </div>
+                    <div class="col-12">
+                        <label for="Description" class="form-label fw-bold text-dark">Description <span class="text-red">*</span></label>
+                        <textarea class="form-control form-control-sm text-dark shadow-sm" id="Description" name="Description" rows="3" placeholder="Enter at least 5 words"></textarea>
+                        <span id="WarehouseDescriptionError" class="text-danger d-none"></span>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <button type="submit" form="addWarehouseForm" class="btn btn-success px-4" id="warehouseModalSubmitBtn">
-                    <i class="bi bi-check-circle me-2 text-white"></i>Save
+
+            <!-- Footer -->
+            <div class="modal-footer justify-content-center">
+                <button type="submit" form="addWarehouseForm" class="btn btn-sm btn-success px-4">
+                    <i class="bi bi-check-circle me-2 text-white"></i> Save
                 </button>
             </div>
         </div>
@@ -183,87 +188,73 @@
 </div>
 
 <!-- View Warehouse Modal -->
+<!-- View Warehouse Modal -->
 <div class="modal fade" id="viewWarehouseModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white position-relative py-2">
-                <h5 class="modal-title h5 text-white text-center mb-1 w-100" style="line-height: 1.2;">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content shadow-lg rounded-3">
+
+            <!-- Header -->
+            <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-1">
+                <h5 class="modal-title fw-bold text-white mb-0 fs-5" id="warehouseViewTitle">
                     Warehouse Details
                 </h5>
-                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+
+            <!-- Body -->
             <div class="modal-body">
-                <form class="row g-3">
+                <div class="row g-3">
                     <div class="col-md-6">
-                        <label for="vwCode">Warehouse Code</label>
-                        <div class="form-floating form-floating-outline mb-3">
-                            <input type="text" class="form-control" id="vwCode" readonly>
-
-                        </div>
+                        <label class="form-label fw-bold text-dark">Warehouse Code</label>
+                        <div class="text-dark" id="vwCode">-</div>
                     </div>
+
                     <div class="col-md-6">
-                        <label for="vwName">Warehouse Name</label>
-                        <div class="form-floating form-floating-outline mb-3">
-                            <input type="text" class="form-control" id="vwName" readonly>
-
-                        </div>
+                        <label class="form-label fw-bold text-dark">Warehouse Name</label>
+                        <div class="text-dark" id="vwName">-</div>
                     </div>
+
                     <div class="col-12">
-                        <label for="vwAddress">Address</label>
-                        <div class="form-floating form-floating-outline mb-3">
-                            <textarea class="form-control" id="vwAddress" rows="2" readonly></textarea>
-
-                        </div>
+                        <label class="form-label fw-bold text-dark">Address</label>
+                        <div class="text-dark" id="vwAddress">-</div>
                     </div>
+
                     <div class="col-md-6">
-                        <label for="vwCity">City</label>
-                        <div class="form-floating form-floating-outline mb-3">
-                            <input type="text" class="form-control" id="vwCity" readonly>
-
-                        </div>
+                        <label class="form-label fw-bold text-dark">City</label>
+                        <div class="text-dark" id="vwCity">-</div>
                     </div>
+
                     <div class="col-md-6">
-                        <label for="vwPhone">Phone</label>
-                        <div class="form-floating form-floating-outline mb-3">
-                            <input type="text" class="form-control" id="vwPhone" readonly>
-
-                        </div>
+                        <label class="form-label fw-bold text-dark">Phone</label>
+                        <div class="text-dark" id="vwPhone">-</div>
                     </div>
+
                     <div class="col-md-6">
-                        <label for="vwEmail">Email</label>
-                        <div class="form-floating form-floating-outline mb-3">
-                            <input type="text" class="form-control" id="vwEmail" readonly>
-
-                        </div>
+                        <label class="form-label fw-bold text-dark">Email</label>
+                        <div class="text-dark" id="vwEmail">-</div>
                     </div>
+
                     <div class="col-12">
-                        <label for="vwDesc">Description</label>
-                        <div class="form-floating form-floating-outline mb-3">
-                            <textarea class="form-control" id="vwDesc" rows="2" readonly></textarea>
-
-                        </div>
+                        <label class="form-label fw-bold text-dark">Description</label>
+                        <div class="text-dark" id="vwDesc">-</div>
                     </div>
+
                     <div class="col-md-6">
-                        <label for="vwAddedDates">Added Date</label>
-                        <div class="form-floating form-floating-outline mb-3">
-                            <input type="text" class="form-control" id="vwAddedDates" readonly>
-
-                        </div>
+                        <label class="form-label fw-bold text-dark">Added Date</label>
+                        <div class="text-dark" id="vwAddedDates">-</div>
                     </div>
+
                     <div class="col-md-6">
-                        <label for="vwAddedBy">Added By</label>
-                        <div class="form-floating form-floating-outline mb-3">
-                            <input type="text" class="form-control" id="vwAddedBy" readonly>
-
-                        </div>
+                        <label class="form-label fw-bold text-dark">Added By</label>
+                        <div class="text-dark" id="vwAddedBy">-</div>
                     </div>
-                </form>
+                </div>
             </div>
+
         </div>
     </div>
 </div>
-
-
 <script>
     $(document).ready(function () {
         // ================= CONFIGURATION & CONSTANTS =================
@@ -401,9 +392,16 @@
                         errorId: 'WarehouseEmailError',
                         value: $form.find("#Email").val().trim(),
                         required: true,
-
                         message: 'Email is required.'
-
+                    },
+                    {
+                        id: 'Description',
+                        errorId: 'WarehouseDescriptionError',
+                        value: $form.find("#Description").val().trim(),
+                        required: true,
+                        minWords: 5,
+                        message: 'Description is required.',
+                        minWordsMessage: 'Description must contain at least 5 words.'
                     }
                 ];
 
@@ -415,6 +413,14 @@
                     } else if (field.pattern && !field.pattern.test(field.value)) {
                         utils.showFieldError(field.id, field.errorId, field.patternMessage);
                         isValid = false;
+                    } else if (field.minWords) {
+                        const wordCount = field.value.split(/\s+/).filter(word => word.length > 0).length;
+                        if (wordCount < field.minWords) {
+                            utils.showFieldError(field.id, field.errorId, field.minWordsMessage);
+                            isValid = false;
+                        } else {
+                            utils.clearFieldError(field.id, field.errorId);
+                        }
                     } else {
                         utils.clearFieldError(field.id, field.errorId);
                     }
@@ -422,6 +428,7 @@
 
                 return isValid;
             }
+
         };
 
         // ================= DATA TABLE INITIALIZATION =================
@@ -798,7 +805,8 @@
                 });
             });
         }
-        //========= Date Range Picker====
+
+        // ================= DATE RANGE PICKER =================
         function addDateRangePicker() {
             $('#warehouseTable_wrapper').prepend(`
         <div class="input-group mb-2 mt-3" style="max-width: 280px;">
@@ -852,6 +860,7 @@
         }
 
         // ================= EVENT HANDLERS =================
+        // ================= EVENT HANDLERS =================
         function setupEventHandlers() {
             // Checkbox selection
             $("#WHselectAll").on("change", function () {
@@ -864,9 +873,12 @@
                 $("#WHselectAll").prop("checked", selectedWarehouseIds.size === $(".row-select").length);
             });
 
-            // Location dropdowns
+            // Location dropdowns with proper error clearing
             $('#CountryId').change(function () {
                 const countryCode = $(this).val();
+                // Clear country error
+                utils.clearFieldError('CountryId', 'WarehouseCountryError');
+
                 if (!countryCode) {
                     $("#StateId, #CityId").empty().append('<option value="">-- Select --</option>');
                     return;
@@ -884,6 +896,9 @@
                 const countryCode = $('#CountryId').val();
                 const stateCode = $(this).val();
 
+                // Clear state error
+                utils.clearFieldError('StateId', 'WarehouseStateError');
+
                 $.getJSON(CONFIG.urls.getCities, { countryCode, stateCode }, function (data) {
                     const cities = typeof data === "string" ? JSON.parse(data) : data;
                     $('#CityId').empty().append('<option value="">Select City</option>');
@@ -893,11 +908,31 @@
                 });
             });
 
+            $('#CityId').change(function () {
+                // Clear city error
+                utils.clearFieldError('CityId', 'WarehouseCityError');
+            });
+
             // Form interactions - Clear errors when user starts typing
             $(document).on("input change", "#addWarehouseForm .form-control, #addWarehouseForm .form-select", function () {
                 const fieldId = $(this).attr("id");
+                const fieldName = $(this).attr("name");
+
                 if (fieldId) {
-                    utils.clearFieldError(fieldId, `Warehouse${fieldId}Error`);
+                    // Handle different field types and their error IDs
+                    let errorId;
+
+                    if (fieldName === 'CountryCode') {
+                        errorId = 'WarehouseCountryError';
+                    } else if (fieldName === 'StateCode') {
+                        errorId = 'WarehouseStateError';
+                    } else if (fieldName === 'CityId') {
+                        errorId = 'WarehouseCityError';
+                    } else {
+                        errorId = `Warehouse${fieldId}Error`;
+                    }
+
+                    utils.clearFieldError(fieldId, errorId);
                 }
             });
 
@@ -996,18 +1031,51 @@
             });
         }
 
+        //function handleFormError(res) {
+        //    utils.clearFieldError("WarehouseName", "WarehouseNameError");
+        //    const msg = (res || "").toLowerCase();
+        //    if (msg.includes("already exist") || msg.includes("duplicate") || msg.includes("exists")) {
+        //        utils.showFieldError("WarehouseName", "WarehouseNameError", "Warehouse Name already exists.");
+        //    } else {
+        //        utils.showFieldError("WarehouseName", "WarehouseNameError", message || "Something went wrong while saving Warehouse.");
+        //    }
+        //}
+
         function handleFormError(res) {
             utils.clearAllErrors(CONFIG.selectors.form);
 
             if (res.field) {
-                const fieldId = res.field === 'WarehouseName' ? 'WarehouseName' : res.field;
-                utils.showFieldError(fieldId, `Warehouse${fieldId}Error`, res.message || "This field has an error.");
+                let fieldId = res.field;
+                let errorId = `Warehouse${fieldId}Error`;
+
+                // Special field mappings
+                if (res.field === 'WarehouseName') {
+                    fieldId = 'WarehouseName';
+                    errorId = 'WarehouseNameError';
+                } else if (res.field === 'CountryCode') {
+                    fieldId = 'CountryId';
+                    errorId = 'WarehouseCountryError';
+                } else if (res.field === 'StateCode') {
+                    fieldId = 'StateId';
+                    errorId = 'WarehouseStateError';
+                } else if (res.field === 'Description') {
+                    fieldId = 'Description';
+                    errorId = 'WarehouseDescriptionError';
+                }
+
+                // Show error with hardcoded message
+                utils.showFieldError(fieldId, errorId, "This Name Is Already Exists!.");
 
                 // Scroll to the error field
                 const $input = $(`#${fieldId}`);
                 $('html, body').animate({ scrollTop: $input.offset().top - 100 }, 300);
             } else {
-                Swal.fire({ title: "Error", text: res.message, icon: "error", confirmButtonText: "OK" });
+                Swal.fire({
+                    title: "Error",
+                    text: "Something went wrong while saving Warehouse.",
+                    icon: "error",
+                    confirmButtonText: "OK"
+                });
             }
         }
 
@@ -1025,25 +1093,24 @@
         }
 
         function populateViewModal(data) {
-            $("#vwCode").val(data.WarehouseCode);
-            $("#vwName").val(data.WarehouseName);
-            $("#vwAddress").val(data.Address);
-            $("#vwPhone").val(data.Phone);
-            $("#vwEmail").val(data.Email);
-            $("#vwDesc").val(data.Description);
-            $("#vwAddedDates").val(utils.formatSqlDate(data.AddedDate));
-            $("#vwAddedBy").val(data.AddedBy);
+            $("#vwCode").text(data.WarehouseCode || "-");
+            $("#vwName").text(data.WarehouseName || "-");
+            $("#vwAddress").text(data.Address || "-");
+            $("#vwPhone").text(data.Phone || "-");
+            $("#vwEmail").text(data.Email || "-");
+            $("#vwDesc").text(data.Description || "-");
+            $("#vwAddedDates").text(utils.formatSqlDate(data.AddedDate) || "-");
+            $("#vwAddedBy").text(data.AddedBy || "-");
 
             // Load city name
             if (data.CountryCode && data.StateCode && data.CityId) {
                 $.get(CONFIG.urls.getCities, { countryCode: data.CountryCode, stateCode: data.StateCode, CityId: data.CityId }, function (cityRes) {
-                    $("#vwCity").val(cityRes && cityRes.Name ? cityRes.Name : "N/A");
+                    $("#vwCity").text(cityRes && cityRes.Name ? cityRes.Name : "N/A");
                 });
             } else {
-                $("#vwCity").val("N/A");
+                $("#vwCity").text("N/A");
             }
         }
-
         function editWarehouse(id) {
             $.get(CONFIG.urls.viewWarehouse, { id }, function (res) {
                 if (res.success) {
@@ -1118,7 +1185,7 @@
 
             swalWithBootstrapButtons.fire({
                 title: "Are you sure?",
-                text: "You won't be able to revert this!",
+                text: "You Delete Warehouse!",
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonText: "Yes",
@@ -1158,9 +1225,20 @@
         function initialize() {
             initializeDataTable();
             setupEventHandlers();
-            setTimeout(utils.initTooltips, 500);
-        }
 
+            // Tooltip initialization and refresh
+            setTimeout(utils.initTooltips, 500);
+
+            // Refresh tooltips whenever modal closes
+            $(document).on('hidden.bs.modal', function () {
+                setTimeout(utils.initTooltips, 300);
+            });
+
+            // Refresh tooltips on table updates
+            $(document).on('draw.dt', function () {
+                setTimeout(utils.initTooltips, 200);
+            });
+        }
         // Start the application
         initialize();
     });

@@ -246,7 +246,7 @@
                 });
             });
 
-            // Approve PO on this page
+            // Approve PO on this page 
             $("#btnApprove").click(function () {
                 Swal.fire({
                     title: 'Approve Purchase Order?',
@@ -262,7 +262,23 @@
                     buttonsStyling: false
                 }).then((result) => {
                     if (result.isConfirmed) {
+
+                        // ✅ Show loading popup before sending request
+                        Swal.fire({
+                            title: 'Sending POS...',
+                            text: 'Please wait while email is sending to vendor..',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        // ✅ Your existing AJAX call
                         $.post('/Purchase/ApprovePONAM', { poCode }, function (res) {
+
+                            // ✅ Close loader after response
+                            Swal.close();
+
                             if (res.success) {
                                 // First success alert
                                 Swal.fire({
@@ -288,6 +304,7 @@
                     }
                 });
             });
+
 
 
 

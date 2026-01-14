@@ -9,22 +9,22 @@
             <div class="col-md-3">
                 <label class="form-label fw-bold">GR No</label>
                 @Html.HiddenFor(m => m.GoodReturnCode)
-                <div class="form-control bg-light">@Model.GoodReturnCode</div>
+                <div class="form-control form-control-sm bg-light">@Model.GoodReturnCode</div>
             </div>
             <div class="col-md-3">
                 <label class="form-label fw-bold">GRN Code</label>
                 @Html.HiddenFor(m => m.GRNCode)
-                <div class="form-control bg-light">@Model.GRNCode</div>
+                <div class="form-control form-control-sm bg-light">@Model.GRNCode</div>
             </div>
             <div class="col-md-3">
                 <label class="form-label fw-bold">PO Code</label>
                 @Html.HiddenFor(m => m.POCode)
-                <div class="form-control bg-light">@Model.POCode</div>
+                <div class="form-control form-control-sm bg-light">@Model.POCode</div>
             </div>
             <div class="col-md-3">
                 <label class="form-label fw-bold">Vendor</label>
                 @Html.HiddenFor(m => m.VendorName)
-                <div class="form-control bg-light">@Model.VendorName</div>
+                <div class="form-control form-control-sm bg-light">@Model.VendorName</div>
             </div>
         </div>
 
@@ -32,7 +32,7 @@
         <div class="row g-3 mb-4">
             <div class="col-md-6">
                 <label class="form-label fw-bold">Company Address</label>
-                <div class="form-control bg-light address"></div>
+                <div class="form-control form-control-sm bg-light address"></div>
             </div>
         </div>
 
@@ -40,12 +40,12 @@
         <div class="row g-3 mb-4">
             <div class="col-md-6">
                 <label class="form-label fw-bold">Transport Name<span class="text-danger">*</span></label>
-                @Html.TextBoxFor(m => m.TransportName, new { @class = "form-control transport-name", placeholder = "Enter Transporter Name" })
+                @Html.TextBoxFor(m => m.TransportName, new { @class = "form-control form-control-sm transport-name", placeholder = "Enter Transporter Name" })
                 <span class="text-danger error-msg"></span>
             </div>
             <div class="col-md-6">
                 <label class="form-label fw-bold">Transport Contact<span class="text-danger">*</span></label>
-                @Html.TextBoxFor(m => m.TransportContact, new { @class = "form-control transport-contact", placeholder = "Enter Transport Contact" , type="number"})
+                @Html.TextBoxFor(m => m.TransportContact, new { @class = "form-control form-control-sm transport-contact", placeholder = "Enter Transport Contact" , type="number"})
                 <span class="text-danger error-msg"></span>
             </div>
             <div class="col-md-6">
@@ -53,12 +53,12 @@
                 @Html.DropDownListFor(m => m.VehicleType,
                     Enumerable.Empty<SelectListItem>(),
                     "Select Vehicle Type",
-                    new { @class = "form-select vehicle-type", id = "vehicleType" })
+                    new { @class = "form-select form-select-sm vehicle-type", id = "vehicleType" })
                 <span class="text-danger error-msg"></span>
             </div>
             <div class="col-md-6">
                 <label class="form-label fw-bold">Vehicle No<span class="text-danger">*</span></label>
-                @Html.TextBoxFor(m => m.VehicleNo, new { @class = "form-control vehicle-no", placeholder = "Enter Vehicle No" })
+                @Html.TextBoxFor(m => m.VehicleNo, new { @class = "form-control form-control-sm vehicle-no", placeholder = "Enter Vehicle No" })
                 <span class="text-danger error-msg"></span>
             </div>
         </div>
@@ -68,6 +68,7 @@
             <table id="DispatchGoods" class="table table-bordered table-hover align-middle shadow-sm">
                 <thead class="table-primary text-center table-dark">
                     <tr>
+                        <th>Sr.No</th>
                         <th>Item Name</th>
                         <th>Ordered Qty</th>
                         <th>UOM</th>
@@ -81,11 +82,12 @@
                         for (int i = 0; i < Model.Items.Count; i++)
                         {
                             <tr>
+                                <td>@(i + 1)</td>
                                 <td>@Html.HiddenFor(m => m.Items[i].ItemName) @Model.Items[i].ItemName</td>
                                 <td>@Html.DisplayFor(m => m.Items[i].Qty)</td>
                                 <td>@Html.HiddenFor(m => m.Items[i].UOM) @Model.Items[i].UOM</td>
-                                <td>@Html.DisplayFor(m => m.Items[i].UnitRate)</td>
-                                <td>@Html.DisplayFor(m => m.Items[i].Amount)</td>
+                                <td>₹@Html.DisplayFor(m => m.Items[i].UnitRate)</td>
+                                <td>₹@Html.DisplayFor(m => m.Items[i].Amount)</td>
                             </tr>
                         }
                     }

@@ -516,6 +516,19 @@ namespace P2PLibray.Inventory
             }
             drMostStock.Close();
 
+            // ----------------- Section Count -----------------
+            Dictionary<string, string> Section = new Dictionary<string, string>
+            {
+                { "@Flag", "TotalSectionCountHSB" }
+            };
+
+            SqlDataReader drSectionStock = await obj.ExecuteStoredProcedureReturnDataReader("InventoryProcedure", Section);
+            if (drSectionStock.HasRows && await drSectionStock.ReadAsync())
+            {
+                model.Section = Convert.ToInt32(drSectionStock["Section"]);
+            }
+            drSectionStock.Close();
+
             return model;
         }
         #endregion
@@ -575,6 +588,38 @@ namespace P2PLibray.Inventory
                 return null;
             }
             
+        }
+
+        public async Task<List<InventoryBinDRB>> GetBinsName(string itemcode)
+        {
+            List<InventoryBinDRB> inventoryBinDRBs = new List<InventoryBinDRB>();
+            Dictionary<string, string> param = new Dictionary<string, string>();
+            param.Add("@Flag", "GetBinsNameDRB");
+            param.Add("@GRNItemCode", itemcode);
+            SqlDataReader dr = await obj.ExecuteStoredProcedureReturnDataReader("InventoryProcedure", param);
+            if (dr != null)
+            {
+                while (dr.Read())
+                {
+                    InventoryBinDRB obj = new InventoryBinDRB
+                    {
+                        BinCode = dr["BinCode"].ToString(),
+                        BinName = dr["BinName"].ToString(),
+                        CurrentItems = dr["QuantityStored"].ToString()
+
+                    };
+
+                    inventoryBinDRBs.Add(obj);
+                }
+
+                return inventoryBinDRBs;
+
+            }
+            else
+            {
+                return null;
+            }
+
         }
 
         /// <summary>
@@ -1228,7 +1273,6 @@ namespace P2PLibray.Inventory
 
                     list = dt.AsEnumerable().Select(r => new ReceivedMaterialReport
                     {
-                        ReceiveMaterialId = r.Field<int>("ReceiveMaterialId"),
                         ReceivedDate = r.Field<DateTime>("ReceivedDate").ToString("yyyy-MM-dd"),
                         GRNCode = r["GRNCode"]?.ToString(),
                         POCode = r["POCode"]?.ToString(),

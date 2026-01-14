@@ -1,24 +1,26 @@
-﻿
+﻿<!-- Date Filters -->
+<div class="mb-3 d-flex align-items-center justify-content-between flex-wrap mt-4">
 
-
-
-
-<div class="d-flex mt-5">
-    <!-- Date Filters -->
-    <div class="mb-3 d-flex gap-2">
-        <div class="input-group" style="max-width: 280px;">
-            <span class="input-group-text bg-primary text-white">
-                <i class="bi bi-calendar-date"></i> <!-- Bootstrap icon -->
-            </span>
-            <input type="text" id="Rejectedrange" placeholder="Select date Range" class="form-control" readonly />
-        </div>
+    <!-- Date Range Input -->
+    <div class="input-group input-group-sm" style="max-width: 280px;">
+        <span class="input-group-text bg-primary text-white">
+            <i class="bi bi-calendar-date"></i>
+        </span>
+        <input type="text" id="Rejectedrange" class="form-control form-control-sm"
+               placeholder="Select date range" readonly />
     </div>
 
-    <div style="margin-left:190px;">
-        <h4 class="text-center text-primary fw-bold">Rejected Goods List</h4>
+    <!-- Section Title -->
+    <div class="flex-grow-1 text-center">
+        <h4 class="text-primary fw-bold mb-0">Rejected Goods List</h4>
+    </div>
+
+    <div class="flex-grow-1 text-center">
 
     </div>
+
 </div>
+
 
 <div class="row">
     <div class="col-12">
@@ -53,15 +55,15 @@
         <div class="modal-content text-center">
 
             <!-- Modal Header -->
-            <div class="modal-header bg-primary text-white d-flex justify-content-center position-relative p-0">
+            <div class="modal-header bg-primary text-white d-flex justify-content-center position-relative p-1 fs-5">
 
                 <!-- Title Centered -->
-                <h5 class="modal-title m-0 flex-grow-1 text-center text-white py-3">
+                <h5 class="modal-title m-0 flex-grow-1 text-center text-white py-1 fs-5">
                     Create Goods Return
                 </h5>
 
                 <!-- Close Button Full Height -->
-                <button type="button" class="btn-close top-0 end-0 rounded-end-3 fs-4 position-absolute btn-close-white m-3"
+                <button type="button" class="btn-close top-0 end-0 rounded-end-3 fs-5 position-absolute btn-close-white m-1"
                         data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 

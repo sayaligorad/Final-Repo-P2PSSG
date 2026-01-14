@@ -11,7 +11,7 @@
                 <th>Item Name</th>
                 <th>Quantity</th>
 
-                <th>Checked By</th>
+               
                 <th>Date</th>
                 <th>Status</th>
             </tr>
@@ -32,7 +32,7 @@
                         <td>@item.ItemName</td>
                         <td>@item.Quantity</td>
 
-                        <td>@item.AddedBy</td>
+                       
                         <td>@(item.AddedDate.HasValue? item.AddedDate.Value.ToString("dd'/'MM'/'yyyy", System.Globalization.CultureInfo.InvariantCulture): "")</td>
                         <td><span class="@statusClass">@item.Status</span></td>
                     </tr>

@@ -1,4 +1,4 @@
-﻿@{
+﻿﻿@{
     ViewBag.Title = "Vendor Management";
 }
 <!DOCTYPE html>
@@ -9,20 +9,14 @@
     <title>Vendor Management</title>
     <link href="~/Content/VendorManagementOK.css" rel="stylesheet" />
     <style>
-
-        .btn-sm {
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
+        
         input {
             outline: none !important;
         }
 
         #exportContainer .dt-buttons {
             display: flex;
-            justify-content: end; /* center align */
+            justify-content: end; /* center alignss */
             gap: 8px;
             margin-left: -10px;
         }
@@ -32,31 +26,31 @@
             width: 100%;
         }
 
-        .erp-table {
+/*        .erp-table {
             width: 100% !important;
             table-layout: auto;
             border-radius: 6px;
             overflow: hidden;
         }
-
+*/
             /* Header Styling */
-            .erp-table thead th {
-                white-space: nowrap; /* keep header text in one line */
-                text-align: center;
+            /*.erp-table thead th {
+                white-space: nowrap;*/ /* keep header text in one line */
+                /*text-align: center;
                 vertical-align: middle;
                 font-weight: 600;
                 padding: 12px 10px;
-            }
+            }*/
 
                 /* Select All column alignment */
-                .erp-table thead th:first-child {
+                /*.erp-table thead th:first-child {
                     text-align: left;
                     vertical-align: middle;
                 }
 
                     .erp-table thead th:first-child input {
                         margin-right: 6px;
-                    }
+                    }*/
 
         /* Right-align the DataTables search container */
         div.dataTables_wrapper div.dt-search {
@@ -87,6 +81,7 @@
             padding: 0px;
             margin-left: -10px;
         }
+
         /* ============================= */
         /* Remove green border for valid */
         /* ============================= */
@@ -159,16 +154,16 @@
          class="toast-container position-fixed top-0 end-0 p-3"
          style="z-index: 2000;">
     </div>
-    <div class="container my-5">
+    <div class="container my-5 mt-0">
         <div class="bg-white shadow rounded p-4">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h3 class="text-center m-auto text-primary">Vendor Management</h3>
             </div>
             <!-- Tabs -->
-            <div class="tab-header">
+            <div class="tab-header p-0 m-3">
 
                 <!-- Nav Pills -->
-                <ul class="nav nav-pills mb-3" id="vendorTab" role="tablist">
+                <ul class="nav nav-pills mt-0" id="vendorTab" role="tablist">
                     <li class="nav-item me-2" role="presentation">
                         <button class="nav-link active" id="registration-tab" data-bs-toggle="pill" data-bs-target="#registration" type="button" role="tab" aria-controls="registration" aria-selected="true">
                             Vendor Registration
@@ -182,42 +177,42 @@
                 </ul>
             </div>
             <!-- Vendor Registration Modal Form -->
-            <div class="tab-content active" id="registration">
+            <div class="tab-content active mt-0" id="registration">
                 <form id="Vendorform" class="row g-3 needs-validation" novalidate>
                     <!-- Personal Details -->
-                    <div class="form-section">
-                        <h5>Personal Details</h5>
+                    <div class="form-section mt-0">
+                        <h5 class="text-dark">Personal Details</h5>
                         <div class="row">
                             <!-- Full Name -->
                             <div class="col-md-6 mb-3">
-                                <label for="fullName" class="form-label">Full Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="fullName" name="VendorName" required>
+                                <label for="fullName" class="form-label form-label-sm fw-bold text-dark">Full Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control form-control-sm text-dark shadow-sm" id="fullName" name="VendorName" required>
                                 <div class="invalid-feedback">Full Name is required.</div>
                             </div>
                             <!-- Mobile -->
                             <div class="col-md-6 mb-3">
-                                <label for="mobile" class="form-label">Mobile Number <span class="text-danger">*</span></label>
-                                <input type="tel" class="form-control" id="mobile" name="MobileNo" required>
+                                <label for="mobile" class="form-label form-label-sm fw-bold text-dark">Mobile Number <span class="text-danger">*</span></label>
+                                <input type="tel" class="form-control form-control-sm text-dark shadow-sm" id="mobile" name="MobileNo" required>
                                 <div class="invalid-feedback">Mobile Number is required.</div>
                             </div>
 
                             <!-- Alternate Mobile -->
                             <div class="col-md-6 mb-3">
-                                <label for="altMobile" class="form-label">Alternate Mobile</label>
-                                <input type="tel" class="form-control" id="altMobile" name="AlternateNo">
+                                <label for="altMobile" class="form-label form-label-sm fw-bold text-dark">Alternate Mobile</label>
+                                <input type="tel" class="form-control form-control-sm text-dark shadow-sm" id="altMobile" name="AlternateNo">
                             </div>
 
                             <!-- Personal Email -->
                             <div class="col-md-6 mb-3">
-                                <label for="personalEmail" class="form-label">Personal Email <span class="text-danger">*</span></label>
-                                <input type="email" class="form-control" id="personalEmail" name="Email" required>
+                                <label for="personalEmail" class="form-label form-label-sm fw-bold text-dark">Personal Email <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control form-control-sm text-dark shadow-sm" id="personalEmail" name="Email" required>
                                 <div class="invalid-feedback">Valid email is required.</div>
                             </div>
 
                             <!-- Address -->
                             <div class="col-12 mb-3">
-                                <label for="address" class="form-label">Address <span class="text-danger">*</span></label>
-                                <textarea class="form-control" id="address" name="Address" rows="2" required></textarea>
+                                <label for="address" class="form-label form-label-sm fw-bold text-dark">Address <span class="text-danger">*</span></label>
+                                <textarea class="form-control form-control-sm text-dark shadow-sm" id="address" name="Address" rows="2" required></textarea>
                                 <div class="invalid-feedback">Address is required.</div>
                             </div>
                         </div>
@@ -225,39 +220,39 @@
 
                     <!-- Communication Details -->
                     <div class="form-section">
-                        <h5>Communication Details</h5>
+                        <h5 class="text-dark">Communication Details</h5>
                         <div class="row">
                             <!-- Company Email -->
                             <div class="col-md-6 mb-3">
-                                <label for="CompanyEmail" class="form-label">Company Email <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="CompanyEmail" name="CompanyEmail" required>
+                                <label for="CompanyEmail" class="form-label form-label-sm fw-bold text-dark">Company Email <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control form-control-sm text-dark shadow-sm" id="CompanyEmail" name="CompanyEmail" required>
                                 <div class="invalid-feedback">Company Email is required.</div>
                             </div>
 
                             <!-- Company Mobile -->
                             <div class="col-md-6 mb-3">
-                                <label for="CompanyMobileNo" class="form-label">Company Mobile Number <span class="text-danger">*</span></label>
-                                <input type="tel" class="form-control" id="CompanyMobileNo" name="CompanyMobileNo" required>
+                                <label for="CompanyMobileNo" class="form-label form-label-sm fw-bold text-dark">Company Mobile Number <span class="text-danger">*</span></label>
+                                <input type="tel" class="form-control form-control-sm text-dark shadow-sm" id="CompanyMobileNo" name="CompanyMobileNo" required>
                                 <div class="invalid-feedback">Company Mobile Number is required.</div>
                             </div>
 
                             <!-- Alternate Company Mobile -->
                             <div class="col-md-6 mb-3">
-                                <label for="CompanyAlternateNo" class="form-label">Alternate Mobile</label>
-                                <input type="tel" class="form-control" id="CompanyAlternateNo" name="CompanyAlternateNo">
+                                <label for="CompanyAlternateNo" class="form-label fw-bold text-dark">Alternate Mobile</label>
+                                <input type="tel" class="form-control form-control-sm text-dark shadow-sm" id="CompanyAlternateNo" name="CompanyAlternateNo">
                             </div>
 
                             <!-- Company Name -->
                             <div class="col-md-6 mb-3">
-                                <label for="companyName" class="form-label">Company Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="companyName" name="CompanyName" required>
+                                <label for="companyName" class="form-label fw-bold text-dark">Company Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control form-control-sm text-dark shadow-sm" id="companyName" name="CompanyName" required>
                                 <div class="invalid-feedback">Company Name is required.</div>
                             </div>
 
                             <!-- Company Address -->
                             <div class="col-12 mb-3">
-                                <label for="companyAddress" class="form-label">Company Address <span class="text-danger">*</span></label>
-                                <textarea class="form-control" id="companyAddress" name="CompanyAddress" rows="2" required></textarea>
+                                <label for="companyAddress" class="form-label fw-bold text-dark">Company Address <span class="text-danger">*</span></label>
+                                <textarea class="form-control form-control-sm  text-dark shadow-sm" id="companyAddress" name="CompanyAddress" rows="2" required></textarea>
                                 <div class="invalid-feedback">Company Address is required.</div>
                             </div>
 
@@ -265,29 +260,29 @@
 
                                 <!-- Industry Type -->
                                 <div class="col-md-4 mb-3">
-                                    <label for="industryType" class="form-label">Industry Type <span class="text-danger">*</span></label>
-                                    <select class="form-select" id="industryType" name="IndustryTypeId" required></select>
+                                    <label for="industryType" class="form-label fw-bold text-dark">Industry Type <span class="text-danger">*</span></label>
+                                    <select class="form-select form-select-sm item-select shadow-sm" id="industryType" name="IndustryTypeId" required></select>
                                     <div class="invalid-feedback">Industry Type is required.</div>
                                 </div>
 
                                 <!-- Country -->
                                 <div class="col-md-4 mb-3">
-                                    <label for="country" class="form-label">Country <span class="text-danger">*</span></label>
-                                    <select class="form-select" id="country" name="CountryCode" required></select>
+                                    <label for="country" class="form-label fw-bold text-dark">Country <span class="text-danger">*</span></label>
+                                    <select class="form-select form-select-sm item-select shadow-sm" id="country" name="CountryCode" required></select>
                                     <div class="invalid-feedback">Country is required.</div>
                                 </div>
 
                                 <!-- State -->
                                 <div class="col-md-4 mb-3">
-                                    <label for="state" class="form-label">State <span class="text-danger">*</span></label>
-                                    <select class="form-select" id="state" name="StateCode" required></select>
+                                    <label for="state" class="form-label fw-bold text-dark">State <span class="text-danger">*</span></label>
+                                    <select class="form-select form-select-sm item-select shadow-sm" id="state" name="StateCode" required></select>
                                     <div class="invalid-feedback">State is required.</div>
                                 </div>
 
                                 <!-- City -->
                                 <div class="col-md-6 mb-3">
-                                    <label for="city" class="form-label">City <span class="text-danger">*</span></label>
-                                    <select class="form-select" id="city" name="CityId" required></select>
+                                    <label for="city" class="form-label fw-bold text-dark">City <span class="text-danger">*</span></label>
+                                    <select class="form-select form-select-sm item-select shadow-sm" id="city" name="CityId" required></select>
                                     <div class="invalid-feedback">City is required.</div>
                                 </div>
 
@@ -298,91 +293,113 @@
 
                     <!-- Payment Details -->
                     <div class="form-section">
-                        <h5>Payment Details</h5>
+                        <h5 class="text-dark">Payment Details</h5>
                         <div class="row">
 
                             <!-- Bank Name -->
                             <div class="col-md-6 mb-3">
-                                <label for="bankName" class="form-label">Bank Name <span class="text-danger">*</span></label>
-                                <select class="form-select" id="bankName" required></select>
+                                <label for="bankName" class="form-label fw-bold text-dark">Bank Name <span class="text-danger">*</span></label>
+                                <select class="form-select form-select-sm item-select shadow-sm" id="bankName" required></select>
                                 <div class="invalid-feedback">Please select a bank.</div>
                             </div>
 
                             <!-- Branch -->
                             <div class="col-md-6 mb-3">
-                                <label for="branchName" class="form-label">Branch <span class="text-danger">*</span></label>
-                                <select class="form-select" id="branchName" name="BranchId" required></select>
+                                <label for="branchName" class="form-label fw-bold text-dark">Branch <span class="text-danger">*</span></label>
+                                <select class="form-select form-select-sm item-select shadow-sm" id="branchName" name="BranchId" required></select>
                                 <div class="invalid-feedback">Please select a branch.</div>
                             </div>
 
                             <!-- Account Number -->
                             <div class="col-md-6 mb-3">
-                                <label for="accountNumber" class="form-label">Account Number <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="accountNumber" name="AccountNumber" required>
+                                <label for="accountNumber" class="form-label fw-bold text-dark">Account Number <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control form-control-sm  text-dark shadow-sm" id="accountNumber" name="AccountNumber" required>
                                 <div class="invalid-feedback">Account Number is required.</div>
                             </div>
 
 
                             <!-- IFSC -->
                             <div class="col-md-6 mb-3">
-                                <label for="ifsc" class="form-label">IFSC Code <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="ifsc" name="IFSCCode" required>
+                                <label for="ifsc" class="form-label fw-bold text-dark">IFSC Code <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control form-control-sm  text-dark shadow-sm" id="ifsc" name="IFSCCode" required>
                                 <div class="invalid-feedback">IFSC Code is required.</div>
                             </div>
 
                             <!-- Swift -->
                             <div class="col-md-6 mb-3">
-                                <label for="swift" class="form-label">Swift Code <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="swift" name="SwiftCode" required>
+                                <label for="swift" class="form-label form-label-sm fw-bold text-dark">Swift Code <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control form-control-sm  text-dark shadow-sm" id="swift" name="SwiftCode" required>
                                 <div class="invalid-feedback">Swift Code is required.</div>
                             </div>
                         </div>
                     </div>
 
 
-                    <!-- Buttons -->
+                    <!-- Action Buttons -->
                     <div class="d-flex justify-content-end gap-2 mt-3">
-                        <button type="button" class="btn btn-lg btn-danger btn-clear" data-bs-dismiss="modal">Clear</button>
-                        <button type="submit" class="btn btn-lg btn-success text-white">Save</button>
+                        <button type="button" class="btn btn-sm btn-danger btn-clear" data-bs-dismiss="modal"> <i class="bi bi-x-circle me-2"></i>Clear</button>
+                        <button type="submit" class="btn btn-sm btn-success text-white"> <i class="bi bi-check2-circle me-2"></i>Save</button>
                     </div>
+
                 </form>
             </div>
 
 
 
             <!-- Pending Vendor Approval -->
+            <!--<div class="tab-content p-0 ps-1 pe-1 mt-2" id="approval">
+    <!-- Toolbar -->
+            <!--<div class="table-toolbar d-flex justify-content-between align-items-center mb-1 mt-7 ps-3 pe-3">-->
+            <!-- Left Section: Date Picker + Export Buttons -->
+            <!--<div class="d-flex align-items-center flex-column gap-3 flex-wrap expbtndate">-->
+            <!-- Date Range Picker -->
+            <!--<div class="input-group border-1 border-gray">
+        <span class="input-group-text bg-primary text-white border-0">
+            <i class="bi bi-calendar-date"></i>
+        </span>
+        <input type="text" id="vendorcreateddate"
+               class="form-control shadow-none ms-0 border"
+               placeholder="Select date range" readonly
+               style="height:100%; border-color: #ced4da;" />
+    </div>-->
+            <!-- Export Buttons -->
+            <!--<div id="exportContainer" class="d-flex align-items-center gap-2 ps-0 ms-0">
+        </div>
+    </div>-->
+            <!-- Right Section: Search Box -->
+            <!--<div id="searchContainer">-->
+            @*<i class="ri-search-line text-primary me-2"></i>*@
+            <!-- DataTables search input will be injected here -->
+            <!--</div>
+    </div>-->
+
+
+
             <div class="tab-content p-0 ps-1 pe-1 mt-2" id="approval">
-                <!-- Toolbar -->
-                <div class="table-toolbar d-flex justify-content-between align-items-center mb-3 p-3">
 
-                    <!-- Left Section: Date Picker + Export Buttons -->
-                    <div class="d-flex align-items-center flex-column gap-3 flex-wrap expbtndate">
+                <!-- ✅ Toolbar -->
+                <div class="table-toolbar d-flex justify-content-between align-items-center flex-wrap mb-2 mt-4 px-3">
 
-                        <!-- Date Range Picker -->
-                        <div class="input-group border-1 border-gray">
-                            <span class="input-group-text bg-primary text-white border-0">
-                                <i class="bi bi-calendar-date"></i>
-                            </span>
-                            <input type="text" id="vendorcreateddate"
-                                   class="form-control shadow-none ms-0 border"
-                                   placeholder="Select date range" readonly
-                                   style="height:100%; border-color: #ced4da;" />
+                    <!-- ✅ Left Section: Date Picker + Export Buttons -->
+                    <div class="row d-flex align-items-center flex-wrap gap-3">
+
+                        <!-- ✅ Date Picker Column -->
+                        <div class="col-6 p-0">
+                            <div class="input-group">
+                                <span class="input-group-text bg-primary text-white">
+                                    <i class="bi bi-calendar-event"></i>
+                                </span>
+                                <input type="text" id="vendorcreateddate" class="form-control" placeholder="Select Date Range" readonly />
+                            </div>
                         </div>
 
-                        <!-- Export Buttons -->
-                        <div id="exportContainer" class="d-flex align-items-center gap-2 ps-0 ms-0">
-                        </div>
+                        <!-- ✅ Export Buttons -->
+                        <div id="exportContainer" class="d-flex align-items-center gap-2"></div>
                     </div>
 
-
-                    <!-- Right Section: Search Box -->
-                    <div id="searchContainer">
-                        @*<i class="ri-search-line text-primary me-2"></i>*@
-                        <!-- DataTables search input will be injected here -->
-                    </div>
+                    <!-- ✅ Right Section: Search Box -->
+                    <div id="searchContainer" class="d-flex align-items-center ps-1"></div>
                 </div>
-
-
 
 
 
@@ -428,162 +445,144 @@
                     </table>
                 </div>
             </div>
-
-
-
-
-            <!-- =======================View pending Vendor MODAL ======================= -->
+        </div>
+            <!-- Vendor Details Modal -->
             <div class="modal fade" id="viewvendorModal" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-xl modal-dialog-scrollable">
-                    <div class="modal-content">
-                        <div class="modal-header bg-primary text-white position-relative">
-                            <h5 class="d-flex justify-content-center text-center ms-auto text-white">
-                                Vendor Details
-                            </h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <div class="modal-content shadow-lg rounded-3">
+                        <!-- Header -->
+                        <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-1">
+                            <h5 class="modal-title fw-bold text-white mb-0 fs-5">Vendor Details</h5>
+                            <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
 
+                        <!-- Body -->
                         <div class="modal-body">
-
-                            <!-- Vendor Registration Form inside Modal -->
                             <form id="Vendorform" class="row g-3 needs-validation" novalidate>
 
                                 <!-- Personal Details -->
-                                <div class="form-section">
-                                    <h5>Personal Details</h5>
+                                <div class="form-section mb-3">
+                                    <h5 class="text-dark fw-bold">Personal Details</h5>
                                     <div class="row">
-                                        <!-- Full Name -->
                                         <div class="col-md-6">
-                                            <label for="FullName" class="form-label fw-semibold">Full Name</label>
-                                            <input type="text" class="form-control" id="FullName" name="VendorName" placeholder="Enter Full Name" readonly>
-                                        </div>
-                                        <!-- Mobile -->
-                                        <div class="col-md-6">
-                                            <label for="Mobile" class="form-label fw-semibold">Mobile Number</label>
-                                            <input type="tel" class="form-control" id="Mobile" name="MobileNo" placeholder="Enter Mobile Number" readonly>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="AltMobile" class="form-label fw-semibold">Alternate Mobile</label>
-                                            <input type="tel" class="form-control" id="AltMobile" name="AlternateNo" placeholder="Enter Alternate Mobile" readonly>
+                                            <label for="FullName" class="form-label fw-bold text-dark">Full Name</label><br />
+                                            <input type="text" class="form-control form-control-sm text-dark shadow-sm" id="FullName" name="VendorName" readonly>
+                                            @*<label class="text-dark d-inline ps-5" id="FullName"></label>*@
                                         </div>
 
                                         <div class="col-md-6">
-                                            <label for="PersonalEmail" class="form-label fw-semibold">Personal Email</label>
-                                            <input type="email" class="form-control" id="PersonalEmail" name="Email" placeholder="Enter Email Address" readonly>
+                                            <label for="Mobile" class="form-label fw-bold text-dark">Mobile Number</label>
+                                            <input type="tel" class="form-control form-control-sm text-dark shadow-sm" id="Mobile" name="MobileNo" readonly>
                                         </div>
-                                        <!-- Address -->
+
+                                        <div class="col-md-6">
+                                            <label for="AltMobile" class="form-label fw-bold text-dark">Alternate Mobile</label>
+                                            <input type="tel" class="form-control form-control-sm text-dark shadow-sm" id="AltMobile" name="AlternateNo" readonly>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label for="PersonalEmail" class="form-label fw-bold text-dark">Personal Email</label>
+                                            <input type="email" class="form-control form-control-sm text-dark shadow-sm" id="PersonalEmail" name="Email" readonly>
+                                        </div>
+
                                         <div class="col-12">
-                                            <label for="Address" class="form-label fw-semibold">Address</label>
-                                            <textarea class="form-control" id="Address" name="Address" rows="2" placeholder="Enter Address" readonly></textarea>
+                                            <label for="Address" class="form-label fw-bold text-dark">Address</label>
+                                            <textarea class="form-control form-control-sm text-dark shadow-sm" id="Address" name="Address" rows="2" readonly></textarea>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="form-section">
-                                    <h5>Communication Details</h5>
+                                <!-- Communication Details -->
+                                <div class="form-section mb-3">
+                                    <h5 class="text-dark fw-bold">Communication Details</h5>
                                     <div class="row">
-                                        <!-- Company Email -->
                                         <div class="col-md-6">
-                                            <label for="CompanyEmail" class="form-label fw-semibold">Company Email</label>
-                                            <input type="email" class="form-control" id="companyEmail" name="CompanyEmail" placeholder="Enter Company Email" readonly>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="CompanyName" class="form-label fw-semibold">Company Name</label>
-                                            <input type="text" class="form-control" id="CompanyName" name="CompanyName" placeholder="Enter Company Name" readonly>
-                                        </div>
-                                        <!-- Alternate Mobile -->
-                                        <div class="col-md-6">
-                                            <label for="CompanyEmail" class="form-label fw-semibold">Company Mobile Number</label>
-                                            <input type="tel" class="form-control" id="companyMobileNo" name="CompanyAlternateNo" placeholder="AlternateMobile Number" readonly>
-                                        </div>
-                                        <!-- Alternate Mobile -->
-                                        <div class="col-md-6">
-                                            <label for="CompanyEmail" class="form-label fw-semibold">AlternateMobile Number</label>
-                                            <input type="tel" class="form-control" id="companyAlternateNo" name="CompanyAlternateNo" placeholder="AlternateMobile Number" readonly>
-                                        </div>
-                                        <!-- Company Name -->
-                                        <!--<div class="col-md-6">
-                                            <label for="CompanyName" class="form-label fw-semibold">Company Name</label>
-                                            <input type="text" class="form-control" id="CompanyName" name="CompanyName" placeholder="Enter Company Name" readonly>
-                                        </div>-->
-                                        <!-- Company Address -->
-                                        <div class="col-md-6">
-                                            <label for="CompanyName" class="form-label fw-semibold">Company Address</label>
-                                            <input type="text" class="form-control" id="CompanyAddress" name="CompanyAddress" placeholder="Company Address" readonly>
-                                        </div>
-                                        <div class="row g-3">
-
-                                            <!-- Industry Type -->
-                                            <div class="col-md-6">
-                                                <label for="industryType" class="form-label fw-semibold">Industry Type</label>
-                                                <input type="text" class="form-control" id="IndustryType" name="IndustryTypeId" placeholder="Enter Company Email" readonly>
-                                            </div>
-                                            <!-- Country -->
-                                            <div class="col-md-6">
-                                                <label for="Country" class="form-label fw-semibold">Country</label>
-                                                <input type="text" class="form-control" id="Country" readonly placeholder="Enter Country">
-                                            </div>
-
-                                            <!-- State -->
-                                            <div class="col-md-6">
-                                                <label for="State" class="form-label fw-semibold">State</label>
-                                                <input type="text" class="form-control" id="State" readonly placeholder="Enter State">
-                                            </div>
-
-                                            <!-- City -->
-                                            <div class="col-md-6">
-                                                <label for="City" class="form-label fw-semibold">City</label>
-                                                <input type="text" class="form-control" id="City" readonly placeholder="Enter City">
-                                            </div>
-
+                                            <label for="CompanyEmail" class="form-label fw-bold text-dark">Company Email</label>
+                                            <input type="email" class="form-control form-control-sm text-dark shadow-sm" id="CompanyEmail" name="CompanyEmail" readonly>
                                         </div>
 
+                                        <div class="col-md-6">
+                                            <label for="CompanyName" class="form-label fw-bold text-dark">Company Name</label>
+                                            <input type="text" class="form-control form-control-sm text-dark shadow-sm" id="CompanyName" name="CompanyName" readonly>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label for="CompanyMobile" class="form-label fw-bold text-dark">Company Mobile Number</label>
+                                            <input type="tel" class="form-control form-control-sm text-dark shadow-sm" id="CompanyMobile" name="CompanyMobile" readonly>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label for="CompanyAltMobile" class="form-label fw-bold text-dark">Alternate Mobile Number</label>
+                                            <input type="tel" class="form-control form-control-sm text-dark shadow-sm" id="CompanyAltMobile" name="CompanyAlternateNo" readonly>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label for="CompanyAddress" class="form-label fw-bold text-dark">Company Address</label>
+                                            <input type="text" class="form-control form-control-sm text-dark shadow-sm" id="CompanyAddress" name="CompanyAddress" readonly>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label for="IndustryType" class="form-label fw-bold text-dark">Industry Type</label>
+                                            <input type="text" class="form-control form-control-sm text-dark shadow-sm" id="IndustryType" name="IndustryTypeId" readonly>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label for="Country" class="form-label fw-bold text-dark">Country</label>
+                                            <input type="text" class="form-control form-control-sm text-dark shadow-sm" id="Country" readonly>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label for="State" class="form-label fw-bold text-dark">State</label>
+                                            <input type="text" class="form-control form-control-sm text-dark shadow-sm" id="State" readonly>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label for="City" class="form-label fw-bold text-dark">City</label>
+                                            <input type="text" class="form-control form-control-sm text-dark shadow-sm" id="City" readonly>
+                                        </div>
                                     </div>
                                 </div>
 
                                 <!-- Payment Details -->
-                                <div class="form-section">
-                                    <h5>Payment Details</h5>
+                                <div class="form-section mb-3">
+                                    <h5 class="text-dark fw-bold">Payment Details</h5>
                                     <div class="row">
-
-                                        <!-- Bank Name -->
                                         <div class="col-md-6">
-                                            <label for="BankName" class="form-label fw-semibold">Bank Name</label>
-                                            <input type="text" class="form-control" id="BankName" name="BankName" placeholder="Enter Bank Name" readonly>
+                                            <label for="BankName" class="form-label fw-bold text-dark">Bank Name</label>
+                                            <input type="text" class="form-control form-control-sm text-dark shadow-sm" id="BankName" name="BankName" readonly>
                                         </div>
 
-                                        <!-- Branch -->
                                         <div class="col-md-6">
-                                            <label for="Branch" class="form-label fw-semibold">Branch</label>
-                                            <input type="text" class="form-control" id="BranchName" name="Branch" placeholder="Enter Branch Name" readonly>
+                                            <label for="BranchName" class="form-label fw-bold text-dark">Branch</label>
+                                            <input type="text" class="form-control form-control-sm text-dark shadow-sm" id="BranchName" name="Branch" readonly>
                                         </div>
 
-                                        <!-- Account Number -->
                                         <div class="col-md-6">
-                                            <label for="AccountNumber" class="form-label fw-semibold">Account Number</label>
-                                            <input type="text" class="form-control" id="AccountNumber" name="AccountNumber" placeholder="Enter Account Number" readonly>
+                                            <label for="AccountNumber" class="form-label fw-bold text-dark">Account Number</label>
+                                            <input type="text" class="form-control form-control-sm text-dark shadow-sm" id="AccountNumber" name="AccountNumber" readonly>
                                         </div>
 
-                                        <!-- IFSC -->
                                         <div class="col-md-6">
-                                            <label for="IFSC" class="form-label fw-semibold">IFSC Code</label>
-                                            <input type="text" class="form-control" id="Ifsc" name="IFSC" placeholder="Enter IFSC Code" readonly>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="IFSC" class="form-label fw-semibold">Swift Code</label>
-                                            <input type="text" class="form-control" id="Swift" name="SwiftCode" placeholder="Enter IFSC Code" readonly>
+                                            <label for="Ifsc" class="form-label fw-bold text-dark">IFSC Code</label>
+                                            <input type="text" class="form-control form-control-sm text-dark shadow-sm" id="Ifsc" name="IFSC" readonly>
                                         </div>
 
+                                        <div class="col-md-6">
+                                            <label for="Swift" class="form-label fw-bold text-dark">Swift Code</label>
+                                            <input type="text" class="form-control form-control-sm text-dark shadow-sm" id="Swift" name="SwiftCode" readonly>
+                                        </div>
                                     </div>
                                 </div>
-                            </form>
 
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
+
+
         </div>
-    </div>
+   
     <script>
         // SweetAlert2 configuration with Bootstrap button styles
         const swalWithBootstrapButtons = Swal.mixin({
@@ -920,29 +919,34 @@
                 { data: "CountryCode", className: "text-center",visible: false },
                 { data: "StateCode", className: "text-center",visible: false },
                 { data: "CityName", className: "text-center",visible: false },
-
-                // Action column
+                // ✅ Action column with applied custom styling
                 {
                     data: null,
                     className: "text-center",
                     render: function (data, type, row) {
                         return `
                             <div class="d-flex gap-2 justify-content-center">
-                                <!-- View Button with tooltip -->
-                                <button class="btn btn-sm btn-primary btn-view"
+                
+                                <!-- View Button -->
+                                <button type="button" 
+                                        class="btn btn-primary square-pill d-inline-flex align-items-center px-2 py-1 shadow-InStock btn-view"
                                         data-row='${JSON.stringify(row)}'
                                         data-bs-toggle="tooltip"
                                         data-bs-placement="top"
                                         title="View Vendor">
-                                    <i class="bi bi-eye-fill"></i>
+                                    <i class="bi bi-eye-fill fs-6"></i>
                                 </button>
-                                <button class="btn btn-sm btn-success btn-approve"
+
+                                <!-- Approve Button -->
+                                <button type="button" 
+                                        class="btn btn-success square-pill d-inline-flex align-items-center px-2 py-1 shadow-InStock btn-approve"
                                         onclick="ApproveVendor(${row.VendorId})"
                                         data-bs-toggle="tooltip"
                                         data-bs-placement="top"
                                         title="Approve">
-                                    <i class="bi bi-person-check-fill"></i>
+                                    <i class="bi bi-person-check-fill fs-6"></i>
                                 </button>
+
                             </div>
                         `;
                     }
@@ -951,7 +955,7 @@
             paging: true,
             searching: true,
             lengthChange: false,
-            pageLength: 5,
+            pageLength: 10,
             ordering: false,
             select: {
                 style: 'multi',
@@ -1055,10 +1059,10 @@
                     }
                 },
 
-                // PDF Export button
+                // PDF Export button 
                 {
                     extend: 'pdfHtml5',
-                    text: '<i class="bi bi-file-earmark-pdf-fill text-danger fs-5"></i>',
+                    text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
                     titleAttr: 'PDF',
                     title: 'Vendor List',
                     orientation: 'landscape',
@@ -1118,7 +1122,7 @@
                 // Excel Export button
                 {
                     extend: 'excelHtml5',
-                    text: '<i class="bi bi-file-earmark-excel-fill text-success fs-5"></i>',
+                    text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
                     titleAttr: 'Excel',
                     title: ' ', //Vendor List
                     exportOptions: {
@@ -1451,7 +1455,7 @@
         // === Indian Mobile Number Validation (Live) ===
         $("#mobile, #altMobile").on("input", function () {
             this.value = this.value.replace(/\D/g, ""); // Only digits allowed
-            const val = this.value.trim();   
+            const val = this.value.trim();
         });
 
         // Personal email validation (FIXED - now stricter)
@@ -1736,6 +1740,21 @@
 
             // === Validation Starts ===
 
+            const fullName = $("#fullName").val().trim();
+
+            if (!fullName) {
+                setInvalidField("#fullName", "Full Name is required.");
+            }
+            else if (fullName.length < 2) {
+                setInvalidField("#fullName", "Full Name must be at least 2 characters long.");
+            }
+            else if (!/^[A-Za-z\s]+$/.test(fullName)) {
+                setInvalidField("#fullName", "Full Name should contain only letters and spaces.");
+            }
+            else {
+                setValidField("#fullName");
+            }
+
             // Mobile Number validation
             const mobile = $("#mobile").val().trim();
             if (!mobile) {
@@ -1956,11 +1975,12 @@
 
         // Personal details
         $("#FullName").val(rowData.VendorName);
+       // $("#FullName").text(rowData.VendorName);
         $("#Mobile").val(rowData.MobileNo);
         $("#AltMobile").val(rowData.AlternateNo);
         $("#PersonalEmail").val(rowData.Email);
         $("#Address").val(rowData.Address);
-
+  
         // Company details
         $("#companyEmail").val(rowData.CompanyEmail);
         $("#companyMobileNo").val(rowData.CompanyMobileNo);

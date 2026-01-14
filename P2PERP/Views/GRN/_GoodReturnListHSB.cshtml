@@ -1,17 +1,26 @@
-﻿<h4 class="text-center text-primary fw-bold">Goods Return List</h4>
+﻿@*<h4 class="text-center text-primary fw-bold">Goods Return List</h4>*@
 
 <!-- Date Filters -->
-<div class="mb-3 d-flex gap-2">
-    <div class="input-group" style="max-width: 280px;">
+<div class="mb-3 d-flex align-items-center justify-content-between flex-wrap mt-5">
+
+    <!-- Date Range Picker -->
+    <div class="input-group input-group-sm" style="max-width: 280px;">
         <span class="input-group-text bg-primary text-white">
-            <i class="bi bi-calendar-date"></i> <!-- Bootstrap icon -->
+            <i class="bi bi-calendar-date"></i>
         </span>
-        <input type="text" id="returnGoodsRange" class="form-control" placeholder="Select date range" readonly />
+        <input type="text" id="returnGoodsRange" class="form-control form-control-sm"
+               placeholder="Select date range" readonly />
     </div>
-    <!-- Reset Filter Button -->
-    @*<button id="resetFilter" class="btn btn-primary">
-            <i class="bi bi-arrow-repeat"></i> Reset
-        </button>*@
+
+    <!-- Title -->
+    <div class="flex-grow-1 text-center">
+        <h4 class="text-primary fw-bold mb-0">Goods Return List</h4>
+    </div>
+
+    <div class="flex-grow-1 text-center">
+
+    </div>
+
 </div>
 
 
@@ -46,9 +55,9 @@
         <div class="modal-content">
 
             <!-- Header -->
-            <div class="modal-header bg-gradient bg-primary text-white d-flex justify-content-center align-items-center">
-                <h5 id="modalHeading" class="modal-title fw-bold text-uppercase text-white mb-2  heading"></h5>
-                <button type="button" class="btn-close top-0 end-0 rounded-end-3 fs-4 position-absolute btn-close-white m-3" data-bs-dismiss="modal"></button>
+            <div class="modal-header bg-gradient bg-primary text-white d-flex justify-content-center align-items-center fs-5 py-1">
+                <h5 id="modalHeading" class="modal-title fw-bold text-uppercase text-white "></h5>
+                <button type="button" class="btn-close  rounded-end-3 fs-5 position-absolute btn-close-white top-0 end-0 m-1" data-bs-dismiss="modal"></button>
             </div>
 
             <!-- Body -->
@@ -480,7 +489,7 @@
                     extend: 'excelHtml5',
                     text: '<i class="bi bi-file-earmark-excel-fill text-success fs-5"></i>',
                     sheetName: 'Good Return List',
-                    filename:'GoodReturnList',
+                    filename: 'GoodReturnList',
                     title: null,
                     exportOptions: {
                         columns: [1, 2, 3, 4, 5, 6, 7],

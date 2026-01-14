@@ -13,6 +13,12 @@
             content: none !important;
         }
 
+    table th {
+        white-space: nowrap; /* Prevents text wrapping */
+        text-overflow: ellipsis; /* Adds "..." if text is too long */
+        overflow: hidden; /* Hides overflow text */
+    }
+
 </style>
 
 <html lang="en">
@@ -25,17 +31,15 @@
 
 
         <!-- View Item Modal -->
-        <!-- View Item Modal -->
-        <div class="modal fade" id="viewItemModal" data-bs-backdrop="true" tabindex="-1" aria-labelledby="viewItemModalLabel" aria-hidden="true">
+
+        <div class="modal fade" id="viewItemModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-xl modal-dialog-scrollable">
-                <div class="modal-content border-0 shadow-lg" style="background-color: #ffffff;">
-                    <!-- modal background white -->
-                    <!-- Header -->
-                    <div class="modal-header bg-gradient bg-primary text-white">
-                        <h5 class="modal-title w-100 text-center text-white mb-2 fw-bold" id="viewItemModalLabel">
-                            View Item Details
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white mb-2" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-content shadow-lg rounded-3">
+                    <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-1">
+                        <!-- Modal title -->
+                        <h5 class="modal-title fw-bold text-white mb-0 fs-5">  View Item Details</h5>
+                        <!-- Close button -->
+                        <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
 
                     <!-- Body -->
@@ -46,81 +50,82 @@
                             <div class="row g-3">
                                 <div class="col-md-4">
                                     <label class="form-label fw-semibold text-secondary">Item Code</label>
-                                    <input type="text" id="v_itemCode" class="form-control form-control-sm  bg-opacity-25 border" readonly>
+                                    <input type="text" id="v_itemCode" class="form-control form-control-sm  bg-light text-dark shadow-sm bg-opacity-25 border" readonly>
                                 </div>
 
                                 <div class="col-md-4">
                                     <label class="form-label fw-semibold text-secondary">Item Name</label>
-                                    <input type="text" id="v_itemName"  class="form-control form-control-sm  bg-opacity-25 border" readonly>
+                                    <input type="text" id="v_itemName" class="form-control form-control-sm bg-light text-dark bg-opacity-25 shadow-sm border" readonly>
                                 </div>
 
                                 <div class="col-md-4">
                                     <label class="form-label fw-semibold text-secondary">Item Category</label>
-                                    <input type="text" id="v_itemCategory" name="ItemCategoryId" class="form-control form-control-sm  bg-opacity-25 border" readonly>
+                                    <input type="text" id="v_itemCategory" name="ItemCategoryId" class="form-control bg-light text-dark form-control-sm shadow-sm  bg-opacity-25 border" readonly>
                                 </div>
 
                                 <div class="col-md-4">
                                     <label class="form-label fw-semibold text-secondary">Cost Per Unit</label>
-                                    <input type="text" id="v_costPerUnit" class="form-control form-control-sm  bg-opacity-25 border" readonly>
+                                    <input type="text" id="v_costPerUnit" class="form-control form-control-sm bg-light text-dark shadow-sm bg-opacity-25 border" readonly>
                                 </div>
 
                                 <div class="col-md-4">
                                     <label class="form-label fw-semibold text-secondary">Reorder Quantity</label>
-                                    <input type="text" id="v_reorderQuantity" class="form-control form-control-sm  bg-opacity-25 border" readonly>
+                                    <input type="text" id="v_reorderQuantity" class="form-control form-control-sm bg-light text-dark shadow-sm bg-opacity-25 border" readonly>
                                 </div>
 
                                 <div class="col-md-4">
                                     <label class="form-label fw-semibold text-secondary">Min Quantity</label>
-                                    <input type="text" id="v_minQuantity" class="form-control form-control-sm  bg-opacity-25 border" readonly>
+                                    <input type="text" id="v_minQuantity" class="form-control form-control-sm bg-light text-dark shadow-sm bg-opacity-25 border" readonly>
                                 </div>
 
                                 <div class="col-md-4">
                                     <label class="form-label fw-semibold text-secondary">UOM</label>
-                                    <input type="text" id="v_uom" class="form-control form-control-sm  bg-opacity-25 border" readonly>
+                                    <input type="text" id="v_uom" class="form-control form-control-sm bg-light text-dark shadow-sm bg-opacity-25 border" readonly>
                                 </div>
 
                                 <div class="col-md-4">
                                     <label class="form-label fw-semibold text-secondary">HSN Code</label>
-                                    <input type="text" id="v_hsnCode" class="form-control form-control-sm  bg-opacity-25 border" readonly>
+                                    <input type="text" id="v_hsnCode" class="form-control form-control-sm bg-light text-dark shadow-sm bg-opacity-25 border" readonly>
                                 </div>
 
                                 <div class="col-md-4">
                                     <label class="form-label fw-semibold text-secondary">Item Make</label>
-                                    <input type="text" id="v_itemMake" class="form-control form-control-sm  bg-opacity-25 border" readonly>
+                                    <input type="text" id="v_itemMake" class="form-control form-control-sm bg-light text-dark shadow-sm bg-opacity-25 border" readonly>
                                 </div>
 
                                 <div class="col-md-4">
                                     <label class="form-label fw-semibold text-secondary">Expiry Days</label>
-                                    <input type="text" id="v_ExpiryDays" class="form-control form-control-sm  bg-opacity-25 border" readonly>
+                                    <input type="text" id="v_ExpiryDays" class="form-control form-control-sm bg-light text-dark shadow-sm bg-opacity-25 border" readonly>
                                 </div>
 
                                 <div class="col-md-4">
                                     <label class="form-label fw-semibold text-secondary">Quality Check</label>
-                                    <input type="text" id="v_qualityCheck" class="form-control form-control-sm  bg-opacity-25 border" readonly>
+                                    <input type="text" id="v_qualityCheck" class="form-control form-control-sm shadow-sm  bg-light text-dark bg-opacity-25 border" readonly>
                                 </div>
 
                                 <div class="col-md-4">
                                     <label class="form-label fw-semibold text-secondary">Item Status</label>
-                                    <input type="text" id="v_itemStatus" class="form-control form-control-sm  bg-opacity-25 border" readonly>
+                                    <input type="text" id="v_itemStatus" class="form-control form-control-sm shadow-sm bg-light text-dark bg-opacity-25 border" readonly>
                                 </div>
 
                                 <div class="col-md-6">
                                     <label class="form-label fw-semibold text-secondary">Description</label>
-                                    <textarea id="v_description" class="form-control form-control-sm  bg-opacity-25 border" rows="3" readonly></textarea>
+                                    <textarea id="v_description" class="form-control form-control-sm bg-light text-dark shadow-sm bg-opacity-25 border" rows="3" readonly></textarea>
                                 </div>
                             </div>
 
                             <!-- Inspection Plan Section -->
                             <div id="v_inspectionfrm" style="display:none;" class="mt-4">
-                                <div class="table-responsive">
-                                    <table id="v_paralistTable" class="table table-hover table-bordered align-middle">
-                                        <thead class="table-success text-center">
+                                <div class="table-responsive ">
+                                    <table id="v_paralistTable" class="table table-hover  table-bordered align-middle">
+                                        <thead class="table-success text-center table-dark" >
                                             <tr>
                                                 <th>Sr.No</th>
                                                 <th>Quality Parameters</th>
                                                 <th>Parameters</th>
                                                 <th>UOM</th>
                                             </tr>
+
                                         </thead>
                                         <tbody id="v_paralist"></tbody>
                                     </table>
@@ -135,16 +140,17 @@
 
 
 
-        <!-- Modal -->
-        <div class="modal fade" id="itemModal" tabindex="-1" aria-labelledby="itemModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-xl modal-dialog-scrollable">
-                <!-- XL size for full form -->
-                <div class="modal-content">
-                    <div class="modal-header bg-primary ">
-                        <h5 class="modal-title w-100 text-center fw-bolder text-white mb-2 " id="itemModalLabel">Create New Item</h5>
 
-                        <button type="button" class="btn-close btn-close-white mb-2" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal fade" id="itemModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                <div class="modal-content shadow-lg rounded-3">
+                    <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-1">
+                        <!-- Modal title -->
+                        <h5 class="modal-title fw-bold text-white mb-0 fs-5" id="itemModalLabel">Create New Item</h5>
+                        <!-- Close button -->
+                        <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
+
 
                     <div class="modal-body container mt-5 px-8  ">
 
@@ -156,13 +162,13 @@
                                 <!-- Item Code -->
                                 <div class="col-md-6">
                                     <label for="itemCode" class="form-label">Item Code</label>
-                                    <input type="text" id="itemCode" name="ItemCode" class="form-control" readonly placeholder="Enter item code" />
+                                    <input type="text" id="itemCode" name="ItemCode" class="form-control form-control-sm shadow-sm" readonly placeholder="Enter item code" />
                                 </div>
 
                                 <!-- Item Name -->
                                 <div class="col-md-6">
                                     <label for="itemName" class="form-label">Item Name <span class="ic" style="color:red;">*</span></label>
-                                    <input type="text" id="itemName" name="ItemName" class="form-control" placeholder="Enter item name" />
+                                    <input type="text" id="itemName" name="ItemName" class="form-control form-control-sm shadow-sm" placeholder="Enter item name" />
                                     <small id="itemError" class="text-danger" style="display:none;"></small>
 
                                 </div>
@@ -170,7 +176,7 @@
                                 <!-- Cost Per Unit -->
                                 <div class="col-md-6">
                                     <label for="costPerUnit" class="form-label">Cost Per Unit <span style="color:red;">*</span></label>
-                                    <input type="number" id="costPerUnit" name="UnitRates" class="form-control" placeholder="Enter cost per unit" />
+                                    <input type="number" id="costPerUnit" name="UnitRates" class="form-control form-control-sm shadow-sm" placeholder="Enter cost per unit" />
                                     <small id="costError" class="text-danger" style="display:none;"></small>
 
                                 </div>
@@ -178,7 +184,7 @@
                                 <!-- Min Quantity -->
                                 <div class="col-md-6">
                                     <label for="minQuantity" class="form-label">Min Quantity <span style="color:red;">*</span></label>
-                                    <input type="number" id="minQuantity" name="MinQuantity" class="form-control" placeholder="Enter minimum quantity" min="1" />
+                                    <input type="number" id="minQuantity" name="MinQuantity" class="form-control form-control-sm shadow-sm" placeholder="Enter minimum quantity" min="1" />
                                     <small id="minError" class="text-danger" style="display:none;"></small>
 
                                 </div>
@@ -186,7 +192,7 @@
                                 <!-- Item Category -->
                                 <div class="col-md-6">
                                     <label for="itemCategory" class="form-label">Item Category <span class="ic" style="color:red;">*</span></label>
-                                    <select id="itemCategory" name="ItemCategoryId" class="form-select ">
+                                    <select id="itemCategory" name="ItemCategoryId" class="form-select form-select-sm shadow-sm ">
                                         <option value="">--Select Category--</option>
                                     </select>
                                 </div>
@@ -194,13 +200,13 @@
                                 <!-- HSN Code -->
                                 <div class="col-md-6">
                                     <label for="hsnCode" class="form-label">HSN Code <span class="ic" style="color:red;">*</span></label>
-                                    <input type="text" id="hsnCode" name="HSNCode" class="form-control" placeholder="Enter HSN code" readonly />
+                                    <input type="text" id="hsnCode" name="HSNCode" class="form-control form-control-sm shadow-sm" placeholder="Enter HSN code" readonly />
                                 </div>
 
                                 <!-- Reorder Quantity -->
                                 <div class="col-md-6">
                                     <label for="reorderQuantity" class="form-label">Reorder Quantity <span style="color:red;">*</span></label>
-                                    <input type="number" id="reorderQuantity" name="RecorderQuantity" class="form-control" placeholder="Enter reorder quantity" />
+                                    <input type="number" id="reorderQuantity" name="RecorderQuantity" class="form-control form-control-sm shadow-sm" placeholder="Enter reorder quantity" />
                                     <small id="reorderError" class="text-danger" style="display:none;"></small>
 
                                 </div>
@@ -208,13 +214,13 @@
                                 <!-- Description -->
                                 <div class="col-md-12">
                                     <label for="description" class="form-label">Description <span class="ic" style="color:red;">*</span></label>
-                                    <textarea id="description" name="Description" class="form-control" rows="3" placeholder="Enter item description"></textarea>
+                                    <textarea id="description" name="Description" class="form-control shadow-sm" rows="3" placeholder="Enter item description"></textarea>
                                 </div>
 
                                 <!-- Item Status -->
                                 <div class="col-md-6">
                                     <label for="itemStatus" class="form-label">Item Status <span style="color:red;">*</span></label>
-                                    <select id="itemStatus" name="ItemStatusId" class="form-select">
+                                    <select id="itemStatus" name="ItemStatusId" class="form-select form-select-sm shadow-sm">
                                         <option value="">Select Status</option>
                                     </select>
                                 </div>
@@ -224,7 +230,7 @@
                                 <!-- Item Make -->
                                 <div class="col-md-6">
                                     <label for="itemMake" class="form-label">Item Make <span class="ic" style="color:red;">*</span></label>
-                                    <select id="itemMake" name="ItemMakeId" class="form-select">
+                                    <select id="itemMake" name="ItemMakeId" class="form-select form-select-sm shadow-sm">
                                         <option value="">--Select Make--</option>
                                     </select>
                                 </div>
@@ -232,7 +238,7 @@
                                 <!-- UOM -->
                                 <div class="col-md-6">
                                     <label for="uom" class="form-label">UOM <span class="ic" style="color:red;">*</span></label>
-                                    <select id="uom" name="UOMId" class="form-select">
+                                    <select id="uom" name="UOMId" class="form-select form-select-sm shadow-sm">
                                         <option value="">--Select UOM--</option>
                                     </select>
                                 </div>
@@ -240,7 +246,7 @@
                                 <!-- Expiry Days -->
                                 <div class="col-md-6">
                                     <label for="EXD" class="form-label">ExpireDays <span style="color:red;">*</span></label>
-                                    <input type="number" id="ExpiryDays" name="ExpiryDays" class="form-control" />
+                                    <input type="number" id="ExpiryDays" name="ExpiryDays" class="form-control form-control-sm shadow-sm" />
                                     <small id="expiryError" class="text-danger" style="display:none;"></small>
 
                                 </div>
@@ -248,7 +254,7 @@
                                 <!-- Quality Check -->
                                 <div class="col-md-6">
                                     <label for="qualityCheck" class="form-label">Quality Check</label>
-                                    <select id="qualityCheck" name="ISQualityBit" class="form-select">
+                                    <select id="qualityCheck" name="ISQualityBit" class="form-select form-select-sm shadow-sm">
                                         <option value="">--Select--</option>
                                         <option value="1">Yes</option>
                                         <option value="0">No</option>
@@ -265,50 +271,50 @@
 
                                     <div class="col-md-6">
                                         <label for="plantype" class="form-label">Plan Type</label>
-                                        <select id="plantype" name="PlanId" class="form-select">
+                                        <select id="plantype" name="PlanId" class="form-select form-select-sm shadow-sm">
                                             <option value="">Select</option>
                                         </select>
                                     </div>
 
                                     <div class="col-md-6">
                                         <label for="plancode" class="form-label">Plan Code</label>
-                                        <input type="text" id="plancode" name="PlanCode" readonly class="form-control" />
+                                        <input type="text" id="plancode" name="PlanCode" readonly class="form-control form-control-sm shadow-sm" />
                                     </div>
 
                                     <div class="col-md-12">
                                         <label for="pdescription" class="form-label">Description</label>
-                                        <textarea id="pdescription" name="PlanDescription" class="form-control" rows="3" placeholder="Enter item description"></textarea>
+                                        <textarea id="pdescription" name="PlanDescription" class="form-control shadow-sm" rows="3" placeholder="Enter item description"></textarea>
                                     </div>
 
                                     <div class="col-md-6 scroll-select">
                                         <label for="inspetype" class="form-label">Inspection Type</label>
-                                        <select id="inspetype" name="InspectionId" class="form-select">
+                                        <select id="inspetype" name="InspectionId" class="form-select form-select-sm shadow-sm">
                                             <option value="">--Select--</option>
                                         </select>
                                     </div>
 
                                     <div class="col-md-6" id="quantitiDiv">
                                         <label for="quantiti" class="form-label">Quantitative Parameters</label>
-                                        <select id="quantiti" name="QualityParametersId" class="form-select">
+                                        <select id="quantiti" name="QualityParametersId" class="form-select form-select-sm shadow-sm">
                                             <option value="">--Select--</option>
                                         </select>
                                     </div>
 
                                     <div class="col-md-6" id="qualityDiv">
                                         <label for="quality" class="form-label">Qualitative Parameters</label>
-                                        <select id="quality" name="QuantityParametersId" class="form-select">
+                                        <select id="quality" name="QuantityParametersId" class="form-select form-select-sm shadow-sm">
                                             <option value="">--Select--</option>
                                         </select>
                                     </div>
 
                                     <div class="col-md-6">
                                         <label for="qua" class="form-label">Parameters</label>
-                                        <input type="text" id="qua" name="PQuality" class="form-control" />
+                                        <input type="text" id="qua" name="PQuality" class="form-control form-control-sm shadow-sm" />
                                     </div>
 
                                     <div class="col-md-6">
                                         <label for="uompara" class="form-label">UOM</label>
-                                        <select id="uompara" name="PUOMId" class="form-select">
+                                        <select id="uompara" name="PUOMId" class="form-select form-select-sm shadow-sm">
                                             <option value="">--Select UOM--</option>
                                         </select>
                                     </div>
@@ -324,9 +330,14 @@
                                             <tr>
                                                 <th>Sr.No</th>
                                                 <th>Quality Parameters</th>
+<<<<<<< HEAD
+
                                                 <th>Parameters</th>
                                                 @*<th>Parameters</th>*@
+=======
+                                                <th>Parameters</th>
 
+>>>>>>> 53678e2a1bbf2611e4b0740e78e71692daadbeaf
                                                 <th>UOM</th>
                                                 <th>Action</th>
                                             </tr>
@@ -340,7 +351,7 @@
 
                             <!-- Submit -->
                             <div class="mt-4 d-flex justify-content-end">
-                                <button type="submit" id="subitem" class="btn btn-success">Save Item</button>
+                                <button type="submit" id="subitem" class="btn btn-success btn-sm">  Save Item</button>
                             </div>
                         </form>
                     </div>
@@ -353,25 +364,34 @@
 
 
     <!-- table and button for item master-->
-    <div class="container-fluid">
+    <div>
 
-        <div class="card">
-            <div class="card-body">
-                <h3 class="w-100 text-center  text-primary fw-bolder ">Item Master List</h3>
+        
 
                 <!-- 🔹 Header Row inside Card -->
-                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+                <div class="d-flex justify-content-between align-items-center flex-wrap">
+
+
 
                     <!-- Left: Create New Item button -->
 
                     <div class="input-group" style="height: 40px; max-width: 280px;">
+
                         <span class="input-group-text bg-primary text-white" style="height: 100%;">
                             <i class="bi bi-calendar-date"></i>
                         </span>
+
                         <input type="text" id="itemdatefilter" class="form-control" placeholder="Select date range" readonly style="height: 100%;" />
+
+
                     </div>
+
+
                     <!-- Right: Date Range Picker + Export -->
-                    <div class="d-flex align-items-center gap-3 ms-auto">
+                    <div class="d-flex align-items-center gap-3 ms-2">
+
+
+
 
                         <!-- Date Range Picker -->
                         <div>
@@ -379,9 +399,10 @@
                                     data-bs-toggle="modal"
                                     id="createitem"
                                     data-bs-target="#itemModal">
-                                <i class="bi bi-plus-circle"></i> Create New Item
+                                <i class="bi bi-plus-circle me-2"></i>  Create New Item
                             </button>
                         </div>
+
 
                         <!-- Export Buttons -->
                         <div id="exportContainer" class="d-flex" style="height: 40px; align-items: center;">
@@ -399,11 +420,9 @@
                                 <th>Sr.No</th>
                                 <th>ItemCode</th>
                                 <th>ItemName</th>
-                                <th>UOM</th>
                                 <th>Date</th>
                                 <th>Cost per Unit</th>
                                 <th>ItemCategory</th>
-                                <th>Min Quantity</th>
                                 <th>Item Status</th>
                                 <th>Quality Check</th>
                                 <th>Action</th>
@@ -414,10 +433,7 @@
                 </div>
 
             </div>
-        </div>
-
-
-    </div>
+       
 
 </body>
 </html>
@@ -560,7 +576,6 @@
                     },
                     { data: 'ItemCode' },
                     { data: 'ItemName' },
-                    { data: 'UOM' },
                     {
                         data: "Date",
                         render: function (data) {
@@ -591,19 +606,18 @@
 
                     { data: 'UnitRates' },
                     { data: 'ItemCategory' },
-                    { data: 'MinQuantity' },
                     { data: 'Status' },
                     { data: 'ISQuality' },
                     {
                         data: null,
                         render: function (data, type, row) {
-                            return `<div class="d-flex "><button class="btn btn-secondary me-2 btnedit"
+                            return `<div class="d-flex "><button class="btn btn-secondary me-2 btn-sm btnedit"
                         data-id="${row.ItemIdOJ}" data-code="${row.ItemCode}"
                         data-bs-toggle="tooltip" data-bs-placement="top"
                         title="Edit Item"><i class="bi bi-pencil-square"></i></button> 
                         
 
-                         <button class="btn btn-primary btnview"
+                         <button class="btn btn-primary btn-sm btnview"
                          data-id="${row.ItemIdOJ}" 
                          data-code="${row.ItemCode}"
                          data-bs-toggle="tooltip" 
@@ -1361,7 +1375,7 @@
                                         parametersname: inspe.parametersname,
                                         pquality: inspe.pquality,
                                         puomname: inspe.puomname,
-                                        action: '<button class="btn btn-danger btndelete" data-id="' + inspe.ItemQualityId + '"><i class="bi bi-trash3"></i></button>'
+                                        action: '<button class="btn btn-danger   btndelete btn-sm " data-id="' + inspe.ItemQualityId + '"><i class="bi bi-trash3 fs-6"></i></button>'
                                     });
                                 });
                             }
@@ -1859,8 +1873,8 @@ $('#itemForm').on('submit', function (e) {
                                         parametersname: inspe.parametersname,
                                         pquality: inspe.pquality,
                                         puomname: inspe.puomname,
-                                        action: `<button type="button" class="btn btn-danger btndelete" data-id="${inspe.itemquality}">
-                                        <i class="bi bi-trash3"></i>
+                                        action: `<button type="button" class="btn btn-danger btn-sm btndelete" data-id="${inspe.itemquality}">
+                                        <i class="bi bi-trash3 fs-6"></i>
                                     </button>`
 
                                     });
@@ -2080,8 +2094,8 @@ $('#itemForm').on('submit', function (e) {
                             QualityParametersName: inspe.QualityParametersName,
                             PQuality: inspe.PQuality,
                             PUOMName: inspe.PUOMName,
-                            Action: `<button type="button" class="btn btn-danger btndelete" data-id="${inspe.ItemQualityId}">
-                                    <i class="bi bi-trash3"></i>
+                            Action: `<button type="button" class="btn btn-danger btn-sm btndelete" data-id="${inspe.ItemQualityId}">
+                                    <i class="bi bi-trash3 fs-6"></i>
                                 </button>`
                         };
                     });

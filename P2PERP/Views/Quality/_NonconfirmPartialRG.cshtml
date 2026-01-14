@@ -4,44 +4,44 @@
 
         <div class="row g-3">
             <div class="col-md-6">
-                <label class="form-label">GRN No</label>
-                <input type="text" class="form-control" id="grnno" name="GRNCode" value="@ViewBag.GRN" readonly />
+                <label class="form-label fw-bold text-dark">GRN No</label>
+                <input type="text" class="form-control form-control-sm text-dark shadow-sm" id="grnno" name="GRNCode" value="@ViewBag.GRN" readonly />
             </div>
             <div class="col-md-6">
-                <label class="form-label">Failed QC Code</label>
-                <input type="text" class="form-control" id="Nccode" name="NCode" value="@ViewBag.NcCode" readonly />
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label">Inspection Type</label>
-                <input type="text" class="form-control" id="insptype" name="InspectionType" value="@ViewBag.InspType" readonly />
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Plan Name</label>
-                <input type="text" class="form-control" id="planname" name="PlanName" value="@ViewBag.planname" readonly />
+                <label class="form-label fw-bold text-dark">Failed QC Code</label>
+                <input type="text" class="form-control form-control-sm text-dark shadow-sm" id="Nccode" name="NCode" value="@ViewBag.NcCode" readonly />
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">Item Name</label>
-                <input type="text" class="form-control" id="itemname" name="ItemName" value="@ViewBag.itemname" readonly />
+                <label class="form-label fw-bold text-dark">Inspection Type</label>
+                <input type="text" class="form-control form-control-sm text-dark shadow-sm" id="insptype" name="InspectionType" value="@ViewBag.InspType" readonly />
             </div>
             <div class="col-md-6">
-                <label class="form-label">Sample Qty Checked</label>
-                <input type="text" class="form-control" id="sqc" name="SampleQualityCheck" value="@ViewBag.sqc" readonly />
+                <label class="form-label fw-bold text-dark">Plan Name</label>
+                <input type="text" class="form-control form-control-sm text-dark shadow-sm" id="planname" name="PlanName" value="@ViewBag.planname" readonly />
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">Inspection Frequency</label>
-                <input type="text" class="form-control" id="Inf" name="InspectionFrequency" value="@ViewBag.Inf" readonly />
+                <label class="form-label fw-bold text-dark">Item Name</label>
+                <input type="text" class="form-control form-control-sm text-dark shadow-sm" id="itemname" name="ItemName" value="@ViewBag.itemname" readonly />
             </div>
             <div class="col-md-6">
-                <label class="form-label">Item Tested Failed <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" id="itf" name="ItFailed" placeholder="Enter failed qty" />
+                <label class="form-label fw-bold text-dark">Sample Qty Checked</label>
+                <input type="text" class="form-control form-control-sm text-dark shadow-sm" id="sqc" name="SampleQualityCheck" value="@ViewBag.sqc" readonly />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold text-dark">Inspection Frequency</label>
+                <input type="text" class="form-control form-control-sm text-dark shadow-sm" id="Inf" name="InspectionFrequency" value="@ViewBag.Inf" readonly />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-bold text-dark">Item Tested Failed <span class="text-danger">*</span></label>
+                <input type="text" class="form-control form-control-sm text-dark shadow-sm" id="itf" name="ItFailed" placeholder="Enter failed qty" />
             </div>
 
             <div class="col-12">
-                <label class="form-label">Reason Of Rejection <span class="text-danger">*</span></label>
-                <textarea class="form-control" id="ROr" name="ReasonOfRejection" rows="2" placeholder="Enter reason"></textarea>
+                <label class="form-label fw-bold text-dark">Reason Of Rejection <span class="text-danger">*</span></label>
+                <textarea class="form-control form-control-sm text-dark shadow-sm" id="ROr" name="ReasonOfRejection" rows="2" placeholder="Enter reason"></textarea>
             </div>
         </div>
 
@@ -51,7 +51,7 @@
     </div>
 
     <div class="card-footer text-end mt-3">
-        <button type="button" class="btn btn-primary me-2" onclick="finalnc()">Initiate NC</button>
+        <button type="button" class="btn btn-primary me-2 px-2 py-1 btn-sm" onclick="finalnc()">Initiate NC</button>
     </div>
 
 </div>

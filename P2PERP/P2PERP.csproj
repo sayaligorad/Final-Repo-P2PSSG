@@ -14,7 +14,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>P2PERP</RootNamespace>
     <AssemblyName>P2PERP</AssemblyName>
-    <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
     <Use64BitIISExpress />
@@ -25,6 +25,7 @@
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -57,16 +58,14 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Web.Abstractions" />
     <Reference Include="System.Web.Routing" />
     <Reference Include="System.Xml" />
@@ -111,6 +110,7 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="System.Xml.Linq" />
     <Reference Include="WebGrease">
       <Private>True</Private>
       <HintPath>..\packages\WebGrease.1.6.0\lib\WebGrease.dll</HintPath>
@@ -2255,6 +2255,7 @@
     <Content Include="Content\dataTables.bootstrap5.min.css" />
     <Content Include="Content\dataTables.dataTables.min.css" />
     <Content Include="Content\daterangepicker.css" />
+    <Content Include="Content\fixedHeader.dataTables.min.css" />
     <Content Include="Content\font-family-inter.css" />
     <Content Include="Content\form-validation.css" />
     <Content Include="Content\images\avatars\1.png" />
@@ -5405,12 +5406,14 @@
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\bootstrap5%406.1.19_index.global.min.js" />
     <Content Include="Scripts\bootstrap5.js" />
+    <Content Include="Scripts\buttons.bootstrap5.min.js" />
     <Content Include="Scripts\buttons.html5.min.js" />
     <Content Include="Scripts\buttons.print.min.js" />
     <Content Include="Scripts\Calendar-modal.js" />
     <Content Include="Scripts\dashboards-analytics.js" />
     <Content Include="Scripts\dataTables.bootstrap5.min.js" />
     <Content Include="Scripts\dataTables.buttons.min.js" />
+    <Content Include="Scripts\dataTables.fixedHeader.min.js" />
     <Content Include="Scripts\dataTables.min.js" />
     <Content Include="Scripts\daterangepicker.min.js" />
     <Content Include="Scripts\exporting.js" />
@@ -5604,7 +5607,6 @@
     <Content Include="Views\Inventory\ShowStocklevelMHB.cshtml" />
     <Content Include="Views\Inventory\_StockFormMHB.cshtml" />
     <Content Include="Views\Inventory\_viewActionForplanlMHB.cshtml" />
-    <Content Include="Views\Purchase\ShowRejectedPRPRK.cshtml" />
     <Content Include="Views\Purchase\UserDashboardPRK.cshtml" />
     <Content Include="Views\Purchase\_ShowAllPRPartialPRK.cshtml" />
     <Content Include="Views\Purchase\_ShowApprovePOPartialPRK.cshtml" />
@@ -5637,6 +5639,7 @@
     <Content Include="Views\Purchase\_ApprovedPOsPartialVNK.cshtml" />
     <Content Include="Views\Purchase\JustInTimeItemListOK.cshtml" />
     <Content Include="Views\Shared\SendMailHSB.cshtml" />
+    <Content Include="Views\Purchase\_Rejectpr.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

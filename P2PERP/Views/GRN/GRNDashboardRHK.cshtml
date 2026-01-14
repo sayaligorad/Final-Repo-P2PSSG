@@ -4,13 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GRN Dashboard</title>
-    <!--
-      GRN Dashboard - Main View
-      This dashboard displays Key Performance Indicators (KPIs), charts, and recent GRN records.
-      Features include date filtering, modal views for detailed data, and export functionality.
-    -->
-
-
 
     <style>
         #reqTable th,
@@ -25,59 +18,151 @@
             vertical-align: middle;
         }
 
-        /* Improved charts container */
-        .charts-container {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
+        /* Chart Cards — Soft Materio Look */
         .chart-card {
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: #ffffff;
+            border-radius: 1rem !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease-in-out;
         }
 
-        .chart-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            .chart-card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            }
+
+        /* Highcharts Light Theme */
+        .highcharts-background {
+            fill: #ffffff !important;
         }
 
-        .chart-header {
-/*            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);*/
-            color: white !important;
-            border-radius: 12px 12px 0 0 !important;
-            padding: 1rem 1.5rem;
-            border: none;
+        .highcharts-title {
+            fill: #333 !important;
+            font-weight: 600;
         }
 
-        .chart-body {
-            padding: 1.5rem;
-            background-color: #f8f9fa;
+        .highcharts-axis-labels text {
+            fill: #666 !important;
+            font-size: 12px !important;
+            font-weight: 500;
         }
 
-        /* KPI Cards improvements */
-        .kpi-card {
-            transition: all 0.3s ease;
-            border: none;
-            border-radius: 12px;
-            overflow: hidden;
+        .highcharts-grid-line {
+            stroke: rgba(200, 200, 200, 0.2) !important;
         }
 
-        .kpi-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+        .highcharts-tooltip-box {
+            fill: #fff !important;
+            stroke: #ddd !important;
+            filter: drop-shadow(0px 3px 5px rgba(0, 0, 0, 0.05));
         }
 
-        .kpi-icon {
-            background: rgba(255, 255, 255, 0.2) !important;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
+      
+        /* Line chart smooth curve */
+        .highcharts-series path {
+            stroke-width: 3 !important;
+            filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.05));
+        }
+
+        /* Hover animation for cards */
+        .hover-shadow {
+            transition: all 0.3s ease-in-out;
+        }
+
+            .hover-shadow:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+            }
+
+        /* Card Border Shadow Variants */
+        .card-border-shadow-primary {
+            border-left: 4px solid #4e73df !important;
+        }
+
+        .card-border-shadow-success {
+            border-left: 4px solid #1cc88a !important;
+        }
+
+        .card-border-shadow-warning {
+            border-left: 4px solid #f6c23e !important;
+        }
+
+        .card-border-shadow-info {
+            border-left: 4px solid #36b9cc !important;
+        }
+
+        /* Bottom Border Animation */
+        .bottom-border {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            transition: width 0.3s ease-in-out;
+        }
+
+        .card:hover .bottom-border {
+            width: 100%;
+        }
+
+        /* Avatar Styles */
+        .avatar {
             display: flex;
             align-items: center;
             justify-content: center;
+            width: 48px;
+            height: 48px;
+        }
+
+        .avatar-initial {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Background Label Colors */
+        .bg-label-primary {
+            background-color: rgba(78, 115, 223, 0.1) !important;
+            color: #4e73df !important;
+        }
+
+        .bg-label-success {
+            background-color: rgba(28, 200, 138, 0.1) !important;
+            color: #1cc88a !important;
+        }
+
+        .bg-label-warning {
+            background-color: rgba(246, 194, 62, 0.1) !important;
+            color: #f6c23e !important;
+        }
+
+        .bg-label-info {
+            background-color: rgba(54, 185, 204, 0.1) !important;
+            color: #36b9cc !important;
+        }
+
+        /* Text Colors */
+        .text-primary {
+            color: #4e73df !important;
+        }
+
+        .text-success {
+            color: #1cc88a !important;
+        }
+
+        .text-warning {
+            color: #f6c23e !important;
+        }
+
+        .text-info {
+            color: #36b9cc !important;
+        }
+
+        /* Spacing adjustments */
+        .card-body {
+            padding: 1.5rem;
         }
 
         /* Floating button improvements */
@@ -86,10 +171,10 @@
             transition: all 0.3s ease;
         }
 
-        #dateFilterBtn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-        }
+            #dateFilterBtn:hover {
+                transform: scale(1.1);
+                box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            }
 
         /* Table improvements */
         .table-card {
@@ -99,26 +184,13 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        .table-card .card-header {
-            background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
-            color: white;
-            border-radius: 12px 12px 0 0 !important;
-            padding: 1rem 1.5rem;
-            border: none;
-        }
-
-
-        /* Make chart header titles and text white */
-        .card-header.chart-header h5,
-        .chart-header h5,
-        .chart-header .mb-0 {
-            color: white !important;
-        }
-
-        .chart-header .badge {
-            color: #f8f9fa !important;
-            background-color: rgba(255, 255, 255, 0.2) !important;
-        }
+            .table-card .card-header {
+                background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+                color: white;
+                border-radius: 12px 12px 0 0 !important;
+                padding: 1rem 1.5rem;
+                border: none;
+            }
 
         button.dt-button.processing,
         div.dt-button.processing {
@@ -131,189 +203,215 @@
                 content: none !important;
             }
 
+        /* Ripple effect for floating button */
+        .ripple {
+            position: relative;
+            overflow: hidden;
+        }
 
+            .ripple:after {
+                content: "";
+                display: block;
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                top: 0;
+                left: 0;
+                pointer-events: none;
+                background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+                background-repeat: no-repeat;
+                background-position: 50%;
+                transform: scale(10, 10);
+                opacity: 0;
+                transition: transform .5s, opacity 1s;
+            }
+
+            .ripple:active:after {
+                transform: scale(0, 0);
+                opacity: .2;
+                transition: 0s;
+            }
+
+        /* Chart header styling */
+        .chart-header {
+            color: white !important;
+            border-radius: 12px 12px 0 0 !important;
+            padding: 1rem 1.5rem;
+            border: none;
+        }
+
+            .chart-header h5,
+            .chart-header .mb-0 {
+                color: white !important;
+            }
+
+            .chart-header .badge {
+                color: #f8f9fa !important;
+                background-color: rgba(255, 255, 255, 0.2) !important;
+            }
+
+        .chart-body {
+            padding: 1.5rem;
+            background-color: #f8f9fa;
+        }
     </style>
-
 </head>
 <body>
     <div class="container-fluid py-4 main-content">
-        <!--
-      MAIN DASHBOARD CONTAINER
-      Contains all dashboard components including KPIs, charts, and data tables
-    -->
         <!-- FLOATING DATE FILTER BUTTON -->
         <button id="dateFilterBtn"
-                class="btn btn-primary rounded-circle shadow-lg position-fixed"
-                style="top: 70px; right: 20px; width: 60px; height: 60px; z-index: 1050;">
-            <i class="bi bi-calendar-date fs-4"></i>
-            <!--
-          This floating button triggers the date range picker for filtering dashboard data
-          Positioned fixed for easy access from anywhere on the page
-        -->
+                class="btn btn-primary btn-lg rounded-circle shadow-lg position-fixed d-flex align-items-center justify-content-center ripple"
+                style="top: 90px; right: 20px; width: 65px; height: 65px; z-index: 1050;">
+            <i class="bi bi-calendar-date fs-3"></i>
         </button>
 
-
-
-
+        <!-- Hidden input just to trigger daterangepicker -->
+        <input type="text" id="reportrange" style="display:none;" />
 
         <!-- KPI CARDS SECTION -->
-        <div class="row g-4 mb-4">
+        <div class="row g-6 mb-4">
             <!-- Total GRNs Card -->
-            <div class="col-md-4 col-lg-3">
-                <div class="card text-center shadow-sm kpi-card" id="TotalCountCard" style="cursor: pointer; background: linear-gradient(4135deg, burlywood, burlywood); color: white; ">
+            <div class="col-sm-6 col-lg-3">
+                <div id="TotalCountCard" class="card card-border-shadow-primary h-100 border-0 position-relative overflow-hidden hover-shadow" style="cursor: pointer;">
                     <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h5 class="card-title">Total GRNs</h5>
-                                <h2 id="TotalGRNCount">0</h2>
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="avatar me-4">
+                                <span class="avatar-initial rounded bg-label-primary">
+                                    <i class="bi bi-clipboard-data fs-4"></i>
+                                </span>
                             </div>
-                            <div class="kpi-icon">
-                                <i class="bi bi-clipboard-data bi-2x text-white"></i>
-                            </div>
+                            <h4 class="mb-0 fw-bold text-primary" id="TotalGRNCount">0</h4>
                         </div>
-                        <p class="mb-0 mt-2 small opacity-75 text-white">All time GRN count</p>
+                        <h6 class="mb-0 fw-normal">Total GRNs</h6>
+                        <p class="mb-0">
+                            <small class="text-body-secondary">All time GRN count</small>
+                        </p>
                     </div>
+                    <div class="bottom-border bg-primary"></div>
                 </div>
             </div>
 
             <!-- Total GRN Items Card -->
-            <div class="col-md-4 col-lg-3">
-                <div class="card text-center shadow-sm kpi-card" id="GRNItemsCountCard" style="cursor: pointer; background: linear-gradient(4135deg, aquamarine 100%, aquamarine); color: white;">
+            <div class="col-sm-6 col-lg-3">
+                <div id="GRNItemsCountCard" class="card card-border-shadow-success h-100 border-0 position-relative overflow-hidden hover-shadow" style="cursor: pointer;">
                     <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h5 class="card-title">Total GRN Items</h5>
-                                <h2 id="TotalGRNItemCount">0</h2>
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="avatar me-4">
+                                <span class="avatar-initial rounded bg-label-success">
+                                    <i class="bi bi-boxes fs-4"></i>
+                                </span>
                             </div>
-                            <div class="kpi-icon">
-                                <i class="bi bi-boxes bi-2x text-white"></i>
-                            </div>
+                            <h4 class="mb-0 fw-bold text-success" id="TotalGRNItemCount">0</h4>
                         </div>
-                        <p class="mb-0 mt-2 small opacity-75 text-white">All received items</p>
+                        <h6 class="mb-0 fw-normal">Total GRN Items</h6>
+                        <p class="mb-0">
+                            <small class="text-body-secondary">All received items</small>
+                        </p>
                     </div>
+                    <div class="bottom-border bg-success"></div>
                 </div>
             </div>
 
             <!-- QC Assigned Card -->
-            <div class="col-md-4 col-lg-3">
-                <div class="card text-center shadow-sm kpi-card" id="QCCountCard" style="cursor:pointer; background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); color: white;">
+            <div class="col-sm-6 col-lg-3">
+                <div id="QCCountCard" class="card card-border-shadow-warning h-100 border-0 position-relative overflow-hidden hover-shadow" style="cursor: pointer;">
                     <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h5 class="card-title">QC Assigned</h5>
-                                <h2 id="QCAssignedCount">0</h2>
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="avatar me-4">
+                                <span class="avatar-initial rounded bg-label-warning">
+                                    <i class="bi bi-clipboard-check fs-4"></i>
+                                </span>
                             </div>
-                            <div class="kpi-icon">
-                                <i class="bi bi-clipboard-check bi-2x text-white"></i>
-                            </div>
+                            <h4 class="mb-0 fw-bold text-warning" id="QCAssignedCount">0</h4>
                         </div>
-                        <p class="mb-0 mt-2 small opacity-75 text-white">Items for quality check</p>
+                        <h6 class="mb-0 fw-normal">QC Assigned</h6>
+                        <p class="mb-0">
+                            <small class="text-body-secondary">Items for quality check</small>
+                        </p>
                     </div>
+                    <div class="bottom-border bg-warning"></div>
                 </div>
             </div>
 
             <!-- Upcoming Items Card -->
-            <div class="col-md-4 col-lg-3">
-                <div class="card text-center shadow-sm kpi-card" id="UpcomingItemCard" style="cursor:pointer; background: linear-gradient(135deg, #0dcaf0 0%, #0ba6c8 100%); color: white;">
+            <div class="col-sm-6 col-lg-3">
+                <div id="UpcomingItemCard" class="card card-border-shadow-info h-100 border-0 position-relative overflow-hidden hover-shadow" style="cursor: pointer;">
                     <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h5 class="card-title">Upcoming Items</h5>
-                                <h2 id="UpcomingItemCount">0</h2>
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="avatar me-4">
+                                <span class="avatar-initial rounded bg-label-info">
+                                    <i class="bi bi-hourglass fs-4"></i>
+                                </span>
                             </div>
-                            <div class="kpi-icon">
-                                <i class="bi bi-hourglass bi-2x text-white"></i>
-                            </div>
+                            <h4 class="mb-0 fw-bold text-info" id="UpcomingItemCount">0</h4>
                         </div>
-                        <p class="mb-0 mt-2 small opacity-75 text-white">Upcoming Items from PO</p>
+                        <h6 class="mb-0 fw-normal">Upcoming Items</h6>
+                        <p class="mb-0">
+                            <small class="text-body-secondary">Upcoming Items from PO</small>
+                        </p>
                     </div>
+                    <div class="bottom-border bg-info"></div>
                 </div>
             </div>
         </div>
         <!-- END KPI CARDS SECTION -->
-
-
         <!-- CHARTS SECTION -->
-        
-
-
-
-        <!-- IMPROVED CHARTS SECTION -->
-        <div class="charts-container">
-
-            <div class="card chart-card shadow-sm">
-                <div class="card-header chart-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Quality Check Status Distribution</h5>
-                    <span class="badge bg-light text-dark">Date Range: <span id="selectedRangeBadge">This Year</span></span>
-
-                </div>
-                <div class="card-body chart-body">
-                    <div id="statusChart" style="height: 400px;"></div>
+        <div class="row g-4">
+            <!-- Quality Check Status Bar Chart -->
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-0 rounded-4 p-3 chart-card">
+                    <h6 class="fw-bold mb-3 text-success">
+                        <i class="bi bi-bar-chart-fill me-2"></i>Quality Check Status
+                    </h6>
+                    <div id="statusChart" style="height: 350px; min-width: 280px;"></div>
                 </div>
             </div>
 
-            <div class="card chart-card shadow-sm">
-                <div class="card-header chart-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>GRN Trends Over Time</h5>
-                    
-                </div>
-                <div class="card-body chart-body">
-                    <div id="trendChart" style="height: 400px;"></div>
+            <!-- GRN Trends Chart -->
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-0 rounded-4 p-3 chart-card">
+                    <h6 class="fw-bold mb-3 text-primary">
+                        <i class="bi bi-graph-up me-2"></i>GRN Trends Over Time
+                    </h6>
+                    <div id="trendChart" style="height: 350px; min-width: 280px;"></div>
                 </div>
             </div>
         </div>
         <!-- END CHARTS SECTION -->
-
-
-
         <!-- RECENT GRNs TABLE SECTION -->
-        <div class="card mt-4 shadow-sm">
-            <div class="card-header chart-header py-3">
+        <!--<div class="card mt-4 shadow-sm table-card">
+            <div class="card-header py-3" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%); color: white;">
                 <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Recent GRNs</h5>
             </div>
 
             <div class="card-body">
-                <div class="table-responsive">
-                    <!-- TABLE HEADER WITH FILTERS AND EXPORT BUTTONS -->
-                    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
-                        <!-- Date Range Filter -->
-                        <div class="input-group mt-4" style="height: 40px; max-width: 280px;">
-                            <span class="input-group-text bg-primary text-white" style="height: 100%;">
-                                <i class="bi bi-calendar-date"></i>
-                            </span>
-                            <input type="text" id="reportrange" class="form-control" placeholder="Select date range" readonly style="height: 100%;" />
-                            <!--
-                          Date range input for filtering the recent GRNs table
-                          Uses daterangepicker plugin for selection
-                        -->
-                        </div>
-
-                        <!-- Export Buttons Container -->
-                        <div class="d-flex align-items-center gap-3 ms-auto">
-                            <div id="exportContainer" class="d-flex" style="height: 40px; align-items: center;">
-                                <!--
-                              DataTable export buttons will be injected here
-                              Includes Print, PDF, Excel, and CSV export options
-                            -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- RECENT GRNs DATA TABLE -->
-                    <table id="reqTable" class="table table-bordered table-striped table-hover align-middle" style="width:100%">
+                <div class="table-responsive">-->
+        <!-- TABLE HEADER WITH FILTERS AND EXPORT BUTTONS -->
+        <!--<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">-->
+        <!-- Date Range Filter -->
+        <!--<div class="input-group mt-4" style="height: 40px; max-width: 280px;">
+            <span class="input-group-text bg-primary text-white" style="height: 100%;">
+                <i class="bi bi-calendar-date"></i>
+            </span>
+            <input type="text" id="reportrange" class="form-control" placeholder="Select date range" readonly style="height: 100%;" />
+        </div>-->
+        <!-- Export Buttons Container -->
+        <!--<div class="d-flex align-items-center gap-3 ms-auto">
+                <div id="exportContainer" class="d-flex" style="height: 40px; align-items: center;"></div>
+            </div>
+        </div>-->
+        <!-- RECENT GRNs DATA TABLE -->
+        <!--<table id="reqTable" class="table table-bordered table-striped table-hover align-middle" style="width:100%">
                         <thead class="table-dark">
                             <tr>
                                 <th><input type="checkbox" id="selectAll1"></th>
-                                <!-- Select all checkbox for batch operations -->
                                 <th>Sr.No</th>
                                 <th>GRN Code</th>
                                 <th>PO Code</th>
                                 <th>Vendor</th>
                                 <th>Invoice No</th>
-
                                 <th>Added By</th>
                                 <th>Added Date</th>
-                               
                             </tr>
                         </thead>
                         <tbody id="tblRecent">
@@ -324,86 +422,103 @@
                                             <span class="visually-hidden">Loading...</span>
                                         </div>
                                     </div>
-                                    <!-- Loading spinner displayed while table data is being fetched -->
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-
-
             </div>
-        </div>
+        </div>-->
         <!-- END RECENT GRNs TABLE SECTION -->
-
     </div>
-    <!-- END container-fluid -->
-
-
 
     <!-- REUSABLE MODAL FOR DETAILED VIEWS -->
-    <div class="modal fade" id="itemsModal" data-bs-backdrop="true" tabindex="-1" aria-labelledby="itemsModalLabel" aria-hidden="true">
+    @*<div class="modal fade" id="itemsModal" data-bs-backdrop="true" tabindex="-1" aria-labelledby="itemsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
-
                 <div class="modal-header bg-primary text-white position-relative">
                     <div class="w-100 text-center">
                         <h5 class="modal-title text-white fw-bold mb-2" id="itemsModalLabel">Details</h5>
                     </div>
-
                     <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3 mb-2" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-
                 <div class="modal-body" id="modalContent">
                     <div class="spinner-container text-center">
                         <div class="spinner-border text-primary" role="status"></div>
                     </div>
-                    <!--
-                      Modal content area - dynamically loaded with partial views
-                      Shows detailed information when KPI cards or chart segments are clicked
-                    -->
                 </div>
+            </div>
+        </div>
+    </div>*@
+
+
+    <!-- Modal Code -->
+    <div class="modal fade" id="itemsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content shadow-lg rounded-3">
+                <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-1">
+                    <!-- Modal title -->
+                    <h5 class="modal-title fw-bold text-white mb-0 fs-5" id="itemsModalLabel"></h5>
+                    <!-- Close button -->
+                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <!-- Modal body -->
+                <div class="modal-body" id="modalContent"></div>
             </div>
         </div>
     </div>
 
-
-    <!-- END REUSABLE MODAL -->
-    <!-- JAVASCRIPT SECTION -->
     <script>
-
-
         // GLOBAL VARIABLES
-        let dataTable;          // DataTable instance for the recent GRNs table
-        let selectedStartDate = ''; // Start date for filtering
-        let selectedEndDate = '';   // End date for filtering
-        let statusChart, trendChart; // Highcharts chart instances
-        let tableStartDate = null; // Start date for table filtering
-        let tableEndDate = null;   // End date for table filtering
+        let dataTable;
+        let selectedStartDate = '';
+        let selectedEndDate = '';
+        let statusChart, trendChart; // Keeping original variable names
+        let tableStartDate = null;
+        let tableEndDate = null;
 
+        // === Global Highcharts Theme ===
+        Highcharts.setOptions({
+            chart: {
+                style: {
+                    fontFamily: 'Poppins, sans-serif'
+                }
+            },
+            colors: ['#6EC6FF', '#FFD54F', '#A5D6A7', '#F48FB1', '#90CAF9', '#CE93D8'],
+            title: { style: { color: '#333', fontWeight: 'bold' } },
+            xAxis: {
+                lineColor: '#e0e0e0',
+                labels: { style: { color: '#666', fontSize: '12px' } }
+            },
+            yAxis: {
+                gridLineColor: '#f0f0f0',
+                labels: { style: { color: '#666', fontSize: '12px' } }
+            },
+            tooltip: {
+                borderColor: '#ddd',
+                borderRadius: 10,
+                backgroundColor: 'rgba(255,255,255,0.95)',
+                style: { color: '#333', fontSize: '13px' },
+                shadow: { color: 'rgba(0,0,0,0.05)', offsetX: 2, offsetY: 2, opacity: 0.5, width: 1 }
+            },
+            plotOptions: {
+                series: { animation: { duration: 1000 } }
+            }
+        });
 
-
-
-
-
-
-        // DOCUMENT READY FUNCTION - Initializes the dashboard when page is loaded
         $(document).ready(function () {
-
-            
-            // Initialize date range picker for the floating button
+            // Initialize date range picker
             initDateRangePicker();
 
-            // Set up click event handlers for KPI cards
+            // Set up click event handlers for KPI cards - using original IDs
             $("#TotalCountCard").click(() => openModalWithPartial("/GRN/GetGRNListPartialRHK", "All GRNs"));
             $("#GRNItemsCountCard").click(() => openModalWithPartial("/GRN/GetGRNItemsPartialRHK", "GRN Items"));
             $("#QCCountCard").click(() => openModalWithPartial("/GRN/GetQCListPartialRHK", "QC Assigned Items"));
             $("#UpcomingItemCard").click(() => openModalWithPartial("/GRN/GetUpcomingItemPartialRHK", "Upcoming Items"));
+
             // Load initial data
             loadRecentGRNs(selectedStartDate, selectedEndDate);
         });
-
-
 
         function initDateRangePicker1() {
             $('#reportrange').daterangepicker({
@@ -421,32 +536,26 @@
                 }
             });
 
-            // Apply date range when user selects
             $('#reportrange').on('apply.daterangepicker', function (ev, picker) {
                 tableStartDate = picker.startDate;
                 tableEndDate = picker.endDate;
                 $(this).val(tableStartDate.format('DD/MM/YYYY') + ' - ' + tableEndDate.format('DD/MM/YYYY'));
-
-                // Filter the table based on date range
                 filterTableByDate();
             });
 
-            // Clear date range on cancel
             $('#reportrange').on('cancel.daterangepicker', function (ev, picker) {
                 tableStartDate = null;
                 tableEndDate = null;
                 $(this).val('');
-                dataTable.draw(); // Reset filtering
+                dataTable.draw();
             });
         }
 
         function filterTableByDate() {
             if (tableStartDate && tableEndDate) {
-                // Custom filtering function for date range
                 $.fn.dataTable.ext.search.push(
                     function (settings, data, dataIndex) {
-                        var date = moment(data[7], 'DD/MM/YYYY'); // Assuming date is in 4th column (index 3)
-
+                        var date = moment(data[7], 'DD/MM/YYYY');
                         if ((tableStartDate === null && tableEndDate === null) ||
                             (tableStartDate === null && date <= tableEndDate) ||
                             (tableStartDate <= date && tableEndDate === null) ||
@@ -459,41 +568,26 @@
             }
 
             dataTable.draw();
-
-            // Remove the custom filter function after drawing
             $.fn.dataTable.ext.search.pop();
         }
 
-
-
-
-
-
-
-        // INITIALIZE DATE RANGE PICKER FOR DASHBOARD FILTERING
         function initDateRangePicker() {
-            const start = moment().startOf('year'); // Default: last 7 days
+            const start = moment().startOf('year');
             const end = moment().endOf('year');
 
-            // Update dashboard with selected date range
             function updateDashboard(start, end) {
                 selectedStartDate = start.format('YYYY-MM-DD');
                 selectedEndDate = end.format('YYYY-MM-DD');
 
-                // Update the display
                 $('#dateFilterBtn span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
                 $('#selectedRangeBadge').text(start.format('MMM D') + ' - ' + end.format('MMM D'));
 
-                // Refresh all dashboard components with new date range
                 loadKPIData(selectedStartDate, selectedEndDate);
                 loadStatusData(selectedStartDate, selectedEndDate);
                 loadTrendData(selectedStartDate, selectedEndDate);
                 loadRecentGRNs(selectedStartDate, selectedEndDate);
             }
 
-
-
-            // Initialize the date range picker on floating button
             $('#dateFilterBtn').daterangepicker({
                 startDate: start,
                 endDate: end,
@@ -507,7 +601,6 @@
                     'Last 1 Month': [moment().subtract(1, 'months').startOf('day'), moment()],
                     'Last 3 Months': [moment().subtract(3, 'months').startOf('day'), moment()],
                     'Last 1 Year': [moment().subtract(12, 'months').startOf('day'), moment()]
-
                 },
                 alwaysShowCalendars: true,
                 autoApply: false
@@ -515,50 +608,33 @@
                 updateDashboard(start, end);
             });
 
-               // Clear date range on cancel
-   $('#reportrange').on('cancel.daterangepicker', function (ev, picker) {
-       tableStartDate = null;
-       tableEndDate = null;
-       $(this).val('');
-       dataTable.draw(); // Reset filtering
-   });
+            $('#reportrange').on('cancel.daterangepicker', function (ev, picker) {
+                tableStartDate = null;
+                tableEndDate = null;
+                $(this).val('');
+                dataTable.draw();
+            });
 
-            // Clear date range on cancel (Clear button)
             $('#dateFilterBtn').on('cancel.daterangepicker', function (ev, picker) {
-                // Reset selected dates
                 selectedStartDate = "";
                 selectedEndDate = "";
-
-                // Clear the button text
                 $('#dateFilterBtn span').html('All Data');
                 $('#selectedRangeBadge').text('All');
-
-                // Reload full dashboard without date filter
                 loadKPIData(null, null);
                 loadStatusData(null, null);
                 loadTrendData(null, null);
                 loadRecentGRNs(null, null);
             });
 
-
-            // Trigger initial load with default date range
             updateDashboard(start, end);
         }
 
-
-
-
-
-
-        // LOAD KPI DATA WITH DATE PARAMETERS
         function loadKPIData(startDate, endDate) {
-            // Show loading states
             $("#TotalGRNCount").html('<span class="spinner-border spinner-border-sm"></span>');
             $("#TotalGRNItemCount").html('<span class="spinner-border spinner-border-sm"></span>');
             $("#QCAssignedCount").html('<span class="spinner-border spinner-border-sm"></span>');
             $("#UpcomingItemCount").html('<span class="spinner-border spinner-border-sm"></span>');
 
-            // Load each KPI with date parameters 
             $.getJSON("/GRN/GetTotalGRNRHK", { startDate: startDate, endDate: endDate }, function (data) {
                 $("#TotalGRNCount").text(data.count || 0);
             }).fail(function () {
@@ -584,11 +660,7 @@
             });
         }
 
-
-
-
-
-        // LOAD STATUS DATA FOR PIE CHART
+        // LOAD STATUS DATA FOR BAR CHART (keeping original function name)
         function loadStatusData(startDate, endDate) {
             $.getJSON("/GRN/GetApproveCountRHK", { startDate: startDate, endDate: endDate }, function (res1) {
                 $.getJSON("/GRN/GetRejectedGRNCountRHK", { startDate: startDate, endDate: endDate }, function (res2) {
@@ -596,7 +668,6 @@
                         const approvedCount = res1.count || 0;
                         const rejectedCount = res2.count || 0;
                         const pendingCount = res3.count || 0;
-
                         createStatusChart(approvedCount, rejectedCount, pendingCount);
                     }).fail(function () {
                         createStatusChart(0, 0, 0);
@@ -609,108 +680,166 @@
             });
         }
 
-
-
-        // CREATE STATUS CHART (PIE CHART)
+        // CREATE STATUS CHART AS BAR CHART (keeping original function name)
         function createStatusChart(approvedCount, rejectedCount, pendingCount) {
-            // Destroy existing chart instance if it exists
             if (statusChart) {
                 statusChart.destroy();
             }
 
-            // Create new Highcharts pie chart
             statusChart = Highcharts.chart('statusChart', {
                 chart: {
-                    type: 'pie',
-                    backgroundColor: 'transparent'
+                    type: 'bar',
+                    backgroundColor: 'transparent',
+                    height: 320,
+                    animation: { duration: 700 }
                 },
                 title: {
-                    text: 'Quality Check Status',
-                    style: { fontWeight: '600', fontSize: '18px' }
-                },
-                tooltip: {
-                    pointFormat: '{series.name}: <b>{point.y}</b> ({point.percentage:.1f}%)'
-                },
-                plotOptions: {
-                    pie: {
-                        allowPointSelect: true,
-                        cursor: 'pointer',
-                        dataLabels: {
-                            enabled: true,
-                            format: '<b>{point.name}</b>: {point.y}',
-                            style: { fontWeight: '500' }
-                        },
-                        colors: ['#28a745', '#dc3545', '#ffc107'] // Green, Red, Yellow
+                    text: 'Confirm, Non-Confirm & Pending Items',
+                    style: {
+                        fontSize: '18px',
+                        fontWeight: '600',
+                        color: '#2c3e50'
                     }
                 },
-                series: [{
-                    name: 'Items',
-                    colorByPoint: true,
-                    data: [
-                        { name: 'Confirmed', y: approvedCount },
-                        { name: 'Non-Confirmed', y: rejectedCount },
-                        { name: 'Pending', y: pendingCount }
-                    ],
-                    point: {
-                        events: {
-                            click: function () {
-                                // Open appropriate modal based on clicked segment
-                                if (this.name === "Confirmed") {
-                                    openModalWithPartial("/GRN/GetApprovedItemsPartialRHK", "Approved Items");
-                                } else if (this.name === "Non-Confirmed") {
-                                    openModalWithPartial("/GRN/GetRejectedItemsPartialRHK", "Rejected Items");
-                                } else if (this.name === "Pending") {
-                                    openModalWithPartial("/GRN/GetPendingItemsPartialRHK", "Pending Items");
-                                } else {
-                                    openModalWithPartial("/GRN/GetQCListPartialRHK", "QC Assigned Items");
+                xAxis: {
+                    categories: ['Confirm', 'Non Confirm', 'Pending'],
+                    labels: {
+                        style: {
+                            fontSize: '14px',
+                            fontWeight: '600',
+                            color: '#2c3e50'
+                        }
+                    }
+                },
+                yAxis: {
+                    title: { text: '' },
+                    min: 0,
+                    allowDecimals: false,
+                    gridLineColor: '#e5e5e5',
+                    labels: {
+                        formatter: function () {
+                            return Highcharts.numberFormat(this.value, 0);
+                        },
+                        style: {
+                            color: '#555',
+                            fontWeight: '500'
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: '#fff',
+                    borderColor: '#ccc',
+                    borderRadius: 4,
+                    shadow: true,
+                    useHTML: true,
+                    pointFormatter: function () {
+                        return `<b>${this.name}:</b> ${Highcharts.numberFormat(this.y, 0)} items`;
+                    }
+                },
+                plotOptions: {
+                    bar: {
+                        borderRadius: 6,
+                        pointPadding: 0.2,
+                        groupPadding: 0.15,
+                        dataLabels: {
+                            enabled: true,
+                            style: {
+                                fontWeight: '600',
+                                color: '#000',
+                                textOutline: 'none',
+                                fontSize: '13px'
+                            }
+                        },
+                        states: {
+                            hover: {
+                                brightness: 0.1
+                            }
+                        },
+                        cursor: 'pointer',
+                        point: {
+                            events: {
+                                click: function () {
+                                    if (this.category === 'Confirm') {
+                                        openModalWithPartial("/GRN/GetApprovedItemsPartialRHK", "Approved Items");
+                                    } else if (this.category === 'Non Confirm') {
+                                        openModalWithPartial("/GRN/GetRejectedItemsPartialRHK", "Rejected Items");
+                                    } else {
+                                        openModalWithPartial("/GRN/GetPendingItemsPartialRHK", "Pending Items");
+                                    }
                                 }
                             }
                         }
                     }
-                }],
-                credits: { enabled: false }
+                },
+                legend: { enabled: false },
+                credits: { enabled: false },
+                series: [{
+                    name: 'Count',
+                    data: [
+                        { name: 'Confirm', y: approvedCount, color: '#28a745' },   // Green
+                        { name: 'Non Confirm', y: rejectedCount, color: '#dc3545' }, // Red
+                        { name: 'Pending', y: pendingCount, color: '#fd7e14' }     // Orange
+                    ]
+                }]
             });
         }
 
 
 
-        // LOAD TREND DATA WITH DATE RANGE
+
+
         function loadTrendData(startDate, endDate) {
             $.getJSON("/GRN/GetGRNTrendsRHK", { startdate: startDate, enddate: endDate }, function (res) {
-                // Destroy existing chart if it exists
                 if (trendChart) {
                     trendChart.destroy();
                 }
 
-                // Create new Highcharts line chart
                 trendChart = Highcharts.chart('trendChart', {
                     chart: {
-                        type: 'line',
-                        backgroundColor: 'transparent'
+                        type: 'spline',
+                        backgroundColor: 'transparent',
+                        height: 300
                     },
                     title: {
-                        text: 'GRN Trends',
-                        style: { fontWeight: '600', fontSize: '18px' }
+                        text: 'GRN Trends Over Time',
+                        style: {
+                            fontSize: '16px',
+                            fontWeight: 'bold',
+                            color: '#333'
+                        }
                     },
                     xAxis: {
                         categories: res.dates,
                         title: { text: 'Date' }
                     },
                     yAxis: {
-                        title: { text: 'Number of GRNs' },
-                        min: 0
+                        min: 0,
+                        title: {
+                            text: 'Number of GRNs'
+                        },
+                        labels: {
+                            formatter: function () {
+                                return Highcharts.numberFormat(this.value, 0); // 0 decimal places
+                            }
+                        },
+                        allowDecimals: false
+                    },
+                    tooltip: {
+                        pointFormatter: function () {
+                            return '<span style="color:' + this.color + '">●</span> ' + this.series.name + ': <b>' + Highcharts.numberFormat(this.y, 0) + '</b><br/>';
+                        }
+                    },
+                    plotOptions: {
+                        spline: {
+                            dataLabels: {
+                                enabled: false
+                            }
+                        }
                     },
                     series: [{
                         name: 'GRNs',
                         data: res.counts,
-                        color: '#4361ee',
-                        lineWidth: 3,
-                        marker: {
-                            radius: 5,
-                            fillColor: '#ffffff',
-                            lineWidth: 2,
-                            lineColor: '#4361ee'
-                        }
+                        color: '#4361ee'
                     }],
                     credits: { enabled: false }
                 });
@@ -721,8 +850,14 @@
                 }
 
                 trendChart = Highcharts.chart('trendChart', {
-                    chart: { type: 'line' },
-                    title: { text: 'GRN Trends' },
+                    chart: {
+                        type: 'spline',
+                        backgroundColor: 'transparent'
+                    },
+                    title: { text: 'GRN Trends Over Time' },
+                    yAxis: {
+                        allowDecimals: false
+                    },
                     series: [{ name: 'GRNs', data: [] }],
                     credits: { enabled: false }
                 });
@@ -730,51 +865,39 @@
         }
 
 
-
-        // LOAD RECENT GRNs WITH DATE FILTERING
-
-
         function loadRecentGRNs(startDate, endDate) {
             $('#tableSpinner').removeClass('d-none');
 
-            // AJAX call to fetch recent GRN data
             $.ajax({
                 url: "/GRN/RecentGRNListRHK",
                 success: function (response) {
-                    console.log(response); // Debugging output
-
+                    console.log(response);
                     $('#tblRecent').empty();
 
                     if (response.data?.length > 0) {
                         let i = 1;
-                        // Populate table with received data
                         response.data.forEach((d) => {
-
-                        
-
                             $('#tblRecent').append(`
-                            <tr>
-                                <td><input type="checkbox" class="row-select" value="${d.GRNCode}"></td>
-                                <td>${i}</td>
-                                <td>${d.GRNCode || 'N/A'}</td>
-                                <td>${d.POCode || 'N/A'}</td>
-                                <td>${d.Vendor || 'N/A'}</td>
-                                <td>${d.InvoiceNo || 'N/A'}</td>
-                                <td>${d.AddedBy || 'N/A'}</td>
-                               <td>${moment(d.AddedDate).format('DD/MM/YYYY')}</td>
-                                
-                            </tr>
-                        `);
-                            i++; // Increment counter after using it
+                                    <tr>
+                                        <td><input type="checkbox" class="row-select" value="${d.GRNCode}"></td>
+                                        <td>${i}</td>
+                                        <td>${d.GRNCode || 'N/A'}</td>
+                                        <td>${d.POCode || 'N/A'}</td>
+                                        <td>${d.Vendor || 'N/A'}</td>
+                                        <td>${d.InvoiceNo || 'N/A'}</td>
+                                        <td>${d.AddedBy || 'N/A'}</td>
+                                       <td>${moment(d.AddedDate).format('DD/MM/YYYY')}</td>
+                                    </tr>
+                                `);
+                            i++;
                         });
                     } else {
                         $('#tblRecent').html('<tr><td colspan="9" class="text-center py-4">No recent GRNs</td></tr>');
                     }
 
-                    // Initialize DataTable and date picker for table filtering
                     initDataTable();
                     initDateRangePicker1();
-                    $('#tableSpinner').addClass('d-none'); // Hide spinner after load
+                    $('#tableSpinner').addClass('d-none');
                 },
                 error: function () {
                     $('#tblRecent').html('<tr><td colspan="9" class="text-center py-4 text-danger">Error loading data</td></tr>');
@@ -783,29 +906,13 @@
             });
         }
 
-        // HELPER FUNCTION TO GET BADGE COLOR BASED ON STATUS
-        function getStatusBadgeColor(status) {
-            switch (status?.toLowerCase()) {
-                case 'approved': return 'success';
-                case 'rejected': return 'danger';
-                case 'pending': return 'warning';
-                default: return 'secondary';
-            }
-        }
-
-
-
         function initDataTable() {
-            // Destroy existing DataTable instance if it exists
             if (dataTable) {
                 dataTable.destroy();
             }
 
-
             let $table = $(".table");
 
-
-            // Initialize DataTable with configuration
             dataTable = $('#reqTable').DataTable({
                 pageLength: 10,
                 paging: true,
@@ -813,7 +920,6 @@
                 searching: true,
                 dom: '<"d-flex justify-content-between align-items-center mt-1 mb-2"Bf>rt<"d-flex justify-content-between mt-2"<"datatable-info"i><"datatable-pagination"p>>',
                 buttons: [
-                    // 🔹 Print
                     {
                         extend: 'print',
                         text: '<i class="bi bi-printer-fill text-dark fs-5"></i>',
@@ -844,46 +950,38 @@
                                     return typeof data === 'string'
                                         ? data.replace(/<[^>]*>/g, '').trim()
                                         : data;
-
                                 }
                             }
                         },
                         customize: function (win) {
                             var $body = $(win.document.body);
-
                             $body.append(`
-        <style>
-            thead th {
-                background-color: black !important;
-                color: white !important;
-                text-align: center !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-            table {
-                border-collapse: collapse !important;
-                width: 100% !important;
-            }
-            td, th {
-                border: 1px solid #000 !important;
-                padding: 6px !important;
-                 text-align: center !important;
-            }
-        </style>
-`);
-
+                <style>
+                    thead th {
+                        background-color: black !important;
+                        color: white !important;
+                        text-align: center !important;
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
+                    table {
+                        border-collapse: collapse !important;
+                        width: 100% !important;
+                    }
+                    td, th {
+                        border: 1px solid #000 !important;
+                        padding: 6px !important;
+                         text-align: center !important;
+                    }
+                </style>
+                                    `);
                             $body.find('h1').css('text-align', 'center');
-
-
-
                             $body.find('table')
                                 .addClass('table table-bordered table-striped')
                                 .css('width', '100%');
-
                             $body.css('font-size', '12pt');
                         }
                     },
-                    // 🔹 PDF
                     {
                         extend: 'pdfHtml5',
                         text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
@@ -892,18 +990,15 @@
                         orientation: 'landscape',
                         pagesize: 'A4',
                         customize: function (doc) {
-
                             doc.content.splice(1, 0, {
                                 text: 'Generated Date: ' + new Date().toLocaleDateString('en-GB'),
                                 alignment: 'center',
                                 margin: [0, 0, 0, 12]
                             });
 
-                            // Center table
                             var table = doc.content[doc.content.length - 1].table;
-                            table.widths = new Array(table.body[0].length).fill('*'); // equal widths
-                            doc.content[doc.content.length - 1].alignment = 'center'; // ✅ Center table
-
+                            table.widths = new Array(table.body[0].length).fill('*');
+                            doc.content[doc.content.length - 1].alignment = 'center';
 
                             doc.styles.tableHeader = { fillColor: '#000000', color: 'white', alignment: 'center' };
 
@@ -947,7 +1042,6 @@
                             }
                         }
                     },
-                    //Excel
                     {
                         extend: 'excelHtml5',
                         text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
@@ -979,15 +1073,10 @@
                         },
                         customize: function (xlsx) {
                             const sheet = xlsx.xl.worksheets['sheet1.xml'];
-
-                            // 🔹 Center the Title (Row 1)
                             $('row:first c', sheet).attr('s', '51');
-
-                            // 🔹 Center the "Generated Date" messageTop (Row 2)
                             $('row:eq(1) c', sheet).attr('s', '51');
                         }
                     },
-                    // 🔹 CSV
                     {
                         extend: 'csvHtml5',
                         text: '<i class="bi bi-filetype-csv text-primary fs-5"></i>',
@@ -1020,50 +1109,36 @@
                 ]
             });
 
-            // --- SelectAll toggle ---
             $('#selectAll1').off('change').on('change', function () {
                 $('#reqTable tbody .row-select').prop('checked', $(this).prop('checked'));
             });
 
-            // --- Update SelectAll state ---
             $('#reqTable').off('change', '.row-select').on('change', '.row-select', function () {
                 let total = $('#reqTable tbody .row-select').length;
                 let checked = $('#reqTable tbody .row-select:checked').length;
                 $('#selectAll1').prop('checked', total === checked);
             });
-
         }
 
-
-
-
-
-        // OPEN MODAL WITH PARTIAL VIEW
         function openModalWithPartial(url, title) {
             $("#itemsModal").modal("show");
             $("#itemsModalLabel").text(title);
             $("#modalContent").html('<div class="spinner-container"><div class="spinner-border text-primary"></div></div>');
 
-            // Pass date range to partial views
             const fullUrl = `${url}?startDate=${selectedStartDate}&endDate=${selectedEndDate}`;
 
-            // Load partial view content
             $.get(fullUrl, function (html) {
                 $("#modalContent").html(html);
 
                 let $table = $("#ListTable");
-              //  let $tblmain = $("#'#reqTable'")
-                // Append datatable1 class only if data rows exist
                 if ($table.find("tbody tr").length > 0 &&
                     !$table.find("tbody tr td").hasClass("text-center")) {
                     $table.addClass("datatable1");
                 }
 
-                // Initialize DataTable in modal if present
                 if ($(".datatable1").length) {
                     let $table = $(".datatable1");
 
-                    // ✅ Destroy existing DataTable if initialized
                     if ($.fn.DataTable.isDataTable($table)) {
                         $table.DataTable().destroy();
                     }
@@ -1073,10 +1148,8 @@
                         paging: true,
                         ordering: false,
                         searching: true,
-                        
                         dom: '<"d-flex justify-content-between align-items-center mt-1 mb-2"Bf>rt<"d-flex justify-content-between mt-2"<"datatable-info"i><"datatable-pagination"p>>',
                         buttons: [
-                            // 🔹 Print
                             {
                                 extend: 'print',
                                 text: '<i class="bi bi-printer-fill text-dark fs-5"></i>',
@@ -1107,46 +1180,38 @@
                                             return typeof data === 'string'
                                                 ? data.replace(/<[^>]*>/g, '').trim()
                                                 : data;
-
                                         }
                                     }
                                 },
                                 customize: function (win) {
                                     var $body = $(win.document.body);
-
                                     $body.append(`
-        <style>
-            thead th {
-                background-color: black !important;
-                color: white !important;
-                text-align: center !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-            table {
-                border-collapse: collapse !important;
-                width: 100% !important;
-            }
-            td, th {
-                border: 1px solid #000 !important;
-                padding: 6px !important;
-                 text-align: center !important;
-            }
-        </style>
-`);
-
+                <style>
+                    thead th {
+                        background-color: black !important;
+                        color: white !important;
+                        text-align: center !important;
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
+                    table {
+                        border-collapse: collapse !important;
+                        width: 100% !important;
+                    }
+                    td, th {
+                        border: 1px solid #000 !important;
+                        padding: 6px !important;
+                         text-align: center !important;
+                    }
+                </style>
+                                            `);
                                     $body.find('h1').css('text-align', 'center');
-
-
-
                                     $body.find('table')
                                         .addClass('table table-bordered table-striped')
                                         .css('width', '100%');
-
                                     $body.css('font-size', '12pt');
                                 }
                             },
-                            // 🔹 PDF
                             {
                                 extend: 'pdfHtml5',
                                 text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
@@ -1155,18 +1220,15 @@
                                 orientation: 'landscape',
                                 pagesize: 'A4',
                                 customize: function (doc) {
-
                                     doc.content.splice(1, 0, {
                                         text: 'Generated Date: ' + new Date().toLocaleDateString('en-GB'),
                                         alignment: 'center',
                                         margin: [0, 0, 0, 12]
                                     });
 
-                                    // Center table
                                     var table = doc.content[doc.content.length - 1].table;
-                                    table.widths = new Array(table.body[0].length).fill('*'); // equal widths
-                                    doc.content[doc.content.length - 1].alignment = 'center'; // ✅ Center table
-
+                                    table.widths = new Array(table.body[0].length).fill('*');
+                                    doc.content[doc.content.length - 1].alignment = 'center';
 
                                     doc.styles.tableHeader = { fillColor: '#000000', color: 'white', alignment: 'center' };
 
@@ -1241,15 +1303,10 @@
                                 },
                                 customize: function (xlsx) {
                                     const sheet = xlsx.xl.worksheets['sheet1.xml'];
-
-                                    // Center the title
                                     $('row:first c', sheet).attr('s', '51');
-
-                                    // Center the "Generated Date" messageTop
                                     $('row:eq(1) c', sheet).attr('s', '51');
                                 }
                             },
-                            // 🔹 CSV
                             {
                                 extend: 'csvHtml5',
                                 text: '<i class="bi bi-filetype-csv text-primary fs-5"></i>',
@@ -1282,38 +1339,22 @@
                         ]
                     });
 
-                    // --- SelectAll toggle ---
                     $('#selectAll').off('change').on('change', function () {
                         $('#ListTable tbody .row-select').prop('checked', $(this).prop('checked'));
                     });
 
-                    // --- Update SelectAll state ---
                     $('#ListTable').off('change', '.row-select').on('change', '.row-select', function () {
                         let total = $('#ListTable tbody .row-select').length;
                         let checked = $('#ListTable tbody .row-select:checked').length;
                         $('#selectAll').prop('checked', total === checked);
                     });
-
                 }
-
-
-
-
-
-
-
-
             }).fail(function () {
-                // Handle error case
                 $("#modalContent").html(
                     '<div class="alert alert-danger text-center mt-3">Failed to load data. Please try again.</div>'
                 );
             });
         }
-
-
-
-
 
         // ✅ Configure toastr once
         toastr.options = {
@@ -1334,8 +1375,6 @@
         function showExportToast() {
             toastr.warning("Please select at least one row before exporting.");
         }
-
-
     </script>
 </body>
 </html>

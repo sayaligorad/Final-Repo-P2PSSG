@@ -28,10 +28,10 @@
 </style>
 
 
-<div class="text-center mb-3">
+@*<div class="text-center mb-3">
     <h3 class="text-primary fw-bold">Pending Purchase Order</h3>
 
-</div>
+</div>*@
 
 <!-- Date Range Picker -->
 <div class="mb-3">
@@ -70,7 +70,7 @@
 
             <!-- Card Header -->
             <div class="modal-header bg-primary text-white justify-content-center">
-                <h3 class="modal-title fw-bold w-100 text-center mb-3 text-white">Pending Purchase Order Details</h3>
+                <h5 class="modal-title fw-bold w-100 text-center mb-3 text-white">Pending Purchase Order Details</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
@@ -141,10 +141,15 @@
                             let buttons = '';
 
                             if (amount < 500000) {
-                                buttons += `<button class="btn btn-sm btn-success btn-approve" data-pocode="${pocode}">Approve</button>`;
+                                buttons += `<button class="btn btn-sm btn-success btn-approve" data-pocode="${pocode}"><i class="bi bi-check-circle text-white" 
+                  data-bs-toggle="tooltip" 
+                  data-bs-placement="top" 
+                  title="Approve" 
+                  style="cursor:pointer; font-size:18px;" 
+                  "></i></button>`;
                             }
 
-                            buttons += `<button class="btn btn-sm btn-view btn-primary ms-1" data-pocode="${pocode}"><i class="bi bi-eye-fill"></i></button>`;
+                            buttons += `<button class="btn btn-sm btn-view btn-primary square-pill d-inline-flex align-items-center px-2 py-1  ms-1" data-pocode="${pocode}"><i class="bi bi-eye-fill"></i></button>`;
                             return buttons;
                         }
                     }
@@ -441,19 +446,35 @@
                 buttonsStyling: false
             }).then((result) => {
                 if (result.isConfirmed) {
+
+                    
+                    Swal.fire({
+                        title: 'Sending POS...',
+                        text: 'Please wait while email is sending to Vendor .',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                   
                     $.post('/Purchase/ApprovePONAM', { poCode }, function (res) {
+
+                      
+                        Swal.close();
+
                         if (res.success) {
-                            // First success alert for approval
+                            
                             Swal.fire({
                                 icon: 'success',
                                 title: 'PO ' + poCode + ' approved!',
                                 showConfirmButton: false,
                                 timer: 2000
                             }).then(() => {
-                                // Second info alert for email sent
+                                
                                 Swal.fire({
                                     icon: 'info',
-                                    title: 'Email sent to vendor!',
+                                    title: 'Email sent to vendor',
                                     showConfirmButton: false,
                                     timer: 2000
                                 });
@@ -478,7 +499,7 @@
             });
         });
 
-        // Date Range Picker filter
+
         // ✅ Date filter with custom ranges for Pending PO
         $(document).off('focus', '#PendingDatepicker').on('focus', '#PendingDatepicker', function () {
             if (!$(this).data('daterangepicker')) {
