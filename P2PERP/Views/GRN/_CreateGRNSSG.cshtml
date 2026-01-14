@@ -161,6 +161,7 @@
                     <th>Item Name</th>
                     <th>Description</th>
                     <th>Quantity</th>
+                    <th>UOM</th>
                     <th>Unit Rate</th>
                     <th>Discount</th>
                     <th>GST</th>
@@ -348,6 +349,7 @@ $(document).ready(function () {
                 }
             },
             { data: 'Quantity', className: 'text-center' },
+            { data: 'UOMName', className: 'text-center' },
             { data: 'UnitRate', className: 'text-center', render: data => `₹${data}` },
             { data: 'Discount', className: 'text-center', render: data => `${data}%` },
             { data: 'GST', className: 'text-center' },
@@ -496,6 +498,7 @@ $(document).ready(function () {
             ItemName: item ? (item.ItemName || item.Name || item.itemName || '') : '',
             Description: item ? (item.Description || item.Desc || '') : '',
             Quantity: qty,
+            UOMName: item ? (item.UOMName || '') : '',
             UnitRate: item ? (item.CostPerUnit || item.UnitRate || 0) : 0,
             Discount: item ? (item.DiscountPercent || item.Discount || 0) : 0,
             GST: item ? (item.GST || 0) : 0,
