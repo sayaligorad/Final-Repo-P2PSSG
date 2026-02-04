@@ -268,12 +268,12 @@
                         </div>
 
                         <!-- Modal Footer -->
-                        @*<div class="modal-footer py-2 d-flex justify-content-end">
+                        <div class="modal-footer py-2 d-flex justify-content-end">
                             <button type="button" class="btn btn-success btn-sm px-3 d-flex align-items-center text-nowrap" onclick="OpenPOView()">
                                 <i class="bi bi-plus-circle me-1"></i> Create PO
                             </button>
                             
-                        </div>*@
+                        </div>
                     </div>
                 </div>
             </div>
@@ -662,6 +662,7 @@
                         btnApi.processing(true);
 
                         // If pdfMake exists, wrap its download so we can stop spinner when done
+                        //dnsnd
                         if (window.pdfMake && pdfMake.createPdf && !pdfMake._patchedForDT) {
                             (function () {
                                 var origCreate = pdfMake.createPdf;
@@ -982,75 +983,18 @@
             $("#subAmount").text('₹' + row.SubAmount);
             console.log("SubAmount= ", row.SubAmount);
 
-
-            // 👇👇 ADD THIS PART HERE 👇👇
-            //convertInputToLabel("quotationIdLarge");
-            //convertInputToLabel("vendorNameLarge");
-            //convertInputToLabel("vendorCodeLarge");
-            //convertInputToLabel("rfqCodeLarge");
-            //convertInputToLabel("companyName");
-            //convertInputToLabel("priority");
-
-
-
             // Convert RequiredDateString to dd/mm/yyyy
-            //if (row.RequiredDateString) {
-            //    $("#requireddate").val(moment(row.RequiredDateString, "YYYY-MM-DD").format("DD/MM/YYYY"));
-            //}
-
-            //// Convert QuotationDateString to dd/mm/yyyy
-            //if (row.QuotationDateString) {
-            //    $("#quotationDateLarge").val(moment(row.QuotationDateString, "YYYY-MM-DD").format("DD/MM/YYYY"));
-            //}
-            //if (row.VendorDeliveryDateString) {
-            //    $("#vendordeliverydate").val(moment(row.VendorDeliveryDateString, ["YYYY-MM-DD", "YYYY-MM-DDTHH:mm:ss"]).format("DD/MM/YYYY"));
-            //}
-
-            //if (row.RequiredDateString) {
-            //    $("#requireddate").val(
-            //        moment(row.RequiredDateString).format("DD/MM/YYYY")
-            //    );
-            //}
-            //convertInputToLabel("requireddate");
-
-
-            //$("#quotationDateLarge").val(
-            //    moment(row.QuotationDateString).format("DD/MM/YYYY")
-            //);
-            //convertInputToLabel("quotationDateLarge");
-
-            //$("#vendordeliverydate").val(
-            //    moment(row.VendorDeliveryDateString).format("DD/MM/YYYY")
-            //);
-            //if (row.RequiredDateString) {
-            //    $("#requireddate").text(
-            //        moment(row.RequiredDateString, "YYYY-MM-DD").format("DD/MM/YYYY")
-            //    );
-            //}
-
-
             if (row.RequiredDateString) {
-                $("#requireddate").val(moment(row.RequiredDateString).format("DD/MM/YYYY"));
+                $("#requireddate").val(moment(row.RequiredDateString, "YYYY-MM-DD").format("DD/MM/YYYY"));
             }
 
-            $("#quotationDateLarge").val(
-                moment(row.QuotationDateString).format("DD/MM/YYYY")
-            );
-
-            $("#vendordeliverydate").val(
-                moment(row.VendorDeliveryDateString).format("DD/MM/YYYY")
-            );
-
-
-            makeLabelValueInline("quotationIdLarge");
-            makeLabelValueInline("quotationDateLarge");
-            makeLabelValueInline("vendorNameLarge");
-            makeLabelValueInline("rfqCodeLarge");
-            makeLabelValueInline("companyName");
-            makeLabelValueInline("vendorCodeLarge");
-            makeLabelValueInline("requireddate");
-            makeLabelValueInline("vendordeliverydate");
-            makeLabelValueInline("priority");
+            // Convert QuotationDateString to dd/mm/yyyy
+            if (row.QuotationDateString) {
+                $("#quotationDateLarge").val(moment(row.QuotationDateString, "YYYY-MM-DD").format("DD/MM/YYYY"));
+            }
+            if (row.VendorDeliveryDateString) {
+                $("#vendordeliverydate").val(moment(row.VendorDeliveryDateString, ["YYYY-MM-DD", "YYYY-MM-DDTHH:mm:ss"]).format("DD/MM/YYYY"));
+            }
 
             // Fetch quotation items
             $.get('@Url.Action("FetchSelectedQuotationItemsOK", "Purchase")', { RQCode: row.QuotationID })
@@ -1194,106 +1138,6 @@
         let sr = checkedRows.findIndex(row => tbl.row(row).index() === rowIdx) + 1;
         return sr; // consecutive Sr.no
     }
-    //function convertInputToLabel(inputId) {
-    //    const $input = $("#" + inputId);
-
-    //    // prevent double conversion
-    //    if ($input.prop("tagName") !== "INPUT") return;
-
-    //    const value = $input.val();
-
-    //    const $label = $("<span>", {
-    //        id: inputId,
-    //        class: "form-control-plaintext fw-semibold text-dark",
-    //        text: value
-    //    });
-
-    //    $input.replaceWith($label);
-    //}
-    //function convertInputToLabel(inputId) {
-    //    const $input = $("#" + inputId);
-    //    const value = $input.val();
-
-    //    const $label = $("<div>", {
-    //        id: inputId,
-    //        class: "fw-semibold ps-3",
-    //        text: value
-    //    });
-
-    //    $input.replaceWith($label);
-    //}
-    function makeLabelValueInline(labelForId) {
-        const $label = $(`label[for='${labelForId}']`);
-        const $input = $("#" + labelForId);
-
-        if ($label.length === 0 || $input.length === 0) return;
-
-        const value = $input.val();
-
-        // ✅ Prevent duplicate :
-        if (!$label.text().trim().endsWith(":")) {
-            $label.text($label.text().trim() + " :").addClass("fs-6 fw-semibold");
-        }
-
-        // Create value span
-        const $value = $("<span>", {
-            id: labelForId,
-            text: value,
-            class: "fw-semibold"
-        });
-
-        // Create wrapper
-        const $wrapper = $("<div>", {
-            class: "d-flex align-items-center mb-2"
-        });
-
-        $label
-            .addClass("me-2 mb-0")
-            .css("min-width", "160px");
-
-        // Wrap label + value
-        $label.before($wrapper);
-        $wrapper.append($label).append($value);
-
-        // Remove old input
-        $input.remove();
-    }
-    //function makeLabelValueInline(fieldId) {
-    //    const $label = $(`label[for='${fieldId}']`);
-    //    const $input = $("#" + fieldId);
-
-    //    if ($label.length === 0 || $input.length === 0) return;
-
-    //    const value = $input.val();
-
-    //    // Create value span
-    //    const $value = $("<span>", {
-    //        id: fieldId,
-    //        text: value,
-    //        class: fieldId === "quotationIdLarge"
-    //            ? "fw-bold fs-4 text-dark"   // 👈 BIG TEXT
-    //            : "fw-semibold text-dark"
-    //    });
-
-    //    // Add colon to label
-    //    $label.text($label.text() + " :");
-
-    //    const $wrapper = $("<div>", {
-    //        class: "d-flex align-items-center mb-2"
-    //    });
-
-    //    $label
-    //        .addClass("me-2 mb-0")
-    //        .css("min-width", "160px");
-
-    //    $label.before($wrapper);
-    //    $wrapper.append($label).append($value);
-
-    //    // Remove input
-    //    $input.remove();
-    //}
-
-
 </script>
 </body>
 </html>

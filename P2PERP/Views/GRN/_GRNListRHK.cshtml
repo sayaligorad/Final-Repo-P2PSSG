@@ -10,10 +10,11 @@
                 <th>PO Code</th>
                 <th>Vendor</th>
                 <th>Invoice No</th>
-  
+
                 <th>Added By</th>
                 <th>GRN Date</th>
-              
+                <th>Action</th>
+
             </tr>
         </thead>
         <tbody>
@@ -34,7 +35,13 @@
 
                         <td>@item.AddedBy</td>
                         <td>@(item.AddedDate.HasValue? item.AddedDate.Value.ToString("dd'/'MM'/'yyyy", System.Globalization.CultureInfo.InvariantCulture): "")</td>
-                       
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary view-grn-items"
+                                    data-grncode="@item.GRNCode"
+                                    title="View GRN Items">
+                                <i class="bi bi-eye-fill"></i>
+                            </button>
+                        </td>
                     </tr>
                     i++;
                 }

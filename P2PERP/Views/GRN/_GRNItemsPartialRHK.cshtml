@@ -1,0 +1,33 @@
+﻿
+@model IEnumerable<P2PLibray.GRN.GRN>
+
+<table class="table table-bordered table-striped" id="ListTable">
+    <thead class="table-dark">
+        <tr>
+            <th><input type="checkbox" id="selectAll"></th>
+            <th>Sr.No</th>
+            <th>Item Name</th>
+            <th>Qty</th>
+            <th>UOM</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int i = 1;
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td><input type="checkbox" class="row-select" /></td>
+                    <td>@i</td>
+                    <td>@item.ItemName</td>
+                    <td>@item.Quantity</td>
+                    <td>@item.UOMName</td>
+                    <td>@item.QualityCheckCode</td>
+                </tr>
+                i++;
+            }
+        }
+    </tbody>
+
+</table>

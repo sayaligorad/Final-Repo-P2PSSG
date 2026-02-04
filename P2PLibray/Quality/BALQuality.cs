@@ -855,15 +855,22 @@ namespace P2PLibray.Quality
                         ItemName = row["ItemName"].ToString(),
                         StatusName = row["StatusName"].ToString(),
                         Quantity = row["Quantity"] != DBNull.Value
-                           ? Convert.ToInt32(row["Quantity"])
-                           : 0,
-                        AddedDate = Convert.ToDateTime(row["AddedDate"]).ToString("yyyy-MM-dd"),
-                        AddedBy = row["AddedBy"].ToString()
+                            ? Convert.ToInt32(row["Quantity"])
+                            : 0,
+                        AddedDate = Convert
+                            .ToDateTime(row["AddedDate"])
+                            .ToString("yyyy-MM-dd"),
+                        AddedBy = row["AddedBy"].ToString(),
+
+                        // ✅ THIS IS THE MISSING LINE
+                        Reason = row["Reason"] == DBNull.Value
+                                    ? ""
+                                    : row["Reason"].ToString()
                     });
                 }
             }
-            return list;
 
+            return list;
 
 
         }

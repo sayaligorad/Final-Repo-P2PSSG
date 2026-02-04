@@ -289,12 +289,9 @@
 
             <!-- Terms & Conditions -->
             <h5 class="section-title mt-4">Terms & Conditions</h5>
-            @*<div id="termsLists" class="mb-3">*@
+            <div id="termsList" class="mb-3">
                 <!-- Terms will be populated dynamically -->
-                <ul id="termsList" class="list-group">
-                    <li></li>
-                </ul>
-            @*</div>*@
+            </div>
             <div class="invalid-feedback" id="termsFeedback" style="display: none;">
                 Please select at least one term and condition.
             </div>
@@ -561,8 +558,7 @@
                         $("#SwiftCode").val(header.SwiftCode);
                         $("#DeliveryAddress").val(header.DeliveryAddress);
                         $("#transportationCharges").text('₹' +header.ShippingCharges);
-                        $("#grandTotal").text('₹' + header.TotalAmount);
-                        $("#subTotal").text('₹' + (header.SubAmount).toFixed(2));
+
 
                          if (header.QuotationDateString) {
                              console.log(header.QuotationDateString);
@@ -585,47 +581,18 @@
                             $("#ddlAccountant").append(`<option value="${row.StaffCode}">${row.AccountEmail}</option>`);
                         });
 
-                        //// ------------------------------
-                        //// 📜 Terms & Conditions
-                        //// ------------------------------
-                        //$("#termsList").empty();
-                        //$.each(terms, function (i, row) {
-                        //    $("#termsList").append(`
-                        //        <div class="form-check">
-                        //            <input class="form-check-input" type="checkbox" value="${row.TermConditionId}" id="term${row.TermConditionId}">
-                        //            <label class="form-check-label" for="term${row.TermConditionId}">${row.TermConditionName}</label>
-                        //        </div>
-                        //    `);
-                         //  });
-
-
-                         // ------------------------------
-                         // 📜 Terms & Conditions
-                         // ------------------------------
-                         $("#termsList").empty();
-
-                         const mandatoryTerms = [3,6];
-
-                         $.each(terms, function (i, row) {
-                             console.log("Termssss", row.TermConditionId);
-                             const isMandatory = mandatoryTerms.includes(row.TermConditionId);
-                             console.log("Trdnsfsf",isMandatory);
-                             $("#termsList").append(`
+                        // ------------------------------
+                        // 📜 Terms & Conditions
+                        // ------------------------------
+                        $("#termsList").empty();
+                        $.each(terms, function (i, row) {
+                            $("#termsList").append(`
                                 <div class="form-check">
-                                    <input class="form-check-input"
-                                           type="checkbox"
-                                           value="${row.TermConditionId}"
-                                           id="term${row.TermConditionId}"
-                                           ${isMandatory ? "checked onclick='return false;'" : ""}>
-
-                                    <label class="form-check-label" for="term${row.TermConditionId}">
-                                        ${row.TermConditionName}
-                                        ${isMandatory ? '<span class="text-danger">*</span>' : ''}
-                                    </label>
+                                    <input class="form-check-input" type="checkbox" value="${row.TermConditionId}" id="term${row.TermConditionId}">
+                                    <label class="form-check-label" for="term${row.TermConditionId}">${row.TermConditionName}</label>
                                 </div>
                             `);
-                         });
-
+                        });
 
                         // ------------------------------
                         // 📦 Items Table Initialization
@@ -693,10 +660,10 @@
 
                             }
                         });
-                         //if (mode === "JIT") {
-                         //    table.column(-1).visible(false).draw(false);
-                         //    console.log("✅ Hidden last column for JIT mode");
-                         //}
+                         if (mode === "JIT") {
+                             table.column(-1).visible(false).draw(false);
+                             console.log("✅ Hidden last column for JIT mode");
+                         }
                         // Recalculate totals
                         updateTableCalculations();
                         // Remove link handler
@@ -774,36 +741,12 @@
                     // ------------------------------
                     // 📜 Terms & Conditions
                     // ------------------------------
-                    //$("#termsList").empty();
-                    //$.each(terms, function (i, row) {
-                    //    $("#termsList").append(`
-                    //        <div class="form-check">
-                    //            <input class="form-check-input" type="checkbox" value="${row.TermConditionId}" id="term${row.TermConditionId}">
-                    //            <label class="form-check-label" for="term${row.TermConditionId}">${row.TermConditionName}</label>
-                    //        </div>
-                    //    `);
-                    //});
-
                     $("#termsList").empty();
-
-                    const mandatoryTerms = [3, 6];
-
                     $.each(terms, function (i, row) {
-                        console.log("Termssss", row.TermConditionId);
-                        const isMandatory = mandatoryTerms.includes(row.TermConditionId);
-                        console.log("Trdnsfsf", isMandatory);
                         $("#termsList").append(`
                             <div class="form-check">
-                                <input class="form-check-input"
-                                       type="checkbox"
-                                       value="${row.TermConditionId}"
-                                       id="term${row.TermConditionId}"
-                                       ${isMandatory ? "checked onclick='return false;'" : ""}>
-
-                                <label class="form-check-label" for="term${row.TermConditionId}">
-                                    ${row.TermConditionName}
-                                    ${isMandatory ? '<span class="text-danger">*</span>' : ''}
-                                </label>
+                                <input class="form-check-input" type="checkbox" value="${row.TermConditionId}" id="term${row.TermConditionId}">
+                                <label class="form-check-label" for="term${row.TermConditionId}">${row.TermConditionName}</label>
                             </div>
                         `);
                     });
@@ -1152,15 +1095,6 @@
                 }
             });
         }
-        // 🔒 Lock mandatory Terms & Conditions
-        $(document).on("change", ".term-checkbox", function () {
-
-            if ($(this).attr("data-mandatory") === "true" && !this.checked) {
-                alert("This term is mandatory and cannot be unchecked.");
-                $(this).prop("checked", true);
-            }
-        });
-
 
         // ====================================================
         // ✅ End of Scripted

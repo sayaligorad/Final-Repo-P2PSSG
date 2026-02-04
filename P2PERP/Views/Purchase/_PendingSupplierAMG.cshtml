@@ -417,7 +417,6 @@
                                         return dt.toLocaleDateString("en-GB"); // dd/mm/yyyy
                                     }
 
-                                    // Agar normal ISO string hai to
                                     var dt2 = new Date(data);
                                     if (!isNaN(dt2.getTime())) {
                                         return dt2.toLocaleDateString("en-GB");
@@ -437,11 +436,45 @@
                             { data: "DeliverySpeed" },
                             { data: "AffordableRank", visible: false },
                             {
-                                data: "RecommendedQuotation",
-                                render: data => data === "Recommended"
-                                    ? `<span class="badge bg-success">${data}</span>`
-                                    : `<span class="badge bg-secondary">-</span>`
-                            },
+                                data: null,
+                                render: function (data, type, row) {
+
+                                    // Convert rank safely (handles "1", 1, null)
+                                    const rank = parseInt(row.AffordableRank, 10);
+
+                                    // Not recommended
+                                    if (isNaN(rank) || rank !== 1) {
+                                        return `<span class="badge bg-secondary">-</span>`;
+                                    }
+
+                                    let reason = '';
+
+                                    const delivery = (row.DeliverySpeed || '').toLowerCase();
+
+                                    if (delivery.includes('early')) {
+                                        reason = 'Recommended due to faster delivery';
+                                    }
+                                    else if (delivery.includes('on-time')) {
+                                        reason = 'Recommended due to best price with on-time delivery';
+                                    }
+                                    else if (delivery.includes('late')) {
+                                        reason = 'Recommended due to lowest price despite late delivery';
+                                    }
+                                    else {
+                                        reason = 'Recommended due to optimal price and delivery balance';
+                                    }
+
+                                    return `
+            <div class="d-flex flex-column align-items-center">
+                <span class="badge bg-success mb-1">Recommended</span>
+                <small class="text-muted text-center">
+                    ${reason}
+                </small>
+            </div>
+        `;
+                                }
+                            }
+,
                             {
                                 data: null, orderable: false, render: function (data, type, row) {
                                     let quotationCode = row.RegisterQuotationCode || ''; // fallback if null 

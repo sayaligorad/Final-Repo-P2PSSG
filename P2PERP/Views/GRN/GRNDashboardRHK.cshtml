@@ -57,7 +57,7 @@
             filter: drop-shadow(0px 3px 5px rgba(0, 0, 0, 0.05));
         }
 
-      
+
         /* Line chart smooth curve */
         .highcharts-series path {
             stroke-width: 3 !important;
@@ -254,6 +254,13 @@
             padding: 1.5rem;
             background-color: #f8f9fa;
         }
+
+         Modal date picker styling 
+        .modal-date-picker-container {
+            padding: 0.75rem 1.5rem !important;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
     </style>
 </head>
 <body>
@@ -265,13 +272,10 @@
             <i class="bi bi-calendar-date fs-3"></i>
         </button>
 
-        <!-- Hidden input just to trigger daterangepicker -->
-        <input type="text" id="reportrange" style="display:none;" />
-
         <!-- KPI CARDS SECTION -->
         <div class="row g-6 mb-4">
             <!-- Total GRNs Card -->
-            <div class="col-sm-6 col-lg-3">
+            <div class="col-sm-6 col-lg-4">
                 <div id="TotalCountCard" class="card card-border-shadow-primary h-100 border-0 position-relative overflow-hidden hover-shadow" style="cursor: pointer;">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2">
@@ -292,7 +296,7 @@
             </div>
 
             <!-- Total GRN Items Card -->
-            <div class="col-sm-6 col-lg-3">
+            @*<div class="col-sm-6 col-lg-3">
                 <div id="GRNItemsCountCard" class="card card-border-shadow-success h-100 border-0 position-relative overflow-hidden hover-shadow" style="cursor: pointer;">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2">
@@ -310,23 +314,23 @@
                     </div>
                     <div class="bottom-border bg-success"></div>
                 </div>
-            </div>
+            </div>*@
 
-            <!-- QC Assigned Card -->
-            <div class="col-sm-6 col-lg-3">
+            <!-- QC Pending Card -->
+            <div class="col-sm-6 col-lg-4">
                 <div id="QCCountCard" class="card card-border-shadow-warning h-100 border-0 position-relative overflow-hidden hover-shadow" style="cursor: pointer;">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2">
                             <div class="avatar me-4">
                                 <span class="avatar-initial rounded bg-label-warning">
-                                    <i class="bi bi-clipboard-check fs-4"></i>
+                                    <i class="bi bi-clock-history fs-4"></i>
                                 </span>
                             </div>
                             <h4 class="mb-0 fw-bold text-warning" id="QCAssignedCount">0</h4>
                         </div>
-                        <h6 class="mb-0 fw-normal">QC Assigned</h6>
+                        <h6 class="mb-0 fw-normal">QC Pending</h6>
                         <p class="mb-0">
-                            <small class="text-body-secondary">Items for quality check</small>
+                            <small class="text-body-secondary">Items awaiting quality check</small>
                         </p>
                     </div>
                     <div class="bottom-border bg-warning"></div>
@@ -334,7 +338,7 @@
             </div>
 
             <!-- Upcoming Items Card -->
-            <div class="col-sm-6 col-lg-3">
+            <div class="col-sm-6 col-lg-4">
                 <div id="UpcomingItemCard" class="card card-border-shadow-info h-100 border-0 position-relative overflow-hidden hover-shadow" style="cursor: pointer;">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2">
@@ -355,13 +359,6 @@
             </div>
         </div>
         <!-- END KPI CARDS SECTION -->
-        <!-- Selected Date Range Display -->
-        @*<div class="position-fixed" style="top: 165px; right: 20px; z-index: 1050;">
-            <span id="selectedRangeBadge" class="badge bg-primary px-3 py-2 shadow-sm">
-                All Data
-            </span>
-        </div>*@
-
         <!-- Date Range Heading -->
         <div class="row mb-3">
             <div class="col-12 text-center">
@@ -373,13 +370,9 @@
             </div>
         </div>
 
-
-
         <!-- CHARTS SECTION -->
         <div class="row g-4">
             <!-- Quality Check Status Bar Chart -->
-
-
             <div class="col-lg-6">
                 <div class="card shadow-sm border-0 rounded-4 p-3 chart-card">
                     <h6 class="fw-bold mb-3 text-success">
@@ -400,104 +393,70 @@
             </div>
         </div>
         <!-- END CHARTS SECTION -->
-        <!-- RECENT GRNs TABLE SECTION -->
-        <!--<div class="card mt-4 shadow-sm table-card">
-    <div class="card-header py-3" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%); color: white;">
-        <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Recent GRNs</h5>
-    </div>
-
-    <div class="card-body">
-        <div class="table-responsive">-->
-        <!-- TABLE HEADER WITH FILTERS AND EXPORT BUTTONS -->
-        <!--<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">-->
-        <!-- Date Range Filter -->
-        <!--<div class="input-group mt-4" style="height: 40px; max-width: 280px;">
-        <span class="input-group-text bg-primary text-white" style="height: 100%;">
-            <i class="bi bi-calendar-date"></i>
-        </span>
-        <input type="text" id="reportrange" class="form-control" placeholder="Select date range" readonly style="height: 100%;" />
-    </div>-->
-        <!-- Export Buttons Container -->
-        <!--<div class="d-flex align-items-center gap-3 ms-auto">
-            <div id="exportContainer" class="d-flex" style="height: 40px; align-items: center;"></div>
-        </div>
-    </div>-->
-        <!-- RECENT GRNs DATA TABLE -->
-        <!--<table id="reqTable" class="table table-bordered table-striped table-hover align-middle" style="width:100%">
-                    <thead class="table-dark">
-                        <tr>
-                            <th><input type="checkbox" id="selectAll1"></th>
-                            <th>Sr.No</th>
-                            <th>GRN Code</th>
-                            <th>PO Code</th>
-                            <th>Vendor</th>
-                            <th>Invoice No</th>
-                            <th>Added By</th>
-                            <th>Added Date</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tblRecent">
-                        <tr>
-                            <td colspan="9" class="text-center">
-                                <div class="spinner-container">
-                                    <div class="spinner-border text-primary" role="status">
-                                        <span class="visually-hidden">Loading...</span>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>-->
-        <!-- END RECENT GRNs TABLE SECTION -->
     </div>
 
     <!-- REUSABLE MODAL FOR DETAILED VIEWS -->
-    @*<div class="modal fade" id="itemsModal" data-bs-backdrop="true" tabindex="-1" aria-labelledby="itemsModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white position-relative">
-                    <div class="w-100 text-center">
-                        <h5 class="modal-title text-white fw-bold mb-2" id="itemsModalLabel">Details</h5>
-                    </div>
-                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3 mb-2" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" id="modalContent">
-                    <div class="spinner-container text-center">
-                        <div class="spinner-border text-primary" role="status"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>*@
-
-
-    <!-- Modal Code -->
     <div class="modal fade" id="itemsModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-dialog modal-xl ">
             <div class="modal-content shadow-lg rounded-3">
-                <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-1">
-                    <!-- Modal title -->
+                <!-- Modal Header -->
+                <div class="modal-header bg-primary d-flex justify-content-center align-items-center rounded-top p-3">
                     <h5 class="modal-title fw-bold text-white mb-0 fs-5" id="itemsModalLabel"></h5>
-                    <!-- Close button -->
-                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-2" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3"
+                            data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <!-- Modal body -->
+
+                <!-- ===== DATE PICKER SECTION ===== -->
+                <div class="modal-date-picker-container w-10 mt-5">
+                    <div class="row align-items-center g-2">
+                        <div class="col-md-3 ms-5">
+                            <div class="input-group">
+                                <span class="input-group-text bg-primary text-white">
+                                    <i class="bi bi-calendar-date"></i>
+                                </span>
+                                <input type="text" id="modalDatePicker"
+                                       class="form-control"
+                                       placeholder="Select date range"
+                                       readonly />
+                            </div>
+                        </div>
+
+                        @*<div class="col-md-8 d-flex justify-content-end align-items-center"
+                             id="modalExportContainer">
+                        </div>*@
+                    </div>
+                </div>
+                <!-- ===== END DATE PICKER ===== -->
+                <!-- Modal Body -->
                 <div class="modal-body" id="modalContent"></div>
             </div>
         </div>
     </div>
+
+    <style>
+        button.dt-button.processing,
+        div.dt-button.processing {
+            pointer-events: auto !important;
+            opacity: 1 !important;
+            background: none !important;
+        }
+
+            button.dt-button.processing:after {
+                content: none !important;
+            }
+    </style>
 
     <script>
         // GLOBAL VARIABLES
         let dataTable;
         let selectedStartDate = '';
         let selectedEndDate = '';
-        let statusChart, trendChart; // Keeping original variable names
+        let statusChart, trendChart;
         let tableStartDate = null;
         let tableEndDate = null;
+        let modalDataTable = null;
+        let currentModalUrl = '';
+        let currentModalTitle = '';
 
         // === Global Highcharts Theme ===
         Highcharts.setOptions({
@@ -529,68 +488,87 @@
         });
 
         $(document).ready(function () {
-            // Initialize date range picker
+
+
+            $(document).on('click', '.view-grn-items', function () {
+
+                const grnCode = $(this).data('grncode');
+
+                $("#itemsModal").modal("show");
+                $("#itemsModalLabel").text("GRN Items - " + grnCode);
+
+                $("#modalContent").html(`
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary"></div>
+            <p class="mt-2">Loading GRN Items...</p>
+        </div>
+    `);
+    $.get('@Url.Action("GetGRNItemsByGRNCodePartialRHK","GRN")',
+      { grnCode: grnCode },
+      function (html) {
+          $("#modalContent").html(html);
+          initializeModalDataTable("GRN Items - " + grnCode);
+      })
+ .fail(function (xhr) {
+      alert("ERROR: " + xhr.status);
+ });
+
+            });
+
+
+
+
+
+            // Initialize main dashboard date range picker
             initDateRangePicker();
 
-            // Set up click event handlers for KPI cards - using original IDs
+            // Initialize modal date picker
+            initModalDatePicker();
+
+            // Set up click event handlers for KPI cards
             $("#TotalCountCard").click(() => openModalWithPartial("/GRN/GetGRNListPartialRHK", "All GRNs"));
             $("#GRNItemsCountCard").click(() => openModalWithPartial("/GRN/GetGRNItemsPartialRHK", "GRN Items"));
-            $("#QCCountCard").click(() => openModalWithPartial("/GRN/GetQCListPartialRHK", "QC Assigned Items"));
+            $("#QCCountCard").click(() => openModalWithPartial("/GRN/GetPendingItemsPartialRHK", "Pending QC Items"));
             $("#UpcomingItemCard").click(() => openModalWithPartial("/GRN/GetUpcomingItemPartialRHK", "Upcoming Items"));
 
             // Load initial data
-            loadRecentGRNs(selectedStartDate, selectedEndDate);
+            loadKPIData(selectedStartDate, selectedEndDate);
+            loadStatusData(selectedStartDate, selectedEndDate);
+            loadTrendData(selectedStartDate, selectedEndDate);
         });
 
-        function initDateRangePicker1() {
-            $('#reportrange').daterangepicker({
+        // Initialize modal date picker
+        function initModalDatePicker() {
+            $('#modalDatePicker').daterangepicker({
                 autoUpdateInput: false,
+                opens: "center",
+                drops: "down",
                 locale: {
-                    cancelLabel: 'Clear',
-                    format: 'DD/MM/YYYY'
+                    format: "DD-MM-YYYY",
+                    cancelLabel: "Clear"
                 },
                 ranges: {
                     'Today': [moment(), moment()],
                     'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                    'Last 1 Month': [moment().subtract(1, 'months').startOf('day'), moment()],
-                    'Last 3 Months': [moment().subtract(3, 'months').startOf('day'), moment()],
-                    'Last 1 Year': [moment().subtract(12, 'months').startOf('day'), moment()]
+                    'Last 1 Month': [moment().subtract(1, 'month'), moment()],
+                    'Last 3 Months': [moment().subtract(3, 'month'), moment()],
+                    'Last 1 Year': [moment().subtract(1, 'year'), moment()]
+                }
+            }, function (start, end) {
+                $('#modalDatePicker').val(start.format("DD-MM-YYYY") + " - " + end.format("DD-MM-YYYY"));
+                // Reload modal content with new dates
+                if (currentModalUrl) {
+                    reloadModalContent(currentModalUrl, currentModalTitle, start.format("YYYY-MM-DD"), end.format("YYYY-MM-DD"));
                 }
             });
 
-            $('#reportrange').on('apply.daterangepicker', function (ev, picker) {
-                tableStartDate = picker.startDate;
-                tableEndDate = picker.endDate;
-                $(this).val(tableStartDate.format('DD/MM/YYYY') + ' - ' + tableEndDate.format('DD/MM/YYYY'));
-                filterTableByDate();
+            $('#modalDatePicker').on("cancel.daterangepicker", function () {
+                $(this).val("");
+                // Reload modal content without date filter
+                if (currentModalUrl) {
+                    reloadModalContent(currentModalUrl, currentModalTitle, null, null);
+                }
             });
-
-            $('#reportrange').on('cancel.daterangepicker', function (ev, picker) {
-                tableStartDate = null;
-                tableEndDate = null;
-                $(this).val('');
-                dataTable.draw();
-            });
-        }
-
-        function filterTableByDate() {
-            if (tableStartDate && tableEndDate) {
-                $.fn.dataTable.ext.search.push(
-                    function (settings, data, dataIndex) {
-                        var date = moment(data[7], 'DD/MM/YYYY');
-                        if ((tableStartDate === null && tableEndDate === null) ||
-                            (tableStartDate === null && date <= tableEndDate) ||
-                            (tableStartDate <= date && tableEndDate === null) ||
-                            (tableStartDate <= date && date <= tableEndDate)) {
-                            return true;
-                        }
-                        return false;
-                    }
-                );
-            }
-
-            dataTable.draw();
-            $.fn.dataTable.ext.search.pop();
         }
 
         function initDateRangePicker() {
@@ -608,7 +586,6 @@
                 loadKPIData(selectedStartDate, selectedEndDate);
                 loadStatusData(selectedStartDate, selectedEndDate);
                 loadTrendData(selectedStartDate, selectedEndDate);
-                loadRecentGRNs(selectedStartDate, selectedEndDate);
             }
 
             $('#dateFilterBtn').daterangepicker({
@@ -631,13 +608,6 @@
                 updateDashboard(start, end);
             });
 
-            $('#reportrange').on('cancel.daterangepicker', function (ev, picker) {
-                tableStartDate = null;
-                tableEndDate = null;
-                $(this).val('');
-                dataTable.draw();
-            });
-
             $('#dateFilterBtn').on('cancel.daterangepicker', function (ev, picker) {
                 selectedStartDate = "";
                 selectedEndDate = "";
@@ -646,7 +616,6 @@
                 loadKPIData(null, null);
                 loadStatusData(null, null);
                 loadTrendData(null, null);
-                loadRecentGRNs(null, null);
             });
 
             updateDashboard(start, end);
@@ -670,7 +639,8 @@
                 $("#TotalGRNItemCount").text("Error");
             });
 
-            $.getJSON("/GRN/GetQCAssignedCountRHK", { startDate: startDate, endDate: endDate }, function (data) {
+            // FIXED: Using PendingCountRHK instead of QCAssignedCountRHK
+            $.getJSON("/GRN/GetPendingCountRHK", { startDate: startDate, endDate: endDate }, function (data) {
                 $("#QCAssignedCount").text(data.count || 0);
             }).fail(function () {
                 $("#QCAssignedCount").text("Error");
@@ -683,7 +653,6 @@
             });
         }
 
-        // LOAD STATUS DATA FOR BAR CHART (keeping original function name)
         function loadStatusData(startDate, endDate) {
             $.getJSON("/GRN/GetApproveCountRHK", { startDate: startDate, endDate: endDate }, function (res1) {
                 $.getJSON("/GRN/GetRejectedGRNCountRHK", { startDate: startDate, endDate: endDate }, function (res2) {
@@ -703,7 +672,6 @@
             });
         }
 
-        // CREATE STATUS CHART AS BAR CHART (keeping original function name)
         function createStatusChart(approvedCount, rejectedCount, pendingCount) {
             if (statusChart) {
                 statusChart.destroy();
@@ -799,17 +767,13 @@
                 series: [{
                     name: 'Count',
                     data: [
-                        { name: 'Confirm', y: approvedCount, color: '#28a745' },   // Green
-                        { name: 'Non Confirm', y: rejectedCount, color: '#dc3545' }, // Red
-                        { name: 'Pending', y: pendingCount, color: '#fd7e14' }     // Orange
+                        { name: 'Confirm', y: approvedCount, color: '#28a745' },
+                        { name: 'Non Confirm', y: rejectedCount, color: '#dc3545' },
+                        { name: 'Pending', y: pendingCount, color: '#fd7e14' }
                     ]
                 }]
             });
         }
-
-
-
-
 
         function loadTrendData(startDate, endDate) {
             $.getJSON("/GRN/GetGRNTrendsRHK", { startdate: startDate, enddate: endDate }, function (res) {
@@ -824,7 +788,7 @@
                         height: 300
                     },
                     title: {
-                        text: 'GRN Trends Over Time',
+                        text: 'Monthly GRN Trends',
                         style: {
                             fontSize: '16px',
                             fontWeight: 'bold',
@@ -832,8 +796,8 @@
                         }
                     },
                     xAxis: {
-                        categories: res.dates,
-                        title: { text: 'Date' }
+                        categories: res.months,
+                        title: { text: 'Month' }
                     },
                     yAxis: {
                         min: 0,
@@ -842,14 +806,14 @@
                         },
                         labels: {
                             formatter: function () {
-                                return Highcharts.numberFormat(this.value, 0); // 0 decimal places
+                                return Highcharts.numberFormat(this.value, 0);
                             }
                         },
                         allowDecimals: false
                     },
                     tooltip: {
-                        pointFormatter: function () {
-                            return '<span style="color:' + this.color + '">●</span> ' + this.series.name + ': <b>' + Highcharts.numberFormat(this.y, 0) + '</b><br/>';
+                        formatter: function () {
+                            return `<b>${this.x}</b><br/>GRNs: <b>${this.y}</b>`;
                         }
                     },
                     plotOptions: {
@@ -867,7 +831,6 @@
                     credits: { enabled: false }
                 });
             }).fail(function () {
-                // Handle error case by creating empty chart
                 if (trendChart) {
                     trendChart.destroy();
                 }
@@ -877,7 +840,7 @@
                         type: 'spline',
                         backgroundColor: 'transparent'
                     },
-                    title: { text: 'GRN Trends Over Time' },
+                    title: { text: 'Monthly GRN Trends' },
                     yAxis: {
                         allowDecimals: false
                     },
@@ -887,491 +850,28 @@
             });
         }
 
-
-        function loadRecentGRNs(startDate, endDate) {
-            $('#tableSpinner').removeClass('d-none');
-
-            $.ajax({
-                url: "/GRN/RecentGRNListRHK",
-                success: function (response) {
-                    console.log(response);
-                    $('#tblRecent').empty();
-
-                    if (response.data?.length > 0) {
-                        let i = 1;
-                        response.data.forEach((d) => {
-                            $('#tblRecent').append(`
-                                    <tr>
-                                        <td><input type="checkbox" class="row-select" value="${d.GRNCode}"></td>
-                                        <td>${i}</td>
-                                        <td>${d.GRNCode || 'N/A'}</td>
-                                        <td>${d.POCode || 'N/A'}</td>
-                                        <td>${d.Vendor || 'N/A'}</td>
-                                        <td>${d.InvoiceNo || 'N/A'}</td>
-                                        <td>${d.AddedBy || 'N/A'}</td>
-                                       <td>${moment(d.AddedDate).format('DD/MM/YYYY')}</td>
-                                    </tr>
-                                `);
-                            i++;
-                        });
-                    } else {
-                        $('#tblRecent').html('<tr><td colspan="9" class="text-center py-4">No recent GRNs</td></tr>');
-                    }
-
-                    initDataTable();
-                    initDateRangePicker1();
-                    $('#tableSpinner').addClass('d-none');
-                },
-                error: function () {
-                    $('#tblRecent').html('<tr><td colspan="9" class="text-center py-4 text-danger">Error loading data</td></tr>');
-                    $('#tableSpinner').addClass('d-none');
-                }
-            });
-        }
-
-        function initDataTable() {
-            if (dataTable) {
-                dataTable.destroy();
-            }
-
-            let $table = $(".table");
-
-            dataTable = $('#reqTable').DataTable({
-                pageLength: 10,
-                paging: true,
-                ordering: false,
-                searching: true,
-                dom: '<"d-flex justify-content-between align-items-center mt-1 mb-2"Bf>rt<"d-flex justify-content-between mt-2"<"datatable-info"i><"datatable-pagination"p>>',
-                buttons: [
-                    {
-                        extend: 'print',
-                        text: '<i class="bi bi-printer-fill text-dark fs-5"></i>',
-                        className: 'btn btn-sm btn-outline-dark',
-                        title: 'Recent GRN',
-                        messageTop: function () {
-                            return '<h3 style="text-align:center">Generated Date: ' +
-                                new Date().toLocaleDateString('en-GB') + '</h3>';
-                        },
-                        action: function (e, dt, button, config) {
-                            if ($('#reqTable tbody input.row-select:checked').length === 0) {
-                                showExportToast();
-                                return;
-                            }
-                            $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config);
-                        },
-                        exportOptions: {
-                            rows: function (idx, data, node) {
-                                return $(node).find('.row-select').prop('checked');
-                            },
-                            columns: ':visible:not(:first-child)',
-                            format: {
-                                body: function (data, row, column, node) {
-                                    if (column === 1)
-                                        return $('#reqTable tbody input.row-select:checked')
-                                            .index($(node).closest('tr').find('.row-select')) + 1;
-
-                                    return typeof data === 'string'
-                                        ? data.replace(/<[^>]*>/g, '').trim()
-                                        : data;
-                                }
-                            }
-                        },
-                        customize: function (win) {
-                            var $body = $(win.document.body);
-                            $body.append(`
-                <style>
-                    thead th {
-                        background-color: black !important;
-                        color: white !important;
-                        text-align: center !important;
-                        -webkit-print-color-adjust: exact !important;
-                        print-color-adjust: exact !important;
-                    }
-                    table {
-                        border-collapse: collapse !important;
-                        width: 100% !important;
-                    }
-                    td, th {
-                        border: 1px solid #000 !important;
-                        padding: 6px !important;
-                         text-align: center !important;
-                    }
-                </style>
-                                    `);
-                            $body.find('h1').css('text-align', 'center');
-                            $body.find('table')
-                                .addClass('table table-bordered table-striped')
-                                .css('width', '100%');
-                            $body.css('font-size', '12pt');
-                        }
-                    },
-                    {
-                        extend: 'pdfHtml5',
-                        text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
-                        className: 'btn btn-sm btn-outline-danger',
-                        title: "Recent GRN",
-                        orientation: 'landscape',
-                        pagesize: 'A4',
-                        customize: function (doc) {
-                            doc.content.splice(1, 0, {
-                                text: 'Generated Date: ' + new Date().toLocaleDateString('en-GB'),
-                                alignment: 'center',
-                                margin: [0, 0, 0, 12]
-                            });
-
-                            var table = doc.content[doc.content.length - 1].table;
-                            table.widths = new Array(table.body[0].length).fill('*');
-                            doc.content[doc.content.length - 1].alignment = 'center';
-
-                            doc.styles.tableHeader = { fillColor: '#000000', color: 'white', alignment: 'center' };
-
-                            var objLayout = {};
-                            objLayout['hLineWidth'] = function () { return 1; };
-                            objLayout['vLineWidth'] = function () { return 1; };
-                            objLayout['hLineColor'] = function () { return '#000'; };
-                            objLayout['vLineColor'] = function () { return '#000'; };
-                            objLayout['paddingLeft'] = function () { return 4; };
-                            objLayout['paddingRight'] = function () { return 4; };
-                            doc.content[doc.content.length - 1].layout = objLayout;
-
-                            var tableBody = doc.content[doc.content.length - 1].table.body;
-                            tableBody.forEach(function (row) {
-                                row.forEach(function (cell) {
-                                    cell.alignment = 'center';
-                                });
-                            });
-                        },
-                        action: function (e, dt, button, config) {
-                            if ($('#reqTable tbody input.row-select:checked').length === 0) {
-                                showExportToast();
-                                return;
-                            }
-                            $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, button, config);
-                        },
-                        exportOptions: {
-                            rows: function (idx, data, node) {
-                                return $(node).find('.row-select').prop('checked');
-                            },
-                            columns: ':visible:not(:first-child)',
-                            format: {
-                                body: function (data, row, column, node) {
-                                    if (column === 1)
-                                        return $('#reqTable tbody input.row-select:checked')
-                                            .index($(node).closest('tr').find('.row-select')) + 1;
-                                    return typeof data === 'string'
-                                        ? data.replace(/<[^>]*>/g, '').trim()
-                                        : data;
-                                }
-                            }
-                        }
-                    },
-                    {
-                        extend: 'excelHtml5',
-                        text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
-                        className: 'btn btn-sm btn-outline-success',
-                        title: "Recent GRN",
-                        messageTop: 'Generated Date: ' + moment().format('DD/MM/YYYY'),
-                        action: function (e, dt, button, config) {
-                            if ($('#reqTable tbody input.row-select:checked').length === 0) {
-                                showExportToast();
-                                return;
-                            }
-                            $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
-                        },
-                        exportOptions: {
-                            rows: function (idx, data, node) {
-                                return $(node).find('.row-select').prop('checked');
-                            },
-                            columns: ':visible:not(:first-child)',
-                            format: {
-                                body: function (data, row, column, node) {
-                                    if (column === 1)
-                                        return $('#reqTable tbody input.row-select:checked')
-                                            .index($(node).closest('tr').find('.row-select')) + 1;
-                                    return typeof data === 'string'
-                                        ? data.replace(/<[^>]*>/g, '').trim()
-                                        : data;
-                                }
-                            }
-                        },
-                        customize: function (xlsx) {
-                            const sheet = xlsx.xl.worksheets['sheet1.xml'];
-                            $('row:first c', sheet).attr('s', '51');
-                            $('row:eq(1) c', sheet).attr('s', '51');
-                        }
-                    },
-                    {
-                        extend: 'csvHtml5',
-                        text: '<i class="bi bi-filetype-csv text-primary fs-5"></i>',
-                        className: 'btn btn-sm btn-outline-primary',
-                        title: "Recent GRN",
-                        action: function (e, dt, button, config) {
-                            if ($('#reqTable tbody input.row-select:checked').length === 0) {
-                                showExportToast();
-                                return;
-                            }
-                            $.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, button, config);
-                        },
-                        exportOptions: {
-                            rows: function (idx, data, node) {
-                                return $(node).find('.row-select').prop('checked');
-                            },
-                            columns: ':visible:not(:first-child)',
-                            format: {
-                                body: function (data, row, column, node) {
-                                    if (column === 1)
-                                        return $('#reqTable tbody input.row-select:checked')
-                                            .index($(node).closest('tr').find('.row-select')) + 1;
-                                    return typeof data === 'string'
-                                        ? data.replace(/<[^>]*>/g, '').trim()
-                                        : data;
-                                }
-                            }
-                        }
-                    }
-                ]
-            });
-
-            $('#selectAll1').off('change').on('change', function () {
-                $('#reqTable tbody .row-select').prop('checked', $(this).prop('checked'));
-            });
-
-            $('#reqTable').off('change', '.row-select').on('change', '.row-select', function () {
-                let total = $('#reqTable tbody .row-select').length;
-                let checked = $('#reqTable tbody .row-select:checked').length;
-                $('#selectAll1').prop('checked', total === checked);
-            });
-        }
-
         function openModalWithPartial(url, title) {
+            currentModalUrl = url;
+            currentModalTitle = title;
+
             $("#itemsModal").modal("show");
             $("#itemsModalLabel").text(title);
-            $("#modalContent").html('<div class="spinner-container"><div class="spinner-border text-primary"></div></div>');
+            $("#modalContent").html('<div class="spinner-container text-center py-5"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Loading...</p></div>');
 
-            const fullUrl = `${url}?startDate=${selectedStartDate}&endDate=${selectedEndDate}`;
+            // Set initial date in modal picker
+            if (selectedStartDate && selectedEndDate) {
+                const start = moment(selectedStartDate).format("DD-MM-YYYY");
+                const end = moment(selectedEndDate).format("DD-MM-YYYY");
+                $('#modalDatePicker').val(start + " - " + end);
+            } else {
+                $('#modalDatePicker').val("");
+            }
+
+            const fullUrl = `${url}?startDate=${selectedStartDate || ''}&endDate=${selectedEndDate || ''}`;
 
             $.get(fullUrl, function (html) {
                 $("#modalContent").html(html);
-
-                let $table = $("#ListTable");
-                if ($table.find("tbody tr").length > 0 &&
-                    !$table.find("tbody tr td").hasClass("text-center")) {
-                    $table.addClass("datatable1");
-                }
-
-                if ($(".datatable1").length) {
-                    let $table = $(".datatable1");
-
-                    if ($.fn.DataTable.isDataTable($table)) {
-                        $table.DataTable().destroy();
-                    }
-
-                    $table.DataTable({
-                        pageLength: 10,
-                        paging: true,
-                        ordering: false,
-                        searching: true,
-                        dom: '<"d-flex justify-content-between align-items-center mt-1 mb-2"Bf>rt<"d-flex justify-content-between mt-2"<"datatable-info"i><"datatable-pagination"p>>',
-                        buttons: [
-                            {
-                                extend: 'print',
-                                text: '<i class="bi bi-printer-fill text-dark fs-5"></i>',
-                                className: 'btn btn-sm btn-outline-dark',
-                                title: `${title}`,
-                                messageTop: function () {
-                                    return '<h3 style="text-align:center">Generated Date: ' +
-                                        new Date().toLocaleDateString('en-GB') + '</h3>';
-                                },
-                                action: function (e, dt, button, config) {
-                                    if ($('#ListTable tbody input.row-select:checked').length === 0) {
-                                        showExportToast();
-                                        return;
-                                    }
-                                    $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config);
-                                },
-                                exportOptions: {
-                                    rows: function (idx, data, node) {
-                                        return $(node).find('.row-select').prop('checked');
-                                    },
-                                    columns: ':visible:not(:first-child)',
-                                    format: {
-                                        body: function (data, row, column, node) {
-                                            if (column === 1)
-                                                return $('#ListTable tbody input.row-select:checked')
-                                                    .index($(node).closest('tr').find('.row-select')) + 1;
-
-                                            return typeof data === 'string'
-                                                ? data.replace(/<[^>]*>/g, '').trim()
-                                                : data;
-                                        }
-                                    }
-                                },
-                                customize: function (win) {
-                                    var $body = $(win.document.body);
-                                    $body.append(`
-                <style>
-                    thead th {
-                        background-color: black !important;
-                        color: white !important;
-                        text-align: center !important;
-                        -webkit-print-color-adjust: exact !important;
-                        print-color-adjust: exact !important;
-                    }
-                    table {
-                        border-collapse: collapse !important;
-                        width: 100% !important;
-                    }
-                    td, th {
-                        border: 1px solid #000 !important;
-                        padding: 6px !important;
-                         text-align: center !important;
-                    }
-                </style>
-                                            `);
-                                    $body.find('h1').css('text-align', 'center');
-                                    $body.find('table')
-                                        .addClass('table table-bordered table-striped')
-                                        .css('width', '100%');
-                                    $body.css('font-size', '12pt');
-                                }
-                            },
-                            {
-                                extend: 'pdfHtml5',
-                                text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
-                                className: 'btn btn-sm btn-outline-danger',
-                                title: `${title}`,
-                                orientation: 'landscape',
-                                pagesize: 'A4',
-                                customize: function (doc) {
-                                    doc.content.splice(1, 0, {
-                                        text: 'Generated Date: ' + new Date().toLocaleDateString('en-GB'),
-                                        alignment: 'center',
-                                        margin: [0, 0, 0, 12]
-                                    });
-
-                                    var table = doc.content[doc.content.length - 1].table;
-                                    table.widths = new Array(table.body[0].length).fill('*');
-                                    doc.content[doc.content.length - 1].alignment = 'center';
-
-                                    doc.styles.tableHeader = { fillColor: '#000000', color: 'white', alignment: 'center' };
-
-                                    var objLayout = {};
-                                    objLayout['hLineWidth'] = function () { return 1; };
-                                    objLayout['vLineWidth'] = function () { return 1; };
-                                    objLayout['hLineColor'] = function () { return '#000'; };
-                                    objLayout['vLineColor'] = function () { return '#000'; };
-                                    objLayout['paddingLeft'] = function () { return 4; };
-                                    objLayout['paddingRight'] = function () { return 4; };
-                                    doc.content[doc.content.length - 1].layout = objLayout;
-
-                                    var tableBody = doc.content[doc.content.length - 1].table.body;
-                                    tableBody.forEach(function (row) {
-                                        row.forEach(function (cell) {
-                                            cell.alignment = 'center';
-                                        });
-                                    });
-                                },
-                                action: function (e, dt, button, config) {
-                                    if ($('#ListTable tbody input.row-select:checked').length === 0) {
-                                        showExportToast();
-                                        return;
-                                    }
-                                    $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, button, config);
-                                },
-                                exportOptions: {
-                                    rows: function (idx, data, node) {
-                                        return $(node).find('.row-select').prop('checked');
-                                    },
-                                    columns: ':visible:not(:first-child)',
-                                    format: {
-                                        body: function (data, row, column, node) {
-                                            if (column === 1)
-                                                return $('#ListTable tbody input.row-select:checked')
-                                                    .index($(node).closest('tr').find('.row-select')) + 1;
-                                            return typeof data === 'string'
-                                                ? data.replace(/<[^>]*>/g, '').trim()
-                                                : data;
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                extend: 'excelHtml5',
-                                text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
-                                className: 'btn btn-sm btn-outline-success',
-                                title: `${title}`,
-                                messageTop: 'Generated Date: ' + moment().format('DD/MM/YYYY'),
-                                action: function (e, dt, button, config) {
-                                    if ($('#ListTable tbody input.row-select:checked').length === 0) {
-                                        showExportToast();
-                                        return;
-                                    }
-                                    $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
-                                },
-                                exportOptions: {
-                                    rows: function (idx, data, node) {
-                                        return $(node).find('.row-select').prop('checked');
-                                    },
-                                    columns: ':visible:not(:first-child)',
-                                    format: {
-                                        body: function (data, row, column, node) {
-                                            if (column === 1)
-                                                return $('#ListTable tbody input.row-select:checked')
-                                                    .index($(node).closest('tr').find('.row-select')) + 1;
-                                            return typeof data === 'string'
-                                                ? data.replace(/<[^>]*>/g, '').trim()
-                                                : data;
-                                        }
-                                    }
-                                },
-                                customize: function (xlsx) {
-                                    const sheet = xlsx.xl.worksheets['sheet1.xml'];
-                                    $('row:first c', sheet).attr('s', '51');
-                                    $('row:eq(1) c', sheet).attr('s', '51');
-                                }
-                            },
-                            {
-                                extend: 'csvHtml5',
-                                text: '<i class="bi bi-filetype-csv text-primary fs-5"></i>',
-                                className: 'btn btn-sm btn-outline-primary',
-                                title: `${title}`,
-                                action: function (e, dt, button, config) {
-                                    if ($('#ListTable tbody input.row-select:checked').length === 0) {
-                                        showExportToast();
-                                        return;
-                                    }
-                                    $.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, button, config);
-                                },
-                                exportOptions: {
-                                    rows: function (idx, data, node) {
-                                        return $(node).find('.row-select').prop('checked');
-                                    },
-                                    columns: ':visible:not(:first-child)',
-                                    format: {
-                                        body: function (data, row, column, node) {
-                                            if (column === 1)
-                                                return $('#ListTable tbody input.row-select:checked')
-                                                    .index($(node).closest('tr').find('.row-select')) + 1;
-                                            return typeof data === 'string'
-                                                ? data.replace(/<[^>]*>/g, '').trim()
-                                                : data;
-                                        }
-                                    }
-                                }
-                            }
-                        ]
-                    });
-
-                    $('#selectAll').off('change').on('change', function () {
-                        $('#ListTable tbody .row-select').prop('checked', $(this).prop('checked'));
-                    });
-
-                    $('#ListTable').off('change', '.row-select').on('change', '.row-select', function () {
-                        let total = $('#ListTable tbody .row-select').length;
-                        let checked = $('#ListTable tbody .row-select:checked').length;
-                        $('#selectAll').prop('checked', total === checked);
-                    });
-                }
+                initializeModalDataTable(title);
             }).fail(function () {
                 $("#modalContent").html(
                     '<div class="alert alert-danger text-center mt-3">Failed to load data. Please try again.</div>'
@@ -1379,7 +879,245 @@
             });
         }
 
-        // ✅ Configure toastr once
+        function reloadModalContent(url, title, startDate, endDate) {
+            $("#modalContent").html('<div class="spinner-container text-center py-5"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Loading...</p></div>');
+
+            const fullUrl = `${url}?startDate=${startDate || ''}&endDate=${endDate || ''}`;
+
+            $.get(fullUrl, function (html) {
+                $("#modalContent").html(html);
+                initializeModalDataTable(title);
+            }).fail(function () {
+                $("#modalContent").html(
+                    '<div class="alert alert-danger text-center mt-3">Failed to load data. Please try again.</div>'
+                );
+            });
+        }
+
+        function initializeModalDataTable(title) {
+            let $table = $("#ListTable");
+
+            // Destroy existing DataTable if it exists
+            if ($.fn.DataTable.isDataTable($table)) {
+                modalDataTable.destroy();
+            }
+
+            // Check if table has data
+            if ($table.find("tbody tr").length > 0 &&
+                !$table.find("tbody tr td").hasClass("text-center")) {
+
+                modalDataTable = $table.DataTable({
+                    pageLength: 10,
+                    paging: true,
+                    ordering: false,
+                    searching: true,
+                    dom: '<"row mb-3"<"col-md-6 d-flex gap-2"B><"col-md-6 d-flex justify-content-end"f>>' +
+                        '<"table-responsive"t>' +
+                        '<"row mt-3"<"col-md-6"i><"col-md-6 d-flex justify-content-end"p>>',
+                    buttons: [
+                        {
+                            extend: 'print',
+                            text: '<i class="bi bi-printer-fill text-dark fs-5"></i>',
+                            className: 'btn btn-sm btn-outline-dark',
+                            title: `${title}`,
+                            messageTop: function () {
+                                return '<h3 style="text-align:center">Generated Date: ' +
+                                    new Date().toLocaleDateString('en-GB') + '</h3>';
+                            },
+                            action: function (e, dt, button, config) {
+                                if ($('#ListTable tbody input.row-select:checked').length === 0) {
+                                    showExportToast();
+                                    return;
+                                }
+                                $.fn.dataTable.ext.buttons.print.action.call(this, e, dt, button, config);
+                            },
+                            exportOptions: {
+                                rows: function (idx, data, node) {
+                                    return $(node).find('.row-select').prop('checked');
+                                },
+                                columns: ':visible:not(:first-child)',
+                                format: {
+                                    body: function (data, row, column, node) {
+                                        if (column === 1)
+                                            return $('#ListTable tbody input.row-select:checked')
+                                                .index($(node).closest('tr').find('.row-select')) + 1;
+
+                                        return typeof data === 'string'
+                                            ? data.replace(/<[^>]*>/g, '').trim()
+                                            : data;
+                                    }
+                                }
+                            },
+                            customize: function (win) {
+                                var $body = $(win.document.body);
+                                $body.append(`
+                                        <style>
+                                            thead th {
+                                                background-color: black !important;
+                                                color: white !important;
+                                                text-align: center !important;
+                                                -webkit-print-color-adjust: exact !important;
+                                                print-color-adjust: exact !important;
+                                            }
+                                            table {
+                                                border-collapse: collapse !important;
+                                                width: 100% !important;
+                                            }
+                                            td, th {
+                                                border: 1px solid #000 !important;
+                                                padding: 6px !important;
+                                                text-align: center !important;
+                                            }
+                                        </style>
+                                    `);
+                                $body.find('h1').css('text-align', 'center');
+                                $body.find('table')
+                                    .addClass('table table-bordered table-striped')
+                                    .css('width', '100%');
+                                $body.css('font-size', '12pt');
+                            }
+                        },
+                        {
+                            extend: 'pdfHtml5',
+                            text: '<i class="bi bi-file-earmark-pdf text-danger fs-5"></i>',
+                            className: 'btn btn-sm btn-outline-danger',
+                            title: `${title}`,
+                            orientation: 'landscape',
+                            pagesize: 'A4',
+                            customize: function (doc) {
+                                doc.content.splice(1, 0, {
+                                    text: 'Generated Date: ' + new Date().toLocaleDateString('en-GB'),
+                                    alignment: 'center',
+                                    margin: [0, 0, 0, 12]
+                                });
+
+                                var table = doc.content[doc.content.length - 1].table;
+                                table.widths = new Array(table.body[0].length).fill('*');
+                                doc.content[doc.content.length - 1].alignment = 'center';
+
+                                doc.styles.tableHeader = { fillColor: '#000000', color: 'white', alignment: 'center' };
+
+                                var objLayout = {};
+                                objLayout['hLineWidth'] = function () { return 1; };
+                                objLayout['vLineWidth'] = function () { return 1; };
+                                objLayout['hLineColor'] = function () { return '#000'; };
+                                objLayout['vLineColor'] = function () { return '#000'; };
+                                objLayout['paddingLeft'] = function () { return 4; };
+                                objLayout['paddingRight'] = function () { return 4; };
+                                doc.content[doc.content.length - 1].layout = objLayout;
+
+                                var tableBody = doc.content[doc.content.length - 1].table.body;
+                                tableBody.forEach(function (row) {
+                                    row.forEach(function (cell) {
+                                        cell.alignment = 'center';
+                                    });
+                                });
+                            },
+                            action: function (e, dt, button, config) {
+                                if ($('#ListTable tbody input.row-select:checked').length === 0) {
+                                    showExportToast();
+                                    return;
+                                }
+                                $.fn.dataTable.ext.buttons.pdfHtml5.action.call(this, e, dt, button, config);
+                            },
+                            exportOptions: {
+                                rows: function (idx, data, node) {
+                                    return $(node).find('.row-select').prop('checked');
+                                },
+                                columns: ':visible:not(:first-child)',
+                                format: {
+                                    body: function (data, row, column, node) {
+                                        if (column === 1)
+                                            return $('#ListTable tbody input.row-select:checked')
+                                                .index($(node).closest('tr').find('.row-select')) + 1;
+                                        return typeof data === 'string'
+                                            ? data.replace(/<[^>]*>/g, '').trim()
+                                            : data;
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            extend: 'excelHtml5',
+                            text: '<i class="bi bi-file-earmark-excel text-success fs-5"></i>',
+                            className: 'btn btn-sm btn-outline-success',
+                            title: `${title}`,
+                            messageTop: 'Generated Date: ' + moment().format('DD/MM/YYYY'),
+                            action: function (e, dt, button, config) {
+                                if ($('#ListTable tbody input.row-select:checked').length === 0) {
+                                    showExportToast();
+                                    return;
+                                }
+                                $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
+                            },
+                            exportOptions: {
+                                rows: function (idx, data, node) {
+                                    return $(node).find('.row-select').prop('checked');
+                                },
+                                columns: ':visible:not(:first-child)',
+                                format: {
+                                    body: function (data, row, column, node) {
+                                        if (column === 1)
+                                            return $('#ListTable tbody input.row-select:checked')
+                                                .index($(node).closest('tr').find('.row-select')) + 1;
+                                        return typeof data === 'string'
+                                            ? data.replace(/<[^>]*>/g, '').trim()
+                                            : data;
+                                    }
+                                }
+                            },
+                            customize: function (xlsx) {
+                                const sheet = xlsx.xl.worksheets['sheet1.xml'];
+                                $('row:first c', sheet).attr('s', '51');
+                                $('row:eq(1) c', sheet).attr('s', '51');
+                            }
+                        },
+                        {
+                            extend: 'csvHtml5',
+                            text: '<i class="bi bi-filetype-csv text-primary fs-5"></i>',
+                            className: 'btn btn-sm btn-outline-primary',
+                            title: `${title}`,
+                            action: function (e, dt, button, config) {
+                                if ($('#ListTable tbody input.row-select:checked').length === 0) {
+                                    showExportToast();
+                                    return;
+                                }
+                                $.fn.dataTable.ext.buttons.csvHtml5.action.call(this, e, dt, button, config);
+                            },
+                            exportOptions: {
+                                rows: function (idx, data, node) {
+                                    return $(node).find('.row-select').prop('checked');
+                                },
+                                columns: ':visible:not(:first-child)',
+                                format: {
+                                    body: function (data, row, column, node) {
+                                        if (column === 1)
+                                            return $('#ListTable tbody input.row-select:checked')
+                                                .index($(node).closest('tr').find('.row-select')) + 1;
+                                        return typeof data === 'string'
+                                            ? data.replace(/<[^>]*>/g, '').trim()
+                                            : data;
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                });
+
+                // Checkbox handling
+                $('#selectAll').off('change').on('change', function () {
+                    $('#ListTable tbody .row-select').prop('checked', $(this).prop('checked'));
+                });
+
+                $('#ListTable').off('change', '.row-select').on('change', '.row-select', function () {
+                    let total = $('#ListTable tbody .row-select').length;
+                    let checked = $('#ListTable tbody .row-select:checked').length;
+                    $('#selectAll').prop('checked', total === checked);
+                });
+            }
+        }
+
+        // Toastr configuration
         toastr.options = {
             closeButton: true,
             progressBar: true,
@@ -1394,7 +1132,6 @@
             hideMethod: "fadeOut"
         };
 
-        // ✅ Helper function for warning toast
         function showExportToast() {
             toastr.warning("Please select at least one row before exporting.");
         }

@@ -10,6 +10,10 @@
         background: none !important;
     }
 
+    .swal2-gap-btn {
+        margin: 0 8px !important; 
+    }
+
         button.dt-button.processing:after {
             content: none !important;
         }
@@ -34,12 +38,12 @@
 </div>*@
 
 <!-- Date Range Picker -->
-<div class="mb-3">
-    <div class="input-group" style="max-width: 280px;">
+<div class="mb-3 d-flex gap-2">
+    <div class="input-group" style="max-width: 230px;">
         <span class="input-group-text bg-primary text-white">
             <i class="bi bi-calendar-date"></i>
         </span>
-        <input type="text" id="PendingDatepicker" class="form-control" placeholder="Select date range" readonly />
+        <input type="text" id="PendingDatepicker" class="form-control form-control-sm shadow-sm" placeholder="Select date range" readonly />
     </div>
 </div>
 
@@ -64,9 +68,10 @@
 
 
 <!-- PO Details Modal -->
-<div class="modal fade" id="poModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+<div class="modal fade"id="poModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
-        <div class="modal-content">
+        <div class="modal-content shadow-lg rounded-3">
+            
 
             <!-- Card Header -->
             <div class="modal-header bg-primary text-white justify-content-center">
@@ -440,38 +445,32 @@
                 confirmButtonText: 'Yes, approve it!',
                 cancelButtonText: 'Cancel',
                 customClass: {
-                    confirmButton: 'swal2-confirm btn btn-success',
-                    cancelButton: 'swal2-cancel btn btn-danger'
+                    confirmButton: 'swal2-confirm btn btn-success swal2-gap-btn',
+                    cancelButton: 'swal2-cancel btn btn-danger swal2-gap-btn'
                 },
                 buttonsStyling: false
             }).then((result) => {
                 if (result.isConfirmed) {
 
-                    
                     Swal.fire({
                         title: 'Sending POS...',
-                        text: 'Please wait while email is sending to Vendor .',
+                        text: 'Please wait while email is sending to Vendor.',
                         allowOutsideClick: false,
                         didOpen: () => {
                             Swal.showLoading();
                         }
                     });
 
-                   
                     $.post('/Purchase/ApprovePONAM', { poCode }, function (res) {
-
-                      
                         Swal.close();
 
                         if (res.success) {
-                            
                             Swal.fire({
                                 icon: 'success',
                                 title: 'PO ' + poCode + ' approved!',
                                 showConfirmButton: false,
                                 timer: 2000
                             }).then(() => {
-                                
                                 Swal.fire({
                                     icon: 'info',
                                     title: 'Email sent to vendor',
@@ -488,6 +487,9 @@
                 }
             });
         });
+
+        
+
 
         // View PO
         $(document).on('click', '#tblPending .btn-view', function () {

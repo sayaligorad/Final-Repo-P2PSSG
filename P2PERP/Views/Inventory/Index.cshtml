@@ -357,7 +357,7 @@
                             <i class="bi bi-wallet2"></i>
                         </div>
                         <h5 id="inventoryValue" class="card-value">0</h5>
-                        <p id="lblInventoryValue" class="card-label">Inventory Value</p>
+                        <p id="lblInventoryValue" class="card-label">Current Inventory Value</p>
                     </div>
                     <i class="bi bi-wallet2 card-bg-icon"></i>
                 </div>
@@ -372,7 +372,7 @@
                             <i class="bi bi-lightning-charge-fill"></i>
                         </div>
                         <h5 id="highConsumptionValue" class="card-value">0</h5>
-                        <p id="lblHighConsumptionValue" class="card-label">High Consumption</p>
+                        <p id="lblHighConsumptionValue" class="card-label">Current High Consumption</p>
                     </div>
                     <i class="bi bi-lightning-charge-fill card-bg-icon"></i>
                 </div>
@@ -387,7 +387,7 @@
                             <i class="bi bi-archive-fill"></i>
                         </div>
                         <h5 id="nonMovingValue" class="card-value">0</h5>
-                        <p id="lblNonMovingValue" class="card-label">Non Moving Items</p>
+                        <p id="lblNonMovingValue" class="card-label">Current Dead Stocks</p>
                     </div>
                     <i class="bi bi-archive-fill card-bg-icon"></i>
                 </div>
@@ -403,7 +403,7 @@
                             <i class="bi bi-box-arrow-right"></i>
                         </div>
                         <h5 id="issuedValue" class="card-value">0</h5>
-                        <p id="lblIssuedValue" class="card-label">Issued Value</p>
+                        <p id="lblIssuedValue" class="card-label">Current Issued Value</p>
                     </div>
                     <i class="bi bi-box-arrow-right card-bg-icon"></i>
                 </div>
@@ -1475,10 +1475,10 @@
                 filterText = ` (${startDate.format("MMM D")} - ${endDate.format("MMM D")})`;
             }
 
-            $("#lblInventoryValue").text("Inventory Value" + filterText);
+            $("#lblInventoryValue").text("Current Inventory Value" + filterText);
             $("#lblHighConsumptionValue").text("High Consumption Value" + filterText);
-            $("#lblNonMovingValue").text("lblNonMovingValue" + filterText);
-            $("#lblIssuedValue").text("lblIssuedValue" + filterText);
+            $("#lblNonMovingValue").text("Current Dead Stocks" + filterText);
+            $("#lblIssuedValue").text("Current Issued Value" + filterText);
         });
     }
 </script>

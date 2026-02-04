@@ -5644,8 +5644,7 @@
     <Content Include="Views\Purchase\JustInTimeItemListOK.cshtml" />
     <Content Include="Views\Shared\SendMailHSB.cshtml" />
     <Content Include="Views\Purchase\_Rejectpr.cshtml" />
-    <Content Include="Views\Purchase\_ShowRejectedPRPartialPRK.cshtml" />
-    <Content Include="Views\Purchase\ShowRejectedPRPRK.cshtml" />
+    <Content Include="Views\GRN\_GRNItemsPartialRHK.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

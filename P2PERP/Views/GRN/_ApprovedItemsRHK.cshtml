@@ -1,5 +1,7 @@
 ﻿@model IEnumerable<P2PLibray.GRN.GRN>
 
+
+
 <div class="table-responsive">
     <table class="table table-striped table-bordered" id="ListTable">
         <thead class="table-dark">
@@ -18,11 +20,11 @@
         </thead>
         <tbody>
             @if (Model != null && Model.Any())
-                        {
-                            var i = 1;
-                            foreach (var item in Model)
-                            {
-                                var statusClass = item.Status == "Confirmed" ? "badge bg-success" : "badge bg-danger";
+            {
+                var i = 1;
+                foreach (var item in Model)
+                {
+                    var statusClass = item.Status == "Confirmed" ? "badge bg-success" : "badge bg-danger";
                     <tr>
 
                         <td><input type="checkbox" class="row-select" value="@i"></td>

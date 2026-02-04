@@ -189,7 +189,7 @@
                             </div>
                         </div>
 
-                        <div class="row g-3 mb-3 align-items-center">
+                        @*<div class="row g-3 mb-3 align-items-center">
                             <div class="col-md-3">
                                 <label class="form-label form-label-sm fw-bold text-dark">Item <span class="required-star">*</span></label>
                                 <select id="itemCode" class="form-select form-select-sm item-select shadow-sm"></select>
@@ -224,7 +224,7 @@
                                     <i class="bi bi-plus-circle me-2"></i> ADD
                                 </button>
                             </div>
-                        </div>
+                        </div>*@
 
                         <div class="mb-3">
                             <table id="grid" class="table table-striped table-hover table-bordered align-middle">
@@ -258,7 +258,14 @@
                         <div class="row g-3 align-items-center">
                             <div class="col-sm-4">
                                 <label class="form-label fw-bold text-dark">Shipping Charges</label>
-                                <input id="shipping" type="number" step="0.01" class="form-control form-control-sm  text-dark shadow-sm" value="" min="0">
+                                @*<input id="shipping" type="number" step="0.01" class="form-control form-control-sm  text-dark shadow-sm" value="" min="0">*@
+                                <input id="shipping"
+                                       type="number"
+                                       min="0"
+                                       step="0.01"
+                                       class="form-control form-control-sm text-dark shadow-sm"
+                                       onkeydown="return event.key !== '-'">
+
                                 <span id="shippingError" class="field-error"></span>
                             </div>
                             <div class="col-sm-4">
@@ -345,11 +352,30 @@ $(document).ready(function(){
         ddl.empty().append($("<option>").val("0").text("--Select Vendor--"));
         if(data) data.forEach(v=>ddl.append($("<option>").val(v.VendorCode).text(v.VendorName)));
     });
-
+    console.log($("#prCode").val())
     // Load Items
-    $.get('/Purchase/GetItemsForRFQVNK',{prCode:$("#prCode").val()},function(rows){
-        allItems = rows; updateItemDropdown();
+    $.get('/Purchase/GetAllItemsInPRVNK', { prCode: $("#prCode").val() }, function (rows) {
+        if (rows && rows.length > 0) {
+            rows.forEach(r => {
+                let row = {
+                    itemCode: r.ItemCode,
+                    itemName: r.ItemName,
+                    desc: r.Description,
+                    uom: r.UOMName,
+                    qty: r.Quantity,
+                    cpu: r.CostPerUnit,   // ✅ FROM SQL
+                    disc: 0,                         // ✅ Discount NULL is correct
+                    gst:r.GST,         // ✅ FROM SQL
+                    amount: 0
+                };
+
+                row.amount = calcLine(row.qty, row.cpu, row.disc, row.gst).lineTotal;
+                gridItems.push(row);
+            });
+            renderGrid();
+        }
     });
+
 
     function updateItemDropdown(){
         const ddl=$("#itemCode").empty().append('<option value="">--Select Item--</option>');
@@ -371,13 +397,47 @@ $(document).ready(function(){
         gridItems.forEach((r,idx)=>{
             total+=r.amount;
             $tb.append(`<tr>
-                <td>${idx+1}</td><td>${r.itemCode}</td><td>${r.itemName||''}</td>
-                <td><span data-bs-toggle="tooltip" data-bs-placement="top" title="${r.desc||''}">${r.desc||''}</span></td>
-                <td>${r.uom || ''}</td><td class="text-center">${r.qty}</td><td class="text-center">₹${r.cpu.toFixed(2)}</td>
-                <td class="text-center">${r.disc}%</td><td class="text-center">${r.gst}%</td><td class="text-center">₹${r.amount.toFixed(2)}</td>
-                <td><button class="btn btn-sm  btn-remove square-pill d-inline-flex align-items-center px-2 py-1" data-i="${idx}"><i class="bi bi-trash "></i></button></td>
-            </tr>`);
-        });
+    <td>${idx + 1}</td>
+    <td>${r.itemCode}</td>
+    <td>${r.itemName || ''}</td>
+    <td>${r.desc || ''}</td>
+    <td>${r.uom || ''}</td>
+    <td class="text-center">${r.qty}</td>
+
+    <!-- Cost / Unit -->
+    <td>
+       <input type="number" min="0"
+       class="form-control form-control-sm text-center cpu-input"
+       data-i="${idx}"
+       value="${r.cpu}"
+       onkeydown="return event.key !== '-'">
+
+    </td>
+
+    <!-- Discount -->
+    <td>
+      <input type="number" min="0" max="100"
+       class="form-control form-control-sm text-center disc-input"
+       data-i="${idx}"
+       value="${r.disc}"
+       onkeydown="return event.key !== '-'">
+
+    </td>
+
+    <!-- GST -->
+    <td class="text-center">${r.gst}%</td>
+
+    <!-- Amount -->
+    <td class="text-center">₹${r.amount.toFixed(2)}</td>
+
+    <!-- Action -->
+    <td>
+        <button class="btn btn-sm btn-remove" data-i="${idx}">
+            <i class="bi bi-trash"></i>
+        </button>
+    </td>
+</tr>`);
+ });
         $("#ftTotal").text(`₹${total.toFixed(2)}`);
         const shipping=Number($("#shipping").val()||0);
         $("#grandTotal").val(`₹${(total+shipping).toFixed(2)}`);
@@ -385,6 +445,109 @@ $(document).ready(function(){
         updateItemDropdown();
         $('[data-bs-toggle="tooltip"]').tooltip();
     }
+
+    $("#grid").on("input", ".cpu-input", function () {
+        const index = $(this).data("i");
+        let value = Number($(this).val() || 0);
+
+        // Restrict negative
+        if (value < 0) value = 0;
+
+        // If value exceeds 50000, correct it
+        if (value > 50000) {
+            value = 50000;
+            $(this).val(50000);
+        }
+
+        // ✅ Now mark error only if original value > 50000
+        if (value === 50000 && Number($(this).val()) === 50000) {
+            // exact 50000 is valid
+            $(this).removeClass("invalid");
+            $(this).siblings(".cpu-error").text("");
+        }
+
+        gridItems[index].cpu = value;
+        const row = gridItems[index];
+        row.amount = calcLine(row.qty, row.cpu, row.disc, row.gst).lineTotal;
+
+        // update amount cell
+        $(this).closest("tr")
+            .find("td:eq(9)")
+            .text(`₹${row.amount.toFixed(2)}`);
+
+        // update totals
+        let total = gridItems.reduce((s, x) => s + x.amount, 0);
+        $("#ftTotal").text(`₹${total.toFixed(2)}`);
+        $("#grandTotal").val(`₹${(total + Number($("#shipping").val() || 0)).toFixed(2)}`);
+    });
+
+
+
+
+    //$("#grid").on("input", ".disc-input", function () {
+    //    const index = $(this).data("i");
+    //    let value = Number($(this).val() || 0);
+
+    //    if (value < 0) value = 0;
+    //    if (value > 100) value = 100;
+    //    gridItems[index].disc = value;
+
+    //    const row = gridItems[index];
+    //    row.amount = calcLine(row.qty, row.cpu, row.disc, row.gst).lineTotal;
+
+    //    // 🔹 update amount cell only
+    //    $(this).closest("tr")
+    //        .find("td:eq(9)")
+    //        .text(`₹${row.amount.toFixed(2)}`);
+
+    //    // 🔹 update totals only
+    //    let total = gridItems.reduce((s, x) => s + x.amount, 0);
+    //    $("#ftTotal").text(`₹${total.toFixed(2)}`);
+    //    $("#grandTotal").val(`₹${(total + Number($("#shipping").val() || 0)).toFixed(2)}`);
+    //});
+    $("#grid").on("input", ".disc-input", function () {
+        const index = $(this).data("i");
+        let value = Number($(this).val() || 0);
+        const $error = $(this).siblings(".disc-error");
+
+        // prevent negative
+        if (value < 0) {
+            value = 0;
+            $(this).val(0);
+        }
+
+        // handle max limit
+        if (value > 20) {
+            // silently correct to 20
+            value = 20;
+            $(this).val(20);
+
+            // ❌ DO NOT mark invalid
+            $error.text("");
+            $(this).removeClass("invalid");
+        } else {
+            // valid range (0–20)
+            $error.text("");
+            $(this).removeClass("invalid");
+        }
+
+        gridItems[index].disc = value;
+
+        const row = gridItems[index];
+        row.amount = calcLine(row.qty, row.cpu, row.disc, row.gst).lineTotal;
+
+        // update amount
+        $(this).closest("tr").find("td:eq(9)")
+            .text(`₹${row.amount.toFixed(2)}`);
+
+        // update totals
+        let total = gridItems.reduce((s, x) => s + x.amount, 0);
+        $("#ftTotal").text(`₹${total.toFixed(2)}`);
+        $("#grandTotal").val(
+            `₹${(total + Number($("#shipping").val() || 0)).toFixed(2)}`
+        );
+    });
+
 
     // Add Item
     $("#btnAdd").click(function(){
@@ -416,7 +579,25 @@ $(document).ready(function(){
         gridItems.splice(index,1); renderGrid();
     });
 
-    $("#shipping").on("input", function(){ validatePositive("shipping"); renderGrid(); });
+    $("#shipping").on("input", function () {
+        let shipping = Number($(this).val() || 0);
+
+        if (shipping < 0) shipping = 0;
+
+        if (shipping > 25000) {
+            shipping = 25000;
+            $("#shippingError").text("Shipping charges cannot exceed ₹25,000");
+            $(this).addClass("invalid");
+        } else {
+            $("#shippingError").text("");
+            $(this).removeClass("invalid");
+        }
+
+        $(this).val(shipping);
+
+        // ✅ just recalc totals
+        renderGrid();
+    });
 
     // Register Quotation
     $("#btnCreate").click(function(){
@@ -558,7 +739,7 @@ $(document).ready(function(){
     // Vendor change
     $("#vendorCode").change(function(){
         clearError("vendor");
-        const val=$(this).val(); gridItems=[]; renderGrid();
+        const val=$(this).val();
         if(val==="0") return;
         $.getJSON('/Purchase/GetVendorDetailsVNK',{vendorCode:val}, function(r){
             if(r && r.length){ $("#Vendor_Code").val(r[0].VendorCode); $("#Vendor_Company").val(r[0].CompanyName); }
@@ -574,7 +755,8 @@ $(document).ready(function(){
       
         if (selected) {
             $("#qty")
-                .val(selected.quantity || 0)               
+                .val(selected.qty
+ || 0)               
                 .attr("readonly", true)                  
                 //.attr("max", selected.quantity || 0)
                 //.attr("placeholder", "Max: " + (selected.quantity || 0));
@@ -589,6 +771,9 @@ $(document).ready(function(){
     });
 
 });
+
+       
+
     </script>
 </body>
 </html>

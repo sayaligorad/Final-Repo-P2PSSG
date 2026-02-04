@@ -152,7 +152,8 @@ namespace P2PLibray.Purchase
         public decimal GST { get; set; }
         public string UOMName { get; set; }
         public string Description { get; set; }
-        //public decimal ShippingCharges { get; set; }
+        public decimal UnitRates { get; set; }
+
 
 
 
@@ -300,14 +301,6 @@ namespace P2PLibray.Purchase
 
 
     #endregion
-    #region omkar
-    public class POTermOK
-    {
-        public int SRNO { get; set; }
-        public string TermConditionName { get; set; }
-    }
-
-    #endregion
     public class Purchase
     {
 
@@ -386,13 +379,13 @@ namespace P2PLibray.Purchase
         public string AddedDateVK { get; set; }
         public string ExpDate { get; set; }
 
-
         public int HasUnregisteredVendors { get; set; }
 
         public int AnyVendor { get; set; }
         public int HasApproved { get; set; }
 
-
+        public string UOMName { get; set; }
+      
 
 
         #endregion vaibhavi

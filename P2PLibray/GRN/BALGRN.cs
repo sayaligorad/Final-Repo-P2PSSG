@@ -562,6 +562,46 @@ namespace P2PLibray.GRN
 
 
         #region Rushikesh
+
+
+        /// <summary>
+        /// Retrieves GRN items by GRN Code
+        /// </summary>
+        public async Task<List<GRN>> GetGRNItemsByGRNCode(string grnCode)
+        {
+            Dictionary<string, string> para = new Dictionary<string, string>();
+            para.Add("@Flag", "GRNItemsListbyGRNCodeRHK");
+            para.Add("@GRNCode", grnCode);
+
+            DataSet ds = await obj.ExecuteStoredProcedureReturnDS(
+                "GRNProcedure", para);
+
+            List<GRN> list = new List<GRN>();
+
+            if (ds.Tables.Count > 0)
+            {
+                foreach (DataRow dr in ds.Tables[0].Rows)
+                {
+                    list.Add(new GRN
+                    {
+                        GRNCode = dr["GRNCode"].ToString(),
+                        UOMName = dr["UOMName"].ToString(),
+                        ItemCode = dr["ItemCode"].ToString(),
+                        ItemName = dr["ItemName"].ToString(),
+                        Quantity = Convert.ToInt32(dr["Quantity"]),
+                        QualityCheckCode = dr["ISQuality"].ToString()
+                    });
+                }
+            }
+
+            return list;
+        }
+
+
+
+
+
+
         /// <summary>
         /// Returns total number of GRNs created in the given date range.
         /// Calls GRNProcedure with Flag = 'TotalGRNRHK'.

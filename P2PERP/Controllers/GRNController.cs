@@ -726,6 +726,14 @@ namespace P2PERP.Controllers
         {
             return View();
         }
+        public async Task<ActionResult> GetGRNItemsByGRNCodePartialRHK(string grnCode)
+        {
+            if (string.IsNullOrEmpty(grnCode))
+                return PartialView("_GRNItemsPartialRHK", new List<GRN>());
+
+            var items = await bal.GetGRNItemsByGRNCode(grnCode);
+            return PartialView("_GRNItemsPartialRHK", items);
+        }
 
         /// <summary>
         /// Returns total GRN count between startDate and endDate.
@@ -854,48 +862,32 @@ namespace P2PERP.Controllers
             try
             {
                 DataSet ds = await bal.GRNTrendsRHK(startDate, endDate);
-                List<string> dates = new List<string>();
+
+                List<string> months = new List<string>();
                 List<int> counts = new List<int>();
 
                 if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                 {
                     foreach (DataRow dr in ds.Tables[0].Rows)
                     {
-                        dates.Add(Convert.ToDateTime(dr["Date"]).ToString("MMM dd"));
+                        months.Add(dr["MonthName"].ToString());   // e.g. Jan 2025
                         counts.Add(Convert.ToInt32(dr["GRNCount"]));
                     }
                 }
-                else
-                {
-                    // No records → Return all dates with 0
-                    DateTime currentDate = (DateTime)startDate;
-                    while (currentDate <= endDate)
-                    {
-                        dates.Add(currentDate.ToString("MMM dd"));
-                        counts.Add(0);
-                        currentDate = currentDate.AddDays(1);
-                    }
-                }
 
-                return Json(new { dates = dates, counts = counts }, JsonRequestBehavior.AllowGet);
+                return Json(new { months = months, counts = counts }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception)
             {
-                // Return default 0 values in case of error
-                List<string> dates = new List<string>();
-                List<int> counts = new List<int>();
-
-                DateTime currentDate = (DateTime)startDate;
-                while (currentDate <= endDate)
+                // In case of error, return empty monthly chart
+                return Json(new
                 {
-                    dates.Add(currentDate.ToString("MMM dd"));
-                    counts.Add(0);
-                    currentDate = currentDate.AddDays(1);
-                }
-
-                return Json(new { dates = dates, counts = counts }, JsonRequestBehavior.AllowGet);
+                    months = new List<string>(),
+                    counts = new List<int>()
+                }, JsonRequestBehavior.AllowGet);
             }
         }
+
 
         /// <summary>
         /// Returns last 10 recent GRNs with vendor, PO, invoice, and status.
@@ -1612,7 +1604,7 @@ namespace P2PERP.Controllers
                     catch
                     {
                         watermarkPath = System.Web.Hosting.HostingEnvironment
-                            .MapPath("\"~/Content/images/Watermark.png");
+                            .MapPath("~/Content/images/Watermark.png");
                     }
 
                     // Attach watermark event
